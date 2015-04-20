@@ -1,0 +1,5 @@
+vbox检测不到usb设备,是因为当前用户没有在vboxusers组里,如想在vbox里win7上使用
+招行的U Key或建行的二代网银盾,其实它们都是usb-key.
+gpasswd -a jusss vboxusers然后登出shell,再登录shell,然后groups查看当前用户是
+否已经在vboxusers用户组里,若在,打开vbox Device-USB Devices就能看到网银盾,点击
+即可安装驱动,然后使用从银行官网下载的网银盾登录软件即可使用网银盾登录
