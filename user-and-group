@@ -1,0 +1,28 @@
+user group suid sgid
+
+添加用户 useradd -m creat user home -g属于一个已存在的组 -G同时也属于另一个组 -s指定登录shell从/etc/shells中选择
+非登录shell用户用/usr/bin/nologin或/sbin/nologin
+
+把用户添加进组 usermod -aG 组1,组2,组3 用户名 -a会把用户从后面列表以外的组中移除该用户,也可以使用gpasswd -a 用户名 组名
+这个一次只添加一个用户进一个组
+
+设置密码 passwd 用户名
+用户删除 userdel -r 用户名 -r同时删除user home directory ~
+
+查看所有用户 cat /etc/passwd
+所有用户的密码hash后存放在/etc/shadow
+
+查看所有组 cat /etc/group
+
+创建组 groupadd 组名
+重命名组 groupmod -n 新组名 旧组名
+删除组 groupdel 组名
+移除用户从组 gpasswd -d 用户名 组名
+查看用户属于的组 groups 用户名
+
+wheel组     su和sudo用户需在此组
+vboxsf组    vbox共享目录
+
+把jusss添加进vboxusers组后,登出再登入,然后groups jusss看是否已属于vboxusers组,打开vbox, Devices-USB Devices即可看到
+usb设备,如招行的usb key是Tendyron Token [0001],建行的是Watchdata USB Key [0001],点击即可安装驱动使用,然后再从银行官网
+下载网银盾登录软件即可使用网银盾登录
