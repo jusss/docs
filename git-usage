@@ -132,3 +132,8 @@ $ cat .gitconfig
 http://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000/0013743256916071d599b3aed534aaab22a0db6c4e07fd0000
 
 不小心git rm vbox了,然后git status提示用 git reset HEAD vbox,再git status,再git checkout -- vbox就回来了
+
+
+创建文件后在work directory,用git status会提示有文件没commit, 然后git add添加进stage/index, git commit 进仓库, 这时git rm 文件后,可以用git log --prety=oneline看到commit id,第一行的就是最近一次的动作,然后用回滚 git reset --hard commit-id就可以把刚删除的文件滚回来,
+
+git log and git status
