@@ -134,6 +134,14 @@ http://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b0
 不小心git rm vbox了,然后git status提示用 git reset HEAD vbox,再git status,再git checkout -- vbox就回来了
 
 
-创建文件后在work directory,用git status会提示有文件没commit, 然后git add添加进stage/index, git commit 进仓库, 这时git rm 文件后,可以用git log --prety=oneline看到commit id,第一行的就是最近一次的动作,然后用回滚 git reset --hard commit-id就可以把刚删除的文件滚回来,
+创建文件后在work directory,用git status会提示有文件没commit, 然后git add添加进stage/index, git commit 进分支, 这时git rm 文件后,可以用git log --prety=oneline看到commit id,第一行的就是最近一次的动作,然后用回滚 git reset --hard commit-id就可以把刚删除的文件滚回来,要是git rm之后不想再回滚这个文件就git commit提交,就可以了,对于远端的仓库可以同步使用git push也删除远端仓库的文件,git push只是把本地所有的动作最后形成的同步备份到远端
+,git pull 就是以前的备份从远端拉下来
+
+修改文件后,使用git add, git commit 提交分支,不想保存修改,就git check -- file
+git add之后不想提交分支,就git reset HEAD file to unstage
+
+三个区域, work directory, stage/index, 分支
+多个分支,创建分支,就是当前分支所有备份给新分支
 
 git log and git status
+
