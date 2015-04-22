@@ -1,0 +1,2 @@
+mplayer默认需要在前台播放,放到后台播放通过&符号,需要加参数-noconsolecontrols,如果不想信息输出到stdout,就
+再加参数 -really-quiet 然后 2>/dev/null
