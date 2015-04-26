@@ -1,0 +1,6 @@
+load a script into repl with parameter -i,
+$python -i x.py or execfile('file.py')
+
+load into another script
+just write another script in the same directory and
+ import from.. but that only works on recentish versions
