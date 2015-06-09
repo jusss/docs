@@ -11,6 +11,6 @@ m mark
 u undo mark
 d set delete mark
 x delete file marked by d
-C-x C-f create file
+C-x C-f create file, or jump to directory 
 + create directory
 
