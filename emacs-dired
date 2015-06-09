@@ -1,5 +1,7 @@
 C-x d get into dired-mode or M-x dired
 R rename or move
+^ return to up-level folder
+g flush buffer
 v view file
 q quit
 D delete
