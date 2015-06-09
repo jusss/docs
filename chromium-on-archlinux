@@ -1,0 +1,5 @@
+follow the item chromium on wiki.archlinux.org
+you can install chromim-pepper-flash from aur
+now because the package use some packages on dl.google.com in PKGBUILD
+so download the files it needs, and store them in the folder which include PKGBUILD
+and then run makepkg -s to make *.pkg.tar.gz, and then run sudo pacman -U *.pkg.tar.gz to install
