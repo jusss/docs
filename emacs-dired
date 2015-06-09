@@ -1,0 +1,14 @@
+C-x d get into dired-mode or M-x dired
+R rename or move
+v view file
+q quit
+D delete
+C copy
+o open file in new window
+m mark
+u undo mark
+d set delete mark
+x delete file marked by d
+C-x C-f create file
++ create directory
+
