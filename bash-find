@@ -1,0 +1,17 @@
+-exec 参数后面跟的是 command命令
+command命令的终止，使用 ';' (分号）来判定，在后面必须有一个 ';'
+'{}'，使用{}来表示文件名，也就是find前面处理过程中过滤出来的文件，用于command命令进行处理
+特别强调，对于不同的系统，直接使用分号可能会有不同的意义， 使用转义符 '\'在分号前明确说明，对于前面我们遇到的问题，主要就是这个原因引起的！
+eg. $ find ./ -inum 5636102 -exec mv {} 207.srt \;
+
+find . -name "*.txt" -exec rm {} \;
+find . -name "*.txt" | xargs rm {} 
+-exec
+    1.参数是一个一个传递的，传递一个参数执行一次rm
+    2.文件名有空格等特殊字符也能处理
+xargs 
+    1.一次将参数传给命令，可以使用-n控制参数个数
+    2.处理特殊文件名需要采用如下方式：
+    find . -name "*.txt" print0 |xargs -0 rm {} 
+find -print0  与 xargs -0 的结合避免文件名有特殊字符如空格，引号等无法处理：
+ find . -name "*.txt" print0 |xargs -0 rm {} 
