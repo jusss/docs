@@ -1,0 +1,42 @@
+延迟执行，用多线程有4种方式 1.在主线程判断条件为真后即时打开新线程然后关闭 2.子线程一开始就创建然后用wait等待主线程的event通知来激活，这样不用不停的创建和销毁线程
+3.也是子线程一开始就创建，但用socket来和主线程通信来实现延迟执行，子线程recv()接收主线程发的语句然后执行，这种子线程执行的语句可以随时变化而不像2那样一开始就写死，但
+socket有个问题就是超时timeout需要修改，防止过长时间未通信中断和主线程的连接
+4.子线程开始创建，然后wait等待主线程激活，激活后读取全局变量的值作为语句执行
+
+线程创建后，执行完应该会自动销毁，除非用while for这种循环阻止线程的结束，在c或python中为了阻止主线程过快结束导致子线程无法完全执行，可以用join()让主线程去等待子线程
+<KirkMcDonald> jusss: A thread will end when its target returns.
+其它方法有用SIGALRM实现timer去搞，js python的deferLater都是用event loop实现延迟执行的，而scheme那种有parallel-execute,在guile里叫parallel
+
+<jusss`> does function parallel-execute will auto destory threads after
+	 threads have done ?  [00:23]
+*** Your new nickname is jusss
+<stamourv> jusss: Both of Racket's parallel execution mechanisms (places and
+	   futures) should auto-terminate once they're done.  [00:26]
+*** ninja-maid-robot (~pyon@unaffiliated/pyon) has quit: Ping timeout: 252
+    seconds  [00:28]
+<jusss> stamourv: that's good! is there parallel-execute built-in racket ?
+<stamourv> jusss: Not under that name. First you need to pick which parallel
+	   execution model you want to use.  [00:29]
+<jusss> stamourv: how much it has? 
+<jusss> how many models  [00:30]
+<stamourv> Futures are light-weight, "best-effort" parallelism, while places
+	   are more heavyweight (they are clones of the Racket runtime) and
+	   restrict communication, but guarantee parallelism.
+<stamourv> Just those two are built-in.
+<stamourv> Though there are open-mpi and opencl packages on
+	   pkgs.racket-lang.ogr.
+<tim-brown> stamourv: the first messages i send down the channels are "atoms"
+	    -- integers -- and those messages are 8 bytes long. it seems that
+	    cons'ing makes place-messages big
+<stamourv> s/ogr/org/
+<stamourv> tim-brown: Hm, weird.
+<tim-brown> innit?
+* stamourv looks at the places docs.  [00:31]
+<tim-brown> hold on... i'll take my abusive code out and see whether that's
+	    causing such largness.
+<jusss> stamourv: could you give me a link ?  [00:32]
+<stamourv> jusss: Futures: docs.racket-lang.org/reference/futures.html  [00:33]
+<stamourv> jusss: Places: docs.racket-lang.org/reference/places.html
+<stamourv> tim-brown: I don't see anything in the docs about message
+	   encoding/overhead.
+ERC> 
