@@ -1,0 +1,127 @@
+[jusss@localhost ~]$ racket
+Welcome to Racket v6.2.
+> (define (parallel-execute . thunks) (for-each thread thunks))
+> (define x 10)
+> (parallel-execute (lambda () (set! x (* x x))) (lambda () (set! x (+ x 1))))
+> (display x)
+> (display x)
+121> (define s (delay (display 9)))
+> (force s)
+9> (define s (delay (lambda () (sleep 3) (display 9))))
+> (force s)
+#<procedure>
+
+> (define s (delay (lambda () (sleep 3) 9)))
+> (force s)
+#<procedure>
+> ((force s))
+9
+> (parallel-execute ((force s)) 1)
+thread: contract violation
+  expected: (-> any)
+  given: 9
+  context...:
+   stdin::14: parallel-execute
+   /usr/share/racket/collects/racket/private/misc.rkt:87:7
+> (parallel-execute 9 1)
+thread: contract violation
+  expected: (-> any)
+  given: 9
+  context...:
+   stdin::14: parallel-execute
+   /usr/share/racket/collects/racket/private/misc.rkt:87:7
+> (parallel-execute (force s) (display 1))
+thread: contract violation
+  expected: (-> any)
+  given: #<void>
+  context...:
+   stdin::14: parallel-execute
+   /usr/share/racket/collects/racket/private/misc.rkt:87:7
+1> (parallel-execute (lambda () 9)) (lambda () 1))
+> #<procedure>
+> stdin::523: read: unexpected `)'
+  context...:
+   /usr/share/racket/collects/racket/private/misc.rkt:87:7
+> (parallel-execute (lambda () 9) (lambda () 1))
+> (parallel-execute (lambda () (display 9)) (lambda () (display 1)))
+> (list 9)                        
+19'(9)
+> (list 1)
+'(1)
+> (parallel-execute (lambda () (list 1)) (lambda () (list 9)))
+> (define var 2)                              
+> var
+2
+> ((lambda () (set! var 3)))
+> var
+3
+> (define s (delay (lambda () (sleep 3) (set! var 9))))
+> (parallel-execute (lambda () (force s)) (lambda () (list 3)))
+> var
+3
+> var
+3
+> var
+3
+> var
+3
+> (((lambda () (lambda () (set! var 9)))))
+> var
+9
+> (define bla () (set! var 33))
+stdin::945: define: bad syntax (multiple expressions after identifier)
+  in: (define bla () (set! var 33))
+  context...:
+   /usr/share/racket/collects/racket/private/norm-define.rkt:166:4: normalize-definition
+   /usr/share/racket/collects/racket/private/kw.rkt:839:2
+> (define (bla) (set! var 33))
+> (bla)
+> var
+33
+> (parallel-execute (force s) (lambda () (list 3)))
+> var
+33
+> var
+9
+> (parallel-execute (force s) '9)
+thread: contract violation
+  expected: (-> any)
+  given: 9
+  context...:
+   stdin::14: parallel-execute
+   /usr/share/racket/collects/racket/private/misc.rkt:87:7
+> (parallel-execute (force s) ''2) 
+thread: contract violation
+  expected: (-> any)
+  given: ''2
+  context...:
+   stdin::14: parallel-execute
+   /usr/share/racket/collects/racket/private/misc.rkt:87:7
+> (parallel-execute (force s)   
+
+^Cuser break
+  context...:
+   /usr/share/racket/collects/racket/private/misc.rkt:87:7
+> ^Cuser break
+  context...:
+   /usr/share/racket/collects/racket/private/misc.rkt:87:7
+> (define (my-delay-eval) (+ 1 1) (parallel-execute (force s) (lambda () (list 32))) (+ 2 3))
+> var
+9
+> (set! var 22)
+> var
+22
+> (my-delay-eval)
+5
+> var
+9
+> (set! var 33)
+> (my-delay-eval)
+5
+> var
+33
+> var
+33
+> var
+9
+>   
