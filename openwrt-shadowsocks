@@ -1,0 +1,48 @@
+0. vps: #ss-server -u -s server-ip -k password -p server-port -m method
+-t timeout --workers 5
+
+1. openwrt: #ss-redir -v -c /mnt/ss.json -l 7070
+            #ss-tunnel -v -c /mnt/ss.json -l 5353 -u -L 114.114.114.114:53
+            #iptables -t nat -P PREROUTING ACCEPT
+            #iptables -t nat -N ss
+            #/mnt/iptables.ss.sh
+
+root@OpenWrt:~# cat /mnt/ss.json 
+{
+    "server": "server-ip",
+    "server_port": server-port,
+    "local_address": "192.168.2.1", router's address, not 127.0.0.1
+    "password": "password",
+    "method": "method"
+}
+
+root@OpenWrt:~# cat /mnt/iptables.ss.sh 
+#!/bin/sh
+# ss-redir -v -c /mnt/ss.json -l 7070 
+# ss-tunnel -v -c /mnt/ss.json -l 5353 -u -L 114.114.114.114:53
+# iptables -t nat -N ss
+iptables -t nat -A ss -d server-ip -j RETURN
+iptables -t nat -A ss -d 192.168.0.0/16 -j RETURN
+iptables -t nat -A ss -p tcp -j REDIRECT --to-port 7070
+iptables -t nat -A ss -p udp -j REDIRECT --to-port 5353
+iptables -t nat -A PREROUTING -s 192.168.2.254 -p tcp -j ss
+iptables -t nat -A PREROUTING -s 192.168.2.254 -p udp --dport 53 -j ss
+
+# iptables -t nat -F ss
+
+2. laptop or android: set 192.168.2.254 as static ip, and set any ip as dns server like 1.1.1.1
+
+
+
+etc:
+ you can download openwrt-SDK from downloads.openwrt.org, and download
+ shadowsocks-libev Makefile from github.com/openwrt, and compile it,
+ then install it use opkg install shadowsocks-libev-xxx.ipk
+ --force-checksum
+
+about compile:
+export TOPDIR=location-where-SDK-is-in
+download the Makefile and put it in SDK/package/shadowsocks-libev/,
+then run make menuconfig on SDK directory to generate .config,
+make package/shadowsocks-libev/compile V=s -j8
+then it will generate ipk file on SDK/bin/xxx/packages/base/
