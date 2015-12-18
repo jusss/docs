@@ -1,0 +1,95 @@
+文件的特殊权限SGID, SUID..SBIT 大家都知道文件和目录的权限最常见的有三个. 
+可读(r)..可写(w)..可执行(x)..它们的级别分别是4..2..1..我们有时也会发现有 
+些文件 所属主的权限上带有一个s的标志位.目录的所属组上也带...-
+文件的特殊权限SGID, SUID..SBIT
+
+大家都知道文件和目录的权限最常见的有三个.可读(r)..可写(w)..可执行(x)..它 
+们的级别分别是4..2..1..我们有时也会发现有些文件 所属主的权限上带有一个s 
+的标志位.目录的所属组上也带有s标志位.很多人不理解这是为什么....下面我们 
+举例来看一下...
+          #ls -l  /usr/bin/passwd
+          -rwsr-xr-x 1 root root 19876 Jul 17  2006 /usr/bin/passwd
+          这个文件的所属主的x标志位上变成了s,这时称为set uid ..简写就是 
+suid..其实这个文件属性也没有特殊的含义..当这个s标志位出现在一些脚本上时, 
+它就有意义了...比方说我我们有一个脚本名为 sum.sh.这个脚本的权限如下:
+         -rwsrwxr-x 1 root root   117 Feb  6 20:46 sum.sh
+这个脚本的所属主和所属组为root.我们当然可以以root的用户的身份执行它..我 
+们还可以看见它的所属主的标志位上有个s..其他人有读取和执行的 权限.假如我 
+们现在有个普通用户名为redhat..现在切换到redhat..执行此脚本..表面上我们看 
+是执行成功了..其实我们是借助 root用户的身份来执行它..而不是redhat..这就 
+是suid的特性....
+         下满我们来说下SGID,看了上面的SUID后很容易就知道所谓SGID就是将标 
+志s加到gid的x标志位上..称为set gid.简称sgid..在这强调一下SUID我们一般用 
+在文件上.特别是一些脚本上...SGID用在目录上最多...比方说我以root身份创建 
+一个 目录a.给他加上sgid权限
+         #mkdir a
+         #chmod   2757  a
+         #ls  -l
+           drwxr-srwx 2 root root  4096 Feb  6 21:09  a
+因为我们给a目录其他人所具有的权限是可读,可写,可执行...当我们以redhat用户 
+的身份切换到另外一个终端..进入a目录中,我们在此目录中创建 一个目录b和一个 
+文件c
+         [redhat@station18 a]$ mkdir b
+         [redhat@station18 a]$ touch c
+         [redhat@station18 a]$ ls -l
+         drwxrwsr-x 2 redhat root 4096 Feb  6 21:20 b
+         -rw-rw-r-- 1    redhat root    0 Feb  6 21:20 c
+我们可以看到目录b和文件c的所属组都为root......当你将一个a目录置为sgid权 
+限时候,如果其他人有读取,执行和写入的权限时,别人在此目 录中创建的任何文件 
+和目录的所属组都为a目录的所属组..但所属主还是自己...这个会经常的用到.... 
+有一点大家得注意...就是任何人在a 目录中创建的东西.别人都可以删掉...这就 
+是我们下面要讲到的SBIT....
+         SBIT 全称Sticky Bit.但是它只对目录有效,对文件却是无效的,它的作 
+用就是防止别人删除对方的资料...我们举例来说明...
+       1..我用root用户登录创建一个目录名为test
+        [root@station18 ~]# mkdir test
+        [root@station18 ~]# chmod o+w test/
+        [root@station18 ~]# ls -l
+        drwxr-xrwx 2 root root  4096 Feb  6 21:30 test
+       2..我们切换到redhat用户登录一个终端,创建一个目录a..
+        [redhat@station18 test]$ mkdir a
+       3.我们在切换到xiaoming用户登录一个终端,创建一个目录b...
+        [xiaoming@station18 test]$ mkdir b
+        [xiaoming@station18 test]$ ls  -l
+        drwxrwxr-x 2 redhat   redhat   4096 Feb  6 21:32 a
+        drwxrwxr-x 2 xiaoming xiaoming 4096 Feb  6 21:31 b
+我们可以以任何用户的身份进入test目录发现可以删除a和b目录...这样就乱了 
+套...别人的目录你岂能随便删的...这时我们就需要将test目录 加上SBIT权限了...
+        [root@station18 ~]# chmod  1757  test/
+        [root@station18 ~]# ls -l
+        drwxr-xrwt 4 root root  4096 Feb  6 21:42 test
+        我们在用别的用户登录进入test目录他就删不掉别人的资料了,系统会提 
+示rm: cannot remove directory `a': Operation not permitted..意思是你权限 
+不够....呵呵...这样别人就没辙了....我测试过成功的...
+        下面我来说一下关于SUID SGID  SBIT权限的设定...
+         SUID为4
+         SGID为2
+         SBIT为1
+         我在上面设定一些文件或目录的权限你可能看不懂,,下面我来详细讲解...
+         假如我们有个文件叫file.有一个目录叫test..file它的权限是 
+644..test的权限是755
+         1..如果我们想把file加上suid权限的话执行此命令
+         #chmod  4755  file
+         2..如果我们想把test目录加上sgid的话执行此命令
+         #chmod  2755   test/
+         3.如果我们想把test目录加上sbit权限的话执行此命令
+         #chmod  1755   test/
+         4..大家可以看得出来s与t都是取代x权限的...
+         5..如果不想让test具备SUID和SGID权限执行此命令
+         #chmod   7666  file
+         #ls  -l
+          -rwSrwSrwT 1 root root     0 Feb  6 21:49 file
+这里的S和T就代表空..不具备其他人执行的权限...7666也就是说用户,组,以及其 
+他的人都不具备x的权限,除了root.任何人修改不了此文 件...
+         这儿我用数字代替给文件加一些 权限....我们也可以用别的方法.比方 
+说..我们给file文件加上suid权限
+         #chmod  u=rwxs,o=rx   file
+         给test目录加上SGID权限和other可读取写入执行权限
+         #chmod  g+s,o=wrx    test/
+         给test目录加上SBIT权限和other可读取写入执行权限
+         #chmod   o=rwxt   test/
+
+
+原文：http://blog.chinaunix.net/u3/111913/showart_2182986.html
+
+给wpa_supplicant更新了下，发现非root用不了wpa_supplicant，文件改变可能导致set uid不起作用了，so 每次更新完系统后最好重新设置下set uid还有fctix的C-;和emacs冲突问题
