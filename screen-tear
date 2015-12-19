@@ -16,3 +16,6 @@ by the way, xorg-server-1.18之后就不需要xf86-input-evdev了，但1.17需�
 安装一个xf86-input-evdev-2.10以前的版本如2.9.2-1降级之后，再装xorg-server-1.17.2-1就不会再冲突了
 
 一个非官方的archlinux RollBack repo: http://seblu.net/a/archive/
+some old packages you can find in /var/cache/pacman/pkg/ and use pacman -U xxx.tar.xz to install 
+or just download from seblu.net/a/archive
+
