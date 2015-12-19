@@ -19,3 +19,7 @@ by the way, xorg-server-1.18之后就不需要xf86-input-evdev了，但1.17需�
 some old packages you can find in /var/cache/pacman/pkg/ and use pacman -U xxx.tar.xz to install 
 or just download from seblu.net/a/archive
 
+my cpu is i3, when mpv play movies with vaapi hard decode, then screen tear, without vaapi, no screen
+tear, so the problem may be intel driver
+
+
