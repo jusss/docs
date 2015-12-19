@@ -1,0 +1,18 @@
+2015.12.19 update archlinux, 发现用chromium和mpv看flash或电影时，屏幕下方有些红黄蓝小点闪烁撕裂画面
+就像看电视时信号不好，官方有人提交了这个问题，当前的解决办法是把xorg.conf里的sna加速改为uxa,
+其实两年前在archlinux里就遇到过screen tear问题，当时的解决办法是把xorg.conf里的uxa加速改为sna加速即可
+安装xf86-video-intel后其实默认uxa加速，因为两年前遇到的那个问题后来改成了sna加速，现在又遇到另一种
+的screen tear竟然建议我再把sna改为uxa, how ironic
+所以现在我是通过降级downgrade软件包来解决这个问题，反正官方不解决这个问题，我就不更新这几个包
+virtualbox-guest-utils-5.0.8-1-x86_64.pkg.tar.xz
+xf86-input-evdev-2.9.2-1-x86_64.pkg.tar.xz
+xf86-input-synaptics-1.8.2-1-x86_64.pkg.tar.xz
+xf86-video-intel-1:2.99.917+364+gb24e758-1-x86_64.pkg.tar.xz
+xorg-server-1.17.2-1-x86_64.pkg.tar.xz
+xorg-server-common-1.17.2-1-x86_64.pkg.tar.xz
+使用sna加速时，上面这些版本是没画面撕裂的,到底原因是xorg-server还是xf86-video-intel，我也不是很清楚
+by the way, xorg-server-1.18之后就不需要xf86-input-evdev了，但1.17需要，所以降级xorg-server时一直
+提示xf86-input-evdev和xorg-server-1.17版本冲突但卸载xf86-input-evdev提示target not found, 需要先
+安装一个xf86-input-evdev-2.10以前的版本如2.9.2-1降级之后，再装xorg-server-1.17.2-1就不会再冲突了
+
+一个非官方的archlinux RollBack repo: http://seblu.net/a/archive/
