@@ -1,0 +1,2 @@
+rsync -a --progress martian.* ~/movies/Seen/
+it can show a progress when copy files.
