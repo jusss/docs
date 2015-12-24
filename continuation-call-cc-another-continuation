@@ -120,3 +120,4 @@ This repeats in r1 now. We announce stuff and then jump back to where we where b
 
 Back to your code
 In your code the concept is exactly the same. In fact superfluous-computation is almost identical to the above functions when you stop and think about it. So what's up with the set!s? In this code all they do is change the value of do-other-work to the newest continuation. That's it. In my example I used recursion. In this example they use set!.
+
