@@ -1,0 +1,6 @@
+scheme@(guile-user) [1]> (use-modules (ice-9 control))
+scheme@(guile-user) [1]> (+ 1 (call/cc (lambda (k1)
+				     (k1 (reset (+ 2 (shift k2 (k2 3))))))))
+$3 = 6
+
+捕捉(reset 到 (shift 之间的continuation给shift的参数k2，然后(k2 3)带3求值那个continuation. 这个continuation叫delimited continuation, 或者composable continuation
