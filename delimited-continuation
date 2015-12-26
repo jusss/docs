@@ -1,20 +1,38 @@
+
+continuation：接下来要做的所有的 or 接下来要做的一切 or 接下来所有要做的 or what the next to do
+delimited continuation：接下来要做的所有的中的一部分要做的 or 接下来所有要做的中的一部分要做的 or a piece of what the next to do
+
 scheme@(guile-user) [1]> (use-modules (ice-9 control))
 scheme@(guile-user) [1]> (+ 1 (call/cc (lambda (k1)
 				     (k1 (reset (+ 2 (shift k2 (k2 3))))))))
 $3 = 6
 
-捕捉(reset 到 (shift 之间的continuation给shift的参数k2，然后(k2 3)带3求值那个continuation. 这个continuation叫delimited continuation, 或者composable continuation
+捕捉(reset 到 (shift 之间的表达式做continuation. 这个continuation叫delimited continuation, 或者composable continuation
 
-因为reset限定了界限,所以即使再次调用k也不会执行reset外面的表达式，而call/cc则执行外面的
-(+ 1 (reset ((lambda (k) (+ 1 1)) (shift k (set! a k)))))   (a 3) 外面那个+1应该不再求值 但call/cc求
-reset至shift的那个continuation会作为(reset …)的返回值返回给外面，并执行reset外面的表达式，但第二次再调用这个continuation时，reset外面的表达式就不再执行，而call/cc会依旧执行call/cc外面的，因为call/cc外面的表达式就是continuation，所以每次调用call/cc的continuation就每次执行call/cc外面的表达式，这就是full continuarion call/cc和 delimited continuation reset/shifr的区别，一个捕捉call/cc后面所有的作continuation 一个捕捉reset-shift这一段做continuation 即使调用也只执行这一段这就是delimited continuation， 而call/cc捕捉了所有的，再调用会执行所有的
+因为reset限定了界限,所以即使再次调用k也不会执行reset后面的表达式，而call/cc则会执行call/cc后面的表达式
 
-continuation：接下来要做的所有的
-delimited continuation：接下来要做的中的一部分将要做的
-call/cc把call/cc外面的到(k 0)调用conrinuation这段全部捕捉做continuation，所以会成个循环loop
-而reset-shift则只捕捉reset到shift的作conrinuation，所以在reset外面(k 0)调用continuation则只会执行reset里面的，而不会再执行reset外面到当前(k 0)这段的表达式
+scheme@(guile-user) [1]> (+ 1 (reset (+ 2 (shift k (begin (set! a k) (k 3))))))
+$10 = 6
+scheme@(guile-user) [1]> (a 3)
+$11 = 5
+当调用(a 3) reset后面那个+1不再求值 但call/cc会求值
+reset至shift的那个continuation第一次会正常求值并把continuation的返回值作为(reset …)的返回值返回给后面，并执行reset后面的表达式，但第二次再调
+用这个continuation时，reset后面的表达式就不再执行，而call/cc会依旧执行call/cc后面的，因为call/cc后面的表达式就是continuation，所以每次调
+用call/cc的continuation就每次执行call/cc后面的表达式，这就是full continuation call/cc和 delimited continuation reset/shift的区别，一个捕捉
+call/cc后面所有的表达式作continuation 一个捕捉reset-shift这一段的表达式做continuation 即使再调用也只执行这一段的表达式,这就是delimited continuation
+,而call/cc捕捉了call/cc后面所有的表达式，再调用会执行call/cc后面所有的表达式,这就是full continuation.
 
-(reset ((lambda (m) ...) (shift k (lambda () (set! a k) (k 5))))  从reset到shift的整个lambda是continuation 而参数m是continuation所需要的参数而不是continuation， k才是continuation (k 5)返回continuation所需的参数，这才是m
-而call/cc外面的所有都是contonuation而call/cc的返回值即为continuation所需的参数 k为continuation (k 5)为continuation所需的参数也为call/cc的返回值
-而在reset shift中k为continuation而(k 5)为shift的返回值，为continuation所需的参数，这个continuation的返回值作为reset的返回值
+call/cc把call/cc后面的表达式到再次调用continuation这中间的表达式全部捕捉做continuation，所以会形成循环loop
+而reset-shift则只捕捉reset到shift的表达式作continuation，所以在reset后面再次调用continuation则只会执行reset里面的表达式，而不会再执行reset后面到再次调
+用continuation这中间的表达式
+
+(reset ((lambda (m) ...) (shift k (begin (set! a k) (k 5))))) 从reset到shift的整个lambda是continuation 而参数m是continuation所需要的参数而不是continuation
+,k才是continuation, (k 5)返回continuation所需的参数，这才是m
+而call/cc后面的所有表达式才是continuation,而call/cc的返回值即为continuation所需的参数, k为continuation, (k 5)为continuation所需的参数也为call/cc的返回值
+而在reset shift中k为continuation而(k 5)为continuation所需的参数，这个continuation的返回值作为reset的返回值
+
+
+
+
+
 
