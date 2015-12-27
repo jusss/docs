@@ -1,8 +1,8 @@
 1.从aur.archlinux.org下jmtpfs的PKGBUILD,然后在PKGBUILD所在的目录里makepkg -s生成jmtpfs.tar.xz
  sudo pacman -U jmtpfs.tar.xz
 2. mkdir ~/tmp
-   sudo umount ~/tmp
-   jmtpfs ~/tmp
+   挂载 jmtpfs ~/tmp
+   卸载 fusermount -u ~/tmp
 
-   卸载fusermount -u ~/tmp
+
    
