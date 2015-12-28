@@ -87,3 +87,38 @@ scheme@(guile-user)> (a b)
 real trick at the current position (another-k current-k) jump to another-k with current-k for jump back into the current position
 在当前位置(another-continuation current-continuation)这样带着当前continuation跳到another-continuation之后，还可以在那边调用current-continuation再跳回
 当前位置
+
+
+
+绑定continuation但不求值
+
+(reset ((lambda (x) (display 0)) (shift k (set! lk k))))
+先执行shift里面的再执行reset-shift之间的
+想要绑定continuation时不求值continuation, 就可以按上面这种做
+因为先执行shift，而shift里没有调用(k whatever)去求值 reset-shift之间的continuation,
+所以就绑定了continuation但没有求值continuation，不求值reset-shift之间的continuation但会求值shift里面的表达式
+
+call/cc先执行call/cc里面的再执行call/cc后面的
+call/cc里面除非有(k another-k)跳转可以导致后面的continuation无法求值，否则的话后面的continuation总会被求值.就像reset后面的总会被求值一样
+
+
+call/cc里面的 相当于 shift里面的
+call/cc外面的 相当于 reset 到 shift 之间的，但同时又可以相当于reset后面的，因为reset后面的总会被求值，因为执行完reset就会求值reset后面的because of求值顺序，而由于求值顺序导致call/cc后面也总会被求值,
+call/cc后面的即是continuation又是按求值顺序接下来要求值的，所以总会被求值除非在call/cc里面调用别的continuation, 如果不求值后面的,到call/cc这就结束了
+
+0scheme@(guile-user)> (define biu 
+			(lambda ()
+			  (define bs 0)
+			  (call/cc (lambda (k)
+				     (set! bs k)))
+			  (display 0)))
+scheme@(guile-user)> (biu)
+0scheme@(guile-user)> (define miu
+			(lambda ()
+			  (define bs 0)
+			  (reset ((lambda (x) (display 0)) (shift k (set! bs k))))))
+scheme@(guile-user)> (miu)
+scheme@(guile-user)> (miu)
+
+
+
