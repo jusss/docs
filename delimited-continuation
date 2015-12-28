@@ -31,8 +31,56 @@ call/cc把call/cc后面的表达式到再次调用continuation这中间的表达
 而call/cc后面的所有表达式才是continuation,而call/cc的返回值即为continuation所需的参数, k为continuation, (k 5)为continuation所需的参数也为call/cc的返回值
 而在reset shift中k为continuation而(k 5)为continuation所需的参数，这个continuation的返回值作为reset的返回值
 
+-----------------------------------------------------------------------------------
+call/cc coroutines
 
+scheme@(guile-user)> (define b (lambda (x)
+				 (display "2")
+				 (set! x (call/cc x))
+				 (display "4")
+				 (call/cc x )))
+scheme@(guile-user)> (define a (lambda (x)
+				 (display "1")
+				 (set! x (call/cc x))
+				 (display "3")
+				 (call/cc x)
+				 (display "5")))
+scheme@(guile-user)> (a b)
+12345scheme@(guile-user)>
 
+-----------------------------------------------------------------------------------
+reset-shift coroutines
 
+scheme@(guile-user)> (define a (lambda (x)
+				 (display 1)
+				 (reset ((lambda (x)
+					   (display 3)
+					   (reset ((lambda (x)
+						     (display 5))
+						   (shift k (x k)))))
+					 (shift k (x k))))))
+scheme@(guile-user)> (define b (lambda (x)
+				 (display 2)
+				 (reset ((lambda (x)
+					   (display 4)
+					   (reset ((lambda (x)
+						     (display 6))
+						   (shift k (x k)))))
+					 (shift k (x k))))))
+scheme@(guile-user)> (a b)
+12345scheme@(guile-user)> (define a (lambda (x)
+				 (display 1)
+				 (reset ((lambda (x)
+					   (display 3)
+					   (reset ((lambda (x)
+						     (display 5)
+						     (x 0))
+						   (shift k (x k)))))
+					 (shift k (x k))))))
+scheme@(guile-user)> (a b)
+123456scheme@(guile-user)>
 
+在call/cc里k是未执行的, 在shift里k是未执行的
+先执行call/cc里面的, 再执行call/cc外面的
+先执行shift里面的, 再执行reset到shift之间的
 
