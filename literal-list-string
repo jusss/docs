@@ -1,0 +1,94 @@
+<jusss> what if there's " " in string it will ?  [22:42]
+<jusss> "a b "c d" e f"
+<jusss> python have ' " " ' to solve that  [22:43]
+<jusss> " ' ' "
+<wasamasa> escaping characters is a thing  [22:44]
+<jusss> wasamasa: #\" ?
+<wasamasa> rudybot: eval "foo \"bar\" baz"
+<rudybot> wasamasa: your sandbox is ready
+<rudybot> wasamasa: ; Value: "foo \"bar\" baz"
+<wasamasa> hm  [22:45]
+<wasamasa> rudybot: eval (display "foo \"bar\" baz")
+<rudybot> wasamasa: ; stdout: "foo \"bar\" baz"
+* wasamasa shrugs
+<jusss> (eval ...) ?
+* wasamasa stares blankly at jusss 
+<jusss> wasamasa: and how to escape ( ?  [22:51]
+<wasamasa> I don't even
+<jusss> display a(b  [22:52]
+<wasamasa> you are misunderstanding a few things
+<wasamasa> don't mind me playing around with the bot
+<wasamasa> a string can contain parentheses and quotes and whatever else just
+	   fine
+<wasamasa> it's just in the case of a double-quote that you escape if with a
+	   backslash  [22:54]
+<jusss> " " make a string, ( ) make a list and what else ?
+<jusss> if there's " in a string and ( in a list then what ?
+<wasamasa> http://www.schemers.org/Documents/Standards/R5RS/HTML/
+<wasamasa> or to be more precise,
+	   http://www.schemers.org/Documents/Standards/R5RS/HTML/r5rs-Z-H-10.html#%_sec_7.1.1
+								        [22:55]
+<rudybot> http://teensy.info/RJf7Xqaqc1
+<jusss> I have to say it's not easy to understand for me now  [23:16]
+<pjb> jusss: it's a general question. You have to distinguish the essence of
+      the objects from their representation.  [23:18]
+<pjb> A string that contains a double quote is merely a string where one of
+      the character is a double quote.
+<pjb> The syntax of the representation of a literal string containing a double
+      quote, obviously depends on the language.  In scheme, you merely escape
+      the double quote, inside the literal string. The escape character is the
+      classical backslash.
+
+<pjb> jusss: the problem is that you haven't read r5rs. It's only fifty pages,
+      and it explains all that.
+<pjb> jusss:
+      http://www.schemers.org/Documents/Standards/R5RS/HTML/r5rs-Z-H-5.html#%_sec_2.3
+								        [23:20]
+<rudybot> http://teensy.info/vkJp5qAzUS
+<pjb> jusss: ( is not lisp syntax. ( represents nothing in lisp.  Therefore
+      you cannot have a ( in a list.  This is meaningless.  [23:21]
+<jusss> pjb: my english is not good, can you explain what "literal" means ?
+								        [23:23]
+<pjb> jusss: you can have a character: #\( ; you can have a string containing
+      #\( : "(".  You can have a symbol whose name contains a #\( : |(| (but
+      notice, this is an extension, it's not specified by r5rs).  You can have
+      a vector containing a #\( character or a |(| symbol or a "(": string
+      #(#\( |(| "(").
+<pjb> jusss: literal is the object that is written textually = literally in
+      the program source.
+<pjb> jusss: (let ((string (make-string 3 #\x))) string) ; <- here, string is
+      a variable bound to a string, but there's no literal string.  [23:24]
+<pjb> jusss: (let ((string "xxx")) string) ; <- here, string is a variable
+      bound to a literal string: a literal representation of the literal
+      string itself is written in the text of the program: "xxx" is the
+      representation of the literal string.  [23:25]
+<pjb> jusss: notice that in both cases, both strings are string-equal.  But
+      the first is a mutable string, while literal objects are immutable.
+<pjb> 42 ; <- a literal integer.  (* 2 24) returns the same integer, but not a
+      literal one.  However, since no integer is mutable, it doesn't make a
+      difference.  [23:26]
+<pjb> '(a b c) returns the literal list represented by (a b c).
+<pjb> (list 'a 'b 'c) returns a new list represented by (a b c).  [23:27]
+<pjb> The former, being literal is immutable. The later is mutable.
+<pjb> Notice that lisp source programs are made both of literal lists, and of
+      possibly built lists (notably syntax definitions can build new source
+      sexps when expanded).  [23:28]
+
+<jusss> I don't even know "literal" is noun or adj
+<pjb> there are those nice little books called "dictionaries", that contains
+      all the words, and explain what they are and what they mean.  [23:33]
+<pjb> You can even use web search engines to find on-line dictionaries.
+<jusss> pjb: yes I'm doing this,
+*** nalaginrut (~nalaginru@210.79.115.75) has joined channel #scheme  [23:35]
+<jusss> pjb: eval it and return it, that's literal ?  [23:36]
+<pjb> jusss: in English, you can use words as verbs, nouns, or adjectives as
+      you wish, basically.  English is rather amorph.  [23:37]
+<pjb> jusss: I wrote the definition above!
+<pjb> "<pjb> jusss: literal is the object that is written textually =
+      literally in the program source."
+<jusss> pjb: I don't know "=" mean what here, equal ?  [23:39]
+<pjb> jusss: literal is the object that is written textually id est literally
+      in the program source.  [23:40]
+[Mon Jan  4 2016]
+<jusss> pjb: I think I may undertand it  [00:03]
+
