@@ -1,0 +1,83 @@
+coroutines:
+http://community.schemewiki.org/?call-with-current-continuation
+(define (hefty-computation do-other-stuff) 
+    (let loop ((n 5)) 
+      (display "Hefty computation: ") 
+      (display n) 
+      (newline) 
+      (set! do-other-stuff (call/cc do-other-stuff)) 
+      (display "Hefty computation (b)")  
+      (newline) 
+      (set! do-other-stuff (call/cc do-other-stuff)) 
+      (display "Hefty computation (c)") 
+      (newline) 
+      (set! do-other-stuff (call/cc do-other-stuff)) 
+      (if (> n 0) 
+          (loop (- n 1)))))
+
+(define (superfluous-computation do-other-stuff) 
+    (let loop () 
+      (for-each (lambda (graphic) 
+                  (display graphic) 
+                  (newline) 
+                  (set! do-other-stuff (call/cc do-other-stuff))) 
+                '("Straight up." "Quarter after." "Half past."  "Quarter til.")) 
+      (loop)))
+
+ > (hefty-computation superfluous-computation) 
+ Hefty computation: 5 
+ Straight up. 
+ Hefty computation (b) 
+ Quarter after. 
+ Hefty computation (c) 
+ Half past. 
+ Hefty computation: 4 
+ Quarter til. 
+
+trick: (call/cc k) eq (k current-k), 在当前位置(call/cc another-continuation) 相当于
+(another-continuation current-continuation)带着当前的continuation跳转到another-continuation
+
+scheme@(guile-user)> (define b (lambda (x)
+				 (display "2")
+				 (set! x (call/cc x))
+				 (display "4")
+				 (call/cc x )))
+scheme@(guile-user)> (define a (lambda (x)
+				 (display "1")
+				 (set! x (call/cc x))
+				 (display "3")
+				 (call/cc x)
+				 (display "5")))
+scheme@(guile-user)> (a b)
+12345scheme@(guile-user)>
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+yin-yang puzzle:
+
+(let* ((yin
+	((lambda (cc) (display #\@) cc)
+	 (call-with-current-continuation (lambda (c) c))))
+       (yang
+	((lambda (cc) (display #\*) cc)
+	 (call-with-current-continuation (lambda (c) c)))))
+  (yin yang))
+
+       
+call/cc会把后面的全部动作捕捉到栈上，但不存上下文的name space,也就是不存变量
+call/cc 会先执行里面的，然后执行后面的，并把后面的动作全部存储到栈上
+
+yin-yang puzzle的trick在于不停的捕捉第二个continuation给yang,导致yang绑定的continuation一直在变，因为(yin yang)中的yin一直在变，这样比如每个continuation在栈上形成一个块，然
+后不停的生成新的块但是，新的块有时会跳回前面的块中，并把带着当前的块跳到前面的块中，并把
+当前的块给予yin,然后再跳回当前的块并在跳回之前又成了个新块
+
+生成新块1 yin，生成新块2 yang,带着新块2 yang 跳回新块1 yin,然后生成新块3 yang',带着新块3 yang'跳回新块2 yang中，此时新块2 yang中的yin指的是新块1 中的yin, 然后带着新块3 yang' 跳到新块1 中的yin, 然后生成新块4 yang'', 带着新块4 yang'' 跳到 新块3 yang' 中依次循环
+
+生成新块，并带这新块跳到前面的块中，然后在再生成新块，带着再生成的新块跳回当前块
+
+
+
+	    
+	    
+	
+	     
