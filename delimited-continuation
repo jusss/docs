@@ -122,3 +122,34 @@ scheme@(guile-user)> (miu)
 
 
 
+call/cc 里面的总会执行，里面的返回值为call/cc的返回值
+reset-shift中(shift k k)将把k作为reset的返回值，不执行reset里面的continuation，因为没调用k在shift中，(shift k (k k)) reset里面的continuation将执行
+
+call/cc捕捉call/cc开始至结尾的表达式为continuation,
+而reset只捕捉reset至shift之间的表达式做continuation
+reset-shift捕捉的k在(k x)调用之后，会继续执行(k x)之后的表达式
+
+(define bla
+  (lambda ()
+    (define k1 0)
+    (reset ((lambda (x)
+	      (display 1))
+	    (shift k (set! k1 k))))
+    (display 2)
+    (k1 3)
+    (display 5)))
+
+(bla) => 215
+
+reset-shift的k在(k x)调用之后继续(k x)之后的表达式
+
+执行到call/cc或reset-shift就捕捉k存到栈上，并执行call/cc里面的和shift里面的表达式,然后
+执行call/cc和reset后面的表达式，执行到再次调用k时(k x)，跳回栈上执行保存的动作，执行完了
+，继续执行(k x)之后的表达式
+
+reset-shfit捕捉到k只要在shift里面不用(k x)调用k，第一次捕捉时就不会被执行
+但call/cc捕捉的k第一次捕捉时总会被执行，因为call/cc后面的表达式总会被求值，而call/cc后面的表达式又恰好是k, call/cc里面的总会被求值，后面的也总会被求值
+
+shift里面的相当于call/cc里面的
+shift外面的至reset里面的，加上reset后面的，才相当于call/cc后面的,因为call/cc后面的即为k且又为接下来要执行的，而reset后面的才为接下来要执行的，reset里面的为k
+
