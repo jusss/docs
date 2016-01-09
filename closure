@@ -1,0 +1,273 @@
+* (defun als () (let ((m 0)) (lambda () (setq m (+ m 2)) m)))
+
+0] (funcall (als))
+
+2
+0] (funcall (als))
+
+2
+0] (defvar ss (als))
+
+
+[3] (funcall ss)
+; No debug variables for current frame: using EVAL instead of EVAL-IN-FRAME.
+2
+0[3] (funcall ss)
+; No debug variables for current frame: using EVAL instead of EVAL-IN-FRAME.
+4
+0[3]
+
+<ai2d7> how I can define a local variable ?
+<ai2d7> without let
+<beach> Why do you not want to use LET?  [16:05]
+<ai2d7> let is not sugar ?
+<beach> LET is the typical way to define a local variable.
+<jackdaniel> ((lambda (variable) …) value)
+<beach> clhs let
+<specbot> http://www.lispworks.com/reference/HyperSpec/Body/s_let_l.htm
+<beach> It's a special operator.
+<beach> So it is at the very basis of the Common Lisp language.
+<beach> ai2d7: Again, why do you not want to use LET?
+<ai2d7> beach: so let is not a syntactic sugar in cl ?  [16:08]
+<Zhivago> Not for the purpose of code-walking, at any rate.
+<beach> No, like I said, it is a special operator.  The term "syntactic sugar"
+	doesn't exist in Common Lisp.
+<Zhivago> (which is all special-operator is meaningful with respect to anyhow)
+<beach> ai2d7: So, you just aren't going to answer my question?
+<ai2d7> beach: sorry, I was thinking it's a sugar, so I'd not likt to use it,
+	my apologize  [16:15]
+<beach> If by "syntactic sugar" you mean macros and such, they represent
+	important abstractions.  So if you want to become a good programmer,
+	you should probably learn to like "syntactic sugar".
+<jackdaniel> "Good notation eliminates thought." – Eric Siggia  [16:16]
+<ai2d7> beach: see this http://paste.ubuntu.com/14445343/ 
+<ai2d7> beach: I don't understand why it's different  [16:17]
+<beach> ai2d7: Why what is different from what else?  [16:18]
+<ai2d7> beach: every (funcall (als)) get the same answer 2, but (defvar ss
+	(als)) and (funcall ss) get different answers
+<jackdaniel> als returns a closure (each call of als returns a new
+	     closure). If you store it in a variable each next funcall of
+	     stored closure preserves same `m'
+<beach> ai2d7: In the first case, the expression (als) is evaluated twice.  In
+	the second case it is evaluated once.
+<beach> ai2d7: When you have general questions like that, you are better off
+	not addressing me personally.  I may disappear at any time.
+<beach> ai2d7: Do you know any other programming languages?  [16:21]
+<ai2d7> yes, python and c 
+<beach> OK, then imagine int x = 0; int f() { x++;}  [16:22]
+<Zhivago> Python supports lexical closure.  [16:23]
+<beach> Oh, OK.
+<jackdaniel> ↑
+<beach> ai2d7: Zhivago can explain this better than I can then.
+<beach> My example was not so great anyway.  [16:24]
+<ai2d7> eval twice or once make me confused  [16:25]
+<ai2d7> when it's twice or onec ?
+<Bike> also, that has nothing to do with let syntax. you can get the same
+       effect with (defun als () ((lambda (m) (lambda () (setq m (+ m 2)) m))
+       0)).
+<Zhivago> http://ideone.com/kOxvQ1
+<resttime> (als) creates a new "box" which has 0 "apples" and a "button" that
+	   adds 2 new "apples" to the "box" every time that "button" is
+	   "pushed."  [16:26]
+<resttime> (funcall (als)) pushes the button of the newly created box.  [16:27]
+<resttime> Every time (funcall (als)) is done a new box is made and the button
+	   of this box is pushed.
+<resttime> (defvar ss (als)) alternatively saves the box as ss
+<Zhivago> Does that python example make sense?
+<moore33> Gotta go fight fires  [16:28]
+<ai2d7> Zhivago: I understand the example, but I need think eval once or twice
+								        [16:30]
+<ai2d7> and my english is not good  [16:31]
+<ai2d7> sorry
+<Zhivago> Here is a fairly literal translation into CL
+	  http://ideone.com/CLQ1IS -- although normally you would use lambda
+	  rather than flet there.  [16:33]
+*** BWV1004 (05aad7db@gateway/web/freenode/ip.5.170.215.219) has joined
+    channel #lisp  [16:37]
+<beach> ai2d7: To "evaluate" means to compute the value.  If you call a
+	function twice, you may not get the same result as you would if you
+	call it once, store the value, and use it later.  [16:45]
+<ai2d7> als return a closure (lambda () (setq m (+ 2 m)) m)  [16:46]
+<ai2d7> and (als) return m ?
+<ai2d7> and ss is not eq (als) ?
+<jackdaniel> ai2d7: als returns a closure (let (m) (lambda () …))  [16:47]
+<jackdaniel> and let is preserved between this closure calls
+<jackdaniel> s/let/m/
+<jackdaniel> each call to (als) creates new closure, but if you store (als)
+	     value in a variable
+<ai2d7> jackdaniel: (defvar ss (als)) and ss'value is not (als) ?
+<jackdaniel> then when you refere to this variable you use the same closure
+<jackdaniel> ai2d7: take function: int *xxx() { return new int[16]; }  [16:48]
+<beach> ai2d7: That's correct.  Each time you call (als) a new object is
+	returned.
+<jackdaniel> each call to xxx returns new table
+<jackdaniel> and als returns a new closure on each call  [16:49]
+<jackdaniel> and closure cares it's own "m" variable
+<ai2d7> each call (als) return a new closure, and store the closure into a
+	variable, and ?  [16:53]
+<beach> ai2d7: Each call (als) returns a new closure that may ore may not be
+	stored into a variable.  [16:54]
+<ai2d7> ok, if I would store it into a variable and ?
+<beach> ai2d7: If you do (funcall (als)) then the closure that (als) returns
+	is not stored in a variable.  It is passed as an argument to funcall
+	which calls the closure and then discards it.
+<jackdaniel> ai2d7: if you store it in a variable, when you call it (this
+	     variable)  [16:55]
+<jackdaniel> you refere to the same closure, which has "m" preserved between
+	     calls
+<jackdaniel> so if this closure increments `m', then next call "sees"
+	     incremented `m'
+<beach> jackdaniel: ai2d7 must have fainted.  It is easy to be overwhelmed by
+	such fantastic technology. :)  [17:12]
+<jackdaniel> beach: yeah, apparently so. I hope my examples weren't that bad
+	     though :p
+<beach> Not bad at all.  [17:14]
+<ai2d7> yes, it's fantastic  [17:15]
+<ai2d7> I mean closure, I don't see this word in other lanuguage
+<contrapunctus> it's mentioned...but not often.
+<beach> ai2d7: Zhivago says Python has closures, and you know Python.
+<Th30n> There's an old saying, objects are poor man's closures.  [17:17]
+<ai2d7> yes, I know a little python, and there's not much about closure on
+	python's introduce
+<beach> Th30n: With CLOS, it's often the other way around.  [17:18]
+<Th30n> ai2d7: Because python didn't have closures initially.
+<Th30n> ai2d7: You had to fake them by using keyword arguments in local
+	functions and lambdas. Setting the default keyword value to something
+	in lexical scope.  [17:19]
+<resttime> There's another old saying, closures are a poor man's object.
+<beach> resttime: That's what I meant by "the other way around".  [17:20]
+<Th30n> beach: Yep, CLOS is probably the only OO implementation that I like.
+<ai2d7> actually I don't like OOP, even through I use them, but I don't often
+	create class
+<resttime> beach: Whoops, missed that which means time for sleep.
+<beach> ai2d7: The concept of a closure is fundamental in programming:
+	https://en.wikipedia.org/wiki/Closure_%28computer_programming%29
+<jackdaniel> There's yet another old saying: side effects are bad for the
+	     cache
+<jackdaniel> :p
+<beach> ai2d7: If I were you, I would stop having (negative) opinions about
+	things that you still need to learn, such as "syntactic sugar" and
+	"OOP" if you want to become a good programmer.  It is much better to
+	learn about those things first, and then have an opinion, which would
+	be an informed one at that point.  [17:23]
+<ai2d7> you're right
+<ai2d7> my some opinions are not good  [17:24]
+<beach> ai2d7: People who hang out here are typically very knowledgeable, so
+	it is preferable to have informed opinions when you discuss with them.
+<ai2d7> actually there's a puzzle called yin-yang puzzle make me confused
+	about closure  [17:28]
+<beach> Interestingly, one of the first examples on the Wikipedia page on
+	closures is in Python.
+<ai2d7> it seems yin-yang puzzle is not a cl stuff, so I don't ask it here
+<beach> That Wikipedia page looks like it would be a good idea for you to
+	read.  [17:30]
+<Th30n> beach: Yeah, I laughed a bit seeing the first example in Python. But
+	then again, at work we use closures regularly in Python.
+<ai2d7> I read wikipedia page about yin yang puzzle , but I don't think it's
+	enought detail
+<ai2d7> it use continuations, and it don't mention closure on the wikipedia
+<ai2d7> language is a really problem for me, my bad english  [17:33]
+<Th30n> ai2d7: continuation is a different concept from closure  [17:34]
+<ai2d7> Th30n: yes, it's different, is there a possible one variable save the
+	continuation and the variable is free variable in closure?
+<ai2d7> like the upper example, I don't know what's the good name of m  [17:37]
+<Th30n> Ugh, your English really makes the question hard to understand. But if
+	I get it correctly, then the answer would be yes.  [17:38]
+<ai2d7> closure: some free variables and inner functions 
+<Th30n> ai2d7: Yes, and the variable gets the value from the scope of function
+	definition.
+<ai2d7> Th30n: like the upper example, so m can store the continuation ?
+<Th30n> What upper example? Wikipedia on closures?  [17:40]
+<ai2d7> Th30n: I mean my example
+<ai2d7> Th30n: m of here http://paste.ubuntu.com/14445343/
+<Th30n> Oh, I came late. I don't have that in my logs
+<ai2d7> m is variable in closure, and it's a free variable to the inner
+	function in closure  [17:41]
+<Th30n> Oh yeah, so for example you say (let ((m some-function)))
+<Th30n> and you use m inside the inner function
+<ai2d7> so this m can store continuation ?  [17:42]
+<Th30n> Yes, functions are first class. You can treat them as data. A variable
+	can store any value, this includes functions.
+<ai2d7> continuation can store what the next to do, and m in closure can store
+	the something, so if m store continuation, I think it's fantastic
+<Th30n> Yep  [17:44]
+<jackdaniel> where did the continuation talk came from? :p it's not available
+	     in CL standard (scheme has continuations)
+<Th30n> jackdaniel: I don't know, when I came continuations transformed into
+	closures. So we discussed that, it went back to conts.  [17:45]
+<ai2d7> like there's a function, it display 1 2 3, and it display 1 at the
+	first time I call it, and it display 2 at the second time, and it
+	display 3 at the third time
+<jackdaniel> ai2d7: I know what continuations are, I'm just saying they're not
+	     covered by common lisp standard :) cc is a great concept though
+								        [17:46]
+<ai2d7> like you call the function at the first time, it just execute 1/3 
+<ai2d7> and you call it again, it execute 1/3 to 2/3  [17:47]
+<ai2d7> and you call it at the third time, it will execute 2/3 to 3/3
+* jackdaniel wonders if ai2d7 read his last statement
+<ai2d7> is that wonderful ?
+<Th30n> jackdaniel: I think he is explaining it to himself.
+<Th30n> It sure is, especially when you discover the advanced uses which make
+	some things a lot easier.
+<ai2d7> 1/3 means 1/3 of whole program  [17:49]
+<jackdaniel> ai2d7: you may also get back in time and call the function from
+	     the state between 1/3 and 2/3 after 3/3 ;)
+<ai2d7> store the continuation in variable of the closure, then store closure
+	into another variable, each call this variable I call jump to the
+	continuation  [17:52]
+<ai2d7> the different continuation
+
+racket@> (define als
+	   (lambda ()
+	     (define m 0)
+	     (lambda ()
+	       (set! m (+ m 2))
+	       m)))
+racket@> als
+#<procedure:als>
+racket@> (als)
+#<procedure>
+racket@> ((als))
+2
+racket@> ((als))
+2
+racket@> (define ss (als))
+racket@> (ss)
+2
+racket@> (ss)
+4
+
+racket@> (define ddd
+	   (lambda ()
+	     (define x 9)
+	     (lambda (y)
+	       (set! x (+ x y))
+	       x)))
+racket@> ddd
+#<procedure:ddd>
+racket@> (ddd)
+#<procedure>
+racket@> ((ddd) 3)
+12
+racket@> ((ddd) 3)
+12
+racket@> (define bsy (ddd))
+racket@> bsy
+#<procedure>
+racket@> (bsy 3)
+12
+racket@> (bsy 3)
+15
+racket@> (bsy 3)
+18
+racket@> (define iu (lambda () 3))
+racket@> iu
+#<procedure:iu>
+racket@> (lambda () 3)
+#<procedure>
+racket@> 
+
+(lambda ...)不会自动求值，只有外加()后才会求值
+(lambda ...) & ()
+(quote ...) & (eval ...)
+
