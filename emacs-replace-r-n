@@ -1,0 +1,8 @@
+\n C-o or C-q C-j
+\r C-q C-m
+
+M-x replace-string RET C-o RET RET
+M-x replace-string RET C-q C-m RET RET
+
+C-q (quoted-insert) will let you insert a ^M
+
