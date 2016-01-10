@@ -1,0 +1,90 @@
+http://www.douban.com/note/214018601/
+
+用人肉Scheme解释器分析一个小程序的运行
+fzwudc fzwudc 2012-05-11 18:24:43
+      最近我发现以前在lisp小组回应的关于continuation的主题http://www.douban.com/group/topic/20557726/，又被翻出来。
+      有一个兄弟，贴了一个小程序，涉及continuation运作，要求解释。一时激起了我的好奇心。
+      这个scheme程序是这样的：
+     (let* ((yin  	
+                 ((lambda (cc)  	(display #\@) cc)  	(call/cc  	(lambda (c) c))))        
+            (yang  	
+                 ((lambda (cc)  	(display #\*) cc)  	(call/cc  	(lambda (c) c)))))
+       (yin yang))
+     有点阴阳之气。猛一看，程序输出
+     应该是 
+    @*@*@*...................
+     实际上是
+    @*@**@***@****................
+    
+    哥用本人作为人肉scheme解释器分析如下：
+   这个小程序不仅涉及到延续，关键点还是对闭包和环境运作的理解。 延续是等待一个值的函数，而在词法定域的scheme语言中，
+   函数从语义上看是一个闭包，包含了函数定义时（对延续而言就是call/cc时候）的环境。
+    环境在程序解释执行用于存储符号定义，例如 {yin => …,   yang=>  …｝，相当于一个由<名字, 值>序对组成的表。
+   为理解方便，可以把程序转换为一个假想的解释器（虚拟机）指令形式
+program = new-cont-with-env cont1 {};  
+                display #\@ ;  
+                bind-to-env yin cont1; 
+               new-cont-with-env cont" {yin => ?};  
+               display #\*;  
+              bind-to-env yang cont";  
+              funcall yin  yang.
+cont1(x) with-env {}= 
+              display #\@ ; 
+              bind yin x;  
+             new cont";  
+             display #\*;   
+             bind yang cont"; 
+             yin yang.
+cont2(x)  with-env {yin => ?} = 
+             display #\*;  
+           bind yang x; 
+           yin yang.
+ 对其中几个指令的约定：
+        new-cont-with-env  捕获当前执行点的延续闭包，保存当前环境到其中
+        bind-to-env 在当前环境中增加一个<名字，值>序对
+        funcall  函数调用
+ cont1和cont2分别是表达成函数形式的两个捕获点的延续，with-env {yin => ?｝代表延续中保存的环境， ｛｝表示空环境。
+这个程序执行中，延续cont1是比较简单的，复杂的是延续cont2，其环境{yin => ? }在执行中不断改变。
+  同一个程序文本（yin yang), 由于环境中定义的不同，在实际执行中跳转到不同的延续点。
+（1）初始化
+首先执行program，当前环境是｛｝
+ 在函数调用前，先后输出了一个@和*， 当前环境变为
+{ yin =>  cont1 with-env {},  
+  yang => cont2 with-env {yin => cont1 with-env {}}}  
+所以funcall yin yang 相当于 funcall cont1 cont2。
+
+（2）第一次函数调用   跳转到cont1
+从cont1中提取当前环境为｛｝,  加入参数x后变为  { x =>  cont2 with-env {yin => cont1 with-env {}}}。
+先后输出@和*， 在函数调用前， 当前环境变为
+{ x =>  cont2 with-env {yin => cont1 with-env {}}，
+  yin =>  x , 
+  yang => cont2'  with-env {yin => x} }
+函数调用funcall yin yang相当于 funcall cont2  cont2' 。
+这里用cont2' 和cont2，表示在相同位置的一个捕获点，它们的区别在于包含环境的不同，函数形式完全一样。
+
+(3) 第二次函数调用  跳转到cont2
+从cont2中提取环境为 {yin => cont1 with-env {}}， 加入参数x后变为
+{ yin => cont1 with-env {}},
+  x => cont2'  with-env {yin => cont2 with-env {yin => cont1 with-env {}}} }
+此次执行只输出了*, 在函数调用前， 当前环境变为
+{ yin => cont1 with-env {}},
+  x => cont2'  with-env {yin =>  cont2 with-env {yin => cont1 with-env {}}} ,
+ yang => x }
+函数调用funcall yin yang相当于 funcall cont1 cont2'。
+
+(4) 第三次函数调用  又跳转到cont1  这是新一轮循环的开始  
+从cont1中提取环境为{}， 但是加入参数x后变为 { x => cont2'  with-env {yin =>  cont2 with-env {yin => cont1 with-env {}}}}。
+注意比较（4）和（2）步，都跳转到cont1，执行的程序指令一样，但是环境变复杂了。
+执行这步将输出 @ *  .
+
+(5) 第四次函数调用    跳转到cont2'  输出 *
+(6) 第五次函数调用   跳转到cont2  再输出 *
+(7) 第六次函数调用  又将回到cont1   新的一轮循环  可以推出  这次加入参数后环境将变为
+{ x => cont2'' with-env { yin => cont2' with-env { yin => cont2 with-env {yin => cont1 with-env {}}}}}。
+这一轮循环的函数调用次数将由新环境决定，在cont1后输出@和＊后，将依次调用 cont2" 、cont2'、cont2，输出三个*。
+每一次循环，都将比上一轮多输出一个*。
+
+这个程序将无法终止，不断运行，每一轮新循环产生的环境都将多一层，同时多输出一个*。
+人肉scheme解释器就是这样分析的…..
+
+
