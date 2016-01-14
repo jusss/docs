@@ -1,0 +1,37 @@
+Redmi2联通版,其它名字wt88047或2014811
+
+xda Redmi2版块:
+http://forum.xda-developers.com/redmi-2/development
+http://forum.xda-developers.com/redmi-2
+or search "xda Redmi2" with google or bing
+
+gapps:
+http://forum.xda-developers.com/android/software/app-minimal-gapps-gapps-lp-20150107-1-t2997368
+http://opengapps.org/
+
+ROM: cm-13.0-20151230-UNOFFICIAL-wt88047.zip
+from: http://forum.xda-developers.com/redmi-2/development/rom-cyanogenmod-unofficial-builds-t3267958
+download: https://drive.google.com/folderview?id=0B0MePlwwEJYGfjE0WGpLT1pnR2VfNkVVbnNiM0hKRUZ3Ump5SmZFaE9ib2p6bFVpODYzblE&usp=sharing
+ROM OS Version: 6.0.x
+Known Issues:
+    Sound out from both speaker and headset if headset already connected on a reboot
+    Use VOL UP + VOL DOWN + POWER button to enter recovery mode
+    设置声音时，设置异常退出,第一次刷玩机启动后自动重启过一次,刷机后再进入recovery mode需同时按音量+ -键和电源键，以前是音量+和电源键
+
+ROM: cm-12.1-20150926-UNOFFICIAL-hm2014811.zip
+from: http://forum.xda-developers.com/android/development/redmi-2-cyanogenmod-12-1-t3189949
+download: https://basketbuild.com/devs/zwliew/hm2014811
+ROM OS Version: 5.1.x Lollipop
+ROM Kernel: Linux 3.10.x
+Bugs:
+Audio recorded will have a short 3-4 second screeching noise at the start
+CPU gets stuck at 1.2 GHz for ~5 minutes at first boot.
+
+
+
+ROM: cm-13.0-20160113-UNOFFICIAL-wt88047-TEMASEK.zip
+from: http://forum.xda-developers.com/redmi-2/development/rom-temaseks-cm13-0-build-v1-9-t3276970
+download: https://ny1.androidfilehost.com/dl/KnyK5Rhd2Z2EshqlQB4T7w/1453013469/24369303960684164/cm-13.0-20160113-UNOFFICIAL-wt88047-TEMASEK.zip
+bugs: unknown
+
+
