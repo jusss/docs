@@ -11,7 +11,7 @@ X11Forwarding = yes
 android的那个也是同理， chroot之后的android也是无法直接打开Xorg的
 但是有xsdl, xsdl是个android上的X11应用，然后用X11转发，把chroot之后的那个
 X11信息传回xsdl上显示，相当于android ssh -XY ...进chroot里的那个系统，并把
-那个系统里的X11信息回传到android的X11应用xsdl上显示
+那个系统里的X11信息回传到android的X11应用xsdl上显示, android可以用connectbot ssh chroot之后的系统
 
 其实xsdl已经相当于android上的X11了，不用X11转发，也可以直接用，chroot之后直接
 xterm :0&即可，然后xsdl上就有xterm了，xsdl默认也打开在:0
