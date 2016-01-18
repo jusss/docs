@@ -5,6 +5,8 @@ http://forum.xda-developers.com/redmi-2/development
 http://forum.xda-developers.com/redmi-2
 or search "xda Redmi2" with google or bing
 
+recovery mode: 音量+ 电源键, 音量+ - 电源键, 音量+ -
+
 gapps:
 http://forum.xda-developers.com/android/software/app-minimal-gapps-gapps-lp-20150107-1-t2997368
 http://opengapps.org/
@@ -12,26 +14,47 @@ http://opengapps.org/
 ROM: cm-13.0-20151230-UNOFFICIAL-wt88047.zip
 from: http://forum.xda-developers.com/redmi-2/development/rom-cyanogenmod-unofficial-builds-t3267958
 download: https://drive.google.com/folderview?id=0B0MePlwwEJYGfjE0WGpLT1pnR2VfNkVVbnNiM0hKRUZ3Ump5SmZFaE9ib2p6bFVpODYzblE&usp=sharing
-ROM OS Version: 6.0.x
+ROM OS Version: 6.0.1
 Known Issues:
     Sound out from both speaker and headset if headset already connected on a reboot
     Use VOL UP + VOL DOWN + POWER button to enter recovery mode
     设置声音时，设置异常退出,第一次刷玩机启动后自动重启过一次,刷机后再进入recovery mode需同时按音量+ -键和电源键，以前是音量+和电源键
-
+    第一次开机无限自动重启
+    通话 正常 没有 黑屏 设置声音，unfortunately, setting has stopped.
+    
 ROM: cm-12.1-20150926-UNOFFICIAL-hm2014811.zip
 from: http://forum.xda-developers.com/android/development/redmi-2-cyanogenmod-12-1-t3189949
 download: https://basketbuild.com/devs/zwliew/hm2014811
 ROM OS Version: 5.1.x Lollipop
-ROM Kernel: Linux 3.10.x
 Bugs:
 Audio recorded will have a short 3-4 second screeching noise at the start
 CPU gets stuck at 1.2 GHz for ~5 minutes at first boot.
-
-
+CM12 通话 黑屏
 
 ROM: cm-13.0-20160113-UNOFFICIAL-wt88047-TEMASEK.zip
 from: http://forum.xda-developers.com/redmi-2/development/rom-temaseks-cm13-0-build-v1-9-t3276970
 download: https://ny1.androidfilehost.com/dl/KnyK5Rhd2Z2EshqlQB4T7w/1453013469/24369303960684164/cm-13.0-20160113-UNOFFICIAL-wt88047-TEMASEK.zip
+bugs: 开不了机
+
+ROM: cm-11-20150829-UNOFFICIAL-hm2014811.zip
+download: https://basketbuild.com/devs/zwliew/hm2014811
+version: 4.4.4
 bugs: unknown
 
+ROM:aicp_wt88047_mm-11.0-UNOFFICIAL-20160105.zip
+from http://forum.xda-developers.com/redmi-2/development/rom-t3277061
+version: 6.0.1
+bugs: 没有短信应用，初次打开Camera会停止Camera运行, 卡刷gapps 6.0.1 Setup Wizard has stopped. 桌面UI起不来，进recovery双清之后就能正常启动
+
+
+ROM: cm-13.0-20151223-UNOFFICIAL-wt88047-Temasek.zip
+from: http://forum.xda-developers.com/redmi-2/development/rom-temaseks-cm13-0-build-v1-9-t3276970
+version: 6.0.1
+bugs: Unfortunately, settings has stopped. 设置声音时，取消拨号等声音提示
+      安装小米便签失败,安装失败后，屏幕闪烁一下
+
+ROM: cm-13.0-20160103-UNOFFICIAL-wt88047-TEMASEK.zip
+from: http://forum.xda-developers.com/redmi-2/development/rom-temaseks-cm13-0-build-v1-9-t3276970
+version: 6.0.1
+bugs: unknown, 当前正在使用中 刷了gapps-601
 
