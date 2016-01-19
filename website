@@ -64,5 +64,7 @@ deb http://mirrors.aliyun.com/debian wheezy main non-free contrib
 deb-src http://mirrors.aliyun.com/debian/ wheezy main non-free contrib
 deb http://mirrors.kernel.org/debian/ unstable main contrib non-free
 
+Server = https://mirrors.ustc.edu.cn/archlinuxarm/$arch/$repo
+
 
 
