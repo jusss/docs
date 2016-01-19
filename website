@@ -6,7 +6,6 @@ https://chaturbate.com/
 http://xvideos.com/
 http://www.bthand.com/  209.126.117.226
 
-
 movie:
 thepiratebay.cd
 thepiratebay.cr
@@ -53,4 +52,17 @@ dns:
 208.67.222.222
 208.67.220.220
 8.8.8.8
+
+linux mirrors:
+Server=http://mirrors.kernel.org/archlinux/$repo/os/$arch
+Server=http://ftp.jaist.ac.jp/pub/Linux/ArchLinux/$repo/os/$arch
+Server=http://mirrors.sohu.com/archlinux/$repo/os/$arch
+Server=http://mirrors.ustc.edu.cn/archlinux/$repo/os/$arch
+Server=http://mirrors.aliyun.com/archlinux/$repo/os/$arch
+
+deb http://mirrors.aliyun.com/debian wheezy main non-free contrib
+deb-src http://mirrors.aliyun.com/debian/ wheezy main non-free contrib
+deb http://mirrors.kernel.org/debian/ unstable main contrib non-free
+
+
 
