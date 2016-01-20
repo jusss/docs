@@ -39,13 +39,7 @@ bugs: 开不了机
 ROM: cm-11-20150829-UNOFFICIAL-hm2014811.zip
 download: https://basketbuild.com/devs/zwliew/hm2014811
 version: 4.4.4
-bugs: unknown
-
-ROM:aicp_wt88047_mm-11.0-UNOFFICIAL-20160105.zip
-from http://forum.xda-developers.com/redmi-2/development/rom-t3277061
-version: 6.0.1
-bugs: 没有短信应用，初次打开Camera会停止Camera运行, 卡刷gapps 6.0.1 Setup Wizard has stopped. 桌面UI起不来，进recovery双清之后就能正常启动
-
+bugs: UMS无法使用，即在电脑上挂载sdcard无法挂载
 
 ROM: cm-13.0-20151223-UNOFFICIAL-wt88047-Temasek.zip
 from: http://forum.xda-developers.com/redmi-2/development/rom-temaseks-cm13-0-build-v1-9-t3276970
@@ -56,5 +50,33 @@ bugs: Unfortunately, settings has stopped. 设置声音时，取消拨号等声�
 ROM: cm-13.0-20160103-UNOFFICIAL-wt88047-TEMASEK.zip
 from: http://forum.xda-developers.com/redmi-2/development/rom-temaseks-cm13-0-build-v1-9-t3276970
 version: 6.0.1
-bugs: unknown, 当前正在使用中 刷了gapps-601
+bugs: unknown, 当前正在使用中 刷了gapps-601, chroot后pacman -Syu导致手机重启，安装软件也是这样
+      ，mtp连上windows或archlinux用jmtpfs后发现移动了的文件位置没有移动，还有就是有3G的内置空间可用
+      传个2G的文件都说空间不足, 无法挂载img文件
+
+ROM: cm-11-20150116-UNOFFICIAL-hm2014811.zip
+from: http://en.miui.com/thread-77155-1-1.html
+bugs: 连接电脑时没有挂载sdcard选项
+
+ROM: cm-11-20150223-UNOFFICIAL-HM2014813.zip
+from: http://en.miui.com/thread-77155-1-1.html
+bugs: 有第三方推广软件,连接电脑，没有挂载选项通知, 甚至不能mtp挂载内置空间
+
+ROM: cm_HM2014813-ota-2477c043d5.zip
+from: http://en.miui.com/thread-77155-1-1.html
+bugs: 通话时黑屏之后无法再点亮屏幕
+
+ROM: cm_HM2014813-ota-80ad7fac5d.zip
+from: http://en.miui.com/thread-77155-1-1.html
+bugs: 有第三方推广软件 在笔记本上挂载不了sdcard, mtp连接上无法创造文件
+
+ROM:aicp_wt88047_mm-11.0-UNOFFICIAL-20160105.zip
+from http://forum.xda-developers.com/redmi-2/development/rom-t3277061
+version: 6.0.1
+bugs: 没有短信应用，初次打开Camera会停止Camera运行, 卡刷gapps 6.0.1 Setup
+      Wizard has stopped. 桌面UI起不来，进recovery双清之后就能正常启动
+      在刷此包时同时卡刷gapps就不会出现桌面起不来的问题，同样无法挂载sdcard
+      里的img文件，可以挂载sdcard，chroot进去pacman -Syu时不会自动重启
+      外置sdcard位置/mnt/media_rw/下，也可用df -h, mount, fdisk -l等查看
+
 
