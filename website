@@ -70,3 +70,4 @@ Server = https://mirrors.ustc.edu.cn/archlinuxarm/$arch/$repo
 
 android:
 http://android-studio.org/?/explore/
+http://www.androiddevtools.cn/
