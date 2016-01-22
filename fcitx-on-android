@@ -1,0 +1,16 @@
+android上keyboard用hacker's keyboard, OTG也选这个
+1. pacman -S fcitx fcitx-configtool
+2. vi /etc/profile
+   export GTK_IM_MODULE=fcitx
+   export QT_IM_MODULE=fcitx
+   export XMODIFIERS=@im=fcitx
+
+3. fcitx -rd&
+   fcitx-configtool
+   fcitx在xterm里需要触发才能用，而xsdl里ctrl-space被fcitx识别为了lctrl,所以
+   触发不了fcitx,点Trigger Input Method把ctrl-space组合键变为F12，就能用F12触发
+   fcitx在xterm里，语言选项那就留english和pinyin, 字体设置为文泉译正黑 大小为10
+   然后fcitx -rd&就能在新打开的emacs或xterm里按F12触发fcitx输入中文了，默认lshift切换
+   english和pinyin
+
+
