@@ -79,4 +79,16 @@ bugs: 没有短信应用，初次打开Camera会停止Camera运行, 卡刷gapps 
       里的img文件，可以挂载sdcard，chroot进去pacman -Syu时不会自动重启
       外置sdcard位置/mnt/media_rw/下，也可用df -h, mount, fdisk -l等查看
 
+现在正在用aicp包，chroot之后xsdl也正常，可以emacs on android了,替换自带的AOSP keyboard为
+hacker's keyboard就能在xsdl里的xterm里输入正常了，还有关闭xsdl的三个控制按钮ctrl esc alt
+xsdl就不会卡了, fcitx记得用fcitx-configtool把Trigger Input Method由Ctrl-space改为F12，这样
+才能在xterm里按F12触发fcitx,因为xsdl里按Ctrl-space被fcitx识别为了LCtrl,所以没法触发，还有
+就是改下fcitx的字体为文泉译正黑，字体大小为10,fcitx里只留english and pinyin即可
+
+
+
+
+
+
+
 
