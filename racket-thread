@@ -1,0 +1,164 @@
+from: http://blog.csdn.net/hrcnpc/article/details/17718947
+
+Racket支持程序中的多线程控制、线程本地存储、一些基元同步机制、以及一个用于组成同步抽象的框架。此外，racket/future和racket/libraries提供并行支持以提升性能。
+
+10.1 线程
+参见Threads章节了解Racket线程模型的基本信息。同时请参见Futures章节。
+当线程被创建起来时，它会被放在当前监护者（current custodian）的管理之下并被加入到当前线程组（thread group）中。一个线程可以通过thread-resume函数拥有任意数量个监护管理者。
+线程会在其1.不可达且暂停；2.不可达且仅被通过诸如semaphore-wait, semaphore-wait/enable-break, channel-put, channel-get, sync, sync/enable-break或thread-wait等函数堵塞在仅有不可达事件时被垃圾回收机制回收。注意，在place-channel中的堵塞是有限度的，参见Places章节的caveat部分。
+线程可以被当作一种同步事件（synchronizable event）（参见Events章节）。线程在thread-wait没有堵塞的情况下是准备同步的（ready for synchronization）；一个线程的同步结果（synchronization）是其自身。
+Racket中提供的所有的常量时间过程和操作都是线程安全的，因为他们都是原子的（atomic）。例如，set!函数为变量赋值，这对所有线程来说都是原子的，没有哪个线程会看见“半赋值”的变量。类似地，vector-set!函数原子地为一个向量赋值。hash-set!过程不是原子的，但表会被锁保护起来；参见Hash Tables了解更多细节。端口操作一般不是原子的，但它们是线程安全的，因为一线程在一个输入端口消耗的一个字节不会在另一个线程中被返回，而类似port-commit-peeked和write-bytes-avail的过程都提供了特定的并发保护。
+
+10.1.1 创建线程
+(thread thunk) -> thread?
+  thunk : (-> any)
+在一个新线程的控制中不带参数地调用thunk函数。thread过程会立即返回一个线程描述符（thread descriptor）的值。当thunk函数返回时，被创建起来用于调用thunk的线程就终止了。
+
+(thread? v) -> thread?
+  v : any/c
+若v是一个线程描述符则返回#t，否则返回#f。
+
+(current-thread) -> thread?
+返回当前在执行的线程描述符。
+
+(thread/suspend-to-kill thunk) -> thread
+  thunk : (-> any)
+类似thread函数，但它仅在暂停线程而非终止线程时用kill-thread或custodian-shutdown-all函数来杀死线程。
+
+(call-in-nested-thread thunk [cust]) -> any
+  thunk : (-> any)
+  cust : custodian? = (current-custodian)
+创建一个被cust管理的线程来执行thunk。（被嵌套线程的当前监护者会继承自创建它的线程，而独立于cust参数。）当前线程直到thunk返回之前都会被堵塞，call-in-nested-thread函数返回的值是thunk返回的值。
+嵌套线程的异常处理器会被初始化为一个过程，它会跳至线程的开始处并将异常转化至原始线程。处理器因此会终止嵌套线程并在原始线程里重新产生异常。
+若通过call-in-nested-thread创建的线程在thunk返回之前就已经死亡，原始线程中会产生exn:fail异常。若原始线程在thunk返回之前被杀死，会有一个断点为嵌套线程入队。
+若断点为原始线程入队（用break-thread）而嵌套线程仍在运行，断点会被重定向至嵌套线程。若在嵌套线程被创建时原始线程中已有断点入队，则断点会被移至嵌套线程。若断点在嵌套线程完成时仍在队中，它会被移至原始线程。
+
+10.1.2 暂停，恢复和杀死线程
+(thread-suspend thd) -> void?
+  thd : thread?
+若thd在运行则立即暂停thd的执行。若线程已终止或暂停，thread-suspend无效。线程会一直维持暂停状态（即不会执行）直到用thread-resume恢复它。若当前监护者不是单独地管理thd（即，某些thd的监护者不是当前监护者或其下属），此函数会产生exn:fail:contract异常而线程不会被终止。
+
+(thread-resume thd [benefactor]) -> void?
+  thd : thread?
+  benefactor : (or/c thread? custodian? #f) = #f
+若thd被暂停且拥有至少一个监护者（可能通过benefactor来增加，下述）则恢复线程的执行。若线程已终止，或线程仍在运行肯没有提供benefactor参数，或线程没有监护者且没有提供benefactor，thread-resume函数无效。若给出benefactor参数，函数会在下面三种动作间切换：
+若benefactor是线程，在其从暂停状态中被恢复过来时，thd同样也被恢复。（恢复thd会使得其它先前用thread-resume附加到thd身上的线程也被恢复。）
+新的监护者可以被加到thd的管理者集合中。若benefactor是一个线程，则该线程的所有监护者都会被加到thd中。否则，若benefactor是一个监护者，它会被加到thd中（除非该监护者早已被关闭）。若thd是同时被监护者及它的一个或多个下属管理，多余的下属会被从thd中移除。若thd被暂停且增加监护者，thd仅会在添加监护者后被恢复。
+若benefactor是线程，当其此后接受了一个新的管理监护者后，thd同样也会接受此监护者。（给thd添加监护者会使得先前用thread-resume附加到thd身上的线程也被添加该监护者。）
+(kill-thread thd) -> void?
+  thd : thread?
+立即终止指定线程，若thd是用thread/suspend-to-kill创建出来的则暂停线程。终止主线程会退出程序。若thd已被终止，kill-thread什么也不做。若当前监护者不管理thd（它的所有下属也不管理htd），会引发exn:fail:contract异常，此线程不会被杀死或终止。
+除非特别注明，否则Racket（以及GRacket）提供的过程都是杀死安全和暂停安全的；即，杀死或暂停一个线程不会影响应用程序在其它线程的过程。例如，若一个线程在其它从输入端口中读取字符时被杀死，字符或是被完整地恢复或不恢复，而其它线程可以安全地使用此端口。
+
+(break-thread thd [kind]) -> void?
+  thd : thread?
+  kind : (or/c #f 'hang-up 'terminate) = #f
+用一个特定线程登记一个断点，这里kind可选地表示要登记的断点类型。若thd中禁用断点，断点会被忽略直到断点重新被启用（参见Breaks章节）。
+
+(sleep [secs]) -> void?
+  secs : (>=/c 0) = 0
+使当前线程睡眠secs秒。secs为0时仅仅作为允许其它线程执行的提示。secs的值可以是非整数、以任意精度地请求睡眠时间；实际的睡眠时间精度是非指定的。
+
+(thread-running? thd) -> any
+  thd : thread?
+若thd既没有终止也没有暂停返回#t，否则返回#f。
+
+(thread-dead? thd) -> any
+  thd : thread?
+若thd终止返回#t，否则返回#f。
+
+10.1.3 同步线程状态
+(thread-wait thd) -> void?
+  thd : thread?
+阻塞当前线程执行直到thd终止。注意(thread-wait (current-thread))会将当前线程死锁，但断点可以终止死锁（若断点激活的话；参见Breaks章节）。
+
+(thread-dead-evt thd) -> evt?
+  thd : thread?
+当且仅当thd终止时返回一个准备同步（ready for synchronization）的同步事件（sychronizable event）（参见Events）。除非直接使用thd，否则对此事件的引用不会防止thd被垃圾回收机制回收（参见Garbage Collection）。对于一个给定的thd，thread-dead-evt总是返回相同的（即eq?)的结果。一个线程死亡事件的同步结果（synchronization result）是该线程死亡事件本身。
+
+(thread-resume-evt thd) -> evt?
+  thd : thread?
+返回一个同步事件，这个事件会在thd运行时变成准备同步。（若thd已终止，该事件永远不会变成准备状态。）若thd运行后被thread-resume-evt函数暂停，此函数返回的事件仍是准备状态的；在每个thd被暂停时都会生成一个新的事件由thread-resume-evt返回。事件的结果是thd，但若thd从不恢复 ，指向事件的引用不会保护thd被垃圾回收机制回收（参见Garbage Collection）。线程恢复事件的同步结果（sychronization result）是线程恢复事件本身。
+
+(thread-suspend-evt thd) -> evt?
+  thd : thread?
+返回一个同步事件，这个事件会在thd暂停时变成准备同步。（若thd已终止，该事件永远不会解除堵塞。）若thd运行后被thread-resume-evt函数暂停，此函数返回的事件仍是准备状态的；在每个thd被恢复时都会生成一个新的事件由thread-suspend-evt返回。线程暂停事件的同步结果（sychronization result）是线程暂停事件本身。
+
+10.1.4 线程邮箱
+每个线程都有一个邮箱（mailbox)，邮箱可以接收任意信息。换句话说，每个线程都有内建的异步通道。
+(thread-send thd v [fail-thunk]) -> any
+  thd : thread?
+  v : any/c
+  fail-thunk : (or/c (-> any) #f)
+               = (lambda () (raise-mismatch-error ....))
+将v入队作为thd的消息而不堵塞它。若消息入队，返回值是#<void>。若thd停止运行——即thread-running?返回#f——而后消息才进队，fail-thunk会被调用（通过一个尾调用），若fail-thunk是一个产生返回值的过程刚返回结果，否则若fail-thunk为#f返回#f。
+
+(thread-receive) -> any/c
+从当前的线程中接h队列中的一条消息（如果存在的话）并令其出队。若没有任何可用消息，thread-receive函数会堵塞直到出现可用消息。
+
+(thread-try-receive) -> any/c
+从当前的线程中接收队列中的一条消息（如果存在的话）并令其出队。若没有任何可用消息则立即返回#f。
+
+(thread-receive-evt) -> evt?
+返回一个同步事件，这个事件会将同步线程将要接收一条消息时变成准备同步。线程接收事件的同步结果是线程接收事件本身。
+
+(thread-rewind-receive lst) -> void?
+  lst : list?
+将lst中的元素压回当前线程的队列的前部。元素会被逐个压入，因此第一个有效的消息将会是lst的最后一个元素。
+
+10.2 同步
+Racket的同步工具箱有三层：
+可同步事件——一个用于同步的通用框架；
+频道——一个原则上可被用于构建大多数其它类型的可同步事件（除了组合的事件）的基元；
+信号——一个用于同步的简单而较廉价的基元。
+
+10.2.1 事件
+同步事件（或简称事件）与sync过程协作以规划线程间的同步。某类对象同时也是事件，这包括端口和线程。其它类型的对象则仅被用作事件。
+在任意的时间点，事件或是处于“准备同步”状态，或不是；这取决于事件的类型及其被其它线程如何使用，一个事件可以在任意时则从非准备转换成准备状态（反之亦然）。若一个线程在一个事件准备时同步，则事件会产生一个特定的“同步结果”。
+同步事件可能影响事件的状态。例如，当同步一个信号时，信号内部计数会减少，就如同使用semaphore-wait过程一样。对大多数事件来说，例如端口，同步不会影响事件的状态。
+Racket将包括信号、频道、异步频道、端口、TCP监听者、线程、子进程、将来执行器（will executors）和监护者盒的动作都视为可同步事件。库可以定义新的可同步事件，一般通过prop:evt进行。
+
+(evt? v) -> boolean?
+  v : any/c
+若v是一个可同步事件则返回#t，否则返回#f。
+
+(sync evt ...+) -> any
+  evt : evt?
+在事件evt不在准备状态时（如上定义）堵塞。
+当至少一个事件evt处于准备状态时，返回它的同步结果（通常是evt本身）。若多个事件处于准备状态时，伪随机地返回其中一个事件作为结果；设置current-evt-pseudo-random-generator参数可以控制随机数生成器的结果。
+
+(sync/timeout timeout evt ...+) -> any
+  timeout : (or/c #f (and/c real? (not/c negative?)) (-> any))
+  evt : evt?
+若timeout是#f，此函数与sync函数类似。若timeout是一个实数，那么，若timeout秒过去而没有成功的同步时，返回#f。若timeout是一个过程，那么它会在轮询事件而没有发现准备状态的事件时在尾位置调用此过程。
+timeout的0值相当于(lambda () #f)。此外，每个evt至少会被执行一次才会返回#f或调用timeout。
+参见alarm-evt以了解另一种可选的超时机制。
+
+(sync/enable-break evt ...+) -> any
+  evt : evt?
+类似于sync函数，但在等待evt时断点是可用的。若在sync/enable-break调用时断点机制被禁用，那么或是所有事件都保持未被选择状态或是抛出exn:break异常，但这两种情况不会同时出现。
+
+(sync/timeout/enable-break timeout evt ...+) -> any
+  timeout : (or/c #f (and/c real? (not/c negative?)) (-> any))
+  evt : evt?
+类似于sync/enable-break，但像sync/timeout一样有超时参数。
+
+(choice-evt evt ...) -> evt?
+  evt : evt?
+创建并返回一个结合各个evt的事件。将其传入sync得到的结果与将每个事件都进行同样的调用的结果相同。
+也就是说，一个被choice-evt返回的事件会在一个或多个传入choice-evt的事件在准备同步时进入准备同步状态。若返回事件被选择，处于准备状态的事件会被伪随机地选择，其同步结果是被选事件的同步结果。
+
+(wrap-evt evt wrap) -> evt?
+  evt : (and/c evt? (not/c handle-evt?))
+  wrap : (any/c ... . -> . any)
+创建一个事件，这个事件在evt准备同步时准备同步，但其同步结果由evt的同步结果传入wrap后的执行结果决定。wrap需要的参数数必须与evt同步结果的值的数量一致。
+
+...
+
+prop:evt : struct-type-property?
+一个能识别实例可作为同步事件的结构类型的结构类型属性。此属性的值可以是以下任一种：
+事件evt：在此种情况下，将此结构用作事件等于直接使用evt。
+接受一个参数的过程proc：在些种情况下，此结构体类似于由guard-evt生成的事件，除了这个将成为守护过程的proc授受结构体作为参数，而非没有参数；同样地，proc返回的非事件结果会被一个已处于同步状态的事件所替代，其同步结果是这个结构体；
+一个精确的、非负的、从0（包括）到结构类型的非自动域的数量（不包括）的整数：此函数标记结构体中的一个域，此必须被设定为可变的。若此域包含一个对象或一个接受一个参数的事件生成过程，此事件或过程会像如上的方式被使用。否则，形如事件的结构不会达到准备状态。
+
+http://docs.racket-lang.org/guide/parallelism.html
