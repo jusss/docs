@@ -1,0 +1,53 @@
+http://docs.racket-lang.org/guide/parallelism.html
+
+racket有两种parallel实现，future和place, place有点类似多进程的感觉，通信比较麻烦
+还有thread,但thread并不是真正的并行
+racket/future提供future和touch函数来实现并行
+(define f (future (lambda () (+ 3 4))))
+(list 6 (touch f) 8)
+
+感觉future/touch和delay/force有点类似，但是delay/force是阻塞当前线程的
+而future/touch不会阻塞当前线程
+
+至于future是不是线程安全，我也不是很清楚
+
+下面是不安全的:
+
+多个线程同时修改同一个变量(可以用线程锁解决,线程同步)
+在某一个线程上锁死了跳不出来,无法执行其它线程
+线程死锁deadlock: 一个线程先锁变量a再锁变量b,另一线程先锁变量b再锁变量a,然后这两个线程就谁也
+无法执行(尽量不要同时锁多个变量)
+
+线程不安全是指多线程同时修改同一个变量，使用线程同步(线程锁)虽然可以解决这个问题，但
+又容易引起另一问题就是线程死锁
+
+
+parallel和concurrency/coroutine
+parallel是并行的，互不依赖的，多线程
+concurrency/coroutine是并发，单线程，执行完这个执行那个再返回来执行这个
+
+full continuations和delimited continuations可以实现concurrency/coroutines
+
+http://adit.io/posts/2013-05-15-Locks,-Actors,-And-STM-In-Pictures.html
+
+actor是另一种解决线程不安全的方法
+它用immutable和message传递机制来解决
+
+还有一种方法叫Software Transactional Memory
+
+haskell实现了STM
+
+对于线程不安全，有三种方法可以解决: Lock & Actor & STM
+
+绿色线程green thread并不是系统的线程native thread，它是个逻辑层面的东西，并不是真正的多线程
+
+
+
+
+
+
+
+
+
+
+
