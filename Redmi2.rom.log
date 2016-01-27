@@ -78,6 +78,7 @@ bugs: 没有短信应用，初次打开Camera会停止Camera运行, 卡刷gapps 
       在刷此包时同时卡刷gapps就不会出现桌面起不来的问题，同样无法挂载sdcard
       里的img文件，可以挂载sdcard，chroot进去pacman -Syu时不会自动重启
       外置sdcard位置/mnt/media_rw/下，也可用df -h, mount, fdisk -l等查看
+      如果发现无法使用手机网络上网，设置下APN为3gnet即可
 
 现在正在用aicp包，chroot之后xsdl也正常，可以emacs on android了,替换自带的AOSP keyboard为
 hacker's keyboard就能在xsdl里的xterm里输入正常了，还有关闭xsdl的三个控制按钮ctrl esc alt
