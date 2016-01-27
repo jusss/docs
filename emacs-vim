@@ -1,0 +1,29 @@
+打开x.c并跳到第20行  emacs -nw +20 x.c
+在emacs里跳到第20行 M-g g 20
+显示行号 M-x linum-mode
+跳到当前行后的第20行 C-u 20 C-n
+前20行每行前面插入一个Tab C-S-n 选中那20行 M-x replace-regexp RET ^ RET C-q Tab RET
+或者使用键盘宏  C-x ( 开始记录键盘操作
+	       C-x ) 结束记录键盘操作
+	       M-x name-last-kbd-macro 命名记录的宏
+	       M-x 宏名 执行这个宏
+	       C-u 20 M-x 宏名 执行20次宏
+	       M-x insert-kbd-macro 宏名 可以在其它buffer里插入这个宏然后使用
+	       或者不命名宏直接 C-u 0 C-x e执行刚才定义的宏
+
+reference: http://blog.itpub.net/8225414/viewspace-945109/
+Emacs中的键盘宏(转)[@more@]
+　　　　这 是 我 的 关 于 如 何 在 Emacs 中 让 你 的 手 指少 动 几 次 的 小 技 巧-- 使 用 Emacs 中 的 键盘宏 (keyboard macros)。在 你 编 辑 任 何 文 件 时( 如 C 源 程 序 时) 创 建一 个 键 盘 宏 首 先键 入 `C-x (' ， 当 小 缓 冲 器 显 示`Defining kbd macro' 时， 键 入 任何你 想 自 动 录 入 的 字 符。 例 如 你想 录 入 的 如 下：
+　　int main(int argc, char **argv)
+　　{
+　　当 你 结 束 录 入 时 键 入：`C-x )' ，emacs 将 显示`Keyboard macro defined' 。 现 在 你必 须 给你 的 宏 命 名， 以 便你 以 后 调 用 此 宏， 键 入：`M-x name-last-kbd-macro' 时， 会 提示 输入 宏名。 在 我 们 的 例 子 中， 就 叫 做 `main-type' 之 类 的 吧。 现在 打 开 你 的 .emacs 文件， 移 到文 件 尾 部， 键 入：`M-x insert-kbd-macro'，当 它 问 你 插 入 宏 的 名 字 时， 键 入 你上 次 取 的 名字。 此 时 emacs 就 会 自 动 插 入 生 成 宏 的 代 码。
+现 在 就 可 以 使 用 `M-x < 宏 名>' 来 调 用 你的 宏 了。 不 过 好 象 使 用 起 来 并 不 如 预想的 好， 因 为 使 用 宏是 为 了 减 少 你 的 击 键。 不 过 这 个 问 题 可 以 用 定 义 键 盘(keyboard mapping) 来 解 决。 下 一 步 是 把 此 宏 定 义 到 一 个 功 能 键 上。
+依 你 是 否 需 要 此 宏 用 于 所 有 模 式， 你 可以 使 用 全 程 设 置 键 ( global-set-key) 或 定义 键 (define-key)。
+下 面 是 一 个 全 程 设 置 键 的 例 子， 需 要 你把 它 加 入 到 ..emacs 的 尾 部。
+　　(global-set-key "C-cm" 'main-type)
+如 此， 以 后 你 调 用emacs 时， 只 要 你 键 入“C-c m” 时， 整 个 代 码 (not really, just this one line) 就 会 显 现。 请注 意 不 能 使 用 已 定 义 键。 最 合 适 组 合 键 是 Control C + .
+如 果 你 只 希 望 此 宏 在 C 模 式(cc-mode) 时 使用， 在 你 的 c-mode-common-hook 中 键 入 如下：
+(define-key c-mode-base-map "C-cm" 'main-type)
+在 第 一 种 模 式 中 的 问 题 是 你 只 有 有 限 的键 用 来 定 义， 很 快 就 会 用 完。 而 且， 当你 编 辑 一个html 文 件时， 你 不 会 不 想 到 在 emacs 中 如 上 例 喷 出 'int main ' 的 方 法。
+附 ?给 老 手: 应 该 指 出 的 是 我 只 是 emacs 的 新 手， 到 目 前 我 仅 仅 使 用 了 六 个 月。 如 上 有 误 请 不吝 指 教
+
