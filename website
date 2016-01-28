@@ -40,6 +40,8 @@ http://va.us.mirror.archlinuxarm.org/os/ArchLinuxARM-armv7-latest.tar.gz
 
 scheme:
 http://community.schemewiki.org/?call-with-current-continuation
+http://srfi.schemers.org/final-srfis.html
+
 
 dns:
 210.2.4.8
