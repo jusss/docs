@@ -1,3 +1,5 @@
+thread函数由SRFI-18提供，racket有自己的实现future/touch, 而place这种用channel通信的类似python的multiprocess或actor I think.
+
 from: http://blog.csdn.net/hrcnpc/article/details/17718947
 
 Racket支持程序中的多线程控制、线程本地存储、一些基元同步机制、以及一个用于组成同步抽象的框架。此外，racket/future和racket/libraries提供并行支持以提升性能。
