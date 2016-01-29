@@ -1,3 +1,6 @@
+git log --pretty=oneline file-name 查看文件的commit和commit-hash-id
+git show commit-hash-id 可以看那次commit修改什么
+
 mkdir git
 cd git
 git init
