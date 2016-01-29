@@ -1,3 +1,11 @@
 rsync -a --progress martian.* ~/movies/Seen/
 rsync -avP sleeping.*   ~/movies/Seen/
 it can show a progress when copy files.
+
+rsync local to remote:
+http://blog.chinaunix.net/uid-25603759-id-257462.html
+http://blog.sina.com.cn/s/blog_64333913010198dj.html
+
+remote需要开着rsync daemon, local才能用rsync同步文件到remote
+在remote上用rsync --daemon开启daemon, 会读取/etc/rsyncd.conf为配置文件
+
