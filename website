@@ -41,7 +41,11 @@ http://va.us.mirror.archlinuxarm.org/os/ArchLinuxARM-armv7-latest.tar.gz
 scheme:
 http://community.schemewiki.org/?call-with-current-continuation
 http://srfi.schemers.org/final-srfis.html
-http://codepad.org/6KwM4vf5
+http://codepad.org/
+
+python:
+http://codepad.org  python 2.5
+http://www.python.org/dev/peps
 
 dns:
 210.2.4.8
