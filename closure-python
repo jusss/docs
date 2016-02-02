@@ -1,0 +1,94 @@
+>>> def test():
+...  a=1
+...  def test2():
+...   nonlocal a
+...   a=a+1
+...   return a
+...  return test2
+... 
+>>> c=test()
+>>> c()
+2
+>>> c()
+3
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+>>> def test():
+...  a=1
+...  def test2():
+...   a=a+1
+...   return a
+...  return test2
+... 
+>>> c=test()
+>>> c()
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "<stdin>", line 4, in test2
+UnboundLocalError: local variable 'a' referenced before assignment
+>>> 
+
+reference:
+http://blog.csdn.net/vhghhd/article/details/7291391
+https://www.python.org/dev/peps/pep-0227/
+http://blog.csdn.net/chain2012/article/details/7415602
+
+原因在于原因在于CPython实现closure的方式和常见的functional language不同，采用了flat closures实现。
+
+If a name is bound anywhere within a code block, all uses of the
+    name within the block are treated as references to the current
+    block.  (Note: This can lead to errors when a name is used within
+    a block before it is bound.)
+
+by the way, codepad.org的python是2.5的, nonlocal关键字是3.x才有的
+
+全局变量和别名
+Python里只有2种作用域：全局作用域和局部作用域。全局作用域是指当前代码所在模块的作用域，局部作用域是指当前函数或方法所在的作用域。其实准确来说，Python 3.x引入了nonlocal关键字，可以用于标识外部作用域的变量。
+局部作用域里的代码可以读外部作用域（包括全局作用域）里的变量，但不能更改它。一旦进行更改，就会将其当成是局部变量。而如果在更改前又进行了读取操作，则会抛出异常。
+
+def f():  
+  x = '1'  
+  def g():  
+    x += '2'  
+    return x  
+  return g  
+print f()()  
+如果要更改外部作用域里的变量，最简单的办法就是将其放入全局作用域，用global关键字引入该变量。
+
+x = ''  
+def f():  
+  global x  
+  x = '1'  
+  def g():  
+    global x  
+    x += '2'  
+    return x  
+  return g  
+print f()()  
+在Python 2.x中，闭包只能读外部函数的变量，而不能改写它。
+
+def a():  
+  x = 0  
+  def b():  
+    print locals()  
+    y = x + 1  
+    print locals()  
+    print x, y
+    return b  
+  
+a()()  
+如果要对x进行赋值操作，在Python 2.x中解决这个问题，目前只能使用全局变量：global
+为了解决这个问题，Python 3.x引入了nonlocal关键字（详见The nonlocal statement）。
+只要在闭包内用nonlocal声明变量，就可以让解释器在外层函数中查找变量名了
+
+def a():  
+  x = 0  
+  def b():  
+    nonlocal x  
+    x += 1  
+    print x  
+  return b  
+  
+a()()
