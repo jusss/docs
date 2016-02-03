@@ -1,0 +1,14 @@
+opkg update
+opkg list vsftpd
+opkg install vsftpd
+vi /etc/vsftpd.conf
+write_enable=YES 改为yes,默认是NO,默认无法上传
+添加local_root=/mnt 指定/mnt为ftpd的根目录
+/etc/init.d/vsftpd start
+
+然后在本地 $ftp 192.168.2.1即可，不能用ftp root@192.168.2.1
+get下载文件 put上传
+比scp快很多
+
+
+
