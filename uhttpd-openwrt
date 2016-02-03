@@ -1,0 +1,22 @@
+openwrt自带uhttpd做httpd
+默认192.168.2.1:80为lua配置的登录界面
+so 设置81端口为下载端口
+vi /etc/config/uhttpd
+最后面添加
+
+config uhttpd 'mnt'
+        list 'listen_http' '81'
+        option 'home' '/mnt'
+
+然后重启/etc/init.d/uhttpd restart
+
+这样就能有2个root direcotry, 80的默认是/www, 81的是/mnt
+
+在本地 $aria2c 'http://192.168.2.1:81/steve.jobs.mp4' 就可以直接下文件了
+还可以用vlc之类的播放器在线播放
+
+/mnt下还能放个index.html做首页
+
+by the way, 8080 或 60080这样的端口貌似不能用，也不知道为啥
+81端口倒是能用
+这个传文件更快，5MB/s, vsftpd的是 3MB/s 而 scp的只有 2MB/s
