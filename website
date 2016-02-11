@@ -76,3 +76,9 @@ Server = https://mirrors.ustc.edu.cn/archlinuxarm/$arch/$repo
 android:
 http://android-studio.org/?/explore/
 http://www.androiddevtools.cn/
+
+bilibili:
+http://space.bilibili.com/4648331/#!/index
+http://space.bilibili.com/4111791/#!/index
+http://space.bilibili.com/11112949/#!/index
+http://space.bilibili.com/11805472/#!/index
