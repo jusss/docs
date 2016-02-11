@@ -1,2 +1,5 @@
 ffmpeg -ss start-time -t dust-time -i input-file -vcodec copy -acodec copy output-file
 不能把-i放-t前
+ffmpeg -ss 00:00:08 -t 00:03:07 -i ./mi.mi.mi.serebro.mp4 -vcodec copy -acodec copy mi-mi-mi.mp4
+
+
