@@ -1,0 +1,2 @@
+ffmpeg -ss start-time -t dust-time -i input-file -vcodec copy -acodec copy output-file
+不能把-i放-t前
