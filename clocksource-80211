@@ -1,0 +1,12 @@
+cube i6 air, intel baytrail z3735f, realtek rtl8723bs
+在grub2中linux (hd1,gpt20)/boot/vmlinuz-4.4.1 rw root=/dev/mmcblk0p20 irqpoll clocksource=tsc 设clocksource为tsc
+用cat /sys/devices/system/clocksource/clocksource0/available_clocksource查看当前硬件支持的cloksource
+
+clocksource 为 refind-jiffies时 按一个键弹出n个键 wpa_supplicant -iwlan0 -Dwext -c ./home -d能连上网,弹'nolinked power save enter'
+clocksource为tsc 和 jiffies时都不行，-Dwext连不上网,弹'nolinked power save enter'
+
+clocksource为tsc时 wpa_supplicant -iwlan0 -Dnl80211 -c ./home -d能联网，-Dwext不行，但此时不弹'nolinked power save enter'
+
+clocksource会导致系统卡死，没反应
+
+
