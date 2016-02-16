@@ -1,0 +1,14 @@
+intel atom baytrail z3735f的clocksource只支持tsc jiffies refind-jiffies
+cat /sys/devices/system/clocksource/clocksource0/available_clocksource可查看当前支持的clocksource
+intel core i3-2370m支持的时钟源为tsc hpet acpi_pm
+
+在grub2启动时可以设置内核参数指定时钟源
+linux /boot/vmlinuz root=/dev/mmcblk0p20 rw clocksource=tsc
+
+在cube i6 air tablet上，当时钟源为tsc jiffies时wpa_supplicant -iwlan0 -c ./home -Dwext -d连不上网，且
+弹'nolinked power save enter' 无线网卡为rtl8723bs,当时钟源为refind-jiffies时能连上网但按一个键弹好几个键
+
+当时钟源为tsc时，wpa_supplicant -iwlan0 -c ./home -Dnl80211 -d能连上网，且不弹'nolinked power save enter',
+且输入正常
+
+以前常断网应该是用了-Dwext参数，改成-Dnl80211应该就会正常
