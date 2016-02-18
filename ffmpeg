@@ -1,5 +1,98 @@
-ffmpeg -ss start-time -t dust-time -i input-file -vcodec copy -acodec copy output-file
-不能把-i放-t前
-ffmpeg -ss 00:00:08 -t 00:03:07 -i ./mi.mi.mi.serebro.mp4 -vcodec copy -acodec copy mi-mi-mi.mp4
+1. 先把需求的那段剪出来
+   ffmpeg -ss start-time -t dust-time -i input-file -vcodec copy -acodec copy output-file
+
+2. 把那段变成帧内编码
+   ffmpeg -i input-file -qmax 0 -qscale 0 -intra output-file
+
+3. 再把变成帧内编码的这段精确剪辑
+   ffmpeg -ss start-time -vsync 0 -t dust-time -i input-file -vcodec copy -acodec copy output-file
+
+
+-vsync 画面与声音同步
+-intra 帧内编码
+-qscale -qmax控制质量的stuff, x264的范围是0-50越小越好
+
+----------------------------------------------------------------------------------------------------   
+from: http://blog.csdn.net/xiunai78/article/details/9630771
+
+这里裁剪是指时间轴裁剪，不是空间裁剪。
+ 
+比如说，你想把视频的从一分20秒开始，30秒的视频裁剪出来，保存成一个视频。这是这个文章要讨论的问题。
+ 
+一 裁剪视频
+ 
+ffmpeg提供简单的命令参数：
+ffmpeg -ss START -t DURATION -i INPUT -vcodec copy -acodec copy OUTPUT
+对上面的命令稍做个解释。
+-ss 开始时间，如： 00:00:20，表示从20秒开始；
+-t 时长，如： 00:00:10，表示截取10秒长的视频；
+-i 输入，后面是空格，紧跟着就是输入视频文件；
+-vcodec copy 和 -acodec copy表示所要使用的视频和音频的编码格式，这里指定为copy表示原样拷贝；
+INPUT，输入视频文件；
+OUTPUT，输出视频文件；
+ 
+比如：
+ffmpeg -ss 00:00:20 -t 00:00:10 -i D:/MyVideo.mpg -vcodec copy -acopy copy D:/Split.mpg
+这个命令就是从20秒开始裁剪到20+10=30秒结束，总共10秒的视频。这个命令执行很快，因为只是原始数据的拷贝，中间没有什么编码和解码的过程。
+执行这个命令后你能得到Split.mpg这个输出文件。你可以用视频播放软件播放这个视频看看。可能有些视频裁剪后的效果，如期望一致，20秒开始，30秒结束，总共10秒的视频，但是有些视频裁剪后你会发现可能开始和结束都不是很准确，有可能是从18秒开始，33秒结束。这是为什么呢？
+因为这些视频里20秒和30秒处地方刚好不是关键帧 keyframe, 而ffmpeg会在你输入的这两个时间点附近圆整到最接近的关键帧处，然后做接下来的事情。如果你不懂什么是关键帧，没关系，这也不影响你使用这个命令。
+ 
+如果你的要求能够接受几秒的误差，那么这个命令完全就可以满足你的需要，接下来的内容你也没有必要往下看了。
+ 
+但是在我项目里要求很严格，一定要到确定的时间。所以要用另外一种方式。
+上面的造成那样的原因是所选的时间不是关键帧，那如果我们将输入的视频先转换成所有的帧都为关键帧的视频，其实就是将所有的帧的编码方式转为帧内编码（不理解帧内编码也没关系，你就当没看见它，接着往下看），这个问题就有解了。ffmpeg也可以帮我们完成这个事情。
+ 
+ffmpeg -i INPUT -sameq -intra OUTPUT
+-i 输入，后面是空格，紧跟着就是输入视频文件；
+INPUT 输入文件；
+-sameq 表示保持同样的视频质量；
+-intra， 帧内编码；
+OUTPUT 输出文件名。
+ 
+如：
+ffmpeg -i D:/MyVideo.mpg -sameq -intra D:/temp.mpg
+这个命令的结果文件就是D:/temp.mpg.这个文件的视频和D:/MyVideo.mpg是一样的，但是你会发现这个文件会比D:/MyVideo.mpg大很多倍，原因就是转换前一般采用的帧间编码，转换后变成了帧内编码。这里我们说是一般，原因是有些视频文件本身就采用了帧内编码。
+ 
+接下来我们就开始裁剪。
+ffmpeg -ss START -vsync 0 -t DURATION -i INPUT -vcodec VIDEOCODEC-acodec AUDIOCODEC OUTPUT
+-ss 开始时间，如： 00:00:20，表示从20秒开始；
+-t 时长，如： 00:00:10，表示截取10秒长的视频；
+-i 输入，后面是空格，紧跟着就是输入视频文件；
+-vcodec 视频的编码格表示所要使用的视频式；
+-acodec 音频的编码格表示所要使用的视频式；
+INPUT，输入视频文件；
+OUTPUT，输出视频文件；
+ 
+如：
+ffmpeg -ss 00:00:30 -vsync 0 -t 00:00:30 -i D:/temp.mpg -vcodec libx264-acodec libfaac D:/result.mpg
+这里音频和视频分别采用了aac和h264.
+ 
+这样就得到了我们最终想要的结果。
+ 
+二 合并视频
+1. 首先将各个视频全部转换为mpeg格式：
+ffmpeg  -i INPUT -f mpeg  OUTPUT
+
+例如：
+ffmpeg  -i D:/temp1.avi -f mpeg  D:/result1.mpg
+ffmpeg  -i D:/temp2.mp4 -f mpeg  D:/result2.mpg
+
+2. 通过copy或者cat命令合并视频
+copy -b INPUT+INPUT OUTPUT
+
+例如：
+copy /b "D:/result1.mpg"+"D:/result1.mpg" "D:/result.mpge"
+
+3. 将合并的视频进行编码生成最终的结果视频
+ffmpeg -i INPUT -f FORMAT OUTPUT
+
+例如：
+ffmpeg -i "D:/result.mpge" -f mp4 "D:/result.mp4"
+
+http://zhidao.baidu.com/link?url=f64O9lRIpmzp86IZ9qcYM_MHBjkeLX-ERUILdbthqqfRgvr_-rblg96aUDWYVE8v1FjC91rC5x4VL7Yj9Dqjb_
+
+xvid或x264之类的编码器对编码的程度有量化的级数。-sameq保持和输入时一样的级数，但再次有损编码进行编码，画质肯定会下降，所以不是一样的画质。
+-qmax n 声明变化级数编码时最大的级数整数n。  n的值由具体编码决定，x264是[0,51]之间。0代表最好，51最差
+-qscale  n 以固定的量化级数值n编码，x264是[0,51]之间。
 
 
