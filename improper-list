@@ -1,0 +1,71 @@
+in lisp there're two kind of list, proper list and improper list
+dot pair or called cons cell is improper list
+(1 . 2) is improper list
+(1 2) is proper list
+improper list does not end in a nil or called empty list '(), proper list does
+that's the difference.
+
+<jusss> dot pair is list?
+<twb> jusss: do you mean an improper list?  '(2 . 3)  [18:04]
+<jusss> twb: (cons 2 3)
+<twb> That is called an improper list, because it does not end in a nil
+<jusss> twb: so improper list is list?
+<twb> mostly
+<twb> a normal list is like (1 2 3 . ())
+<twb> an improper list is like (1 2 . 3)
+<twb> So it saves one cell of memory
+<C-Keen> (listp '( 1 2 . 3)) -> t
+<twb> most of the time it is just annoying
+<twb> listp only checks for consp or nil  [18:09]
+<jusss> twb: nil is empty list '()?
+<twb> ya
+<twb> in elisp and CL () is the same as nil is the same as canonical falseness
+<jusss> twb: list in cl or elisp is diffrent with list in scheme?  [18:14]
+<livcd> hmm for a selected string how do i capitalize it ?
+<twb> yes  [18:15]
+<twb> in scheme, falseness is separate
+<jusss> twb: what's the difference between proper list and improper list?
+<jusss> or normal list and dot pair or called cons cell what ever you called
+<twb> one ends in a nil, the other doesn't  [18:17]
+<twb> that's all
+<jusss> they both can be car and cdr
+<twb> But e.g. it means you cannot run LENGTH on an improper list
+<jusss> (cdr (cdr '(1 2))) => '()  [18:20]
+<jusss> (cdr (cdr '(1 . 2))) => error
+<jusss> so that's it?
+<YoungFrog> 2 is not a cons cell, so you can't take its cdr.  [18:21]
+<YoungFrog> chris64: you can give an optional frame argument to (window-list)
+<twb> jusss: it's not complicated  [18:22]
+<macrobat> ,(cdr 2)
+<fsbot> oops,  Wrong type argument: listp, 2
+<twb> jusss: do yo understand that a cons cell is just a data structure with
+      two pointers
+<macrobat> we draw the conclusion that 2 is not a list
+<twb> By convention a "list" is a chain of cons cells where the first of each
+      pair is a value, and the second is the rest of the list
+<twb> But you can connect cons cells differently if you want  [18:23]
+<twb> jusss: this is very similar to a linked list in C.  Usually we show
+      these to students using a box-and-arrow diagram
+<taylan> jusss: Scheme's list? checks whether something is a "proper
+	 list", CL and Elisp's listp just check whether it's nil or a cons
+	 cell  [17:09]
+<taylan> jusss: both CL and Scheme have the notion of proper and improper
+	 lists, but Scheme's list? only returns #t for proper lists, whereas
+	 CL's listp returns #t for improper lists too, i.e. any cons cell.
+<taylan> (listp obj) is really just (or (null obj) (consp obj))
+<jusss> IIRC empty list '() can be nil but not #f?  [17:23]
+<taylan> in Scheme, there is no nil.  there's () and #f which are two separate
+	 objects.  [17:25]
+<taylan> there's the predicate null? which checks if an object is ()
+<taylan> (null? obj) is basically (eq? obj '())
+<C-Keen> jusss: one of the nice things in scheme is that #f is the only false
+	 value
+<jusss> taylan: so there's no false value in cl?  [17:26]
+<taylan> in CL, nil is false and the empty list  [17:27]
+<taylan> there's no dedicated false value like #f in CL
+<taylan> jusss: if the chain of pairs ends in (), then it's a proper list,
+	 otherwise it's an improper list  [18:04]
+<taylan> normally proper lists are expected
+<taylan> Scheme's "list?" predicate returns #f for improper lists
+<taylan> CL's "listp" returns #t  [18:06]
+
