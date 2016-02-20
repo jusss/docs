@@ -1,0 +1,67 @@
+debian可以用apt-get来安装官方编译的新内核,但这样安装的新内核没有/lib/modules/$new-kernel/build目录
+导致无法重新编译内核模块
+
+#vi /etc/apt/source.list
+deb http://mirrors.aliyun.com/debian jessie-backports main
+#apt-get update
+#apt-get -t jessie-backports install linux-image-amd64
+然后/lib/modules和/boot下就有新内核和模块了还有initramfs
+手工改/boot/grub/grub.cfg添加新内核的启动项，重启即可
+--------------------------------------------------------------------------------------------
+from: https://github.com/hadess/rtl8723bs/wiki/RTL8723BS-module-building-instruction-for-Debian-GNU-Linux
+RTL8723BS module building instruction for Debian GNU Linux
+Debian Jessie (8.0) is running kernel 3.16 which is not supported by the latest version of module. As a result, you may either switch to latest version of kernel, or make an older version of module. Since there is always support from latest version of kernel and module, while less or no support from older version, it is recommended to use the first method, switch to latest version of kernel. This instruction will also provide information for this method.
+
+Switch to latest version of kernel
+
+Assuming existing environment is Debian Jessie (amd64) running kernel 3.16.
+
+Add backports support
+
+# echo "deb http://http.debian.net/debian jessie-backports main" >> /etc/apt/sources.list
+
+Install backports kernel
+
+# apt-get update
+
+# apt-get -t jessie-backports install linux-image-amd64
+
+Reboot the system to run new kernel
+
+# reboot
+
+Verify kernel version after reboot
+
+# uname -r
+
+4.1.0-0.bpo.2-amd64
+
+Make and install the module
+
+Install build support packages, note that "4.1.0-0.bpo.2" below should be replaced by the result of running "uname -r"
+
+# apt-get install unzip build-essential linux-headers-4.1.0-0.bpo.2-all-amd64
+
+Download the module
+
+# cd /usr/local/src
+
+# wget https://github.com/hadess/rtl8723bs/archive/master.zip
+
+Make the module
+
+# unzip master
+
+# cd rtl8723bs-xxx
+
+# make
+
+Install the module
+
+# sudo make install
+
+# sudo depmod -a
+
+# sudo modprobe r8723bs
+
+
