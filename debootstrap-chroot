@@ -29,6 +29,7 @@ net_rw:x:3004:root
 deb http://mirrors.aliyun.com/debian jessie main non-free contrib
 #apt-get update
 
+by the way, debian的源里应该也会提供bootstrap.tar.gz包，解压即可用，这个debootstrap脚本只是把那个包下载下来而已
 ------------------------------------------------------------------------------------------------------------------------
 from: http://www.linuxidc.com/Linux/2015-02/113975.htm
 你可能会有很多理由想要把一个应用、一个用户或者一个环境与你的 Linux 系统隔离开来。不同的操作系统有不同的实现方式，而在 Linux 中，一个典型的方式就是 chroot 环境。
