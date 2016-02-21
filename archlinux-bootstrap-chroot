@@ -1,0 +1,12 @@
+archlinux用bootstrap建chroot环境有2种方式
+1. 用arch-bootstrap.sh
+2. 直接从源下载archlinux-bootstrap.tar.gz解压即可
+但archlinux官方只提供x86_64和i686的bootstrap包，arm的由非官方社区提供
+
+https://wiki.archlinux.org/index.php/Bootstrap
+https://github.com/tokland/arch-bootstrap
+https://github.com/tokland/arch-bootstrap/blob/master/arch-bootstrap.sh
+http://mirrors.aliyun.com/archlinux/iso/2016.02.01/
+http://archlinuxarm.org/developers/downloads
+http://mirrors.ustc.edu.cn/archlinuxarm/os/
+
