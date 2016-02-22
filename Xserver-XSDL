@@ -1,0 +1,9 @@
+在android-x86上chroot进archlinux-bootstrap-i686.tar.gz解压的包里
+然后发现fcitx在emacs里调用不了，但在xterm里可以调用
+是xsdl版本的问题, 换成xserver-xsdl-1.11.37.apk就能在emacs里调用fcitx了
+旧版本的xsdl可以去sourceforge.net下
+原因可能是新版xsdl修改了键盘，添加了自定义的键盘
+
+安装fcitx fcitx-configtool fcitx-gtk3，运行fcitx-configtool提示包未找到
+这时可以用fcitx-config-gtk3来配置fcitx
+
