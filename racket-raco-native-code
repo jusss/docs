@@ -1,0 +1,31 @@
+I. racket脚本
+
+   x.rkt
+   #!/usr/bin/env racket
+   #lang racket/base
+   (define bla
+     (lambda ()
+       ...
+       ))
+   (bla)
+
+   文件权限加x后,$./x.rkt或者$racket x.rtk执行
+
+II. native code
+
+    x.rkt
+    #lang racket/base
+    (define bla
+      (lambda ()
+        ...
+	))
+    (bla)
+
+    raco exe -o x.exe x.rkt
+    
+    打包运行时库和可执行文件到指定目录以便可以在其它机器上运行
+    raco distribute destination-direcotry x.exe
+
+
+from: http://docs.racket-lang.org/raco/exe-dist.html
+      http://docs.racket-lang.org/raco/exe.html?q=raco
