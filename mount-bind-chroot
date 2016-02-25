@@ -1,0 +1,80 @@
+正常的chroot之前的mount
+mount -o bind /dev ./dev
+mount -t devpts /dev/pts ./dev/pts
+mount -t proc /proc ./proc
+mount -t sysfs /sys ./sys
+
+chroot . /bin/bash
+
+mount -o bind /tmp ./tmp
+mount -t tmpfs shm ./dev/shm
+
+或另一种方式
+mount --bind /dev ./dev
+mount -vt devpts devpts ./dev/pts
+mount -vt tmpfs shm ./dev/shm
+mount -vt proc proc ./proc
+mount -vt sysfs sysfs ./sys
+
+创建个5G的iso文件
+dd if=/dev/zero of=./x.img bs=512K count=10000
+格式化
+mkfs.ext4 ./x.img
+mount -o loop ./x.img /mnt
+把bootstrap解压到/mnt
+然后上面的一堆mount最后chroot进去
+
+mount -o bind 等同 --bind
+-o bind 类似于硬链接hard link, 但又不是硬链接, 你删掉一个硬链接,文件依旧存在，
+除非删掉这个文件的所有硬链接, 而mount -o bind old-dir new-dir, 你在new-dir里
+删掉一个文件, old-dir里也会删掉这个文件
+
+initramfs的最后一步就是chroot?
+
+mdev -s会生成/dev下的设备文件
+
+--------------------------------------------------------------------------
+
+cube i6 air, android win10 debian
+
+debian分区在/dev/block/mmcblk0p20
+sdcard的位置在/dev/block/vold/179:17 挂载于/mnt/media_rw/sdcard1
+可以用mount查看sdcard的信息
+
+sdcard挂载进chroot有2种方法
+1. mount -o bind /dev ./dev后进chroot里 mount /dev/block/vold/179:17 /mnt
+2. mount -o bind /mnt/media_rw/sdcard1 ./mnt 然后chroot
+
+1的这种方法在android里umount /dev/block/vold/179:17之后, 进chroot里还应可以dd或fdisk
+
+----------------------------------------------------------------------------------
+
+on android
+
+$su
+#/system/xbin/mount /dev/block/mmcblk0p20 /storage/sdcard0/debian-partition
+#cd /storage/sdcard0/debian-partition/home/john/root.i386
+#mount -o bind /dev ./dev
+#mount -t proc porc ./proc
+#mount -t sysfs sysfs ./sys
+#chroot . /bin/bash
+#exprot PATH=/usr/bin:/bin:/sbin:/usr/local/bin
+#su
+#mount -t devpts devpts /dev/pts        it works! 这说明devpts可以在chroot之后再mount
+#mount /dev/block/vold/179:\17 /mnt     it works!
+或在chroot之前把sdcard的挂载于android的目录mount -o bind到chroot里的目录上
+#mount -o bind /mnt/media_rw/sdcard1 ./mnt 接着chroot . /bin/bash即可
+
+------------------------------------------------------------------------------------
+
+mount -o bind 还可以解决分区大小问题,如/var分区太小,但/export分区足够大
+#mount -o bind /export/var/log  /var/log
+所有写入/var/log里的stuff都会写入/export/var/log里
+还可以改/etc/fstab自动挂载
+/export/var/log    /var/log    none bind 0 0
+
+
+
+
+
+
