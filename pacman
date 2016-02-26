@@ -1,0 +1,97 @@
+pacman 5.0.0-1
+
+大选项 -Database -Query -Remove -Sync -T(deptest) -Upgrade -Files -Version -help
+通用选项 -b -r -v --config --logfile --arch
+然后就是这个大选项里面那些小选项组合
+
+查询nslookup在哪个包里
+pacman -Fy; pacman -Fs nslookup
+
+搜索包
+pacman -Ss package
+
+安装包
+pacman -S package
+
+安装本地的包
+pacman -U package
+
+卸载包
+pacman -R package
+
+-R卸载某个包  -c依赖它的包  -s它依赖的包
+pacman -Rsc package
+
+更新包列表和升级包
+pacman -Syu
+
+升级系统时忽略某些包
+pacman -Syu --ignore package 或者在/etc/pacman.conf IgnorePkg=linux多个包用空格分开
+
+更新包列表
+pacman -Sy
+
+查看已安装的包的版本信息
+pacman -Q package
+
+查看已安装的包的所有文件
+pacman -Ql package
+
+清空缓存包
+pacman -Sc 或者直接删除 /var/cache/pacman/pkg/
+
+pacman 通用选项 -r 指定另外的安装根目录 -b 指定另外的数据库位置 --cachedir 指定另外的包缓存位置
+pacman 数据库的位置 /var/lib/pacman/sync. 配置文件在 /etc/pacman.conf 
+
+pacman -r 指定另外的根目录,这个选项可以把包安装到一个临时挂载的分区上，这个分区被其它系统拥有,
+如果数据库路径和记录文件没有指定在command line或pacman.conf里，它们默认的位置将在这个根路径里
+甚至都可以chroot进这个根目录里,或许可以用pacman -r来构建一个chroot环境,一个bootstrap
+
+源配置文件 /etc/pacman.d/mirrorlist
+Server=http://mirrors.aliyun.com/archlinux/$repo/os/$arch
+
+<jusss> if I want install packages into another location not /, I just need
+	one parameter -r ?
+<jelle> with pacman?
+<jusss> if my / partition is too small
+<jusss> yes, pacman
+<jelle> jusss: TL;DR you can't
+<Earnestly> jusss: You need fakeroot as well because pacman requires that
+	    you're the root for reasons  [22:57]
+<Earnestly> jusss: E.g. fakeroot -- pacman -r /foo -Sy base
+<Earnestly> jusss: But it will be a completely new prefix and running software
+	    from there will be difficult
+<Earnestly> jusss: Consider all the library paths you'd have to set for all
+	    the different language runtimes  [22:58]
+<Earnestly> jusss: And all the packages which hardcode lookups based on the
+	    typical compile time --prefix option
+<jusss> Earnestly: that will build two repo?
+<Earnestly> jusss: Can you rephrase that since I don't understand the question
+<jusss> Earnestly: there will be two storage location for packages? and they
+	need to be same?
+<Earnestly> jusss: First question: Yeah there will be essentially two
+	    installations, you could even chroot into the second.  Second
+	    question: I have no idea what you're asking, "they need to be the
+	    same"?  What do you mean?  [23:03]
+<jusss> Earnestly: I meant the new one need to sync to the old one, sorry my
+	English is bad
+<Boohbah> jusss: why not make your root partition larger?
+<Earnestly> jusss: Nope, it's completely separate
+<Earnestly> jusss: And it likely won't be suitable for what you're trying to
+	    hack around, as Boohbah says, fix the real problem instead
+<jusss> Boohbah: I make a mistake when I install system, I set / partition too
+	small
+<jusss> made
+<DarkFeather> jusss you can also be aggressive with paccache and clean out the
+	      packages.  [23:06]
+<timotheusbooth> jusss, have you emptied you pacman cache of undeeded
+		 packageS?
+<jusss> DarkFeather: timotheusbooth , yes, I have, the point is / partition is
+	too small, I have to clean it after I install new packages
+<timotheusbooth> jusss, sounds messed up.. how big is your partitin?
+<timotheusbooth> partition*
+<jusss> 10GB  [23:09]
+<Earnestly> jusss: Resize your / partition and make more room for it
+<Earnestly> jusss: Or use pacgraph -c to remove unneeded packages
+<DarkFeather> jusss: did you install on LVM?
+<jusss> DarkFeather: no, just normal
