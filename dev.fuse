@@ -1,3 +1,35 @@
+android的存储问题一直都没有很好的解决。。。
+4.4.4
+/storage/emulated/0 内置存储
+/storage/emulated/legacy 内置存储
+/sdcard -> /storage/emulated/legacy 内置存储
+/mnt/sdcard -> /storage/emulated/legacy 内置存储
+/storage/sdcard0 -> /storage/emulated/legacy 内置存储
+/data/media/0 内置存储
+
+/storage/sdcard1  sdcard卡
+实际上sdcard /dev/block/vold/179:17 on /mnt/media_rw/sdcard1
+
+fuse是个interface,可以让程序在用户态创建文件系统
+内存信息 运行时的信息在/proc 文件系统 proc
+硬件的固件 驱动 内核模块 在/sys 文件系统 sysfs
+
+android分内部存储和sdcard存储, 内部存储在/data下， /data和/sdcard合并分区后， sdcard的存储会以mount -o bind sdcard-dir /data/xxx下
+正常app安装在/data/app里, app的应用数据存储在/data/data/package-name/下， 而某些国内应用喜欢把应用数据存储在 /sdcard/Android/data里甚至/sdcard里或/mnt/sdcard/xxx
+
+UMS 大容量存储 和 MTP
+
+MTP连接电脑时，并不会卸载sdcard而是仍然挂载着sdcard然后通过接收电脑传过来的数据来创建修改文件，MTP的缺点太多了，经常在电脑上通过MTP创建文件
+只有重启后才能在手机上发现刚创建的文件
+而UMS大容量存储就不是这样，UMS会卸载sdcard卡，然后在电脑上挂载sdcard，电脑上可以随意修改sdcard的内容, 但此时手机无法读取sdcard上的数据
+
+/data和/sdcard合并分区后就只能用MTP这种恶心的方式来连接电脑了
+
+from:http://www.zhihu.com/question/22098037
+Android4.X后部分内置大容量储存的手机/data和/sdcard合并，均采用ext3格式，这样可以减少储存空间浪费，同时也可以安装更多程序(不受预留/data分区大小限制)，而Windows无法读取ext3分区格式，所以引入MTP模式读取sdcard分区文件。
+如果/sdcard依旧是FAT32格式，部分机型可以在设置/储存/菜单中设置回大容量储存。
+
+
 from: http://bbs.gfan.com/android-5382920-1-1.html
 关于android的4.2的0文件夹的详解
 
