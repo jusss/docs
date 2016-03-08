@@ -1,0 +1,125 @@
+from: http://www.cyberciti.biz/faq/howto-run-nginx-in-a-chroot-jail/
+How do I run Nginx web server in a chroot (jail) so that I can minimizes the damage done by a potential break-in by isolating the web server to a small section of the filesystem?
+
+You can use traditional chroot kind of setup with nginx. Our sample setup:
+
+Jail Directory : /nginx (D=/nginx)
+Tested On : 64 Bit Linux Sytems (RHEL / CentOS / Fedora etc)
+Nginx role : SSL and HTTP reverse proxy
+Nginx 64 bit Libraries Path : /lib64 and /usr/lib64 (for 32 bit system use /lib and /usr/lib)
+Step #1: Setup Chroot Directory
+
+First, you need to define a chroot directory. Type the following commands:
+# D=/nginx
+# mkdir -p $D
+
+Step #2: Create Isolated Environment
+
+Type the following commands:
+# mkdir -p $D/etc
+# mkdir -p $D/dev
+# mkdir -p $D/var
+# mkdir -p $D/usr
+# mkdir -p $D/usr/local/nginx
+# mkdir -p $D/tmp
+# chmod 1777 $D/tmp
+# mkdir -p $D/var/tmp
+# chmod 1777 $D/var/tmp
+# mkdir -p $D/lib64
+
+Step #3: Create Required Devices in $D/dev
+
+You need to create the following three device entries so that nginx works without problem inside jail:
+# ls -l /dev/{null,random,urandom}
+
+Sample outputs:
+
+crw-rw-rw- 1 root root 1, 3 Apr  5 11:03 /dev/null
+crw-rw-rw- 1 root root 1, 8 Apr  5 11:03 /dev/random
+cr--r--r-- 1 root root 1, 9 Apr  5 11:03 /dev/urandom
+You need to use the mknod command to make block or character special files, enter:
+# /bin/mknod -m 0666 $D/dev/null c 1 3
+# /bin/mknod -m 0666 $D/dev/random c 1 8
+# /bin/mknod -m 0444 $D/dev/urandom c 1 9
+
+Step #4: Copy All Nginx Files In Directory
+
+You need to copy /usr/local/nginx/ to $D/usr/local/nginx, enter:
+# /bin/cp -farv /usr/local/nginx/* $D/usr/local/nginx
+
+Step #5: Copy Required Libs To Jail
+
+$D/usr/local/nginx/sbin/nginx depends upon various libraries, you need to copy them to $D/lib64 and $D/usr/lib64. To display shared library dependencies, enter:
+# ldd /usr/local/nginx/sbin/nginx
+
+Sample outputs:
+
+	libpcre.so.0 => /lib64/libpcre.so.0 (0x000000316b800000)
+	libssl.so.6 => /lib64/libssl.so.6 (0x0000003170400000)
+	libcrypto.so.6 => /lib64/libcrypto.so.6 (0x000000316d400000)
+	libdl.so.2 => /lib64/libdl.so.2 (0x000000316b000000)
+	libz.so.1 => /usr/lib64/libz.so.1 (0x000000316c400000)
+	libc.so.6 => /lib64/libc.so.6 (0x000000316ac00000)
+	libgssapi_krb5.so.2 => /usr/lib64/libgssapi_krb5.so.2 (0x000000316e400000)
+	libkrb5.so.3 => /usr/lib64/libkrb5.so.3 (0x0000003170000000)
+	libcom_err.so.2 => /lib64/libcom_err.so.2 (0x000000316ec00000)
+	libk5crypto.so.3 => /usr/lib64/libk5crypto.so.3 (0x000000316f800000)
+	/lib64/ld-linux-x86-64.so.2 (0x000000316a800000)
+	libkrb5support.so.0 => /usr/lib64/libkrb5support.so.0 (0x000000316fc00000)
+	libkeyutils.so.1 => /lib64/libkeyutils.so.1 (0x000000316f000000)
+	libresolv.so.2 => /lib64/libresolv.so.2 (0x000000316d800000)
+	libselinux.so.1 => /lib64/libselinux.so.1 (0x000000316c000000)
+	libsepol.so.1 => /lib64/libsepol.so.1 (0x000000316bc00000)
+You need to copy all of the above files to $D using the cp command as follows:
+# cp /lib64/libsepol.so.1 $D/lib64
+
+To automate this procedure use our script called n2chroot:
+# cd /tmp
+# wget http://bash.cyberciti.biz/dl/527.sh.zip
+# unzip 527.sh.zip
+# mv 527.sh /usr/bin/n2chroot
+# chmod +x /usr/bin/n2chroot
+
+Edit script and set BASE directory:
+# vi /usr/bin/n2chroot
+
+Finally, run it as follows:
+# n2chroot /usr/local/nginx/sbin/nginx
+# /bin/cp -fv /lib64/* $D/lib64
+
+Step #6: Copy /etc To Jail
+
+Finally, copy /etc to $D, enter:
+# cp -fv /etc/{group,prelink.cache,services,adjtime,shells,gshadow,shadow,hosts.deny,localtime,nsswitch.conf,nscd.conf,prelink.conf,protocols,hosts,passwd,ld.so.cache,ld.so.conf,resolv.conf,host.conf} $D/etc
+
+And a few directories too:
+# cp -avr /etc/{ld.so.conf.d,prelink.conf.d} $D/etc
+
+How Do I Start Chrooted nginx?
+
+First, kill existing nginx (if running):
+# killall -9 nginx
+
+To start chrooted nginx, type:
+# /usr/sbin/chroot /nginx /usr/local/nginx/sbin/nginx -t
+# /usr/sbin/chroot /nginx /usr/local/nginx/sbin/nginx
+
+Make sure nginx starts when system reboots:
+# echo '/usr/sbin/chroot /nginx /usr/local/nginx/sbin/nginx' >> /etc/rc.local
+
+How Do I Reload Chrooted nginx?
+
+Type the following command
+# /usr/sbin/chroot /nginx /usr/local/nginx/sbin/nginx -s reload
+
+How Do I Edit Chrooted nginx Configuration File?
+
+Type the following commands:
+# cd /nginx/usr/local/nginx/conf/
+# vi nginx.conf
+
+Save and close the file. Test and reload the same:
+# /usr/sbin/chroot /nginx /usr/local/nginx/sbin/nginx -t
+# /usr/sbin/chroot /nginx /usr/local/nginx/sbin/nginx -s reload
+
+
