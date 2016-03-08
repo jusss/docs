@@ -1,1 +1,6 @@
 用浏览器插件得到视频的下载地址, 然后直接用mpv播放这个地址即可
+
+archlinux: chromium, fvd downloader, mpv or vlc or mplayer
+android: firefox, GetThemAll Any File Downloader.apk, MX Player or vlc
+
+解析在线视频的地址，然后播放器播放这个地址
