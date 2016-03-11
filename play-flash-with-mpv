@@ -4,3 +4,6 @@ archlinux: chromium, fvd downloader, mpv or vlc or mplayer
 android: firefox, GetThemAll Any File Downloader.apk, MX Player or vlc
 
 解析在线视频的地址，然后播放器播放这个地址
+用flash video downloaer aka fvd downloader 解析bilibili时,有时解析出的
+地址只能播放部分视频,这时安装bilibili helper插件从chrome商店里，然
+后flash video downloader解析出来的地址就能播放完整视频了
