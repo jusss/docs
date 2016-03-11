@@ -1,0 +1,11 @@
+检查object是否为str isinstance(object,str)
+
+except Exception as e:   e is not str object, e is a Exception subclass
+
+存储这个e进文件,用logging
+import logging;
+logger = logging.getLogger(__name__)
+
+then in except clause:
+	   logger.critical('something bad happened', exc_info=True)
+
