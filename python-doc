@@ -1,11 +1,46 @@
 检查object是否为str isinstance(object,str)
+得到某object的所属的类 type("a") -> <class 'str'>
 
 except Exception as e:   e is not str object, e is a Exception subclass
+e.__str__() is str object, and e.args is tuple
 
-存储这个e进文件,用logging
+https://docs.python.org/3/tutorial/errors.html?highlight=exception
+
+The except clause may specify a variable after the exception name. The variable is bound to an exception instance with the arguments stored in instance.args. For convenience, the exception instance defines __str__() so the arguments can be printed directly without having to reference .args. One may also instantiate an exception first before raising it and add any attributes to it as desired.
+
+>>> try:
+...    raise Exception('spam', 'eggs')
+... except Exception as inst:
+...    print(type(inst))    # the exception instance
+...    print(inst.args)     # arguments stored in .args
+...    print(inst)          # __str__ allows args to be printed directly,
+...                         # but may be overridden in exception subclasses
+...    x, y = inst.args     # unpack args
+...    print('x =', x)
+...    print('y =', y)
+...
+<class 'Exception'>
+('spam', 'eggs')
+('spam', 'eggs')
+x = spam
+y = eggs
+
+try:
+...  a+b
+... except Exception as e:
+...  print(e.__str__())
+...  print(type(e.__str__()))
+... 
+name 'b' is not defined
+<class 'str'>
+
+或者也可以用logging来存储这个异常进文件，当然也可以直接用e.__str__()来存异常进文件
 import logging;
 logger = logging.getLogger(__name__)
 
 then in except clause:
-	   logger.critical('something bad happened', exc_info=True)
+   logger.critical('something bad happened', exc_info=True)
 
+这个e多为异常的子类，e.args是异常信息，为tuple,也可以用e.__str__()直接输出字符串异常信息
+元组tuple和列表list很像，区别就是tuple的元素不可更改，用()替代[]
+a=("ad", "adb")
