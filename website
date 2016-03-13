@@ -90,6 +90,8 @@ deb http://mirrors.aliyun.com/debian wheezy main non-free contrib
 deb-src http://mirrors.aliyun.com/debian/ wheezy main non-free contrib
 deb http://mirrors.kernel.org/debian/ unstable main contrib non-free
 
+deb http://httpredir.debian.org/debian jessie main
+
 deb http://mirrors.aliyun.com/debian jessie main non-free contrib
 deb-src http://mirrors.aliyun.com/debian jessie main non-free contrib
 
