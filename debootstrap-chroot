@@ -1,8 +1,11 @@
 cube i6 air自带双系统32位的android-x86和win10, 但cpu是64位的z3735f, 直接在上面装了debian jessie 64位版，因为64位的支持efi引导安装,
 需要搞一个bootia32.efi去引导这个64位的iso, 且只有jessie的支持emmc存储介质, wheezy的iso Installer不识别emmc
 装完debian jessie amd64后用
+
 #debootstrap --variant=build --arch i386 --foreign jessie ~/debian-i386/  http://mirrors.aliyun.com/debian
 建造一个32位的debian环境, --variant=build是安装build-essential包,因为host os是amd64的debian,而建造的是32位的,所以用--arch i386 --foreign
+--arch支持 amd64, arm64, armel, armhf, i386, mips, mipsel, powerpc, ppc64el, or s390x.
+
 chroot进去
 #chroot ~/debian-i386 /bin/bash
 配置first stage下载的包的初始化
