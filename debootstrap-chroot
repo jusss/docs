@@ -17,11 +17,11 @@ $su
 #/system/xbin/mount /dev/block/mmcblk0p20 /mnt/media_rw/sdcard1/debian-partition     mmcblk0p20是debian amd64所在的分区
 #cd /mnt/media_rw/sdcard1/debian-partitian/home/john/debian-i386
 #mount -o bind /dev ./dev
-#mount -t proc /proc ./proc
-#mount -t sysfs /sys ./sys
-#mount -t devpts /dev/pts ./dev/pts
+#mount -t proc proc ./proc
+#mount -t sysfs sysfs ./sys
+#mount -t devpts devpts ./dev/pts
 #chroot . /bin/bash
-#export PATH=/usr/bin:/bin:/sbin
+#export PATH=/usr/bin:/bin:/sbin:/usr/local/bin
 #su 这里su下才会变成这个chroot环境的root
 #vi /etc/group
 inet:x:3003:root
