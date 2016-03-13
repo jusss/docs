@@ -11,7 +11,7 @@ chroot进去
 配置first stage下载的包的初始化
 #/debootstrap/debootstrap --second-stage
 如果ls提示no command found就
-#export PATH=$PATH:/usr/bin:/bin:/sbin:/usr/local/bin:/usr/local/sbin
+#export PATH=$PATH:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
 然后就可以进32位的android里,打开terminal emulate for android应用, connectbot里用ls会导致crash
 $su
 #/system/xbin/mount /dev/block/mmcblk0p20 /mnt/media_rw/sdcard1/debian-partition     mmcblk0p20是debian amd64所在的分区
@@ -21,7 +21,7 @@ $su
 #mount -t sysfs sysfs ./sys
 #mount -t devpts devpts ./dev/pts
 #chroot . /bin/bash
-#export PATH=$PATH:/usr/bin:/bin:/sbin:/usr/local/bin:/usr/local/sbin
+#export PATH=$PATH:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
 #su 这里su下才会变成这个chroot环境的root
 #vi /etc/group
 inet:x:3003:root
