@@ -16,7 +16,7 @@ chroot进去
 $su
 #/system/xbin/mount /dev/block/mmcblk0p20 /mnt/media_rw/sdcard1/debian-partition     mmcblk0p20是debian amd64所在的分区
 #cd /mnt/media_rw/sdcard1/debian-partitian/home/john/debian-i386
-#mount -o bind,ro /dev ./dev
+#mount -o bind /dev ./dev
 #mount -t proc proc ./proc
 #mount -t sysfs sysfs ./sys
 #mount -t devpts devpts ./dev/pts
