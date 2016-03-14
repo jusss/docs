@@ -1,0 +1,49 @@
+<a1phago> /dev下的文件是系统启动时自动生成的吗？  [15:15]
+<a1phago> chroot时mount -o bind /dev ./dev会不安全吗？  [15:16]
+<X> a1phago: 没啥不安全的  [15:19]
+<a1phago> X: 如果不bind /dev的话，能在chroot环境里生成/dev下的文件吗？
+<X> a1phago: 不能.
+<a1phago> X: 如果想搭建chroot jail的话，是怎么做的
+<X> a1phago: jail是什么.
+<a1phago> X: 监狱？
+<X> a1phago: chroot监狱是什么意思?  [15:22]
+<X> a1phago: 我不知道你到底想做什么.
+<a1phago> X: 搭建个chroot环境，在里面运行些程序，如nginx之类的，但又不想
+	  影响到外面的系统  [15:23]
+<X> a1phago: 哦. 为啥不用docker.
+<a1phago> X: 还没尝试， 听说过 docker和 lxc, systemd-nspawn怎么样？
+<X> a1phago: nspawn我还没试过. 看起来也是个container啊  [15:25]
+<a1phago> X: bind /dev时可以大部分文件只读，少数文件可读写吗？
+<X> a1phago: 不能.  [15:32]
+<X> a1phago: 但是你可以对文件做bind.
+<X> a1phago: bind不一定要对目录的. 你对单一文件做bind, 然后单独设置权限
+	  应该是可以的.
+<a1phago> X: 就是先bind整个/dev,然后再单独bind /dev下的某个文件？
+<X> a1phago: 恩, 我是这么想得. 虽然我没试过.
+<X> a1phago: 如果不行的话, 你就挨个bind每个文件, 写个脚本也不难做到.
+<a1phago> X: /proc /sys这两个里面的文件是在系统启动时生成的吗？ 删除里面
+	  的文件会对下次启动有影响吗？  [15:34]
+<X> a1phago: 你删除一个试试看, 压根儿就删除不了啊  [15:35]
+<X> a1phago: 是自动生成的, 每次启动都会在内存里重新创建, 不用担心.
+<a1phago> X: 那/dev里的文件呢？如果删除，对下次启动有影响吗/
+<X> a1phago: 不会.  [15:37]
+<a1phago> X: /dev里的文件也是启动时生成的吗？
+<X> a1phago: 这个都是启动的时候发现了有xx设备然后根据预设的脚本去mknod的.
+<X> a1phago: 每次启动都会检查的, 别担心.
+<a1phago> X: 那这样的话，chroot进的系统，和当前运行的系统，有什么区别吗？
+	  /proc /sys /dev都一样， /usr /bin不一样，有什么是当前运行的系统能做
+	  而chroot里做不了的呢？  [15:39]
+<X> a1phago: 重启.
+<X> a1phago: chroot环境不让重启.
+<X> a1phago: 你这个问题太宽泛了, 我也回答不上来.  [15:40]
+<a1phago> X: 还有其它的吗？比如调整内核参数什么的？
+<X> a1phago: chroot环境下可以调整的
+<X> a1phago: 你这个问题太宽泛了, 没法回答
+<a1phago> X: 那也就是说我可以同时运行多个发行版，但都只用一个内核，是吗？
+								        [15:41]
+<X> a1phago: 可以.
+<a1phago> X: /目录必须装分区里才能启动吗？可以装分区的某个目录里吗？就是
+	  可以启动chroot里的系统吗？  [15:43]
+								        [16:01]
+<Y> a1phago: /proc和/sys的内容都是在内存里，根本不在硬盘上……话说你不
+	   准备下一局，在这问chroot做啥
