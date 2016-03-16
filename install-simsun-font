@@ -5,3 +5,9 @@ mkfontscale
 mkfontdir
 fc-cache -fv ~/.fonts
 fc-list |grep Sim
+
+
+simsun is bitmap font, and others font like wqy mostly are not
+bitmap font, but wqy do have one bitmap font, and it's called
+wqy-bitmapfont in archlinux, and xfonts-wqy in debian jessie.
+bitmap font display better than other fonts.
