@@ -1,0 +1,7 @@
+mkdir ~/.fonts
+cp simsun.ttf ~/.fonts
+cd ~/.fonts
+mkfontscale
+mkfontdir
+fc-cache -fv ~/.fonts
+fc-list |grep Sim
