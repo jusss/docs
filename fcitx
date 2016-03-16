@@ -3,3 +3,8 @@ csslayer:退出之后,改~/.config/fcitx/profile PreeditStringInClientWindow=Fal
 关闭fcitx组合键C-;功能,因为与emacs绑定键冲突
 /usr/share/fcitx/addon/fcitx-clipboard.conf添加Enabled=False
 或者~/.config/fcitx/conf/fcitx-clipboard.config
+
+fcitx in debian jessie report error "Connection Error (/usr/bin/dbus-lauch 
+terminated abnormally without any error message), the reason is debian don't
+install dbus-x11, aptitude install dbus-x11 then restart fcitx with fcitx -rd will
+be fine.
