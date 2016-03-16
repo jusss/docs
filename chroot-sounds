@@ -1,0 +1,3 @@
+chroot into debian-jessie from archlinux on my laptop,
+and I use mpv Happy.mp4, there's no sound,
+aptitude install alsa-utils kmod{a} will solve this.
