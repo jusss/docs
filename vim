@@ -1,6 +1,14 @@
-dw 向后删一个词   M-d
-de 向后删一句  M-k
-dd 删一行 C-k
+archlinux下的vi和vim是不一样的，pacman -Ql vi和pacman -Ql vim可知
+/usr/bin/vi是个软链接-> /usr/bin/ex,
+而/usr/bin/vim就是vim了
+进visual模式复制更方便, 按v进入visual模式，然后y选中开头再按y选中结尾，
+按p粘帖.按d删除。按V自动选择行，按C-v选择列.然后选择所有行的第1列然后按I在行头插入#,
+所有行头都会插入#
+
+D 从光标删到行末 同d$ C-k
+dw 向后删一个词删空格   M-d
+de 向后删一个词不删空格
+dd 删一行，然后可以用p粘帖 C-a C-k
 ^ 移动到行首 C-a
 $ 移动到行尾 C-e
 C-b pageup M-v
@@ -37,6 +45,8 @@ m+单词（单词为a-z或者A-Z） C-space
 如果再需要一个标记，则可以mb,返回则执行'b;  C-u C-space
 
 u undo C-x u
+U 所有改动undo
+C-R 撤销之前的undo
 
 S-insert 插入(粘帖) C-y
 
