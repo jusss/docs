@@ -26,6 +26,24 @@ II. native code
     打包运行时库和可执行文件到指定目录以便可以在其它机器上运行
     raco distribute destination-direcotry x.exe
 
+III. 创建library和调用
 
+     x.rkt
+     #lang racket
+     (provide (all-defined-out)) 也可单独(provide bla)这样单独provide一个函数而不是所有函数
+
+     (define bla ...) 函数定义
+     ...
+
+     y.rkt
+     #!/usr/bin/env racket
+     #lang racket
+     (require (file "~/lab/x.rkt"))
+
+     (bla ...) 函数调用
+     
 from: http://docs.racket-lang.org/raco/exe-dist.html
       http://docs.racket-lang.org/raco/exe.html?q=raco
+      http://docs.racket-lang.org/reference/require.html
+      https://www.douban.com/group/topic/42119635/
+      
