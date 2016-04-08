@@ -38,7 +38,8 @@ III. 创建library和调用
      y.rkt
      #!/usr/bin/env racket
      #lang racket
-     (require (file "~/lab/x.rkt"))
+     (require (file "~/lab/x.rkt")) 当y.rkt和x.rkt在同一目录时，可用相关路径(require "x.rkt")，require后面默认接的路径是相关路径
+     如果x.rkt在y.rkt的上级目录，可以用(require "../x.rkt")
 
      (bla ...) 函数调用
      
