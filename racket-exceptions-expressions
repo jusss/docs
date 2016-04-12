@@ -1,0 +1,132 @@
+tcp-connect 失败时 raise exn:fail:network异常
+用(with-handlers ((exception-you-expect what-you-want-to-do-when-it-omit))
+     the-code-you-want-to-run)
+
+这个the-code-you-want-to-run必须是expressions
+http://docs.racket-lang.org/reference/exns.html?q=tcp-connect#%28part._.Handling_.Exceptions%29
+
+python有statement和expressions
+racket没有statement,有definitions, expressions, a few forms like require
+http://docs.racket-lang.org/reference/syntax-model.html?q=fully#%28part._fully-expanded%29
+expr = id
+
+(define a 0) is a definition not a expression
+
+so (define ...) can't be the-code-you-want-to-run of (with-handlers ...)
+it need expressions.
+
+<jusss> http://paste.ubuntu.com/15763983/  [01:17]
+<jusss> I don't use begin, but ...
+<jusss> where am I wrong? http://paste.ubuntu.com/15763983/
+<soegaard> jusss: The body of with-handlers is empty
+<jusss> soegaard: (define-values (read-port write-port)  [01:21]
+<jusss>               (ssl-connect server-address server-port protocol)) is
+	not body?
+<soegaard> (with-handlers ([exn:fail:network]) …) (define-values (…) …)
+	   something)  [01:22]
+<soegaard> You have: (with-handlers ([exn:fail:network]) …) )
+	   (define-values …)
+<jusss> soegaard: do you know how to fix it? 
+<soegaard> (with-handlers ([exn:fail:network]) …) (define-values (…) …)
+	   something)  [01:23]
+<jusss> soegaard: I just want to handle that exception when it happens, I mean
+	network is down, and I can catch it and do other things
+<soegaard> (with-handlers ([exn:fail:network]) …) (define-values (…) …)
+	   something)  will catch any exceptions that happens in  something.
+								        [01:24]
+<soegaard> It won’t catch anything outside.
+<jusss> soegaard: something: unbound identifier in module  [01:27]
+<jusss> :(
+<soegaard> By something I mean some expression. Like 42 or “done” or “do
+	   something with the ports"
+<jusss> it must be a procedure? 
+<soegaard> rudybot: eval (with-handlers ([exn:fail? (λ (e) "caught")]) (/ 1
+	   0))
+<rudybot> soegaard: your sandbox is ready
+<rudybot> soegaard: ; Value: "caught"
+<soegaard> rudybot: eval (with-handlers ([exn:fail? (λ (e) "caught")])  (+ 1
+	   2))
+<rudybot> soegaard: ; Value: 3
+<soegaard> jusss: Here (/ 1 0) and (+ 1 2) are in the body  [01:30]
+<soegaard> rudybot: eval (with-handlers ([exn:fail? (λ (e) "caught")]))  (/ 1
+	   0)    ; here the body is empty so it is an error
+<rudybot> soegaard: error: eval:1:0: with-handlers: bad syntax <NEWLINE>   in:
+	  (with-handlers ((exn:fail? (λ (e) "caught"))))
+<jusss> (with-handlers ((exception-you-expect
+	procedure-you-want-when-it-happens)) body-to-omit)  do I understand
+	right?  [01:31]
+<soegaard> yes - except you can omit the body. You need some expression in the
+	   body.
+<soegaard> can -> can not
+<stamourv> The handlers only catch exceptions raised while the body is
+	   running, so there wouldn't be much point in having no body.
+<stamourv> Kind of like let with no body.
+<jusss> why it can't be body? (define-values (read-port write-port)
+	(ssl-connect server-address server-port protocol)))  [01:34]
+<soegaard> That’s a definition not an expression. A body is zero or
+	   definitions followed by an expression.
+<stamourv> That can be *in* the body. But it can't be the whole thing.
+<soegaard> zero -> zero or more
+<jusss> what if I add (lambda () (define-values (read-port write-port)
+	(ssl-connect server-address server-port protocol))) , this is a body?
+<soegaard> How about  (define-values (read-port write-port) (ssl-connect
+	   server-address server-port protocol)))    (list read-port
+	   write-port)  ?  [01:37]
+<jusss> it need be an action, a function call, this is right?   [01:39]
+<jusss> a body
+<soegaard> See
+	   http://docs.racket-lang.org/reference/syntax-model.html?q=fully#%28part._fully-expanded%29
+								        [01:40]
+<rudybot> http://teensy.info/Kluwa4MCAF
+<soegaard> Scroll down to expr =   Id
+<soegaard> The different types of expressions are listed.  [01:41]
+<stamourv> jusss: What are you planning to do with those read and write ports?
+	   Whatever that is, it should probably be your body.  [01:44]
+<stamourv> Because any code that will want to refer to those should be in the
+	   same scope as their definition.
+<jusss> stamourv: read and write from the port is what I want to do  [01:46]
+<jusss> I just add (write-string "xxx" write-port) and (read-line read-port)
+	into (with-handlers ...) and it's ok  [01:48]
+<jusss> it works
+<stamourv> There you go. :)
+<jusss> soegaard: I saw expr = id, there's no define stuff, it means define
+	isn't a expr?  [01:53]
+<soegaard> yes
+<jusss> but there just show some expr, how I know others stuff like define?
+								        [01:55]
+<jusss> soegaard: I know what is different between expr and statement, but
+	what define is?
+<jusss> expr have a return value, statement have a side-effect
+<jusss> define is a statement?
+<soegaard> A definition consists of two things: a declaration and an
+	   initialization.  (define a 42) declares that a is a variable.  The
+	   variable will be initialized (its initial value will be) to 42.
+								        [01:57]
+<stamourv> jusss: Racket doesn't have statements. Racket has definitions and
+	   expressions.
+<soegaard> In some languages declarations and initializations are seperate,
+	   but in Racket you do both at the same time. Hence we call it a
+	   definition.  [01:58]
+<jusss> stamourv: and just definitions and expressions? is there any others?
+<soegaard> There are a few forms that controls modules such as    require.
+<jusss> soegaard: what about lambda?  [02:00]
+<jusss> it's expressions?  [02:01]
+<soegaard> That’s an expression.
+<soegaard> In the list is says  #%plain-lambda   (but think about it as
+	   lambda)
+<jusss> is there definition in common lisp? it's different with racket?
+								        [02:02]
+<jusss> lisp-1 and lisp-2
+<soegaard> I am not a CL expert, but I think they have both.
+	   http://clhs.lisp.se/Front/X_Mast_D.htm  [02:03]
+<jusss> what's the relation racket and  lambda calcular?  [02:05]
+<soegaard> lambda calculus is a formal model for computation  [02:06]
+<jusss> actually, I don't know a little about lambda calcular ... :(
+<soegaard> that means that is is very simple and regular
+<jusss> but I see many articles say schem and lisp are base on lambda calcular
+<soegaard> In some sense - but not in practise.
+<soegaard> It pops up in theoretical contexts.  [02:07]
+<soegaard> Mostly.
+<jusss> I have to go, and thanks for you, soegaard and stamourv 
+<jusss> bye! :)
+<soegaard> bye
