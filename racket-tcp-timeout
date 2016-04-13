@@ -1,0 +1,240 @@
+racket没有tcp timeout的函数，tcp初始连接失败时会raise exn:fail:network异常，可以用
+(with-handlers ((exn:fail:network? ())) (...))来捕捉解决, 但是连接成功后，读取端口超时
+却貌似没有这样的异常可以用来捕捉,参考http://docs.racket-lang.org/reference/exns.html#%28def._%28%28lib._racket%2Fprivate%2Fbase..rkt%29._exn~3afail~3aread~3aeof%29%29
+
+有两种方法可以解决读取端口超时问题,一种是用多线程，一个线程从端口读取字符串，读取成功就counter加1,另一个线程sleep 3分钟然后监测现在的counter数值和3分钟以前的counter数值是否相等
+来判断3分钟内是否读取到字符串，  另一种方法就是使用sync/timeout, sync/timeout类似于C或
+python的select(), 用sync/timeout来检测读取端口事件，来实现超时，但是需要先把要检测的表达式变成事件，可以变成thread事件，因为read-line有read-line-evt事件，所以可以直接用sync/timeout检测read-line-evt事件
+
+racket的thread是srfi的，是绿色线程， touch/future才是OS-level的多线程, place是类似于多进程的多线程，但它还是多线程
+
+racket 异常 http://docs.racket-lang.org/reference/exns.html#%28def._%28%28lib._racket%2Fprivate%2Fbase..rkt%29._exn%29%29
+
+racekt read-line-evt 事件  http://docs.racket-lang.org/reference/port-lib.html#(def._((lib._racket%2Fport..rkt)._read-line-evt))
+http://docs.racket-lang.org/reference/sync.html#%28def._%28%28quote._~23~25kernel%29._evt~3f%29%29
+
+sync/timeout  http://docs.racket-lang.org/reference/sync.html?q=timeout#%28def._%28%28quote._~23~25kernel%29._sync%2Ftimeout%29%29
+
+两个线程, 线程1每次循环1次改变下变量a的值 线程2 sleep一会，检查a的值是否变化，如果没变化kill线程1
+a=0 每次线程1结尾循环一次就(set! a (+ a 1)), 线程2(set! b a) (sleep 120) (if (eq? a b) ...)
+
+另一种方法是使用sync/timeout设置read-line-evt超时，当读取端口超时可更改
+(sync/timeout 30 (read-line-evt read-port)) 30秒内读取到了字符串，(sync/timeout ...)返回读取到的字符串，读取不到返回#f
+
+我先用第一种写下, 多线程的
+
+#!/usr/bin/env racket
+#lang racket
+(require openssl)
+(require "string-library.rkt")
+
+(define server-address "")
+(define server-port 993)
+(define protocol 'sslv3)
+(define user "")
+(define password "")
+
+(define counter 0)
+
+(define-values (read-port write-port) (values 0 0))
+
+;;;If a connection cannot be established by tcp-connect, the exn:fail:network exception is raised.
+
+(with-handlers ((exn:fail:network?
+		 (lambda (e)
+		   (system "/home/jusss/lab/notifier \" Fail to Connect Mail Server, It will restart after 3 minutes\" &")
+		  ;;; if network is down, wait for 3 minutes then restart
+		  (sleep 180)
+		  (system "/home/jusss/lab/mailer-part-ii.rkt &")
+		  (exit))))
+  
+  (set!-values (read-port write-port)
+    (ssl-connect server-address server-port protocol))
+  (write-string (merge-strings `("a_tag login " ,user " " ,password "\r\n"))
+		write-port)
+  (write-string "a_tag select inbox\r\n" write-port)
+  (write-string "a_tag idle\r\n" write-port)
+  
+  (flush-output write-port))
+  
+		 
+;;;(define connect-thread
+;;;  (thread (lambda ()
+;;;	    (set!-values (read-port write-port)
+;;;	      (ssl-connect server-address server-port protocol))
+;;;	    (set! counter (+ 1 counter)))))
+
+;;;(define connect-detect-thread
+;;;  (thread (lambda ()
+;;;	    (sleep 4)
+;;;	    (if (eq? 0 counter)
+;;;		(begin
+;;;		  (system "/home/jusss/lab/notifier \" Fail to Connect Mail Server, It will restart after 3 minutes\" &")
+;;;		  ;;; if network is down, wait for 3 minutes then restart
+;;;		  (sleep 180)
+;;;		  (system "/home/jusss/lab/mailer-part-ii.rkt &")
+;;;		  (exit))
+;;;		'()))))
+
+;;;(thread-wait connect-thread)
+
+
+
+(define got-string " ")
+
+(define read-thread
+  (thread (lambda ()
+	    (define thread-loop (call/cc (lambda (k) k)))
+	    (set! got-string (read-line read-port))
+	    (write-string got-string)
+	    (newline)
+	    (if (find-string "RECENT" got-string)
+		(if (find-string "* 0 RECENT" got-string)
+		    '()
+	            ;;; escape the inner quotes with \
+		    (system "/home/jusss/lab/notifier.rkt \" New Mail\" &"))
+		'())
+	    ;;; if it reads string, then counter add one
+	    (set! counter (+ 1 counter))
+	    (thread-loop thread-loop))))
+
+(define upper-counter counter)
+
+(define detect-read-thread
+  (thread (lambda ()
+	    (define thread-loop (call/cc (lambda (k) k)))
+	    (set! upper-counter counter)
+	    ;;; read nothing over 3 minutes, then restart
+	    (sleep 180)
+	    ;;; compare counter with counter that is 3 minutes ago, if it's same,
+	    ;;; it means it reads nothing
+	    (if (eq? upper-counter counter)
+		(begin
+		  (system "/home/jusss/lab/mailer-part-ii.rkt &")
+		  (system "/home/jusss/lab/notifier.rkt \" Disconnect... It will restart\" &")
+		  (exit))
+		(thread-loop thread-loop)))))
+
+(thread-wait read-thread)
+(thread-wait detect-read-thread)
+	    
+
+
+这是第二种，用sync/timeout的
+
+#!/usr/bin/env racket
+#lang racket
+(require openssl)
+(require "string-library.rkt")
+
+;;;use sync/timeout to instead of multi-thread for reading timeout
+;;;use exception to catch connecting failed
+
+(define server-address "xxx")
+(define server-port 993)
+(define protocol 'sslv3)
+(define user "xxx")
+(define password "xxx")
+
+;;;(define counter 0)
+
+(define-values (read-port write-port) (values 0 0))
+
+;;;If a connection cannot be established by tcp-connect, the exn:fail:network exception is raised.
+
+(with-handlers ((exn:fail:network?
+		 (lambda (e)
+		   (system "/home/xxx/lab/notifier \" Fail to Connect Mail Server, Restart after 3 minutes\" &")
+		  ;;; if network is down, wait for 3 minutes then restart
+		  (sleep 180)
+		  (system "/home/xxx/lab/mailer-part-iii.rkt &")
+		  (exit))))
+  
+  (set!-values (read-port write-port)
+    (ssl-connect server-address server-port protocol))
+  (write-string (merge-strings `("a_tag login " ,user " " ,password "\r\n"))
+		write-port)
+  (write-string "a_tag select inbox\r\n" write-port)
+  (write-string "a_tag idle\r\n" write-port)
+  
+  (flush-output write-port))
+		 
+;;;(define connect-thread
+;;;  (thread (lambda ()
+;;;	    (set!-values (read-port write-port)
+;;;	      (ssl-connect server-address server-port protocol))
+;;;	    (set! counter (+ 1 counter)))))
+
+;;;(define connect-detect-thread
+;;;  (thread (lambda ()
+;;;	    (sleep 4)
+;;;	    (if (eq? 0 counter)
+;;;		(begin
+;;;		  (system "/home/xxx/lab/notifier \" Fail to Connect Mail Server, It will restart after 3 minutes\" &")
+;;;		  ;;; if network is down, wait for 3 minutes then restart
+;;;		  (sleep 180)
+;;;		  (system "/home/xxx/lab/mailer-part-ii.rkt &")
+;;;		  (exit))
+;;;		'()))))
+
+;;;(thread-wait connect-thread)
+
+(define read-from-server
+  (lambda (a-port got-string)
+    ;;; if got-string is #f then restart, it means reading timeout
+    (if (not got-string)
+	(begin
+	  (system "/home/xxx/lab/mailer-part-iii.rkt &")
+	  (system "/home/xxx/lab/notifier.rkt \" Disconnect from Mail Server, Restart\" &")
+	  (exit))
+	(if (find-string "RECENT" got-string)
+		(if (find-string "* 0 RECENT" got-string)
+		    '()
+	            ;;; escape the inner quotes with \
+		    (system "/home/xxx/lab/notifier.rkt \" New Mail\" &"))
+		'()))
+    (write-string got-string)
+    (newline)
+    (read-from-server a-port
+		      (sync/timeout 180
+				    (read-line-evt a-port)))))
+
+(read-from-server read-port " ")
+
+;;;(define got-string " ")
+;;;
+;;;(define read-thread
+;;;  (thread (lambda ()
+;;;	    (define thread-loop (call/cc (lambda (k) k)))
+;;;	    (set! got-string (read-line read-port))
+;;;	    (write-string got-string)
+;;;	    (newline)
+;;;	    (if (find-string "RECENT" got-string)
+;;;		(if (find-string "* 0 RECENT" got-string)
+;;;		    '()
+;;;	            ;;; escape the inner quotes with \
+;;;		    (system "/home/xxx/lab/notifier.rkt \" New Mail\" &"))
+;;;		'())
+;;;	    ;;; if it reads string, then counter add one
+;;;	    (set! counter (+ 1 counter))
+;;;	    (thread-loop thread-loop))))
+;;;
+;;;(define upper-counter counter)
+;;;
+;;;(define detect-read-thread
+;;;  (thread (lambda ()
+;;;	    (define thread-loop (call/cc (lambda (k) k)))
+;;;	    (set! upper-counter counter)
+;;;	    ;;; read nothing over 3 minutes, then restart
+;;;	    (sleep 180)
+;;;	    ;;; compare counter with counter that is 3 minutes ago, if it's same,
+;;;	    ;;; it means it reads nothing
+;;;	    (if (eq? upper-counter counter)
+;;;		(begin
+;;;		  (system "/home/xxx/lab/mailer-part-ii.rkt &")
+;;;		  (system "/home/xxx/lab/notifier.rkt \" Disconnect from Mail Server, Restart\" &")
+;;;		  (exit))
+;;;		(thread-loop thread-loop)))))
+;;;
+;;;(thread-wait read-thread)
+;;;(thread-wait detect-read-thread)
