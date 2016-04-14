@@ -1,0 +1,9 @@
+(define a 3) is a definition not an expression
+(set! a 3) is an expression
+(begin ...) and (if ...) they need expressions not definitions
+
+racket have definitions and expressions, no statements
+
+python or c have statements and expressions,
+
+statements have side-effect, expressions only return vaules, no side-effect
