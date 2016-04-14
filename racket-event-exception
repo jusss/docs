@@ -1,0 +1,67 @@
+异常exceptions: 程序运行出错时抛出的stuff
+事件events: 程序运行时，外部发生的事件(动作)(外部变量的变化)对这个程序的影响，
+	    如发送键盘信号 鼠标信号 时间的变化 发送kill signal
+
+<jusss> what's event in racket?
+<soegaard> jusss: http://docs.racket-lang.org/reference/sync.html?q=event
+<jusss> soegaard: I saw it, but I have confused, is that I want turn an
+	expression into an event, I need make it into a thread?  [20:06]
+<soegaard> “turn an expression into an event” ?
+<soegaard> Do you want to do with your expression?  [20:07]
+<soegaard> Run it in parallel?
+<jusss> actually I don't know how to define an event
+<soegaard> “Do you want”  -> What do you want to ...
+<jusss> like read from port  [20:08]
+<jusss> read something from a port, is that an event? 
+<jusss> print something, is that an event ?  [20:09]
+<soegaard> Ah no. Reading from a port it just something that you do.
+<soegaard> An event is something that can happens while your program is
+	   running doing its thing.
+<jusss> that's what I confused, what's "event"
+<soegaard> In a gui program, it could be a “user has clicked the mouse”
+	   event.
+<soegaard> You can tell the system what you want to do if a certain type of
+	   event happens.  [20:10]
+<jusss> it sounds like if
+<soegaard> That’s called an event handler.
+<soegaard> Another example of an event is a timer event.  [20:11]
+<jusss> (if (something-happn) do-something or-not)
+<jusss> what's the different between if and event?
+<soegaard> events are “external” to the program.  [20:12]
+<jusss> exceptions are "external" ?
+<soegaard> An “event” is a concept. And  if  is a concrete control
+	   construct.
+<soegaard> Exceptions could be internal:  If you write (/ 1 0) it is your
+	   program that causes the exception.  [20:13]
+<soegaard> rudybot: eval (/ 1 0)
+<rudybot> soegaard: error: /: division by zero
+<jusss> how to define a timer event?
+<jusss> or I can't
+<soegaard> sorry - I’ve got to go. I think you can find an example in the
+	   docs. But I can’t remember where.
+<jusss> ok, thanks
+<georges-duperon> jusss: I'm not familiar (at all with events), but I think
+		 that the idea is that your program runs, a bunch of stuff can
+		 happen  [20:21]
+<georges-duperon> jusss: Like something becomes available when reading from
+		 the network, or something was sent over the network so we can
+		 now buffer more data, or the user clicked on a mouse button,
+		 or maybe even the Ctrl-C "please quit" signal for
+		 command-line applications  [20:22]
+<georges-duperon> jusss: And "events" are used in some way to describe what
+		 happens in these cases.  [20:23]
+<georges-duperon> jusss: I don't know exactly how you use them (I'm not
+		 working on low-level system stuff nor GUI), but they should
+		 be a cleaner alternative to actively polling for all possible
+		 events:  [20:27]
+<georges-duperon> jusss: (let again ([loop? #t]) (when loop? (again (cond
+		 [mouse-clicked? blah #t] [network-read blah #t]
+		 [network-write blah #t] [else #f]))))
+<jusss> georges-duperon: when the program running, the actions like C-c
+	left-click send to the program, these actions are events, do I
+	understand right?
+<jusss> georges-duperon: send a kill signal to the program, it's also an
+	event?  [20:37]
+<jusss> what you send or do to the program, that is an event or case an event?
+<georges-duperon> jusss: I think that's how it works, yet, but I haven't used
+		 events so I'm not 100% sure.  [22:58]
