@@ -3,6 +3,9 @@
 (begin ...) and (if ...) they need expressions not definitions
 
 racket have definitions and expressions, no statements
+also racket have some control forms, like require that's not a definition or and expression
+http://docs.racket-lang.org/reference/syntax-model.html?q=fully#%28part._fully-expanded%29
+expr = id
 
 python or c have statements and expressions,
 
