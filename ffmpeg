@@ -1,3 +1,7 @@
+除了帧内编码精确控制，如果是mp4格式，可以 1.在用ffmpeg剪切的过程中强制C-c中断截取前面这一段所需的，而不要后面的
+2. 2次剪切，第一次截取的大概，然后在第一次截取出来的片段上再次截取，直到所需的
+
+
 1. 先把需求的那段剪出来
    ffmpeg -ss start-time -t dust-time -i input-file -vcodec copy -acodec copy output-file
 
