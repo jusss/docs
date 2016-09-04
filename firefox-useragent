@@ -3,7 +3,9 @@ useragent访问桌面网站
 
 在火狐浏览器地址栏输入“about:config”，按下回车进入设置菜单。
 找到“general.useragent.override”，如果没有这一项，则点右键“新建”->“字符串”，输入这个字符串。
-将其值设为自己想要的UserAgent
+将其值设为自己想要的UserAgent, 记得添加" "
+如果是chrome则可以通过启动时添加参数来修改
+--user-agent="Mozilla/5.0(iPad; U; CPU iPhone OS 3_2 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) Version/4.0.4 Mobile/7B314 Safari/531.21.10"
 
 常见UA
 “Mozilla/5.0 (X11; U; Linux i686; en-GB; rv:1.8.1.6) Gecko/20070914 Firefox/2.0.0.7″
