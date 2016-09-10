@@ -1,0 +1,46 @@
+生成补丁 quilt diff git
+
+1. git diff > my.patch 对比当前目录的两个工作区域里同名文件的修改生成补丁
+
+2. diff -Nur original.file edited.file > my.patch 对比这两个文件生成补丁，
+   original.file和edited.file不需要同名或同目录,但需要打补丁的文件需要和original.file同名
+   patch匹配的是original.file的位置目录
+
+3. 使用quilt和使用git有点像，在original.file所在的目录里
+   quilt new my.patch 生成patches目录，并设置将要生成的补丁文件名为my.patch
+   quilt add original.file  记录orginal.file的修改
+   quilt edit original.file 修改original.file并保存
+   quilt refresh	    修改完成后运行这个指令生成补丁my.patch
+   此时original.file已修改，如果想恢复文件的原始状态用
+   quilt pop -a	卸载补丁
+   恢复原始状态后，如果想再打上补丁，用quilt push -a
+   用quilt来打别人的补丁貌似有点麻烦，需要用quilt add关联别人的补丁，在这就不写了
+
+
+打补丁 patch git
+
+1. patch -pN < my.patch
+
+   N可以为0 1 2 3...
+   
+   -pN就是去掉my.patch文件里第一行orginial.file的目录里的N个前缀目录，使其之后的目录和
+   my.patch文件当前所在目录下的目录匹配
+   
+   如my.patch里original.file的位置为tmp/hell.c
+   而需要打补丁的文件为~/tmp/bla2/hell.c,则把my.patch复制到~/tmp/bla2下
+   然后 patch -p1 < my.patch
+   如果需要打补丁的文件为~/tmp/hell.c,则把my.patch复制到~/下
+   然后 patch -p0 < my.patc 或者复制my.patch到~/tmp下用 patch -p1 < my.patch
+
+   打完补丁后如果想卸载补丁用 patch -R -pN < my.patch即可
+
+2. git的打补丁方法暂时不会。。。
+
+
+   
+
+
+   
+   
+   
+   
