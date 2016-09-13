@@ -24,7 +24,11 @@
    N可以为0 1 2 3...
    
    -pN就是去掉my.patch文件里第一行orginial.file的目录里的N个前缀目录，使其之后的目录和
-   my.patch文件当前所在目录下的目录匹配
+   你当前所在目录下的目录匹配(同名),而不是my.patch文件当前所在的目录.
+   如my.path在~/rtl8723bs/my.patch
+   my.patch里的第一行为a/net/bla.c
+   而你当前在的位置为~/linux-4.4.1/,里面有net driver目录
+   ~/linux-4.4.1/$ patch -p1 < ../rtl8723bs/my.patch
    
    如my.patch里original.file的位置为tmp/hell.c
    而需要打补丁的文件为~/tmp/bla2/hell.c,则把my.patch复制到~/tmp/bla2下
