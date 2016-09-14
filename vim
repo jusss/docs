@@ -1,3 +1,38 @@
+ciw change a word, daw delete a word
+delete dd D dw de daw dt df x X
+undo u U
+redo C-r :undolist :undo 178
+cw change a word,  dw delete a word, w jumpt to next word
+b back to previous word
+r change a character
+R change and insert
+C-f C-b page up/down
+ma mark
+'a return mark a position
+visual mode  v V C-v, d delete, y yank, p paste, g? ROT-13
+f find a character lik /
+zz middle
+zt top
+zb bottom
+
+:ls list buffer
+:bn next buffer or :n
+:bp previous buffer
+:b# previous buffer
+:bdelete N delete buffer N
+:b N switch to N, N is a number
+
+:set ff=unix or dos file format /r/n /r
+:set fenc=utf-8   file encoding,save as utf-8 encoding
+
+
+只读打开-R或-M
+指定打开多少行+N
+:w :o :e :x
+
+
+
+---------------------------------------------------------------------------------------------------------------------
 archlinux下的vi和vim是不一样的，pacman -Ql vi和pacman -Ql vim可知
 /usr/bin/vi是个软链接-> /usr/bin/ex,
 而/usr/bin/vim就是vim了
