@@ -1,0 +1,26 @@
+test_power module is not compiled when compile kernel
+and now it's required by some programs,
+cd ~/linux-4.4.1
+find . -iname "test_power*"
+and find it in linux-4.4.1/drivers/power/test_power.c
+vim drivers/power/Makefile and know it's CONFIG_TEST_POWER 
+CONFIG_TEST_POWER is not set when compile kernel
+and now set CONFIG_TEST_POWER=m
+1, vim ~/linux-4.4.1/.config
+   set CONFIG_TEST_POWER=m
+2. make prepare
+   make scripts
+3. make M=drivers/power
+will generate drivers/power/test_power.ko
+cp ./drivers/power/test_power.ko /lib/modules/4.4.1/kernel/drivers/power/
+cd /lib/modules/4.4.1
+depmod -a
+modprobe test_power
+
+note, make drivers/power/test_power.ko will generate test_power.o
+but it can't be inserted kernel, because kernel and kernel module are compressed.
+
+reference:
+http://lnmcc.net/2013/03/28/%E7%BC%96%E8%AF%91%E5%8D%95%E4%B8%AAlinux-kernel-%E6%A8%A1%E5%9D%97/
+https://wiki.centos.org/HowTos/BuildingKernelModules
+
