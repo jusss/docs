@@ -1,3 +1,8 @@
+I 行首插入
+A 行尾插入
+i 光标所在字符前插入
+a 光标所在字符后插入
+--------------------------------------------------------------------------------
 颜色 :color or :colorscheme
 ls /usr/share/vim/vim74/colors/ 可知color scheme
 然后 :color color-scheme-name-what-you-want即可
@@ -36,6 +41,7 @@ zb bottom
 :bp previous buffer
 :b# previous buffer
 :bdelete N delete buffer N
+:bd delete current buffer
 :b N switch to N, N is a number
 
 :set ff=unix or dos file format /r/n /r
