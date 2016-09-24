@@ -1,3 +1,14 @@
+
+水平分割窗口 :split
+垂直分割窗口 :vsplit
+移动窗口 C-w then h j k l r(reverse) w(循环移动) t(top) b(bottom) p(previous) x(switch)
+关闭窗口 C-w q(quit) c(close) o(当前窗口以外的所有窗口)
+vim -o test1 test2 水平分割  -O 垂直分割
+
+C-z 挂到后台，然后用fg再调出来
+
+--------------------------------------------------------------------------------------------------------------
+
 ciw change a word, daw delete a word
 delete dd D dw de daw dt df x X
 undo u U
