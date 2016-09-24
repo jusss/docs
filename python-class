@@ -1,0 +1,47 @@
+1. 定义类 class bla(base-class)
+2. 实例化 bla3=bla() 实例化就是 class() 也就是class后面加个()
+3. 给类分配属性 bla.var='xx'
+    class.new-name = variable-or-function   给类添加属性
+4. 所有类都有的属性
+    类里面所有方法的第一个参数都是self
+    类实例化就被执行 def __init__(self,var1,var2)
+                        self.var1='x'
+    self表示instance实例本身
+    有了__init__则类实例化时，参数要匹配它
+    bla3 = bla('var1','var2') 
+    类实例化时的参数要和类定义时的方法__init__的参数匹配
+    __init__也可以设默认参数 def __init__(self,x=1,y=2,z=3):
+
+    类中两个下划线开头即为私有
+    __private-attrs 类私有 不能在类外部使用或访问
+    __private-method 私有方法
+    instance._class__private-name 使用这种方法访问私有属性
+
+    class A:
+        __b = 1
+    B = A()
+    B.__b error
+    B._A__b 
+
+5. 定义一个和父类同名的子类，然后向这个类里添加方法
+    这样这个新的类在当前环境就有父类的方法还有自定义的方法，而不会影响到其它环境的父类
+
+    class QMainWindow(QMainWindow):
+        def my_slot(self):
+            pass
+
+  或者 class QMainWindow(QMainWindow):
+            pass
+       QMainWindow.my_slot=another-function-name
+
+  或者 QMainWindow=QMainWindow
+       QMainWindow.my_slot=another-function-name
+
+6. eg.  class Athlete:
+            def __init__(self, a_name, a_dob=None, a_times=[]):
+                self.name = a_name 
+                self.dob = a_dob
+                self.times = a_times
+            def top3(self):
+                return(sorted(set([Isanitize(t) for t in self.times])) [0:3])
+
