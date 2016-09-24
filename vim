@@ -1,3 +1,8 @@
+颜色 :color or :colorscheme
+ls /usr/share/vim/vim74/colors/ 可知color scheme
+然后 :color color-scheme-name-what-you-want即可
+安装vim-jellybeans后 :color jellybeans即可
+------------------------------------------------------------------------------------------------------
 
 水平分割窗口 :split
 垂直分割窗口 :vsplit
