@@ -1,0 +1,32 @@
+treat data as code
+用变量的值作变量的名
+python exec(statement) eval(expression)
+a="john"
+turn "a is five" to "john is five"
+ruby use #{a}  "#{a} is five"
+python '{} is five".format(a)
+
+运行时需要用户输入一个symbol做变量名，然后输入一个symbol做刚才输入的变量名的值
+然后操作这个变量，比如加1
+
+运行时，动态生成变量
+
+def mp():
+    d=input()
+    e=input()
+    exec('{} = '.format(d) + '{}'.format(e))
+    return(eval(d))
+
+输入z 3 返回3
+
+def generate_var():
+    print("input variable name")
+    var=input()
+    print("input value")
+    value=input()
+    exec(var + '=' + value)
+    exec(var + '=' + var + '+1')
+    print(eval(var))
+    return(eval(var))
+
+
