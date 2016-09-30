@@ -1,0 +1,17 @@
+elpy https://github.com/jorgenschaefer/elpy
+http://blog.csdn.net/mikelearnscode/article/details/23022277
+
+pypi可能被墙导致用pip安装python包经常超时，改用阿里云的源
+更改pip默认安装源。在~/.pip/pip.conf（自建）文件中添加或修改：
+[global]  
+index-url = http://mirrors.aliyun.com/pypi/simple/ 
+
+M-x python-mode 在当前buffer使用python mode然后随便写点python语句直接C-c C-c就会调用python执行
+https://segmentfault.com/a/1190000004165173
+
+http://www.kuqin.com/shuoit/20151222/349566.html
+
+https://github.com/jorgenschaefer/elpy
+https://github.com/xiaohanyu/oh-my-emacs/blob/master/modules/ome-python.org
+
+http://www.zhihu.com/question/27478438/answer/37035381
