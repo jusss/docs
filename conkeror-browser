@@ -1,0 +1,37 @@
+另一个类似vim的是firefox的插件vimperator
+conkeror是一个基于firefox的emacs-like浏览器，可以在网站的text-field frame里
+操作文本就像在emacs里一样，然后用C-c C-c提交form 
+conkeror的escape绑定的是unfocus,但是经常无法escape在dict.cn和bing.com的text-field里
+的focus, 但是可以先使用C-c C-c提交空白之后escape focus,所以我用C-[绑定了unfocus
+因为vim的escape C-c C-[相似，我这就用了C-[
+
+escape focus from text-field frame,  escape or C-[ or C-c C-c or M-x unfocus
+
+define_key(default_global_keymap, "C-[", "unfocus");  //this file is in C:\users\john\.conkerorrc\john.js, it will be loaded
+mode_line_mode(false);  //disable mode line
+
+conkeror中无法使用鼠标右键弹出contextual menu, 所以只能使用DOM来选择文本然后复制
+1. f或n;是用来选中链接的，而不是文本
+2. 用**Tc来选择文本并复制 且不要使用中文输入法来输入匹配数字，用中文输入法输入匹配数字
+    会导致无法匹配上某些文本
+会导致无法匹配上某些文本
+
+常用指令 
+f 给链接贴上数字，然后输入数字敲回车选中链接，而在firefox的vimperator里不用敲回车直接输入数字即可，
+    只有当有2和23选中2时才需要输入2敲回车，如果选23,不用敲回车
+q 退出buffer
+g 打开网站在当前buffer
+c 0 复制当前网站的url
+C-v page down
+M-v page up
+**Tc select text and copy to clipboard
+b bookmark
+M-p previous buffer
+M-n next buffer
+B or l Back
+F Forward
+C-u g open new url in new buffer
+C-c C-c submit form
+C-x C-f open new url in new buffer
+
+
