@@ -29,4 +29,14 @@ def generate_var():
     print(eval(var))
     return(eval(var))
 
+common lisp:
+ (let ((z (read)))
+    (setf (symbol-value z)
+            (read))
+    (+ 1 (symbol-value z)))
+
+input s RET 9
+output 10
+
+
 
