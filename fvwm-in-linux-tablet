@@ -1,0 +1,7 @@
+lxde的dm是lightdm, wm是openbox
+1.当openbox和fvwm并存时，删.xinitrc用startx开的是openbox,可用fvwm -replace替换openbox
+2.openbox 用xrandr --output eDP1 --rotate right正常可用
+  而在~/.xinitrc里写fvwm& 用startx开的fvwm xrandr --output eDP1 --rotate right屏幕右半部分不可用
+
+3. 删~/.xinitrc用startx开后的openbox里，用fvwm -replace替换openbox 右半部分可用
+
