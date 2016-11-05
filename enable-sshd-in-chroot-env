@@ -1,0 +1,14 @@
+直接systemctl start sshd是不行的在chroot环境里
+1. pacman -S openssh
+2. vim /etc/ssh/sshd_config
+3. ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key
+   ssh-keygen -t dsa -f /etc/ssh/ssh_host_dsa_key
+   ssh-keygen -t ecdsa -f /etc/ssh/ssh_host_ecdsa_key
+   ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key
+
+4./usr/bin/sshd
+5.passwd root
+6.ssh root@127.0.0.1
+
+sshd_config里开启22端口和密码验证
+
