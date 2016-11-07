@@ -1,0 +1,171 @@
+#!/usr/bin/env python3
+import tkinter
+
+### 创建主窗口
+top = tkinter.Tk()
+
+"""
+在GUI程序中，我们会有一个顶层窗口，在这个顶层窗口上可以包括所有的小窗口对象，像标签，按钮，列表框等等，也就是说顶层窗口时我们放置其他窗口或者控件的地方。我们用下面的语句可以创建一个顶层窗口，或者叫根窗口：
+Import Tkinter
+top = Tkinter.Tk()
+（如果前面是用的from Tkinter import * ，那么Tk()就够了）
+然后我们就可以在这个根窗口上设置“组件”了。通常这些组件会有一些相应的行为，比如鼠标点击，按下等等，这些称为事件，而程序会根据这些时间采取相应的反应，称为回调。这个过程成为事件驱动。
+所有的创建和放置完毕后，就立刻进入主循环，代码如下：
+Tkinter.mainloop( )
+"""
+
+### tkinter.Label会直接在窗口上创建label,不需要tkinter.mainloop才会创建
+label = tkinter.Label(top, text = 'hello, world')
+
+### 管理显示组件 pack(), pack,grid,place用来放置组件的位置, 组件需要pack才能显示
+label.pack()
+
+###进入主循环
+tkinter.mainloop()
+
+##################################################################################
+
+top = tkinter.Tk()
+def hello():
+    print("hello world")
+
+top.title("my py tk")
+top.geometry("400x200")
+### command 后面的是hello而不是hello(),如果是hello()则会在创建button时直接执行hello()而不需要点击这个按钮然后回调callback hello()函数
+button = tkinter.Button(top, text="click me", command = hello)
+
+
+################################################################################
+
+from tkinter import *
+class App:
+
+    def __init__(self, master):
+        frame = Frame(master)
+        frame.pack()
+        self.button = Button(frame, text="quit", fg="red", command=frame.quit)
+        self.button.pack(side=LEFT)
+        self.hi_there = Button(frame, text="hello", command=self.say_hi)
+        self.hi_there.pack(side=LEFT)
+
+    def say_hi(self):
+        print("hi there, this is a class example")
+win = Tk()
+app = App(win)
+win.mainloop()
+###############################################################################
+
+root = Tk()
+
+def hello():
+    print("hello")
+
+### create a menu bar
+menubar = Menu(root)
+menubar.add_command(label="hello!", command=hello)
+menubar.add_command(label="quit!", command=root.quit)
+
+root.config(menu=menubar)
+
+mainloop()
+
+###########################################################################
+
+root = Tk()
+
+def hello():
+    print('hello')
+
+def about():
+    w = Label(root, text = " my first py gui\naha")
+    w.pack(side=TOP)
+
+menubar = Menu(root)
+### creat sub menu in menu bar
+filemenu = Menu(menubar, tearoff=0)
+filemenu.add_command(label="open",command=hello)
+filemenu.add_command(label="save",command=hello)
+filemenu.add_separator()
+filemenu.add_command(label="exit",command = root.quit)
+menubar.add_cascade(label="file",menu=filemenu)
+
+### creat another sub menu
+editmenu = Menu(menubar, tearoff=0)
+editmenu.add_command(label="Cut", command=hello)
+editmenu.add_command(label="copy", command=hello)
+menubar.add_cascade(label="Edit", menu=editmenu)
+
+### create help menu
+helpmenu = Menu(menubar,tearoff=0)
+helpmenu.add_command(label="about", command=about)
+menubar.add_cascade(label="help", menu=helpmenu)
+
+###display menu
+root.config(menu=menubar)
+
+mainloop()
+
+
+#################################################################################
+###bind()可以绑定快捷键和函数
+###pack()的参数side=LEFT TOP RIGHT BOTTOM, fill = X Y BOTH NONE 水平填充 竖直填充
+### expand= yes no, anchor = N,E,S,W,CENTER
+### 网格用grid(), row = 0 to n, column = 0 to n, sticky = N,E,S,W
+from tkinter import *
+root = Tk()
+
+Label(root, text="user:").grid(row=0, sticky=W)
+input1 = Entry(root)
+input1.grid(row = 0, column = 1, sticky =E)
+Label(root, text="pass:").grid(row=1, sticky=W)
+input2 = Entry(root)
+input2['show']='*'
+input2.grid(row = 1, column = 1, sticky =E)
+Button(root,text = "login").grid(row = 2, column = 1, sticky=E)
+
+root.mainloop()
+
+# bind(<Button-1>,call-back-function), <KeyPress-A> <Control-V> <F1>
+# Entry's get() will get the string you input, and get()'s return value is your string
+# if e is a Entry obj, e['show'] = '*' show nothing but * when you input
+
+# add_command's acceletor can callback function with key
+
+# Label Button Menu etc are called Widget
+
+from tkinter.messagebox import *
+showinfo(title = 'bl', message = 'it is done!')
+### text = Text(root,width=50,height=30)
+### text.pack()
+### text.bind('<Control-N>',my-call-back-funtion)
+### root.geometry('300x200+150+150')
+### root.title('bla')
+### root.overrideredirect(1)
+### root.iconbitmap('pygame.ico')
+
+### from tkinter import *
+### from tkinter.ttk import *
+### from tkinter.messagebox import *
+### from tkinter.filedialog import *
+### from tkinter.filedialog import askopenfilename
+### root.filename =  askopenfilename(initialdir = "/",title = "choose your file",filetypes = (("jpeg files","*.jpg"),("all files","*.*")))
+### print (root.filename)
+### root.withdraw()
+
+
+### <jusss> tkinter in python3, how to get a return value of callback function?
+###	like Button(root,text='browse file',
+###	command=lambda:askopenfilename(...))
+### <jusss> how to get askopenfilename's return value?
+### <mjanssen> jusss: you can't get a return value, where should it return to?
+### <jusss> mjanssen: if I can't get the return value of askopenfilename(), How I
+###	know the user choose which file?
+### <jusss> write a function and use global variable to stroe askopenfilename()'s
+###	return value?
+### <mjanssen> jusss: no do whatever you want to do with the filename in the
+###	   callback
+
+### Entry's insert() can insert string, text.insert(0,'value'), get() get the value
+### search 'tkinter Entry'
+
+### askopenfilename, askdirectory, askopenfilenames
