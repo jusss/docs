@@ -1,0 +1,10 @@
+it's been two years that archlinux on my eeepc don't upgrade, and I'd like to upgrade to now
+#pacman-key --refresh-keys 
+if it takes so long time, then use
+#pacman -S archlinux-keyring
+then
+#pacman -Syu
+
+if it missing some file that make you can't login bash, make a live cd then copy the file into it
+or use live cd mount the disk then pacman -r /mnt -Syu, maybe you need change /etc/pacman.conf
+
