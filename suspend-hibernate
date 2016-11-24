@@ -26,7 +26,8 @@ udev后面追加resume
 为其他不是当前正在运行的内核创建镜像，添加内核版本到命令行， 可以在/usr/lib/modules目录查看支持的内核版本.
 # mkinitcpio -g /boot/linux-custom2.img -k 3.3.0-ARCH
 
-4.或者不想用2,就修改/boot/grub/grub.cfg 添加个启动项，里面加个内核启动参数resume=/dev/sda8
+4.或者不想用2,就修改/boot/grub/grub.cfg 不需要添加个启动项，直接在原有启动项里面加个内核启动参数resume=/dev/sda8即可
+if there is no image to resume from then it can't resume
 
 -------------------------------------------------------------------------------------------------------------------
 
