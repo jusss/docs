@@ -1,0 +1,55 @@
+systemctl suspend
+systemctl hibernate
+
+suspend to ram 不需要 swap分区  
+suspend to disk 需要swap分区，如果没有的话可以创建个swap file代替，然后重启时内核参数用resume_offset
+
+https://wiki.archlinux.org/index.php/Power_management/Suspend_and_hibernate
+
+hibernate需要
+1.swap分区或swap file, swap分区最好比RAM大
+2.重启时内核参数指定 resume=your-swap-partition-like-/dev/sda8 用swapon或fdisk -l或df -h或mount查看
+3.配置initramfs
+vim /etc/mkinitcpio.conf
+HOOKS="base udev resume autodetect modconf block filesystems keyboard fsck"
+udev后面追加resume
+
+重新生成initramfs
+# mkinitcpio -p linux
+-p选项定义了要使用的预配置（preset）；多数内核软件包都会提供一套mkinitcpio预配置文件，
+放在/etc/mkinitcpio.d目录（比如，linux内核是/etc/mkinitcpio.d/linux.preset）。预配置文件中包含内存盘镜像的基本配置。
+警告: 每次升级内核，系统都会自动使用preset文件重新生成内存盘镜像。不要轻易编辑这些文件。
+
+生成自定义的initcpio
+# mkinitcpio -c /etc/mkinitcpio-custom.conf -g /boot/linux-custom.img
+
+为其他不是当前正在运行的内核创建镜像，添加内核版本到命令行， 可以在/usr/lib/modules目录查看支持的内核版本.
+# mkinitcpio -g /boot/linux-custom2.img -k 3.3.0-ARCH
+
+4.或者不想用2,就修改/boot/grub/grub.cfg 添加个启动项，里面加个内核启动参数resume=/dev/sda8
+
+-------------------------------------------------------------------------------------------------------------------
+
+https://wiki.archlinux.org/index.php/Mkinitcpio_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)
+
+'mkinitcpio -L' tells you what hooks are available
+mkinitcpio -H systemd  # would tell  you that systemd replaces the 'base', 'usr', 'udev' and 'timestamp' hooks.
+
+if you're using the systemd hook, you do not need the resume hook at all.
+the systemd hook provides its own resume mechanism.
+When an initramfs with the systemd hook is used, a resume mechanism is already provided, and no further hooks need to be added.
+
+钩子(HOOKS)
+HOOKS设置是此文件中最重要的设置。Hooks 是一系列的小脚本，描述那些东西需要加入到镜像里面。有些钩子还包含了运行组建，
+在启动时执行特定动作，例如启动服务、构建存储栈等。Hooks 按照配置文件中HOOKS项中给出的顺序执行。
+默认的HOOKS可以满足大部分简单的单硬盘系统。对于LVM, mdadm 或 LUKS 等复杂根分区系统，请查看相应的 Wiki 页面。
+PS/2 键盘用户 : 要在初始化早期阶段使用键盘，请把 keyboard 钩子加入 HOOKS. 个别的键盘无法自动检测到 i8042 控制器，出现
+i8042: PNP: No PS/2 controller found. Probing ports directly 报错信息，导致无法使用键盘，请把 atkbd 加入 MODULES.
+
+每次升级内核，mkinitcpio都会默认创建两个内存盘镜像：默认镜像/boot/initramfs-linux.img和
+fallback镜像/boot/initramfs-linux-fallback.img。
+fallback镜像和默认镜像只有一个区别，就是创建时跳过了autodetect钩子扩展，因而它包含更多的内核模块。
+autodetect扩展会探测硬件信息，针对硬件向镜像添加需要的模块，因此缩小了镜像。
+
+there's no vmlinuz-fallback, just vmlinuz in /boot
+
