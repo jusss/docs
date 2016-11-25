@@ -1,0 +1,59 @@
+"eval or not eval, this is a problem"
+
+      	     	   data & code
+
+code: (+ 1 1) (quote (+ 1 1))
+data: (+ 1 1) (quote (+ 1 1))
+(+ 1 1) can be code also data.
+that's the strength of lisp.
+对(+ 1 1)求值，它就是code,不对它求值，它就是data
+"Very few things in lisp can be code but not data."
+
+函数的参数会自动求值，宏的参数不会自动求值，对变量求值得变量的值，对函数求值得函数的返回值
+
+(defmacro f (x) x)
+(f '(+ 3 1)) 宏f返回 '(+ 3 1) 给repl, 然后repl求值'(+ 3 1)得(+ 3 1)
+
+(defmacro f (x) `(+ ,x 1))
+(f 3) 宏f返回(+ 3 1)给repl, repl对(+ 3 1)求值得4
+
+宏定义时不能用递归，但可以在函数里面用递归，然后宏里调用函数
+
+(defvar alist (quote ()))  alist is () also nil
+
+先想像所要的code是什么样的，然后用macro去展开生成那样的
+如(eval (eval (eval expression)))这样的
+(defun nth-eval (expr n)
+   `(myloop ,expr ,n))
+(defun myloop (expr n)
+  (if (eq n 0) expr
+    (myloop (eval expr) (- n 1))))
+
+或者返回(eval (eval (eval expr)))但不求值，需要求值时再eval求值
+(defun myloop (expr n)
+  (if (eq n 0) expr
+    (myloop (cons 'eval `(,expr)) (- n 1))))
+这样返回的是(eval (eval (eval expr)))这个list,但不会求值，因为对expr求值的这个list(对变量求值得变量的值)
+
+(defun f (x) x)
+(f (+ 1 1)) => 2
+(defvar x (f '(+ 1 1))) 绑定(+ 1 1)给symbol x, 对symbol x求值的(+ 1 1)
+(f x) => (+ 1 1)
+
+(f '(+ 1 1)) => (+ 1 1)
+(f (f '(+ 1 1))) => (+ 1 1)
+
+
+(SETF (READTABLE-CASE *READTABLE*) :UPCASE) (setf *readtable*
+       (copy-readtable nil)) (defvar } 3)
+readtable可以设置哪些字符可以当变量名，哪些字符使用时需要使用'逃离'符号
+
+(setf (readtable-case *readtable*) :preserve)  (DEFUN Foo ()
+       'Foo) (DEFUN foo () '42) (LIST (Foo) (foo)) #| --> (Foo 42)
+
+it actually depends on the current *readtable* but in the
+       standard readtable, notably spaces.  {} doesn't need escapes!!!
+
+http://l1sp.org/cl/readtable-case
+
+
