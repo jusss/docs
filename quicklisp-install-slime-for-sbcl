@@ -1,0 +1,11 @@
+$curl -O https://beta.quicklisp.org/quicklisp.lisp
+$sbcl --load quicklisp.lisp
+(quicklisp-quickstart:install)
+(ql:add-to-init-file)
+(ql:quickload "quicklisp-slime-helper")
+
+添加下面的进~/.emacs
+(load (expand-file-name "~/quicklisp/slime-helper.el"))
+;; Replace "sbcl" with the path to your implementation
+(setq inferior-lisp-program "sbcl")
+
