@@ -27,7 +27,10 @@ udev后面追加resume
 # mkinitcpio -g /boot/linux-custom2.img -k 3.3.0-ARCH
 
 4.或者不想用2,就修改/boot/grub/grub.cfg 不需要添加个启动项，直接在原有启动项里面加个内核启动参数resume=/dev/sda8即可
-if there is no image to resume from then it can't resume
+if there is no image to resume from then it can't resume.
+initramfs带resume hook后，initramfs会自动寻找resume内核参数在grub的启动项里，所以当initramfs带resume hook后，需要在
+grub的启动项里添加resume内核参数，即使不是用hibernation,而使用poweroff关机，这样开机也不会报错，当swap分区有镜像时,
+它会resume,而没有镜像时，就不会resume
 
 -------------------------------------------------------------------------------------------------------------------
 
