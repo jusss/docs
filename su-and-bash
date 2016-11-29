@@ -1,0 +1,16 @@
+从root直接su regular-user然后发现shell没readline,没有tab补全不能用backspace键删除
+发现原来用的是sh, 而不是bash,
+1. $/bin/bash 即可
+然后发现screen -S xx 提示Cannot open your terminal '/dev/pts/0' - please check.
+然后查看/dev/pts/0的权限，发现/dev/pts/0对其他用户没有访问权限
+2.  chmod 660 /dev/pts/0 or 1 or 2
+    gpasswd -a john tty
+    screen -S x
+
+然后就可以了，以后直接
+su john
+/bin/bash
+screen -S x
+/bin/bash
+
+    
