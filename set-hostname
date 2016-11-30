@@ -1,0 +1,13 @@
+https://wiki.archlinux.org/index.php/Network_configuration#Set_the_hostname
+Set the hostname
+
+A hostname is a unique name created to identify a machine on a network, configured in /etc/hostname—see hostname(5) and hostname(7) for details. The file can contain the system's domain name, if any. To set the hostname, edit /etc/hostname to include a single line with myhostname:
+/etc/hostname
+myhostname
+Tip: For advice on choosing a hostname, see RFC 1178.
+Alternatively, using hostnamectl(1):
+# hostnamectl set-hostname myhostname
+To temporarily set the hostname (until reboot), use hostname(1) from inetutils:
+# hostname myhostname
+To set the "pretty" hostname and other machine metadata, see machine-info(5).
+
