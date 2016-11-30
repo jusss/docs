@@ -1,3 +1,5 @@
+如果regular user登录，默认的是sh 而不是bash, 用chsh改变默认的shell, 然后重新登录
+------------------------------------------------------------------------------------
 从root直接su regular-user然后发现shell没readline,没有tab补全不能用backspace键删除
 发现原来用的是sh, 而不是bash,
 1. $/bin/bash 即可
@@ -13,4 +15,5 @@ su john
 screen -S x
 /bin/bash
 
-    
+或者可以su -s bash john or su -c /bin/bash john or su -l -s bash
+see `man su`
