@@ -1,7 +1,7 @@
 打开x.c并跳到第20行  emacs -nw +20 x.c
 在emacs里跳到第20行 M-g g 20
 显示行号 M-x linum-mode
-跳到当前行后的第20行 C-u 20 C-n
+跳到当前行后的第20行 C-u 20 C-n or M-20 C-n 
 前20行每行前面插入一个Tab C-S-n 选中那20行 M-x replace-regexp RET ^ RET C-q Tab RET
 或者使用键盘宏  C-x ( 开始记录键盘操作
 	       C-x ) 结束记录键盘操作
