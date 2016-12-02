@@ -1,0 +1,6 @@
+chromium有个bilibili助手，可以用html5 player播放bilibili视频，但是貌似视频缓存
+比较少（进度条很慢，非网络原因）
+现在bilibili官方有了html5播放器，当检测到浏览器的UA非IE时，就用提示用html5播放器
+也可以在播放器右上方（弹幕上边）点设置按钮右边的三个竖着的点选择使用html5播放器或
+flash播放器
+
