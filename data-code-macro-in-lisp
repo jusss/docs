@@ -163,3 +163,24 @@ CL-USER>
 (gen-var a 30)
 于是就生成了变量a!)
 
+或者用变量的值来做变量！！！
+(defvar a 'b)
+(defmacro gen-var (x y)
+  `(defvar ,(eval ,x) ,y)) 这个貌似不行，如果直接用(eval ,x)也不行，因为defvar不会自动求值第一个参数，而第一个参数会是(eval ,x)，所以还是不行 换另一种
+
+(defmacro gen-var (x y)
+  (list 'defvar (eval x) y))
+
+
+CL-USER> (defmacro gen-var (x y)
+  (list 'defvar (eval x) y))
+GEN-VAR
+CL-USER> (defvar a 'b)
+A
+CL-USER> (gen-var a 30)
+B
+CL-USER> b
+30
+CL-USER>
+
+宏展出会返回一个列表，然后对那个列表进行求值，以函数的方式，即那个列表的参数会被自动求值
