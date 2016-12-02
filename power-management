@@ -1,0 +1,31 @@
+from: https://wiki.archlinux.org/index.php/Power_management_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)
+
+systemd 能够处理某些电源相关的 ACPI 事件，通过 /etc/systemd/logind.conf 的下列选项配置：
+HandlePowerKey：按下电源键后的动作
+HandleSleepKey：按下挂起键后的动作
+HandleHibernateKey: 按下休眠键后的动作
+HandleLidSwitch：合上笔记本盖后待机
+动作可以是 ignore、poweroff、reboot、halt、suspend、hibernate、hybrid-sleep、lock 或 kexec。
+系统默认设置为:
+HandlePowerKey=poweroff
+HandleSuspendKey=suspend
+HandleHibernateKey=hibernate
+HandleLidSwitch=suspend
+不用图形界面、或者使用 i3、awesome 这样简单的桌面管理器时，systemd 可以替代 acpid 处理 ACPI 事件。
+注意: 运行 systemctl restart systemd-logind，使上述更改立即生效。
+注意: systemd 无法处理交流电源和电池 ACPI 事件，所以还得使用 Laptop Mode Tools 或 acpid 工具。
+在当前版本的 systemd 中，这些 Handle 选项将会被应用到整个系统当中，除非它们被别的程序——例如某个桌面环境中的电源管理器——给“阻止”（inhibited）。如果其它的程序没有阻止这些 Handle ，你可能会先被 systemd 挂起你的系统，然后当系统被唤醒之后，电源管理器又会再次将系统挂起。
+警告: 目前只有GNOME 和 KDE 支持 "inhibited" 命令。在其它的桌面管理器同样实现该功能之前，如果你想使用Xfce、acpid 或者其它程序来管理 ACPI 事件，你需要把 Handle 选项设置为 ignore。
+
+
+https://wiki.archlinux.org/index.php/Acpid_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)
+
+acpid是用于处理电源相关事件的守护进程，它非常灵活且易于扩展。它侦听/proc/acpi/event，当某个事件发生时，执行相关程序来处理该事件。这些事件是由某些动作触发的，比如：
+按下电源按钮
+按下睡眠/挂起按钮
+合上笔记本盖子
+拔下/插上笔记本外接电源
+警告: 请注意桌面环境比如GNOME倾向于使用自己的电源事件管理方法（独立于acpid）,systemd的登陆管理器也有它自己的一套管理方法。同时运行多套系统可能产生意想不到的结果，比如，当按下电源键时电脑同时执行挂起和关机；或者当按下睡眠按钮时电脑执行了两次挂起操作。所以，使用多套系统时你应只激活一套系统的电源事件管理方法，以免引起冲突。
+
+
+自动休眠，应该是DE 或者screensaver之类的管理的，如果要取消自动休眠，就去DE或screensaver里面设置
