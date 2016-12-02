@@ -57,3 +57,109 @@ it actually depends on the current *readtable* but in the
 http://l1sp.org/cl/readtable-case
 
 
+------------------------------------------------------------------------------
+emacs: C-u 8 C-f 会向前移动 8 个字符。 or M-8 C-f
+
+http://www.ituring.com.cn/article/117593
+
+Lisp 程序是由形式（Form）排列起来构成的。形式就是 S 表达式，它通过下面的规则来进行求值。
+
+符号（Symbol）会被解释为变量，求出该变量所绑定的值。
+
+除符号以外的原子，则求出其自身的值。即：整数的话就是该整数本身，字符串的话就是该字符串本身。
+
+如果形式为表，则头一个符号为“函数名”，表中剩余的元素为参数
+
+ 这是 CommonLisp 等被称为 Lisp-2 系列的 Lisp 中的行为，Scheme 等属于 Lisp-1 系列的语言中，行为是有区别的。（原书注）
+
+在形式中，表示函数名的部分，实际上还分为函数、特殊形式和宏三种类型
+(setq a 128)
+假设 setq 是一个函数，那么 a 作为其参数会被求值，而不会对变量 a 进行赋值。setq 并不会对 a 进行求值，而是将其作为变量名来对待，这是 Lisp 语言中直接设定好的规则，像这样拥有特殊待遇的形式就被称为特殊形式。除了 setq 以外，特殊形式还有用于条件分支的 if 和用于定义局部变量的 let。  (but I think let is a macro...)
+
+(defun square (x)
+   (* x x))
+
+(defmacro square2 (x)
+  (list '* x x))       => (* x x)
+
+
+那么，我们来想想看有没有只有通过宏才 能实现的例子呢？图 5 的程序是将指定变量内容加 1 的宏 inc。
+
+(defmacro inc (var)
+   (list 'setq var (list' 1+ var)))
+图5　inc 宏
+
+“将变量的内容加 1”这样的操作，由于包含赋值操作，用一般的函数是无法实现的。但是，使用宏就可以很容易地实现这样的扩展操作。inc 宏实际使用的例子如图 6 的 (a) 部分所示。
+
+宏的展开结果可以用 macroexpand 函数来查 看。图 6 的 (b) 部分中，我们就用 macroexpand 函数来查看了宏的展开结果，它的展开结果是一个 setq 赋值语句。我们的这个宏非常简单，但如果是复杂的宏，便很难想象出其展开结果会是什么样子，因此 macroexpand 函数对于宏的调试是非常有效的。
+
+;;; (a) inc宏的调用
+(setq a 41) ;; 变量a初始化
+(inc a)     ;; a的值变为42
+
+;;; (b) 查看inc宏的实体
+;;; 用macroexpand函数可以查看宏的展开结果
+(macroexpand '(inc a))
+;;; => (setq a (1+ a))
+
+(如果用(defun inc (var) ...)来写，var会被直接求值成var的值传给函数inc,而无法接着用setq去
+修改var,因为var已经变成了它的值，如果传'var给inc做参数，因为setq的参数第一个参数不会自动求值，所以还是无法得到var这个symbol)
+
+
+
+(对于这种参数不自动求值的过程，只能用宏去生成)
+
+(如setq的第一个参数不求值，就用宏去生成想要的setq过程)
+
+(宏展开用 (macroexpand '(...)) 记得用' 因为函数参数自动求值?)
+
+(用 (apropos 'xxx) 去搜过程的名字)
+
+(slime里用tab自动补全过程名)
+
+(用宏 批量生成变量！！！ )
+
+(defmacro generate-var (x y)
+	   `(defparameter ,x 5)
+	   `(defparameter ,y 7))
+GENERATE-VAR
+CL-USER> (generate-var z s)
+S
+CL-USER> z
+; Evaluation aborted on #<UNBOUND-VARIABLE Z {100342B833}>.
+CL-USER> s
+7
+CL-USER> 
+
+(只会求值宏返回的最后一个列表，或者可以考虑用progn和多值)
+
+CL-USER> (defmacro generate-var (x y)
+	   `(progn (defparameter ,x 5)
+	   (defparameter ,y 7)))
+WARNING: redefining COMMON-LISP-USER::GENERATE-VAR in DEFMACRO
+GENERATE-VAR
+CL-USER> (generate-var z s)
+S
+CL-USER> z
+5
+CL-USER> s
+7
+CL-USER>
+
+CL-USER> (defmacro generate-var (variable value)
+	   `(defparameter ,variable ,value))
+WARNING: redefining COMMON-LISP-USER::GENERATE-VAR in DEFMACRO
+GENERATE-VAR
+CL-USER> (generate-var l 30)
+L
+CL-USER> l
+30
+CL-USER>
+
+(lisp的宏可用来生成变量，因为宏的参数不会自动求值，宏解决了困扰我多年的问题 自动生成变量(当然也可用eval函数解决)
+
+(defmacro gen-var (var value)
+  `(defvar ,var ,value))
+(gen-var a 30)
+于是就生成了变量a!)
+
