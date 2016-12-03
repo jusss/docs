@@ -189,3 +189,19 @@ CL-USER>
 (defmacro gen-var (x y)
   (list 'defvar (f x) y))
 still not working!
+
+(defvar a 3)
+(defun f (x) x)
+(f 3) 3自动求值得3 x的值为3,  (f a) a自动求值得3 x的值为3, 函数调用时的参数求值之后的值做函数定义时参数的值
+
+(defvar a 'b)
+(defmacro gen-var (x y)
+  (list 'defvar (f x) y))
+(gen-var a 30)
+(list )是个函数，所以参数自动求值， 'defvar求值得defvar, (f x) x自动求值得a, (f x)返回a, y自动求值得30,
+so (list 'defvar (f x) y)返回的是(defvar a 30) 求值得a的值为30
+
+(list 'a 'b) 返回的是 ((a . b) . nil)  (a . b)为一个列表只有2个元素的列表，元素a和元素b 没有nil () 
+
+
+
