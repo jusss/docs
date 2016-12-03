@@ -184,3 +184,8 @@ CL-USER> b
 CL-USER>
 
 宏展出会返回一个列表，然后对那个列表进行求值，以函数的方式，即那个列表的参数会被自动求值
+
+(defun f (x) x)
+(defmacro gen-var (x y)
+  (list 'defvar (f x) y))
+still not working!
