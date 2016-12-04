@@ -1,0 +1,41 @@
+os.system("ls")  os.popen2() os.popen3()
+p=os.popen("ls")   p.read() get the return message from command
+p=subprocess.Popen(['command', 'parameter'])   p.pid get PID of command, p.kill() kill the command
+p.poll() p.wait() p.communicate() p.send_signal() p.terminate() p.kill() p.args p.stdin p.stdout p.stderr p.pid
+
+>>> s=subprocess.Popen(['/usr/bin/python3', '/home/jusss/lab/notifier.py', 'good'], shell=False)
+>>> s.pid
+1462
+>>> s.kill()
+
+>>> s=subprocess.Popen(['/home/jusss/lab/notifier.py', 'good'], shell=False)
+>>> s.kill()
+
+p = subprocess.Popen (['/bin/ls'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+p.stdout.read() 或者用readlines()替代read()得到返回值，类似os.popen().read()
+
+1.subprocess.Popen() 使用绝对路径, 当shell=False,  shell=True可使用相等路径~,  如果想获得指令产生的子进程id需要shell为False
+2.使用列表存储指令
+3.指令和参数必须分开存储于列表，否则得到FileNotFoundError
+
+
+http://stackoverflow.com/questions/7989922/opening-a-process-with-popen-and-getting-the-pid
+From the documentation at http://docs.python.org/library/subprocess.html:
+
+Popen.pid The process ID of the child process.
+
+Note that if you set the shell argument to True, this is the process ID of the spawned shell.
+If shell is false, it should behave as you expect, I think.
+
+
+https://docs.python.org/2/library/subprocess.html
+https://docs.python.org/3/library/subprocess.html
+
+http://stackoverflow.com/questions/9935151/popen-error-errno-2-no-such-file-or-directory
+Just a note. shell=True was likely the correct solution to the o.p., since they did not make the following mistake, but you can also get the "No such file or directory" error if you do not split up your executable from its arguments.
+
+import subprocess as sp
+sp.Popen(['echo 1']) # FAILS with "No such file or directory"
+sp.Popen(['echo', '1']) # SUCCEEDS
+sp.Popen(['echo 1'], shell=True) # SUCCEEDS, but extra overhead
+Without shell=True, Popen expects the executable to be the first element of args, which is why it fails, there is no "echo 1" executable. Adding shell=True invokes your system shell and passes the first element of args to the shell. i.e. for linux, Popen(['echo 1'], shell=True) is equivalent to Popen('/bin/sh', '-c', 'echo 1') which is more overhead than you may need. See Popen() documentation for cases when shell=True is actually useful.
