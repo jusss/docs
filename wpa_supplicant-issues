@@ -1,0 +1,4 @@
+asus x45v 连 TP-LINK 用nl80211 会得到 nl80211 drv event 64, 然后ping路由器延迟1000ms
+现在用wext试试
+nl80211连netgear好像没遇到过这种问题
+
