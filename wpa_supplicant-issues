@@ -2,3 +2,6 @@ asus x45v 连 TP-LINK 用nl80211 会得到 nl80211 drv event 64, 然后ping路�
 现在用wext试试
 nl80211连netgear好像没遇到过这种问题
 
+用-Dwext连TP-LINK还是会延迟超高，断网
+可能是路由器的问题
+
