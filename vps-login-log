@@ -1,0 +1,318 @@
+<x> how I can know who is trying or tried login my system with ssh or
+	other way?
+<y> it'll be in /var/log/auth.log
+<x> missmbob: and what else?
+<y> that's it
+<x> I see lots of this "Dec  4 18:25:01 callcc CRON[9925]:
+	pam_unix(cron:session): session closed for user root" this is mean
+	there's somebody tried login my system?  
+
+<y> no. it tells you it was a cron. just system maintance
+<x> but crontab -l got nothings,
+<x> no crontab for me
+<y> narrow down what you want. ssh? sudo grep ssh /var/log/auth.log
+								        
+<y> there are things in /etc/cron.*
+
+cron.d/       cron.daily/   cron.hourly/  cron.monthly/ cron.weekly/  crontab
+
+vps's ss-server 会显示密码错误的连接
+
+--------------------------------------------------------------------------------------------
+from: http://www.centoscn.com/image-text/config/2015/0516/5447.html
+
+fail2ban 能扫描记录然后 Bans IPs after too many failed authentication attempts
+#aptitude install fail2ban
+#vim /etc/fail2ban/fail2ban.conf
+[Definition] 
+loglevel =3 
+logtarget = SYSLOG  #我们需要做的就是把这行改成/var/log/fail2ban.log，方便用来记录日志信息 
+socket =/var/run/fail2ban/fail2ban.sock
+
+#vi /etc/fail2ban/jail.conf
+[DEFAULT]               #全局设置
+ignoreip = 127.0.0.1       #忽略的IP列表,不受设置限制
+bantime  = 600             #屏蔽时间，单位：秒
+findtime  = 600             #这个时间段内超过规定次数会被ban掉
+maxretry = 3                #最大尝试次数
+backend = auto            #日志修改检测机制（gamin、polling和auto这三种）
+
+[sshd]                   #单个服务检查设置，如设置bantime、findtime、maxretry和全局冲突，服务优先级大于全局设置。
+enabled  = true             #是否激活此项（true/false）
+filter   = sshd              #过滤规则filter的名字，对应filter.d目录下的sshd.conf
+action   = iptables[name=SSH, port=ssh, protocol=tcp]#动作的相关参数，对应action.d/iptables.conf文件
+logpath  = /var/log/secure         #检测的日志文件path
+bantime  = 3600
+findtime  = 300
+maxretry = 3
+
+# service fail2ban start 启动服务
+
+解除fail2ban绑定的IP 
+查询限制列表
+# iptables -L --line-numbers
+Chain fail2ban-SSH (1references)
+num  target    prot opt source            destination
+1    DROP      all  -- 118.152.158.61.ha.cnc anywhere
+2    RETURN    all  -- anywhere           anywhere
+解除限制
+# iptables -D fail2ban-SSH 1
+
+------------------------------------------------------------------------------------------------
+# vi /etc/fail2ban.conf
+SSH防攻击规则
+ 
+
+[ssh-iptables]
+enabled  = true
+filter   = sshd
+action   = iptables[name=SSH, port=ssh, protocol=tcp]
+           sendmail-whois[name=SSH, dest=root, sender=fail2ban@example.com, sendername="Fail2Ban"]
+logpath  = /var/log/secure
+maxretry = 5
+[ssh-ddos]
+enabled = true
+filter  = sshd-ddos
+action  = iptables[name=ssh-ddos, port=ssh,sftp protocol=tcp,udp]
+logpath  = /var/log/messages
+maxretry = 2
+[osx-ssh-ipfw]
+enabled  = true
+filter   = sshd
+action   = osx-ipfw
+logpath  = /var/log/secure.log
+maxretry = 5
+[ssh-apf]
+enabled = true
+filter  = sshd
+action  = apf[name=SSH]
+logpath = /var/log/secure
+maxretry = 5
+[osx-ssh-afctl]
+enabled  = true
+filter   = sshd
+action   = osx-afctl[bantime=600]
+logpath  = /var/log/secure.log
+maxretry = 5
+[selinux-ssh]
+enabled = true
+filter  = selinux-ssh
+action  = iptables[name=SELINUX-SSH, port=ssh, protocol=tcp]
+logpath  = /var/log/audit/audit.log
+maxretry = 5
+
+proftp防攻击规则
+ 
+
+[proftpd-iptables]
+enabled  = true
+filter   = proftpd
+action   = iptables[name=ProFTPD, port=ftp, protocol=tcp]
+           sendmail-whois[name=ProFTPD, dest=you@example.com]
+logpath  = /var/log/proftpd/proftpd.log
+maxretry = 6
+
+邮件防攻击规则
+ 
+
+[sasl-iptables]
+enabled  = true
+filter   = postfix-sasl
+backend  = polling
+action   = iptables[name=sasl, port=smtp, protocol=tcp]
+           sendmail-whois[name=sasl, dest=you@example.com]
+logpath  = /var/log/mail.log
+[dovecot]
+enabled = true
+filter  = dovecot
+action  = iptables-multiport[name=dovecot, port="pop3,pop3s,imap,imaps,submission,smtps,sieve", protocol=tcp]
+logpath = /var/log/mail.log
+[dovecot-auth]
+enabled = true
+filter  = dovecot
+action  = iptables-multiport[name=dovecot-auth, port="pop3,pop3s,imap,imaps,submission,smtps,sieve", protocol=tcp]
+logpath = /var/log/secure
+[perdition]
+enabled = true
+filter  = perdition
+action  = iptables-multiport[name=perdition,port="110,143,993,995"]
+logpath = /var/log/maillog
+
+[uwimap-auth]
+enabled = true
+filter  = uwimap-auth
+action  = iptables-multiport[name=uwimap-auth,port="110,143,993,995"]
+logpath = /var/log/maillog
+
+apache防攻击规则
+ 
+
+[apache-tcpwrapper]
+enabled  = true
+filter  = apache-auth
+action   = hostsdeny
+logpath  = /var/log/httpd/error_log
+maxretry = 6
+[apache-badbots]
+enabled  = true
+filter   = apache-badbots
+action   = iptables-multiport[name=BadBots, port="http,https"]
+           sendmail-buffered[name=BadBots, lines=5, dest=you@example.com]
+logpath  = /var/log/httpd/access_log
+bantime  = 172800
+maxretry = 1
+[apache-shorewall]
+enabled  = true
+filter   = apache-noscript
+action   = shorewall
+           sendmail[name=Postfix, dest=you@example.com]
+logpath  = /var/log/httpd/error_log
+
+nginx防攻击规则
+ 
+
+[nginx-http-auth]
+enabled = true
+filter  = nginx-http-auth
+action  = iptables-multiport[name=nginx-http-auth,port="80,443"]
+logpath = /var/log/nginx/error.log
+
+lighttpd防规击规则
+ 
+
+[suhosin]
+enabled  = true
+filter   = suhosin
+action   = iptables-multiport[name=suhosin, port="http,https"]
+# adapt the following two items as needed
+logpath  = /var/log/lighttpd/error.log
+maxretry = 2
+[lighttpd-auth]
+enabled  = true
+filter   = lighttpd-auth
+action   = iptables-multiport[name=lighttpd-auth, port="http,https"]
+# adapt the following two items as needed
+logpath  = /var/log/lighttpd/error.log
+maxretry = 2
+
+vsftpd防攻击规则
+ 
+
+[vsftpd-notification]
+enabled  = true
+filter   = vsftpd
+action   = sendmail-whois[name=VSFTPD, dest=you@example.com]
+logpath  = /var/log/vsftpd.log
+maxretry = 5
+bantime  = 1800
+[vsftpd-iptables]
+enabled  = true
+filter   = vsftpd
+action   = iptables[name=VSFTPD, port=ftp, protocol=tcp]
+           sendmail-whois[name=VSFTPD, dest=you@example.com]
+logpath  = /var/log/vsftpd.log
+maxretry = 5
+bantime  = 1800
+
+pure-ftpd防攻击规则
+ 
+
+[pure-ftpd]
+enabled  = true
+filter   = pure-ftpd
+action   = iptables[name=pure-ftpd, port=ftp, protocol=tcp]
+logpath  = /var/log/pureftpd.log
+maxretry = 2
+bantime  = 86400
+
+mysql防攻击规则
+ 
+
+[mysqld-iptables]
+enabled  = true
+filter   = mysqld-auth
+action   = iptables[name=mysql, port=3306, protocol=tcp]
+           sendmail-whois[name=MySQL, dest=root, sender=fail2ban@example.com]
+logpath  = /var/log/mysqld.log
+maxretry = 5
+
+apache phpmyadmin防攻击规则
+
+[apache-phpmyadmin]
+enabled  = true
+filter   = apache-phpmyadmin
+action  = iptables[name=phpmyadmin, port=http,https protocol=tcp]
+logpath  = /var/log/httpd/error_log
+maxretry = 3
+# /etc/fail2ban/filter.d/apache-phpmyadmin.conf
+将以下内容粘贴到apache-phpmyadmin.conf里保存即可以创建一个apache-phpmyadmin.conf文件.
+# Fail2Ban configuration file
+#
+# Bans bots scanning for non-existing phpMyAdmin installations on your webhost.
+#
+# Author: Gina Haeussge
+#
+
+[Definition]
+
+docroot = /var/www
+badadmin = PMA|phpmyadmin|myadmin|mysql|mysqladmin|sqladmin|mypma|admin|xampp|mysqldb|mydb|db|pmadb|phpmyadmin1|phpmyadmin2
+
+# Option:  failregex
+# Notes.:  Regexp to match often probed and not available phpmyadmin paths.
+# Values:  TEXT
+#
+failregex = [[]client []] File does not exist: %(docroot)s/(?:%(badadmin)s)
+
+# Option:  ignoreregex
+# Notes.:  regex to ignore. If this regex matches, the line is ignored.
+# Values:  TEXT
+#
+ignoreregex =
+# service fail2ban restart
+写在最后，在安装完fail2ban后请立即重启一下fail2ban,看是不是能正常启动，因为在后边我们配置完规则后如果发生无法启动的问题我们可以进行排查.如果安装完后以默认规则能够正常启动，而配置完规则后却不能够正常启动，请先检查一下你 /var/log/ 目录下有没有规则里的 logpath= 后边的文件，或者这个文件的路径与规则里的是不是一致. 如果不一致请在 logpath 项那里修改你的路径， 如果你的缓存目录里没有这个文件，那么请你将该配置项的 enabled 项目的值设置为 false. 然后再进行重启fail2ban，这样一般不会有什么错误了.
+
+---------------------------------------------------------------------
+vi /etc/fail2ban.conf
+#以 daemon 方式启动 fail2ban
+background = true
+#允许尝试次数
+maxfailures = 3
+#触发 maxfailures 之後的封锁时间(秒); 设为 -1 表示永远封锁
+bantime = 3600
+#以 findtime (秒) 时间内的错误记录作为 maxfailures 的计数基准
+findtime = 600
+#排除 IP 范围, 以空白隔开
+ignoreip = 127.0.0.1 192.168.0.0/24
+#不启用 mail 通知
+[MAIL]
+enabled = false
+#修改自 VSFTPD, 未提及的部份保持原设定
+[PROFTPD]
+enabled = true
+logfile = /var/log/proftpd/proftpd.log
+failregex = no such user|Incorrect password
+#未提及的部份保持原设定
+[SSH]
+enabled = true
+logfile = /var/log/secure
+service fail2ban start
+
+-------------------------------------------------------------------
+root@notanameyet:~# cat /etc/fail2ban.conf 
+background = true
+maxfailures = 3
+bantime = 3600
+findtime = 600
+ignoreip = 127.0.0.1 192.168.0.0/24
+
+[MAIL]
+enabled = false
+
+[SSH]
+enabled = true
+logfile = /var/log/ssh.login.log
+
+root@notanameyet:~# 
+root@notanameyet:~# /etc/init.d/fail2ban start
+[ ok ] Starting authentication failure monitor: fail2ban.
