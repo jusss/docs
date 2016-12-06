@@ -2,6 +2,8 @@ http://www.jinbuguo.com/systemd/systemd.service.html
 http://www.ruanyifeng.com/blog/2016/03/systemd-tutorial-commands.html
 https://zh.opensuse.org/openSUSE:How_to_write_a_systemd_service
 
+#man systemd.service
+
 Systemd 支持的服务类型有以下几类：
 
 simple 默认，这是最简单的服务类型。意思就是说启动的程序就是主体程序，这个程序要是退出那么一切皆休。这在图形界面里非常好理解，我打开 Amarok，退出它就没有了。但是命令行的大部分程序都不会那么设计，因为命令行的一个最基本原则就是一个好的程序不能独占命令行窗口。所以输入命令，回车，接着马上返回给你提示符，但程序已经执行了。所以只有少数程序比如 python xxx.py 还使用这种方式。在这种类型下面，如果你的主程序是要响应其它程序的，那么你的通信频道应该在启动本服务前就设好（套接字等），因此这种类型的服务，Systemd 运行它后会立刻就运行下面的服务（需要它的服务），这时没有套接字后面的服务会失败，写 After 也没用，因为 simple 类型不存在主进程退出的情况也就不存在有返回状态的情况，所以它一旦启动就认为是成功的，除非没起来。
