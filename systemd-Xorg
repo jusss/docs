@@ -1,0 +1,49 @@
+Xorg is not a service of systemd, and init stuff that need Xorg
+write it into ~/.xinitrc, not /etc/systemd/system/stuff.service
+
+### <jusss> call python script in systemd service, and I got this
+###     "_tkinter.TclError: couldn't connect to display ":0""
+### <tech2_> jusss: why are you trying to run something that relies on X from
+###      systemd?
+### <jusss> I set ENVIRONMENT="DISPLAY=:0" on it
+### <jusss> tech2_: it's simple battery notifier, use tk
+### <jusss> tech2_: get a graphic notify when battery is low, because I don't run
+###     DE   [23:29]
+### <tech2_> jusss: X isn't guaranteed to be running at the time your service
+###      starts.  If you want to run a battery notifier do it from whatever
+###      your window-manager or desktop environment's startup uses.
+### <tech2_> jusss: you run _something_ to manage windows, right?
+### <Ninpo> You can't have graphics without a server to send them to..
+### <jusss> tech2_: I use fvwm2, and I only start this service after I start Xorg
+### <Ninpo> jusss: systemd services are system wide, there won't be a system wide
+###     DISPLAY variable
+### <Ninpo> it's per user
+### <jusss> Ninpo: so that's :0 can't be recognized or worked?
+### <tech2_> jusss: do it in the same place you start fvwm2.
+### <Ninpo> For starting X based stuff you want an entry in .xinitrc or similart
+### <Ninpo> -t
+### <Ninpo> jusss: well systemd doesn't know what :0 is
+### <Ninpo> and you can't just set it, there's permissions to consider, display
+###     sockets belong to the user
+### <Ninpo> Launch from within X with .xinitrc or something  [23:32]
+### <jusss> tech2_: it works fine when I run it after I open fvwm2 and Xorg,
+###     without systemd start way
+### <tech2_> jusss: this is not what systemd is for. Systemd is for your system,
+###      not your session.
+### <jusss> Ninpo: yeah, you're right, I should try .xinitrc
+### <tech2_> jusss: use your .Xclients, or .xinitrc or .xsession files
+### <jusss> Ninpo: tech2_ , I see, thanks, I'll try it
+### <jusss> but systemd is really pain in the ass, why system v init be replaced
+### <Ninpo> jusss: That's because your shell inside X has your environment
+### <Ninpo> which includes DISPLAY
+### <tech2_> jusss: .Xclients used to be the default option iirc, but it's been a
+###      long time.
+### <jusss> Ninpo: tech2_ it can works on system v init way? I mean call it in
+###     /etc/init.d/xxx
+### <jusss> suppose?
+### <Ninpo> No you need to call it from within X
+### <jusss> Ninpo: I mean when I start Xorg, then call it use
+###     /etc/init.d/my-python start way, works?  [23:36]
+### <jusss> if there's still exist system v init way  [23:37]
+
+
