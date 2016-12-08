@@ -1,0 +1,47 @@
+pkg, pkg_add, ports
+
+ports是一堆Makefile, 从源码编译安装
+pkg_* 已淘汰 pkg_add 老的2进制包管理器
+pkg 直接装2进制包
+
+
+装完系统之后，#pkg 提示包管理器还没装，然后点y安装
+如果安装不上就
+
+修改源
+#vi /etc/pkg/FreeBSD.conf
+按里面的指导
+创建/usr/local/etc/pkg/repos/FreeBSD.conf
+FreeBSD: {
+ url: "pkg+http://pkg.freebsd.org/freebsd:10:x86:64/latest"
+ mirror_type: "srv"
+ enabled: yes
+}
+
+或/usr/local/etc/pkg/repos/fbsdtw.conf
+fbsdtw: {
+ 	url: "http://pkg0.twn.freebsd.org/${ABI}/quarterly",
+ 	mirror_type: "http",
+	enabled: yes
+}
+
+#cd /usr/ports/ports-mgmt/pkg/
+#make
+#make install 会编译pkg
+#pkg2ng
+#pkg update
+#pkg install pkg
+
+
+--------------------------------------------------------------
+国内pkg源 http://mirrors.ustc.edu.cn/freebsd/ 已死
+
+系统更新用freebsd-update
+
+
+http://neue.v2ex.com/t/314498
+之前就考虑过玩一下 FreBSD ，结果就是这样的问题，官方不再接受第三方源，国外的连接速度又太慢，只好作罢。
+
+@d7101120120 pkg 源可以用台湾源， portsnap 貌似可以手动到亚洲国家的 FreeBSD FTP 镜像站
+（如 ftp.hk.freebsd.org ）抓， ports 貌似是直接从软件官网下载的源码（比如用 ports 编译 PHP7 就是从 de.php.net 下载的源码）。 
+可玩性还是比较高的， Linuxer 值得一试。
