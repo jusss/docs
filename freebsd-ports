@@ -1,0 +1,182 @@
+freebsd上有3种方法安装一个包，
+1.源码编译安装
+2.用pkg从官方源下载2进制包(pkg_*已淘汰) (类似Archlinux的pacman) 只有官方源，不允许第三方源
+3.ports里面用Makefile下载源码编译安装（感觉类似archlinux的AUR)
+
+更新ports tree方法1.直接下ports的镜像压缩包然后解压到/usr/ports里
+#fetch 
+ftp://ftp4.FreeBSD.org/pub/FreeBSD/ports/ports/ports.tar.gz 
+#tar -zxvf ports.tar.gz -C /usr/
+#cd /usr/ports/
+#make fetchindex
+#make search name=tmux
+#cd /usr/ports/sysutils/tmux/
+#make install clean
+
+----------------------------------------------------------------------------------------
+https://www.zhihu.com/question/36964775/answer/69796583#
+
+"对于 Ports ，所有 Ports 的集合（collection）叫 Ports Collection，由于它的目录展开形似一棵树，
+所以又叫作 Ports Tree 。Ports Collection 的管理方式有点特别，在 FreeBSD 中以快照的形式存储，
+每一小时 FreeBSD 的 Ports 上游就要更新一次，所以用快照管理工具 Portsnap（Ports Snapshot）来管理。
+
+用 Ports 安装应用前，需要更新一次 Ports Collection 。首次更新用命令 
+
+portsnap fetch extract
+
+以后几次更新用命令 
+
+portsnap fetch update
+
+以后几次更新也可以使用 portsnapn fetch extract，但第一次更新必须要使用 
+portsnap fetch extract 
+虽然每一个 Port 本身是源代码打包文件，但是里面没有源代码，有 Makefile 编译文件。
+用户用 Ports 安装应用，采用命令 
+make install
+也可以配合 make clean 来清理安装完成后残留的缓存文件，
+这两个命令可以合并为 make install clean 
+需要注意的是，当用户在每一个port目录中下达安装命令（ make install ）后，
+系统会自动下达 9 个命令（分别是 make config, make fetch, make checksum, make extract, 
+make patch, make depends, make configure, make build ），再执行make install，
+所以一般不需要手动一个个下达这些命令。"
+
+"首先，ports是一堆Makefile。对每个软件，它主要记载以下信息：
+源码包在哪里下载，如何解压缩
+哈希值是什么
+编译依赖，运行依赖有哪些
+要打哪些补丁
+如何编译，有哪些可选项
+将会安装哪些文件，装到什么地方去
+调用什么工具注册安装信息
+有了这些信息和规则，我们直接敲"make"命令，就能自动下载编译安装某个软件及其依赖。
+因此ports不过是对各种开源软件的源码包进行了二次封装，称不上包管理器。
+
+真正管「装完之后的事情」的，是pkg。它有一个sqlite3数据库，ports在安装软件时会把相关信息告诉pkg，
+让pkg记录在案。如果以后要卸载某个软件，只有pkg知道该删除什么东西。而更新略微复杂，因为ports不知道你机器
+上已经装了什么，而pkg不知道最新的ports是什么，所以需要另外一个工具（portmaster）从双方获取信息，计算你
+机器上哪些软件需要更新，更新的先后顺序是什么。因此对ports用户来说，至少需要ports、pkg、portmaster三样东西，才能实现安装、卸载、更新。
+
+由于pkg记录了所有安装信息，我们完全可以用pkg将某个已安装的软件打包，分发给别的机器解压安装，这就是所谓的package。它可以满足两类用户：
+不想编译安装的用户（使用官方的pkg源）
+既想用ports实现更多定制，又需要批量安装的用户（自己搭建pkg源）"
+
+---------------------------------------------------------------------------------------------------------------------------------
+使用portsnap或cvsup更新ports tree
+http://www.jb51.net/os/Unix/8787.html
+
+更新ports tree方法1.直接下ports的镜像压缩包然后解压到/usr/ports里
+#fetch 
+ftp://ftp4.FreeBSD.org/pub/FreeBSD/ports/ports/ports.tar.gz 
+#tar -zxvf ports.tar.gz -C /usr/
+
+更新ports tree方法2.使用portsnap
+Portsnap 是另一种用于发布 Ports 套件的方法,它最早从 FreeBSD 6.0开始引入,在较早的系统中，可以通过 ports-mgmt/portsnap package 来安装它. 
+首次运行 Portsnap 
+# portsnap fetch 
+# portsnap extract 
+更新 Ports Tree 
+# portsnap fetch update 
+修改镜像站点: 
+#ee /etc/portsnap.conf 
+SERVERNAME=portsnap.tw.FreeBSD.org
+
+更新ports tree方法3.使用cvsup(不推荐)
+
+在首次运行 CVSup 之前， 务必确认 /usr/ports 是空的！ 如果您之前已经用其他地方安装了一份 Ports 套件，则 CVSup 
+可能不会自动删除已经在上游服务器上删除掉的补丁文件。首先安裝 cvsup-without-gui-16.1h 这个 package，你可以选用 
+ports 安裝，或是用 package 裝. CHANGE_THIS.FreeBSD.org 修改成离您较近的 CVSup 服务器。 
+#cp /usr/share/examples/cvsup/ports-supfile ~/ 
+#ee ~/ports-supfile 
+修改: 
+*default host=Change_this.freebsd.org #告诉 cvsup 从哪里获取更新（将Change_this.freebsd.org改为自己认为最快的服务器就可以了) 
+*default base=/var/db # cvsup支持文件的位置 
+*default prefix=/usr # 文件放到哪里 
+*default releases=cvs tag=. # FreeBSD-CURRENT(branch=.，即HEAD) 
+*default delete use-rel-suffix # 删除cvsup创建的，业已在cvs中删除掉的文件 
+src-all # 全部FreeBSD源代码 
+ports-all tag=. # 全部的ports。这里的tag=.用于取代默认的branch。如果使用RELENG_4请务必保留tag=. ！！ 
+更新: 
+# cvsup -L 2 /root/ports-supfile 
+多加的参数意思是: 
+如果您没有运行 X11 或者不喜欢 GUI， 当您运行 cvsup 的时候需要在命令行添加 两个选项： 
+# cvsup -g -L 2 supfile 
+-g 告诉 CVSup 不要使用 GUI。如果您 没在运行 X11 这个是自动的，否则您必须指定它。 
+-L 2 告诉 CVSup 输出所有正在升级的文件的细节。 有三个等级可以选择，从 -L 0 到 -L 2。默认是 0，意味着除了错误消息 什么都不输出。 
+-s 要求 cvsup 进行增量同步，以减少网路压力,所以第一次进行时不能加哪！
+
+----------------------------------------------------------------------------------------------------------------------
+http://www.cnblogs.com/81/archive/2009/07/30/1534705.html
+为何使用portsnap？
+1. portsnap简单，只有三个命令，相比cvsup方便。
+2. 下载压缩包，然后解压，比cvsup直接下载快。
+
+portsnap使用步骤(portsnap在Freebsd最小安装时已安装)：
+1. portsnap fetch  自动查找Mirror站，下载ports包。
+2. portsnap extract  解压Ports包，默认到/usr/ports，先保证此目录为空。
+    我在使用时出现：
+    No snapshot available. Try running
+    portsnap fetch
+    这是由于第1步portsnap fetch下载的文件不完整造成，重新执行第1步。
+3. portsnap update 更新ports tree
+
+第1、2步只需第一次操作，第3步是日常更新。
+    
+-----------------------------------------------------------------------------------------------------
+https://wiki.freebsdchina.org/faq/ports
+portsnap fetch 下载ports tree快照
+portsnap extract 解压成ports tree
+portsnap update 更新ports tree
+
+设置portsnap源,更新ports tree
+portsnap fetch -s portsnap.cn.freebsd.org 指定下载的地址
+或 #vi /etc/portsnap.conf
+设置SERVERNAME=portsnap.cn.freebsd.org
+
+然后#portsnap fetch extract    这里直接下载ports并且解压到/usr/ports/
+
+设置ports源,下载源码编译
+用ports安装软件的时候，如果没有设置相对于你来说最快的ports服务器地址，
+那就会默认的 ftp://ftp.freebsd.org/pub/FreeBSD/ports/distfiles/，这个地址对于很多地方来说是很慢的。
+
+修改 /etc/make.conf 加入以下代码
+
+MASTER_SITE_OVERRIDE=\
+ftp://ftp.freebsdchina.org/pub/FreeBSD/ports/distfiles/${DIST_SUBDIR}\
+ftp://ftp.tw.freebsd.org/pub/FreeBSD/ports/distfiles/${DIST_SUBDIR}
+如果你有最快的地址，可以加到上面去，下载就会快了
+
+-------------------------------------------------------------------------------------------------------
+http://www.cnblogs.com/apexchu/p/4131821.html
+我的FreeBSD 8.0-release是最小化安装，所以既没有ports，也没有/usr/ports目录。选择启用ports的话，
+需要在root下输入"sysinstall"来安装它：
+
+输入sysinstall --> 选择Configure --> Distributions --> ports，然后安装即可。
+
+ports的默认路径是/usr/ports。这个ports的根目录下面有很多的文件夹及子文件夹，组成一个树状目录，包含大量ports下的软件。
+比如mail是邮件服务软件，games是游戏，www代表web服务软件，databases则是数据库软件。
+如果你需要安装什么软件，只要进入当前目录，然后“make install clean”即可。
+
+[root@bsd01 ~]# cd /usr/ports/www/apache22
+[root@bsd01 /usr/ports/www/apache22] make install clean
+/usr/ports/distfiles是存放软件包的文件夹。ports会先检查/usr/ports/distfiles目录内有没有这个软件包，如果没有它就会自动从网上下载安装。
+
+查询ports里是否有pidgin这个包
+$cd /usr/ports
+$make search name=pidgin
+
+安装firefox
+#cd /usr/ports/www/firefox
+#make install clean
+
+卸载firefox
+#cd /usr/ports/www/firefox
+#make deinstall clean
+
+升级firefox
+#cd /usr/ports/www/firefox
+#make deinstall reinstall clean
+
+卸载所有安装的ports
+#cd /var/db/pkg
+#pkg_delete *
+#reboot
