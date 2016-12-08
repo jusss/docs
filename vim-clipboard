@@ -1,0 +1,35 @@
+http://stackoverflow.com/questions/3961859/how-to-copy-to-clipboard-in-vim
+
+you must have vim compiled with the +clipboard feature for ANY of the below 
+suggestions to work in the first place! This is NOT the default on most systems
+
+$vim --version 
+显示的是 -clipboard就是默认没开启这个功能，如果是+clipboard就是开启了
+
+archlinux debian ubuntu的源的vim默认没开启+clipboard功能，需要用xsel或xclip把
+yank的复制进clipboard
+
+进visual mode然后选中yank后
+ :w !xsel -i -b   
+就把yank的stuff传给clipboard了
+
+:r !xsel -o -b
+就把clipboard东西复制到当前buffer了，当然也可以用Shift-Insert
+
+-------------------------------------------------------------------------------
+
+On Mac OSX
+
+copy selected part: visually select text(type v or V in normal mode) and type :w !pbcopy
+copy the whole file :%w !pbcopy
+paste from the clipboard :r !pbpaste
+On most Linux Distros, you can substitute:
+
+pbcopy above with xclip -i -sel c or xsel -i -b
+pbpaste using xclip -o -sel -c or xsel -o -b
+-- Note: In case neither of these tools (xsel and xclip) are preinstalled on your distro, you can probably find them in the repos
+
+
+
+
+
