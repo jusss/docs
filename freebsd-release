@@ -1,0 +1,46 @@
+ftp://ftp.freebsd.org/pub/FreeBSD/releases/ISO-IMAGES/11.0/
+ftp://ftp.jp.freebsd.org/pub/FreeBSD/releases/amd64/
+
+ftp site mirror:
+https://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/mirrors-ftp.html
+
+https://www.freebsd.org/releases/11.0R/announce.html
+
+FTP
+
+FreeBSD 11.0-RELEASE may be downloaded via ftp from the following site:
+
+ftp://ftp.freebsd.org/pub/FreeBSD/releases/ISO-IMAGES/11.0/
+
+However before trying this site, please check your regional mirror(s) first by going to:
+
+ftp://ftp.<your_country_code>.FreeBSD.org/pub/FreeBSD
+
+Any additional mirror sites will be labeled ftp2, ftp3 and so on.
+
+More information about FreeBSD mirror sites can be found at:
+
+https://www.FreeBSD.org/doc/en_US.ISO8859-1/books/handbook/mirrors-ftp.html
+
+FreeBSD 11.0-RELEASE virtual machine images may be downloaded via ftp from:
+
+ftp://ftp.freebsd.org/pub/FreeBSD/releases/VM-IMAGES/11.0-RELEASE/
+
+For instructions on installing FreeBSD or updating an existing machine to 11.0-RELEASE please see:
+
+https://www.FreeBSD.org/releases/11.0R/installation.html
+
+VM-Images
+ftp://ftp.freebsd.org/pub/FreeBSD/releases/VM-IMAGES/11.0-RELEASE/amd64/Latest/
+http://mirrors.aliyun.com/freebsd/releases/VM-IMAGES/
+
+virtualbox支持vhd vmdk的镜像
+
+http://bbs.csdn.net/topics/390129471
+1.FreeBSD的开发代号比较迷惑人，release代表正式发行相当于Debian Stable，"stable"代表较稳定的测试分支相当于Debian Testing，Current是不稳定测试分支相当于Debian Sid，所以一些小白可能会误将Stable当做正式版本。
+debian: stable, testing, sid
+freebsd: release, stable, current
+
+vi你笑什么，你也一样，默认配置下想删除一个字符都得按esc退回命令模式用x，否则你就体验一下delete键越删字越多的思想感情吧……不过vim已经改善很多了，没那么反人类了。
+
+
