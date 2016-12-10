@@ -1,0 +1,48 @@
+yield的function可以实现同一函数同样参数的多次调用但每次的过程都不一样
+如果只是第一次调用不一样，而以后的调用都一样，直接在第一次调用时写个
+异常捕捉来保证第一次调用能通过
+
+yield()返回一个generator object,然后 next(this-generator-object)就
+会执行一部分过程并返回一个值(yield函数定义里yield return-value)
+
+yield文件, same call but run differently!
+
+johns-yield.py
+
+x=0
+if x==0:
+   function_one
+
+if x==1:
+   function_two
+
+def function_one():
+    df=open('w','~/johns-yield.py')
+    ### or
+    system("sed -i -e 's/x=0/x=1/' ~/johns-yield.py")
+    ### because only x==0 will run this function, so sed /x=0/x=1/
+    do_what_your_want
+
+def function_two():
+    ...
+
+### this is for erc-notifier 
+------------------------------------------------------------------
+n=0
+n() will run 0()
+
+n=1 will run 1()
+
+n='b
+(defmacro gen-func (x)
+	  (list 'defun (eval x) () '(procedure)))
+
+
+defmacro(gen-func x):
+  list('defun eval(x) () '(procedure))
+
+use variable's value as function's name!
+
+
+
+
