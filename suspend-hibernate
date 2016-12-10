@@ -1,5 +1,7 @@
 systemctl suspend
 systemctl hibernate
+#echo disk > /sys/power/state
+#echo mem > /sys/power/state
 
 suspend to ram 不需要 swap分区  
 suspend to disk 需要swap分区，如果没有的话可以创建个swap file代替，然后重启时内核参数用resume_offset
