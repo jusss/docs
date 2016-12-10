@@ -3,6 +3,9 @@ systemctl hibernate
 #echo disk > /sys/power/state
 #echo mem > /sys/power/state
 
+systemctl hibernate休眠有时在启动过程中自动重启，导致无法recovery
+直接$echo disk|sudo tee /sys/power/state休眠倒是还没遇到过这种情况，这是什么原因?
+
 suspend to ram 不需要 swap分区  
 suspend to disk 需要swap分区，如果没有的话可以创建个swap file代替，然后重启时内核参数用resume_offset
 
