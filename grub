@@ -1,0 +1,84 @@
+/boot/grub/grub.cfg 
+https://wiki.archlinux.org/index.php/GRUB_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)
+
+设置kernel参数在/etc/default/grub
+设置其它系统启动项在/etc/grub.d/40_custom
+修改完成后用
+grub-mkconfig -o /boot/grub/grub.cfg 生成配置文件
+
+添加其他启动项的最好方法是编辑 /etc/grub.d/40_custom 或 /boot/grub/custom.cfg.
+更新了这些文件后,运行下面命令更新grub.cfg:
+# grub-mkconfig -o /boot/grub/grub.cfg
+
+在 /etc/default/grub 中设置 GRUB_CMDLINE_LINUX 和 GRUB_CMDLINE_LINUX_DEFAULT 
+变量可以向 Linux 镜像传递额外的参数. 生成普通启动项时,这两个参数的值会合并在一起加入,
+ 对于recovery启动项, 则添加 GRUB_CMDLINE_LINUX 参数的值.
+没有必要两者都使用，如果要系统支持休眠后恢复,可以使用
+GRUB_CMDLINE_LINUX_DEFAULT="resume=/dev/sdaX quiet" (sdaX是交换分区).
+生成 recovery 启动项时,不会加入 resume 和 quiet 参数; 而其他的普通启动项会包含它们.
+
+"要生成 GRUB recovery启动项,需要在 /etc/default/grub 中将 #GRUB_DISABLE_RECOVERY=true 注释掉"!!!
+
+当开启了hibernate选项后通过/boot/initramfs, 需要在/etc/default/grub中
+将 #GRUB_DISABLE_RECOVERY=true 注释掉!
+并设置GRUB_CMDLINE_LINUX="resume=/dev/sda8 quiet"
+然后grub-mkconfig -o /boot/grub/grub.cfg生成配置文件
+
+/etc/grub.d/50_custom
+menuentry "Windows 7"{
+    insmod ntfs
+    insmod part_msdos
+    insmod ntldr     
+    set root=(hd0,msdos1)
+    ntldr /bootmgr
+}
+
+
+/etc/grub.d/60_custom
+if [ "${grub_platform}" == "pc" ]; then
+  menuentry "Microsoft Windows XP" {
+    insmod part_msdos
+    insmod ntfs
+    insmod search_fs_uuid
+    insmod ntldr     
+    search --fs-uuid --set=root --hint-bios=hd0,msdos1 --hint-efi=hd0,msdos1 --hint-baremetal=ahci0,msdos1 69B235F6749E84CE
+    ntldr /ntldr
+  }
+fi
+
+/etc/grub.d/40_custom
+#!/bin/sh
+exec tail -n +3 $0
+# This file provides an easy way to add custom menu entries.  Simply type the
+# menu entries you want to add after this comment.  Be careful not to change
+# the 'exec tail' line above.
+
+menuentry "Microsoft Windows 8.1" {
+    echo "Loading Microsoft Windows 8.1..."
+    insmod part_gpt
+    insmod fat
+    insmod search_fs_uuid
+    insmod chain
+    search --fs-uuid --no-floppy --set=root --hint-bios=hd0,gpt2 --hint-efi=hd0,gpt2 --hint-baremetal=ahci0,gpt2 763A-9CB6
+    chainloader /EFI/Microsoft/Boot/bootmgfw.efi
+}
+
+menuentry "Microsoft Control Center" {
+    echo "Loading Microsoft Control Center..."
+    insmod part_gpt
+    insmod fat
+    insmod search_fs_uuid
+    insmod chain
+    search --fs-uuid --no-floppy --set=root --hint-bios=hd0,gpt2 --hint-efi=hd0,gpt2 --hint-baremetal=ahci0,gpt2 763A-9CB6
+    chainloader /EFI/HP/boot/bootmgfw.efi
+}
+
+menuentry "System shutdown" {
+    echo "System shutting down..."
+    halt
+}
+
+menuentry "System restart" {
+    echo "System rebooting..."
+    reboot
+}
