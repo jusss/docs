@@ -9,6 +9,10 @@ https://wiki.archlinux.org/index.php/Power_management/Suspend_and_hibernate
 hibernate需要
 1.swap分区或swap file, swap分区最好比RAM大
 2.重启时内核参数指定 resume=your-swap-partition-like-/dev/sda8 用swapon或fdisk -l或df -h或mount查看
+需要在/etc/default/grub中
+#GRUB_DISABLE_RECOVERY=true 注释掉!
+并设置GRUB_CMDLINE_LINUX="resume=/dev/sda8 quiet"
+然后grub-mkconfig -o /boot/grub/grub.cfg生成配置文件
 3.配置initramfs
 vim /etc/mkinitcpio.conf
 HOOKS="base udev resume autodetect modconf block filesystems keyboard fsck"
