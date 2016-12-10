@@ -1,0 +1,59 @@
+crontab, systemd timer, sleep()  three ways to do something sometime
+
+$crontab -e
+
+#run test.sh every 2 hours
+0 */2 * * *  /home/username/test.sh 
+0 0-23/2 * * * /home/username/test.sh
+0 0,2,4,6,8,10,12,14,16,18,20,22 * * * /home/username/test.sh
+
+linux 内核（2.6.xx)
+1 在/etc/cron.d 下新增执行脚本之后需重新启动crond 进程，而直接在crontab 里面登录的脚本则不需要重启。
+2 /etc/cron.d的文件必须是权限644（否则会在出错），属主为root.
+
+crontab -e, or /etc/crontab, or /etc/cron.d/
+
+30 * * * * offlineimap& 每个小时的第30分钟同步一次邮箱 
+
+http://www.jb51.net/LINUXjishu/74014.html
+
+可用crontab -e命令来编辑，编辑的是/var/spool/cron下对应用户的cron文件，
+也可以直接修改/etc/crontab文件。具体格式如下：
+
+Minute Hour Day Month Week command 
+分钟 小时 天 月 星期 命令 
+0-59 0-23 1-31 1-12 0-6 command
+
+Minute 每个小时的第几分钟执行该任务 
+Hour 每天的第几个小时执行该任务 
+Day 每月的第几天执行该任务 
+Month 每年的第几个月执行该任务 
+DayOfWeek 每周的第几天执行该任务，0表示周日
+Command 指定要执行的程序 、脚本或命令
+对于不指定的字段，要用“*”来填补其位置。
+
+“*”代表取值范围内的数字, 
+“/”代表”每”, 
+“-”代表从某个数字到某个数字, 
+“,”分开几个离散的数字
+
+5  * * * * ls 指定每小时的第5分钟执行一次ls命令 
+30 5 * * * ls 指定每天的 5:30 执行ls命令 
+30 7 8 * * ls 指定每月8号的7：30分执行ls命令 
+30 5 8 6 * ls 指定每年的6月8日5：30执行ls命令 
+30 6 * * 0 ls 指定每星期日的6:30执行ls命令[注：0表示星期天，1表示星期1，以此类推，也可以用英文来表示，sun表示星期天，mon表示星期一等。] 
+30 3 10,20 * * ls 每月10号及20号的3：30执行ls命令[注：“，”用来连接多个不连续的时段] 
+25 8-11 * * * ls 每天8-11点的第25分钟执行ls命令[注：“-”用来连接连续的时段] 
+*/15 * * * * ls 每15分钟执行一次ls命令 [即每个小时的第0 15 30 45 60分钟执行ls命令 ] 
+30 6 */10 * * ls 每个月中，每隔10天6:30执行一次ls命令[即每月的1、11、21、31日是的6：30执行一次ls命令 ]
+每天7：50以root 身份执行/etc/cron.daily目录中的所有可执行文件 
+50 7 * *  * root run-parts  /etc/cron.daily [ 注：run-parts参数表示，执行后面目录中的所有可执行文件
+第10、20、30分钟输出到/tmp/cron1.txt：
+10,20,30 * * * * echo "第10、20、30分钟输出一次" >> /tmp/cron1.txt
+以用户lzw.me的身份每两小时就运行某个程序：
+0 */2 * * * lzw.me /usr/bin/somecommand >> /dev/null 2>&1
+
+
+ 
+
+
