@@ -1,5 +1,7 @@
 crontab, systemd timer, sleep()  three ways to do something sometime
 
+从crontab调用gui script, 1. $xhost +local:  2. env DISPLAY=:0.0 your-gui-script
+
 * 5 * * * command  5点的每一分钟都执行command
 
 如果不想每分钟都执行，就不要设分钟为*  ！！！
@@ -26,7 +28,7 @@ linux 内核（2.6.xx)
 crontab -e, or /etc/crontab, or /etc/cron.d/
 
 30 * * * * offlineimap& 每个小时的第30分钟同步一次邮箱 
-30 18,22 * * 0,3,6 /home/jusss/lab/notifier.py game game
+30 18,22 * * 0,3,6 env DISPLAY=:0.0 /home/jusss/lab/notifier.py game game
 
 http://www.jb51.net/LINUXjishu/74014.html
 
