@@ -1,5 +1,17 @@
 crontab, systemd timer, sleep()  three ways to do something sometime
 
+* 5 * * * command  5点的每一分钟都执行command
+
+如果不想每分钟都执行，就不要设分钟为*  ！！！
+
+1.pacman -Qo $(which crontab)
+pacman -Ql cronie|grep systemd
+archlinux自带的cron是cronie, 且开机不启动cronie
+systemctl start cronie
+systemctl enable cronie
+
+2. sudo gpasswd -a john users
+
 $crontab -e
 
 #run test.sh every 2 hours
