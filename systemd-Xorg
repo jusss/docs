@@ -1,5 +1,6 @@
 Xorg is not a service of systemd, and init stuff that need Xorg
 write it into ~/.xinitrc, not /etc/systemd/system/stuff.service
+or 1. $xhost +local: 2. ENVIRONMENT="DISPLAY=:0.0" in Service Section of stuff.service
 
 ### <jusss> call python script in systemd service, and I got this
 ###     "_tkinter.TclError: couldn't connect to display ":0""
