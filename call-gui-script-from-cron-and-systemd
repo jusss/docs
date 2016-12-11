@@ -1,0 +1,45 @@
+1. xhost +local:
+2. env DISPLAY=:0.0 your-gui-script
+
+20 17 * * * env DISPLAY=:0.0 /home/jusss/lab/notifier.py hello test
+this will work fine!
+you need to give environment variable to cron
+
+http://stackoverflow.com/questions/17518073/trying-to-run-a-python-script-from-ubuntu-crontab
+
+Make the scripts executable
+~$chmod +x script.py
+
+You have to enable X ACL for localhost to connect to for GUI applications to work
+~$ xhost +local:
+
+Add the following line in the crontab "env DISPLAY=:0.0"
+* * * * * env DISPLAY=:0.0 /usr/bin/python /your-script-somewhere.py
+
+And one more line to crontab ">/dev/null 2>&1"
+* * * * * env DISPLAY=:0.0 /usr/bin/python /your-script-somewhere.py >/dev/null 2>&1
+
+you can check errors in /var/log/syslog file
+~$ tail -20 /var/log/syslog
+
+more info:
+https://help.ubuntu.com/community/CronHowto
+----------------------------------------------------------------------
+/etc/systemd/system/battery.notifier.service
+[Unit]
+Description=Battery Notifier
+### run after dnsmasq, because when I open dnsmasq after Xorg by hand, and it ne
+eds Xorg
+After=dnsmasq.service
+
+[Service]
+Type=simple
+Environment="DISPLAY=:0.0"
+ExecStart=/usr/bin/python3 /home/jusss/lab/battery.eeepc.py
+# RestartSec=60
+# TimeoutStartSec=120
+Restart=no
+
+[Install]
+WantedBy=multi-user.target
+
