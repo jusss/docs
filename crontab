@@ -6,6 +6,30 @@ crontab, systemd timer, sleep()  three ways to do something sometime
 
 如果不想每分钟都执行，就不要设分钟为*  ！！！
 
+https://wiki.archlinux.org/index.php/Cron_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)
+cronie使用run-parts来执行在cron.hourly/cron.daily/cron.weekly/cron.monthly里的脚本。
+ 请注意这些文件夹里的脚本名字中不应该含有'.'，因为不含有任何参数的run-parts将会忽略他们。
+例如backup.sh这个脚本是不会被执行的，请将其改名为backup或者其他不含有'.'的名字以定时执行该脚本。
+ 要获取更详细的信息请 man run-parts
+
+运行 X 程序
+If you find that you cannot run X apps from cron jobs then put this before the command:
+export DISPLAY=:0.0 ;
+That sets the DISPLAY variable to the first display; which is usually right unless you 
+like to run multiple xservers on your machine.
+If it still does not work then you need to use xhost to give your user control over X11:
+# xhost +si:localuser:$(whoami)
+I put it in my gnome `Startup Applications' like this:
+bash -c "xhost +si:localuser:$(whoami)"
+Asynchronous job processing
+
+If you regularly turn off your computer but do not want to miss jobs, there are some 
+solutions available (easiest to hardest):
+Dcron
+Vanilla dcron supports asynchronous job processing. Just put it with @hourly, @daily, 
+@weekly or @monthly with a jobname, like this:
+@hourly         ID=greatest_ever_job      echo This job is very useful.
+
 1.pacman -Qo $(which crontab)
 pacman -Ql cronie|grep systemd
 archlinux自带的cron是cronie, 且开机不启动cronie
