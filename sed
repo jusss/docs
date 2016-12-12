@@ -1,3 +1,9 @@
+sed默认替换所有字符串，如果只想替换一次呢？
+sed -i '0,/word-you-want-to-change/ s//new-word-you-want/' file-you-want-to-change
+http://stackoverflow.com/questions/8081297/sed-to-change-string-in-a-file-only-once
+
+-i 会修改文件
+
 from: http://bbs.linuxtone.org/thread-1731-1-1.html
 
 比如，要将目录/modules下面所有文件中的zhangsan都修改成lisi，这样做：
