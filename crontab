@@ -6,6 +6,13 @@ crontab, systemd timer, sleep()  three ways to do something sometime
 
 如果不想每分钟都执行，就不要设分钟为*  ！！！
 
+*/5 应该是能被整除的数，如0 5 10 15 20 25 30 35 40 45 50 55
+*/43 应该是 0 43
+*/3 应该是 0 3 6 9 12 15 ...
+如果想精确执行，就写明时间，用,分割如
+2,3,5,8,13,21 * * * * command
+*/5,*3,2 * * * * * command  能被5整除的数，尾数是3的数，分钟为2的,也就是 0 2 3 5 10 13 15...
+
 https://wiki.archlinux.org/index.php/Cron_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)
 cronie使用run-parts来执行在cron.hourly/cron.daily/cron.weekly/cron.monthly里的脚本。
  请注意这些文件夹里的脚本名字中不应该含有'.'，因为不含有任何参数的run-parts将会忽略他们。
