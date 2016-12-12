@@ -1,6 +1,8 @@
 1. xhost +local:
 2. env DISPLAY=:0.0 your-gui-script
 
+write xhost +local: into ~/.xinitrc, because every reboot X, you need set it 
+
 20 17 * * * env DISPLAY=:0.0 /home/jusss/lab/notifier.py hello test
 this will work fine!
 you need to give environment variable to cron
