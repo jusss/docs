@@ -1,6 +1,7 @@
 crontab, systemd timer, sleep()  three ways to do something sometime
 
 从crontab调用gui script, 1. $xhost +local:  2. env DISPLAY=:0.0 your-gui-script
+write xhost +local: into ~/.xinitrc, because every reboot X, you need set it 
 
 * 5 * * * command  5点的每一分钟都执行command
 
