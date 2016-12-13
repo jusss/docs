@@ -1,0 +1,4 @@
+elisp  "a""  =>  ""
+python "a""  =>  SyntaxError: EOL while scanning string literal
+sbcl  "a"" => "a"
+ruby "a"" 继续等待输入
