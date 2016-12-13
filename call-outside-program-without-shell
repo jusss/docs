@@ -1,0 +1,397 @@
+掉外部程序不要用os.system() (start-process-shell-command ...) 这种使用shell的
+shell会自动求值参数，如果参数里有 ` $ ~就会被shell解析求值，有时很危险比如在参数里
+用了`ls` 或许就会被执行
+用subprocess.Popen() (start-process ...)这种不使用shell的调用外部程序
+
+(start-process-shell-command)会解析它的参数，如果它的参数有`会被执行
+for example,
+~/.emacs
+(add-hook 'erc-text-matched-hook 'john-erc-notifier)
+(defun john-erc-notifier (match-type nickuserhost message)
+  ;;; if message contain these strings then no notification
+  (unless (string-match (regexp-opt '("*** Users on #"
+				      "has changed mode for "
+				      "*** Welcome "
+				      "*** Your new nickname is"
+				      "topic set by"
+				      "You are now identified for "
+				      "is now your hidden host"
+				      "unaffiliated/jusss"
+				      ))
+			message)
+    (start-process-shell-command "erc-notify"
+				 "erc-notify"
+				 "env DISPLAY=:0.0 /tmp/notifier.py erc "
+				 message)))
+
+				 ;;;message不能出现双引号和单引号，否则会破坏字符串结构，单括号也不行
+					;;; (concat "'" message "'")
+				 ;;; even use /tmp/notifier.py, when receive jusss:'l still get Process erc-notify<2> exited abnormally with code 1
+				 ;;; elisp -> shell -> python -> shell -> python or elisp->shell->python is too much calls
+				 ;;;(concat "\"" message "\""))))
+
+
+-------------------------------------------------------------------------------------------
+/tmp/notifier.py
+#!/usr/bin/env python3
+### usage: ./notifier.py power its $ZZZ
+import sys
+from tkinter.messagebox import *
+showinfo(title=sys.argv[1], message=sys.argv[2:])
+-------------------------------------------------------------------------------------------
+Process erc-notify finished
+/bin/bash: line 1: looking: command not found
+
+Process erc-notify exited abnormally with code 127
+/bin/bash: line 1: environment.: command not found
+
+Process erc-notify exited abnormally with code 127
+/bin/bash: -c: line 0: syntax error near unexpected token `('
+/bin/bash: -c: line 0: `env DISPLAY=:0.0 ~/lab/notifier.py erc jusss: you are probably looking for os.kill(pid, 0)'
+Process erc-notify exited abnormally with code 127
+/bin/bash: -c: line 0: syntax error near unexpected token `)'
+/bin/bash: -c: line 0: `env DISPLAY=:0.0 ~/lab/notifier.py erc jusss: Looks different from the first paste ;)'
+-----------------------------------------------------------------------------------------------
+
+erc-text-matched-hook返回的message,是不带双引号的字符串，如 jusss: you are probably looking for os.kill(pid, 0)'
+而start-process-shell-command会调用shell,所以会用shell解析这个参数，于是就变成了
+env DISPLAY=:0.0 ~/lab/notifier.py erc jusss: you are probably looking for os.kill(pid, 0)'
+shell会求值jusss: you are ...(pid, 0)'这个erc-text-matched-hook返回的message
+当这个message含有 `ls`时 传递给shell的将会是
+env DISPLAY=:0.0 ~/lab/notifier.py erc `ls` 于是ls就会被执行！！！然后把ls的结果传递给notifier.py
+所以start-process-shell-command很危险，不建议使用，因为它会使用shell求值解析shell的符号
+---------------------------------------------------------------------------------------------------------
+` ~ $ { $PATH 之类的shell都会解析
+而subprocess.Popen() (start-process) 会直接调用外部程序而不用shell,所以shell的那堆符号它们都不会被解析，但同时它们也
+不会识别~这种符号，也没有$PATH环境变量，调用外部程序只能使用绝对路径 如 /home/jusss/lab/notifier.py
+
+-----------------------------------------------------------------------------------------------------
+(add-hook 'erc-text-matched-hook 'john-erc-notifier)
+(defun john-erc-notifier (match-type nickuserhost message)
+  ;;; if message contain these strings then no notification
+  (unless (string-match (regexp-opt '("*** Users on #"
+				      "has changed mode for "
+				      "*** Welcome "
+				      "*** Your new nickname is"
+				      "topic set by"
+				      "You are now identified for "
+				      "is now your hidden host"
+				      "unaffiliated/jusss"
+				      ))
+			message)
+    (start-process "erc-notify"
+		   "erc-notify"
+		   "/usr/bin/env"
+		   "DISPLAY=:0.0"
+		   "/home/jusss/lab/notifier.py"
+		   "erc"
+		   message)))
+
+----------------------------------------------------------------------------------------------------------------------
+
+<jusss> hmw: hi there
+<Cymew> __heisenbug: GUI! Buttons! Geegawks and bling!
+*** ihon (~we@212.13.0.230) has quit: Client Quit
+<Lokathor> __heisenbug, I program on windows because my computer uses windows
+	   because steam games
+<__heisenbug> Lokathor: There is Steam for Linux!  [16:38]
+<Lokathor> but i do the programming with emacs (for remote editing) or even
+	   just notepad++ (for local file editing)
+<wasamasa> __heisenbug: note that most titles are the original files bundled
+	   with wine and a shell script...
+<wasamasa> __heisenbug: at this point I just run steam via wine
+<__heisenbug> Oh, really? It runs mostly with wine? 
+<Cymew> Talking about that. My daughter claims Sims4 can run on linux. Anyone
+	know how hard it is?  [16:39]
+<taylan> jusss: the string consisting of 'a' and '"' would be turned into 'a"'
+	 so the double quote isn't interpreted by the shell
+<wasamasa> __heisenbug: yeah, porters are really lazy
+<wasamasa> __heisenbug: and a shocking amount of games runs via wine
+<wasamasa> __heisenbug: if it's using directx9 and wine is recent enough, try
+	   your chances
+<__heisenbug> wasamasa: Wow, thought they did really port it :/
+<wasamasa> __heisenbug: some do, like valve with their source titles  [16:40]
+<wasamasa> __heisenbug: or zachtronics with titles using C#/mono
+*** cqi (~cqi@119.254.120.71) has quit: Ping timeout: 264 seconds
+<wasamasa> __heisenbug: that is one of the few I had to bust out steam-native
+	   for :P  [16:41]
+*** mitz (~mitz@KD106167040033.ppp-bb.dion.ne.jp) has joined channel #emacs
+<taylan> jusss: (that is, using single quotes to quote)
+<hmw> jusss: Hi
+<__heisenbug> wasamasa: Hehehe - but well we should be thankful even for that
+	      I guess
+<wasamasa> jusss: please just delete that self-modifying abomination
+<wasamasa> jusss: use a better mechanism to pass the process IDs, like
+	   arguments...
+<hmw> wasamasa: done  [16:42]
+<wasamasa> why was there a need to know the process IDs anyways?  [16:43]
+<wasamasa> it's notification ffs
+<jusss> wasamasa: yes, I'm not using that self-modifying code
+*** sb` (~user@95.154.201.213) has joined channel #emacs  [16:44]
+*** lel (l@unaffiliated/lel) has joined channel #emacs
+*** unphased (~unphased@c-73-231-99-155.hsd1.ca.comcast.net) has joined
+    channel #emacs
+*** ascarter (~ascarter@c-24-16-31-112.hsd1.wa.comcast.net) has quit: Quit: My
+    MacBook has gone to sleep. ZZZzzz…
+*** sb` (~user@95.154.201.213) has quit: Client Quit
+*** freedom01 (~freedom@112.198.71.231) has quit: Ping timeout: 252 seconds
+*** pdgwien (~pdg@static.88-198-194-86.clients.your-server.de) has quit: Quit:
+    ZNC 1.6.2 - http://znc.in  [16:45]
+*** M-VctorCuadradoJ (viccuadmat@gateway/shell/matrix.org/x-xlutdeksxjypfxfi)
+    has joined channel #emacs
+<jusss> hmw: taylan  (start-process-shell-command "erc-notify" "erc-notify"
+	(concat "env DISPLAY=:0.0 /tmp/notifier.py erc" message)) this is
+	erc-notify buffer http://ptpb.pw/I9fh   and I don't know why there're
+	lots of EOF  [16:46]
+*** M-VctorCuadradoJ (viccuadmat@gateway/shell/matrix.org/x-xlutdeksxjypfxfi)
+    has left channel #emacs: "User left"
+*** csed (~CSED]@cbg-off-client.mpi-cbg.de) has joined channel #emacs
+<jusss> and also shell tried to run rest string of 'message'
+<jusss> it really make me confused about 'message'  [16:47]
+<hmw> jusss: What scripts are you using now?
+      http://paste.debian.net/hidden/8406a5dc and the notifier.py you posted
+      yesterday?
+<jusss> 'message' from (add-hook 'erc-text-matched-hook 'john-erc-notifier)
+	(defun john-erc-notifier (match-type nickuserhost message)
+								        [16:48]
+*** doomlord (~textual@host86-157-66-112.range86-157.btcentralplus.com) has
+    joined channel #emacs
+<taylan> jusss: that's because there's no whitespace between 'erc' (the last
+	 word in the string that's the first arg to `concat') and the first
+	 letter of `message'
+*** freedom01 (~freedom@112.198.71.231) has joined channel #emacs
+<jusss> hmw: yes, I posted it yesterday, the first one
+*** unphased (~unphased@c-73-231-99-155.hsd1.ca.comcast.net) has quit: Ping
+    timeout: 250 seconds
+<jusss> hmw: no pid kill stuff, just show window, the first simple one  [16:49]
+*** mcmat (~Matthieu@k2.lip.ens-lyon.fr) has joined channel #emacs
+*** Velveeta_Chef (~Nope@fsf/member/Velveeta-Chef) has joined channel #emacs
+*** Putti (~Putti@unaffiliated/putti) has joined channel #emacs  [16:50]
+<hmw> So you call only notifier.py from start-process-shell-command?
+<jusss> hmw: http://ptpb.pw/_NbX
+*** je (~je@5.103.37.226) has joined channel #emacs  [16:51]
+<jusss> hmw: yes, 
+<Lokathor> so, how does one remap C-backspace to delete back one word and not
+	   overwrite the clipboard in the process? is there some standard
+	   function to map it to?
+<hmw> jusss: To be honest, I can't see how the contents in the erc-notify
+      buffer can be generated from that situation.  [16:54]
+<jusss> taylan: I don't know why when 'messgae' contain a symbol like ' or (,
+	bash will be doomed
+*** flavi0 (~pschmitz@unaffiliated/flavi0) has joined channel #emacs
+<__heisenbug> Sometimes when I mark a text with C-w and cut it, it will cut
+	      the text but the cursor will jump somewhere randomly and insert
+	      something like "^?" to that point where it randomly jumped. What
+	      could cause this and more importantly how to fix it?
+								        [16:55]
+<jusss> hmw: you can try run it, and I send you a message like 'ls , you will
+	see it in the buffer
+*** je (~je@5.103.37.226) has quit: Ping timeout: 248 seconds
+<flavi0> sounds like a heisenbug..
+<__heisenbug> flavi0: :D
+<flavi0> __heisenbug: can you reproduce it?
+<taylan> jusss: because the whole command you pass to
+	 start-process-shell-command is interpreted by the shell.  consider
+	 what the final string is when 'message' is "foobar; rm -rf ~"
+<hmw> jusss: in start-process-shell-command put a blank after ...notifier.py
+      erc", then message is separated from the command.  [16:56]
+<__heisenbug> flavi0: Yes. It happens sometimes but I can't reproduce it
+	      whenever I want. I do not know what causes it
+*** freedom01 (~freedom@112.198.71.231) has quit: Read error: Connection reset
+    by peer
+<wasamasa> taylan: did you just nuke his home directory? 
+<hmw> ;)
+<taylan> wait a minute; does 'message' ACTUALLY come from IRC? O_o
+<wasamasa> YES
+<flavi0> __heisenbug: somewhere randomly in the whole buffer or inside the
+	 visible region of the window?
+<jusss> taylan: of cource
+<jusss> course  [16:57]
+<taylan> holy crap
+<hmw> Too late
+<taylan> jusss: use shell-quasiquote immediately :D
+<jusss> I don't run it now :-)
+<taylan> my rm rf was in double-quotes :P
+<wasamasa> no, don't use a shell, you idiots
+<taylan> wasamasa: shqq is fine
+<__heisenbug> flavi0: Somewhere in the visible region. Most of the time it
+	      won't be that far. More like 1-3 lines
+<jusss> wasamasa: then use what?
+*** gryan (~gerardrya@fedora/gearoid) has joined channel #emacs
+<wasamasa> process with each argument separately   [16:58]
+<jusss> pymacs? I don't try it
+*** freedom01 (~freedom@112.198.71.231) has joined channel #emacs
+*** freedom01 (~freedom@112.198.71.231) has quit: Client Quit
+<wasamasa> there is zero need to call a shell
+*** grdryn (~grdryn@fedora/gearoid) has quit: Quit: I'm the other guy now
+*** je (~je@5.103.37.226) has joined channel #emacs
+<taylan> well wasamasa is right; in this case no need for a shell
+<wasamasa> how do you think shelling out works?   [16:59]
+*** gryan (~gerardrya@fedora/gearoid) is now known as grdryn
+<flavi0> __heisenbug: check view-lossage (C-h l) and see if you can identify
+	 any spurious keystrokes when it happens next time.
+<flavi0> maybe it helps tracking it down..
+<wasamasa> the shell process is called with one concatenated string as its
+	   only argument 
+<__heisenbug> flavi0: Okay. I will thanks
+*** ibouvousaime (~ibouvousa@41.82.50.152) has joined channel #emacs  [17:00]
+<wasamasa> if you know the arguments, just call the process with them
+*** LiMp^ (~LiMp^@d24-141-241-49.home.cgocable.net) has quit: Remote host
+    closed the connection
+*** thc202 (~thc202@unaffiliated/thc202) has joined channel #emacs
+<jusss> wasamasa: I don't get it, is there a simple example?
+<wasamasa> ,utsl 
+<fsbot> I think UTSL is  [0] an abbreviation for Use The Source, Luke!
+<fsbot> [1] an alternative to rtfm when there is no fm to r.
+<fsbot> [2] "When I want to understand what is happening today or try to
+	decide what will happen tomorrow, I look at the source code." -- Omar
+	Khayyám
+*** testuser2 (~none@45.116.2.210) has quit: Quit: leaving  [17:01]
+<wasamasa> ,rtfm
+<fsbot> rtfm is [0] read the fucking manual
+<fsbot> [1] http://www.emacswiki.org/alex/pics/RTFM%20in%20China.jpg
+<fsbot> [2] colloquial for "it is unreservedly recommended that one peruse the
+	documentation with diligence"
+<fsbot> [3] https://xkcd.com/293/
+<taylan> jusss: ,,start-process
+<fsbot> From memory, StartProcess is at
+	http://www.emacswiki.org/emacs/StartProcess
+<taylan> wasamasa: yer not helpin'
+<taylan> oops ,,df start-process
+<fsbot> start-process is a built-in function in `C source code'.
+<fsbot> (start-process NAME BUFFER PROGRAM &rest PROGRAM-ARGS)
+<fsbot> Start a program in a subprocess.  Return the process object for it.
+<fsbot> NAME is name for process.  It is modified if necessary to make it
+	unique. ;;[ ,more/ ,dump]
+<jusss> taylan: start-process always said no such file or directory about the
+	python script
+<wasamasa> I don't have time to read the manual for others 
+*** kedare (~Kedare@151.182.99.11) has joined channel #emacs  [17:02]
+<taylan> jusss: (start-process "erc-notify" "erc-notify" "env" "DISPLAY=:0.0"
+	 "/tmp/notifier.py" "erc" message)
+<taylan> should work I think
+*** Lauxley (~robin@LStLambert-658-1-239-141.w80-15.abo.wanadoo.fr) has joined
+    channel #emacs
+*** vlatkoB_ (~IRC_clien@unaffiliated/vlatkob) has joined channel #emacs
+<wasamasa> learn to $PATH  [17:03]
+*** theoceaniscool (~theoceani@155.210.234.0) has joined channel #emacs
+*** theoceaniscool (~theoceani@155.210.234.0) has quit: Max SendQ exceeded
+								        [17:04]
+*** theoceaniscool (~theoceani@155.210.234.0) has joined channel #emacs
+								        [17:05]
+*** lxsameer (~lxsameer@unaffiliated/lxsameer) has quit: Quit: WeeChat 1.6
+*** theoceaniscool (~theoceani@155.210.234.0) has quit: Max SendQ exceeded
+*** msdicklong (~x@123.180.76.88) has joined channel #emacs  [17:06]
+*** venmx (~pactadmin@cpc8-camd15-2-0-cust699.20-2.cable.virginm.net) has
+    joined channel #emacs
+*** floatingman (~dnewman@c-50-132-251-43.hsd1.tn.comcast.net) has quit: Quit:
+    ZNC 1.6.3 - http://znc.in
+<taylan> jusss: using start-process like this is like using shqq but without
+	 the (in this case useless) shell layer in between.  (shqq is useful
+	 for when e.g. you *want* the shell to interpret some parts but not
+	 others...)
+*** vlatkoB (~IRC_clien@unaffiliated/vlatkob) has quit: Ping timeout: 264
+    seconds  [17:07]
+*** theoceaniscool (~theoceani@155.210.234.0) has joined channel #emacs
+*** lxsameer (~lxsameer@unaffiliated/lxsameer) has joined channel #emacs
+*** theoceaniscool (~theoceani@155.210.234.0) has quit: Client Quit
+<taylan> e.g. with start-process you can't use ~ or $foo or so in the command;
+	 that requires the shell's interpretation to expand those  [17:08]
+<jusss> taylan: maybe add a usage for shqq is better...
+<jusss> an
+*** quazimodo (~quazimodo@155.143.14.28) has joined channel #emacs
+<taylan> "a usage" is actually correct, b/c English :P
+*** stormogulen (~user@194.132.181.36) has joined channel #emacs  [17:09]
+*** rumbler31 (~rumbler31@2601:147:4000:30a4:b857:7c13:c9d5:5601) has joined
+    channel #emacs
+*** mbuf (~mbuf@14.96.26.93) has quit: Ping timeout: 245 seconds
+*** nuk3 (~user@146.64.184.219) has joined channel #emacs  [17:10]
+*** venmx (~pactadmin@cpc8-camd15-2-0-cust699.20-2.cable.virginm.net) has
+    quit: Ping timeout: 252 seconds  [17:11]
+*** wdouglas (~user@c-73-25-153-212.hsd1.or.comcast.net) has quit: Ping
+    timeout: 246 seconds  [17:12]
+*** qu9 (~quassel@unaffiliated/qu9) has joined channel #emacs
+*** joncol (~user@84.19.146.94) has joined channel #emacs
+*** freedom01 (~freedom@112.198.71.231) has joined channel #emacs  [17:13]
+<jusss> shell is like a repl?
+*** Kaligule (~Kaligule@2001:a62:182:9901:5e51:4fff:fe9f:fe57) has joined
+    channel #emacs
+*** rumbler31 (~rumbler31@2601:147:4000:30a4:b857:7c13:c9d5:5601) has quit:
+    Ping timeout: 240 seconds  [17:14]
+<jusss> and evaluate parameters  auto  [17:15]
+*** freedom01 (~freedom@112.198.71.231) has quit: Client Quit
+<taylan> jusss: yeah well, it's where you interactively enter e.g. "ls -l", in
+	 case you ever interactively use the shell.  the same program (usually
+	 bash) can execute commands non-interactively.  [17:16]
+<taylan> and it's its own programming/scripting language
+*** codfection (~codfectio@unaffiliated/codfection) has joined channel #emacs
+								        [17:17]
+*** freedom01 (~freedom@112.198.71.231) has joined channel #emacs
+<taylan> jusss: think of it like using 'eval' instead of 'funcall'  [17:18]
+*** Wizek_ (~Wizek@catv-89-132-132-110.catv.broadband.hu) has quit: Ping
+    timeout: 258 seconds
+<taylan> (eval `(+ ,a ,b)) vs. (funcall '+ a b)
+*** sybariten (~jake@78-47-86-21.cinfuserver.com) has quit: Ping timeout: 246
+    seconds  [17:19]
+<taylan> if you know lisp well, at least :P  otherwise maybe that analogy
+	 doesn't help.
+*** space_otter (~space_ott@2602:306:32e8:cf60:a284:ed24:cb0f:59) has quit:
+    Remote host closed the connection
+*** diogenese (diogenese@diogenese.velotech.net) has quit: Quit: Leaving
+								        [17:20]
+<jusss> taylan: I have a little confused about start-process-shell-command and
+	start-process
+*** pdgwien (~pdg@static.88-198-194-86.clients.your-server.de) has joined
+    channel #emacs
+<jusss> taylan: what's the different about parameters in them
+*** testuser2 (~none@45.116.2.210) has joined channel #emacs
+<taylan> jusss: the former passes a string to the shell to evaluate it.  the
+	 latter takes a program name as its third argument and executes
+	 directly that executable with the other arguments passed to it
+								        [17:21]
+<testuser2> anyone used RubyMine? hows it vs emacs?
+<jusss> I mean 'message' evaluate in start-process-shell-command but not
+	evalute in another
+<taylan> (start-process-shell-command x y foo) is basically (start-process x y
+	 "sh" "-c" foo)  [17:22]
+*** freedom01 (~freedom@112.198.71.231) has quit: Ping timeout: 246 seconds
+*** je (~je@5.103.37.226) has quit: Quit: je  [17:23]
+*** nee` (eobO9Hc468@pictor.uberspace.de) has quit: Remote host closed the
+    connection
+<jusss> taylan: so start-process-shell-command will call shell(like bash) and
+	shell will eval its parameters, and start-process don't call shell and
+	don't eval its parameters?
+*** AimHere (~David@cpc102316-sgyl38-2-0-cust632.18-2.cable.virginm.net) has
+    quit: Quit: Leaving
+<taylan> jusss: correct.  start-process directly uses the exec() function of C
+	 to execute a program with certain literal arguments  [17:24]
+<jusss> taylan: start-process is like subprocess.Popen() and another is like
+	os.system()?  [17:25]
+*** matsl (~matsl@gentoo/developer/matsl) has quit: Ping timeout: 260 seconds
+<taylan> jusss: not a Pythonist but I think so, yeah.
+*** ToBeCloud (uid51591@wikimedia/ToBeFree) has quit: Quit: Connection closed
+    for inactivity
+<taylan> in fact that's probably exactly it  [17:26]
+*** michaelrose (~michael@71-35-144-235.tukw.qwest.net) has quit: Ping
+    timeout: 268 seconds
+<aidalgol> So eBay seems to no longer allow shipping methods from within the
+	   US (there used to be an eBay NZ, for example).  [17:27]
+<aidalgol> I was going to sell my Novena there, and now I have no idea where
+	   else to list it.  Any ideas, #emacs?
+<jusss> taylan: about start-process-shell-command "An old calling convention
+	accepted any number of arguments after COMMAND,which were just
+	concatenated to COMMAND.  This is still supported but strongly
+	discouraged." if the COMMAND is two strings like "ls" "-l" so "ls" and
+	"-l" will eval twice?   [17:29]
+*** Xackle (~Matrixium@unaffiliated/matrixiumn) has quit: Quit: C-x C-c
+								        [17:30]
+<taylan> jusss: no, it will just concatenate them with a whitespace to make it
+	 one string  [17:31]
+*** ktoverso (~ktoverso@78.25.120.53) has joined channel #emacs
+*** roxlu (~roxlu@217.104.68.196.ip.onderwijs.casematelecom.nl) has quit: Ping
+    timeout: 258 seconds  [17:32]
+*** je (~je@5.103.37.226) has joined channel #emacs
+*** aidalgol (~aidalgol@pdpc/supporter/student/aidalgol) has quit: Remote host
+    closed the connection
+<jusss> taylan: oh, I see
+
