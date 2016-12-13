@@ -1,4 +1,4 @@
-掉外部程序不要用os.system() (start-process-shell-command ...) 这种使用shell的
+调用外部程序不要用os.system() (start-process-shell-command ...) 这种使用shell的
 shell会自动求值参数，如果参数里有 ` $ ~就会被shell解析求值，有时很危险比如在参数里
 用了`ls` 或许就会被执行
 用subprocess.Popen() (start-process ...)这种不使用shell的调用外部程序
