@@ -1,0 +1,56 @@
+think bash as repl, bash is a DSL
+存储某个程序的数据给其它程序使用
+1. 以程序返回值存储另一个文件,或者直接在程序里os.write()
+2. 把返回值存储bash变量，$set RETRUN_VAR=$(~/lab/notifier.py)以这种方式调用程序 
+    在notifier.py里执行os.kill($RETURN_VAR)干掉上一个，并把最新的以程序返回值返回给环境变量
+ 或者直接在notifier.py里把os.system("set RETURN_VAR=" str(.pid))
+3. 程序自己修改自己，使用os.system("sed -i -e '...' file")
+
+bash会自动求值程序的参数$program parameter1 parameter2 ,如果parameter1是`ls`或$(ls)则会执行ls
+并把ls的结果返回给program做参数
+把bash想象成repl, 那么bash的第一个参数也就是程序，可以当成函数名，程序的参数也就是函数的参数
+函数执行完会有返回值，可以存储于变量，用环境变量存储程序的返回值，因为bash一直存在，所以bash的
+环境变量会一直存在，不像程序里的变量执行完就销毁
+
+把bash想像成repl, bash是一门语言， bash里的程序就是函数, 程序的参数就是函数的参数, 程序的返回值
+就是函数的返回值, 函数的返回值存储于repl里的变量，程序的返回值存储于bash的环境变量,然后其它程序就
+能使用这个变量的得到返回值
+ bash的程序能递归调用自身吗? 通过用os.system()这种方式? or other way?
+
+bash的程序返回值只能是0-255，但可以使用stdout!!! bar=$(/home/jusss/lab/test.py) 把test.py的stdout赋值给变量bar
+但是不知道这个变量能存在任一bash的环境里吗?
+
+$~/test.py > test.data
+$cat < test.data
+
+test.py有一个参数，每次以 test.py < test.data调用
+test.data > test.py > test.data
+
+ sys.exit(n). n==0
+means success, n!=0 means fail.
+
+ sys.exit(n). n==0
+means success, n!=0 means fail.
+
+<jusss> bremner: print a string as stdout, then what? how to pass it to
+    another program in shell? use pipe?  [15:34]
+<jusss> bremner: set stdout as a shell envrionment variable is possible?
+<jusss> as a value to a shell variable  [15:35]
+
+<twb> jusss: https://en.wikipedia.org/wiki/Exit_status
+*** hualet (~hualet@118.184.15.164) has joined channel #emacs
+<taylan> one can always foo=$(generate the string) but I missed the context so
+     dunno
+<twb> jusss: POSIX specifies that exit status of a POSIX process is 8 bits
+      long  [15:41]
+*** LooneyTunes (~user@96-85-207-106-static.hfc.comcastbusiness.net) has quit:
+    Ping timeout: 264 seconds
+<twb> jusss: if you are on a POSIX system, that is just how things are
+
+I.  $./test.py `cat test.data` > test.data
+II. $ bar=$(/home/jusss/lab/test.py 1)
+[jusss@arch lab]$ cat test.py 
+#!/usr/bin/env python3
+import sys
+print(sys.argv[1])
+
