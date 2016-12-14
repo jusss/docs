@@ -1,0 +1,24 @@
+python 有subprocess调用外部程序，替代os module
+有multiprocessing多进程可以运行python函数，替代threading or thread module
+python的threading还有问题就是GIL全局求值器锁，导致python的多线程实际上只是单核跑的
+
+I/O密集运算的 用多线程
+CPU密集运算的 用多进程。通俗一点有大量得读和写，其中网络编程就是IO密集。
+python有大量的I/O bound密集计算，用threading，
+CPU-bound，最好用multiprocessing
+
+threading or thread don't have a method to kill thread, so use multiprocessing,
+like subprocess, but multiprocessing can run python function and subprocess only
+can run outside program
+
+[jusss@arch ~]$ cat lab/erc-notifier-partii.py 
+#!/usr/bin/env python3
+import sys, time, multiprocessing
+from tkinter.messagebox import *
+def show_message():
+    showinfo(title=sys.argv[1], message=sys.argv[2])
+p=multiprocessing.Process(target=show_message)
+p.start()
+time.sleep(3)
+p.terminate()
+
