@@ -3,6 +3,28 @@ shell会自动求值参数，如果参数里有 ` $ ~就会被shell解析求值�
 用了`ls` 或许就会被执行
 用subprocess.Popen() (start-process ...)这种不使用shell的调用外部程序
 
+http://ftp.gnu.org/old-gnu/Manuals/elisp-manual-20-2.5/html_node/elisp_581.html
+
+Function: start-process-shell-command name buffer-or-name command &rest command-args
+
+The variable shell-file-name specifies which shell to use.
+The point of running a program through the shell, rather than directly with start-process,
+is so that you can employ shell features such as wildcards in the arguments. It follows that
+if you include an arbitrary user-specified filename in the command, you should quote it with
+shell-quote-argument first, so that any special shell characters in the file name do not have
+their special shell meanings. See section http://ftp.gnu.org/old-gnu/Manuals/elisp-manual-20-2.5/html_node/elisp_579.html#SEC582
+
+stdin stderr stdout | > ~ ` $ 都是shell argument
+
+使用shell-quote-argument可以让shell不自动求值shell变量如~ `
+
+in emacs you can press C-h f start-process get docs about it
+
+""" there also is pymacs, you can directly call python in emacs with elisp """
+
+如果你想修改erc的某个函数，不需要重启emacs,直接在*scratch*缓冲区创建同名函数然后C-j执行
+erc再调用这个函数时就会执行新的函数
+
 (start-process-shell-command)会解析它的参数，如果它的参数有`会被执行
 for example,
 ~/.emacs
