@@ -1,0 +1,21 @@
+[jusss@arch ~]$ cat /sys/class/backlight/intel_backlight/brightness 
+3905
+[jusss@arch ~]$  cat /sys/class/backlight/intel_backlight/max_brightness 
+4882
+用root编辑/sys/class/backlight/intel_backlight/brightness可调整屏幕亮度
+或者用 xbacklight -set 50
+xbacklight是xorg-xbacklight包里面的
+
+To set brightness to 50% of maximum:
+$ xbacklight -set 50
+
+https://wiki.archlinux.org/index.php/backlight
+
+xbacklight only works with intel. Radeon does not support the RandR backlight property.
+xbacklight currently does not work with the modesetting driver 
+
+Switching off the backlight (for example when one locks the notebook) can be useful to conserve battery 
+energy. Ideally the following command inside of a graphical session should work:
+$sleep 1 && xset dpms force off
+
+
