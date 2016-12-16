@@ -1,0 +1,13 @@
+background = true
+maxfailures = 3
+bantime = 3600
+findtime = 600
+ignoreip = 127.0.0.1 192.168.0.0/24
+
+[MAIL]
+enabled = false
+
+[SSH]
+enabled = true
+logfile = /var/log/ssh.login.log
+
