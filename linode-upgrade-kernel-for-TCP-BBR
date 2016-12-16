@@ -1,0 +1,95 @@
+debian wheezy 7.8 don't need to upgrade to jessie for kernel 4.9
+because linode provide kernel 4.9 for wheezy
+https://www.linode.com/docs/migrate-to-linode/disk-images/disk-images-and-configuration-profiles#editing-a-configuration-profile
+
+Log in to the Linode Manager.
+Click the Linodes tab. A list of your virtual private servers appears.
+Select a Linode. The Linode’s dashboard appears.
+Select a configuration profile. The Configuration Profile appears.
+Edit the settings as necessary.
+When finished, click Save Changes.
+The changes to the configuration profile have been saved. You may need to reboot your Linode to activate the changes.
+--------------------------------------------------------------------------------------------------------
+sysctl: setting key "net.ipv4.tcp_congestion_control": No such file or directory
+net.ipv4.tcp_congestion_control = bbr
+--------------------------------------------------------------------------------------------
+linode提供的4.9 kernel没有开启TCP BBR congestion control, 升级wheezy to jessie, install 4.9 kernel from
+other repo, 开启BBR, by the way, 下面的这个VPS是使用Xen的, kvm的不知是否是同样的操作
+
+https://www.linode.com/docs/security/upgrading/upgrade-to-debian-8-jessie
+https://www.linode.com/docs/tools-reference/custom-kernels-distros/run-a-distributionsupplied-kernel-with-pvgrub
+http://aenes.com/post/759.html
+
+                    upgrade wheezy to jessie
+screen -S upgrade
+sudo apt-get update && sudo apt-get upgrade -y
+/etc/init.d/nginx stop
+/etc/init.d/postfix stop  dovecot stop
+Edit your /etc/apt/sources.list file and change all instances of wheezy to jessie.
+sudo apt-get update
+apt-get install apt dpkg aptitude
+apt-get dist-upgrade
+Reboot your system using the Linode Manager to make sure that there were no problems during the upgrade.
+### python3's arrow module missing, use pip3 install arrow to install
+
+                    install debian 4.9 kernel (本地开启bbr)
+wget http://kernel.ubuntu.com/~kernel-ppa/mainline/v4.9/linux-image-4.9.0-040900-generic_4.9.0-040900.201612111631_amd64.deb
+from https://github.com/iMeiji/shadowsocks_install/wiki/%E5%BC%80%E5%90%AFTCP-BBR%E6%8B%A5%E5%A1%9E%E6%8E%A7%E5%88%B6%E7%AE%97%E6%B3%95
+or wget http://mirrors.kernel.org/debian/pool/main/l/linux/linux-image-4.9.0-rc8-amd64-unsigned_4.9~rc8-1~exp1_amd64.deb
+from https://www.mf8.biz/linux-kernel-with-tcp-bbr/
+dpkg -i linux-image-4.9.0*.deb
+删除旧内核(可选)
+dpkg -l|grep linux-image 
+apt-get purge 旧内核
+更新 grub 系统引导文件并重启
+update-grub
+reboot
+开机后 uname -r 看看是不是内核4.9
+执行
+echo "net.core.default_qdisc=fq" >> /etc/sysctl.conf
+echo "net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf
+保存生效
+sysctl -p
+执行
+sysctl net.ipv4.tcp_available_congestion_control
+sysctl net.ipv4.tcp_congestion_control
+如果结果都有bbr, 则证明你的内核已开启bbr
+lsmod | grep bbr
+看到有 tcp_bbr 模块即说明bbr已启动
+
+                    install debian 4.9 kernel (VPS开启bbr)
+wget http://kernel.ubuntu.com/~kernel-ppa/mainline/v4.9/linux-image-4.9.0-040900-generic_4.9.0-040900.201612111631_amd64.deb
+or wget http://mirrors.kernel.org/debian/pool/main/l/linux/linux-image-4.9.0-rc8-amd64-unsigned_4.9~rc8-1~exp1_amd64.deb
+apt-get update          
+apt-get upgrade --show-upgraded
+dpkg -i ./linux-image-4.9.0-040900-generic_4.9.0-040900.201612111631_amd64.deb
+mkdir /boot/grub
+apt-get install grub-legacy
+from https://www.linode.com/docs/tools-reference/custom-kernels-distros/run-a-distributionsupplied-kernel-with-pvgrub
+ vim /boot/grub/menu.lst 
+change timeout 5 to timeout 10
+修改# kopt=root=UUID=eae34339-ca68-4e50-aa64-8072b034c5cf ro
+为# kopt=root=/dev/xvda console=hvc0 ro quiet
+找到带有groot=的这一行,确保是这样的
+# groot=(hd0)
+
+update-grub
+
+打开linode的dashboard, Select   Configuration Profiles那点edit, 修改内核为pv-grub-x86_64
+Make sure the root device is specified as xvda
+In the Filesystem/Boot Helpers section, disable the Distro Helper option
+保存退出,Reboot your Linode from the Dashboard tab
+from https://www.linode.com/docs/tools-reference/custom-kernels-distros/run-a-distributionsupplied-kernel-with-pvgrub
+from http://aenes.com/post/759.html
+from http://www.hostoc.com/thread-342471-7-1.html
+
+uname -a
+Linux nonameyet 4.9.0-040900-generic #201612111631 SMP Sun Dec 11 21:33:00 UTC 2016 x86_64 GNU/Linux
+echo "net.core.default_qdisc=fq" >> /etc/sysctl.conf
+echo "net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf
+sysctl -p
+sysctl net.ipv4.tcp_available_congestion_control
+sysctl net.ipv4.tcp_congestion_control
+如果结果都有bbr, 则证明你的内核已开启bbr
+lsmod | grep bbr
+看到有 tcp_bbr 模块即说明bbr已启动
