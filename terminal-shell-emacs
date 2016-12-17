@@ -1,0 +1,384 @@
+emacs上不光有eshell or shell这种shell, 还有ansi-term or term这种terminal emulator,
+xterm也是一种terminal emulator, 当然也有physical terminal
+<tali713> jusss: a shell is a type of program that can run in a terminal.
+M-x eshell    M-x ansi-term
+
+[Sat Dec 17 2016]
+*** You have joined channel #emacs  [14:24]
+*** Topic for #emacs: Please help the FSF meet its 2016 funding goal:
+    https://fsf.org/appeal | Please read emacswiki.org/EmacsChannel | If
+    muted, PM an op (see /cs ACCESS #emacs LIST) | Emacs questions take
+    priority over off-topic chatter, so ask! | No public logging! What happens
+    in #emacs stays in #emacs | No racism, sexism, xenophobia, botwanking, or
+    other asshattery
+*** #emacs: topic set by jlf!~user@pdpc/supporter/active/jlf, 2016-12-02
+    23:28:44
+*** Users on #emacs: jusss Sixmsj duggiefresh vlatkoB sellout- test1600
+    wlemuel zjason heurist` scc`````` enterprisey bocaneri stoopkid wutong
+    corsair Jarcode jlf aidalgol jje barnito xtreak cqi Bentbot fstd laza
+    deznutz2 deznutz framling teleScope aw1 ArneBab_ yeticry bigMouthCommie
+    chandan nowhere_man tomterl AimHere shymax ht smerdyakow MagBo sonophilia
+    diogenese em1l frogger_ TMM terpri lbt reconmaster Madars armyriad
+    boudiccas tgips LuckyRawApe iyzsong gnufied__ Cthulhux
+*** Users on #emacs: SusWombat PetrVod dude42 yrdz Lord_of_Life QualityAddict
+    Sembei ascarter arc- schjetne rumbler31 mek42_laptop vodik zooey netzwurm
+    defaultxr jandrusk Natch Cohedrin hs0ucy fengshaun IanKelling mathrick
+    mappend arbv Hink cow_2001 quigonjinn timvisher xristos banisterfiend ntnn
+    sz0 taylan Coldblackice Putti Guest17281 sacktown emmanuel_erc lnostdal
+    iclon xadi terrycojones jaafar M-meznak moltensteel_[m] sturm zxwieca[m]
+    hongchao[m] confounded[m] harlequin78[m]
+*** Users on #emacs: jturner314[m] Ulrar TheGillies meik[m] Bryan[m] Riviera
+    offby11 ftwtech[m] rizalm[m] cwmart[m] aroducha[m] chgentso[m] jrw[m]
+    bendlas ya-alex[m] squiter[m] shymega[m] duderichy[m] bascht mcescher
+    Xu[m]1 M-leoc am2on jyp[m] wictory[m] Art[m] ianmorty[m] ywecur[m]
+    seadog[m] lugus35[m] jamescdericco[m] mm-[m] CompanionCube[m]
+    WillianPaiva[m] rasmus[m] Perfectio[m] Elephant454[m] cinderfish[m]
+    diamaths[m] kilon[m] Keggums[m] LukaszGolebiewsk regnt[m] nedzs[m]
+*** Users on #emacs: xinode[m] rakete korayal[m] segfault[m] sharikrish[m]
+    aspiwack[m] hongchao[m]1 Stebalien alaeri[m] M-RyanRix M-Xena M-Illandan
+    M-liberdiko Narfinger[m] Ferk[m] necronian daopu[m] RichardPaulBck[m
+    lerbobe[m] budgie[m] JFM[m] nya_ cyphase unknown_lamer TheAdversary
+    jschoolcraft kjeldahl ciniglio chomwitt2 everardocf[m] avoine Mon_Ouie
+    kulty ghostlight FriedBob superbil s00pcan sharkzbot claw MrTorque josephz
+    scgilardi saintromuald cpage_ roxlu janneke scottj
+*** Users on #emacs: jeewee mrkotfw chavezgu jibanes mstevens jweiss mns
+    delian66 Alina-malina jos3ph NextHendrix gauthier rgrau wolfcore bounb
+    michaelrose Willis bendersteed tessier myrkraverk Vulpes hyperair
+    justan0theruser zapata ahungry tali713 plhu Honeyclaw sergiodj isomer
+    nand1 somaReve1 shorberg opt9 xk05 thijso AfroThundr Atrumx jtz satbyy
+    octe Dalvini raso iderrick DANtheBEASTman saorge Pio m1dnight_ ryanc mloy
+    hid GJdan TheBrayn ecbrown drymer ok2 dwilc homerj chrisww
+*** Users on #emacs: fperrin lel Albori aindilis tobiasBora _AnK m4ho
+    CosmicRay offby1-irccloud asjackson mattcen divansantana norotartagen
+    _flow__ Klumben cybrNaut jaster xa0 abbe mrsolo navidr_ noahsussman lloda
+    trigg derrida RandyT cmatei zv faetog eqyiel paulelms peb` gnomon
+    Crazylemon64 loke dooglus phl wmealing strugee JesseWalling tuxlovesyou
+    MrWoohoo burtons returnthis wdouglas parsnip delacroix russm kalle_ icedev
+    simon3145 edmz Blkt mkasu tobark Myrl-saki styl1te dud
+*** Users on #emacs: grimm665 zacts sebboh ritschmaster ghost64 papal
+    Philonous JayDugger perst fschmitt josteink GnarlyBob felipebalbi polyrob
+    nopf fitzsim webshinra_ bpalmer sword cantstanya chu pelegreno___ catern
+    arrdem diginet piyo str1ngs zilti Blukunfando macrobat jockej chris2
+    floatingman froggey drewbarbs brkr Gianormagantrous mk-fg bimawa3 ohama
+    nullman teiresias taargus429496729 pjaspers dxtr SAL9000 quasisane bbigras
+    Rovanion sybariten mniip Xackle dillonb malign
+*** Users on #emacs: suppi danlamanna fsbot teej stig d4gg4d cpe _habnabit
+    WorldsEndless davdunc CrazyEddy twainwek kwladyka Zotan K0HAX zymurgy
+    daishan xxpor Ekho- johnw redcedar parsnip0 gchristensen Helheim
+    NegativeFlare fook Sonderblade reactormonk Silex clearcasting Kamrusepas
+    culot__ Cymew katymoe_ Awesomecase drmeister CStorm poz2k4444
+    greghendershott sdn90 hughrawlinson avelino SeanTAllen akraut aaronjensen
+    skooch cyphix offbyone modulitos yonatankoren Rabbit ffualo
+*** Users on #emacs: pschorf cjk101010 MaryHadalittle superfatkappa wq salva
+    beWhitty monkjan shymega gusnan setheus zamba skangas korutsu n2o4 tazle
+    aminb woddf2 Gamayun vila XenophonF Sleep_Walker flxw mrSpec nckx emerson
+    erethon introom mstr winny ext onmyo an|oszka isak Stromeko mykon bmf1
+    zehl emit_time nephyrin` Na qDot_ deadcyclo joehillen smferris mitchty
+    wieselchen hhes theRoUS KingSpeedy Guest71825 kodein drot babilen ashi_
+    nivekuil swathe k-man Ankhers nwp Koshian____
+*** Users on #emacs: wilornel__ torbjorn des_consolado Sigyn z0d vds a00001
+    drdo s4kashya1 andschwa offtopik cichli_ cliluw chridal stasku hydraz
+    legumbre alphor cerbmuc cgfbee thomases amoe_ vlnx_ pledis_ mjc__
+    Guest85613 spip Croepha forcer seg dzho ironChicken aaptel _Patrick_
+    crough joel135 gendl adulteratedjedi JackMc averell tazjin chewbranca
+    NemesisD leifw shelling__ grandy livcd niko kushal_kumaran bokayio peder
+    gsingh93 totonika fiddlerwoaroof cpt_nemo friesenpeter
+*** Users on #emacs: zeltak chazu f6k nomad_fr dograt jbalint aurelien bibek22
+    luisbg worfox sepi`` toogley Laynef dudz riceandbeans wallyduchamp
+    juancate biffhero stormanka anbz eagleflo chaosdav Fubar^ norfumpit bickle
+    stanley ndrst nick1234 specbot tobel adereth gridaphobe mkomitee dmj`
+    MatthewAllan93 rymdkarl lemonpie Hobbyboy fold4 Walex greister axion
+    dtulig sheepbat grumble marvi jxs kisonecat gko dhanush snow_bckspc
+    TacoThief Petter Glitchy jimeh NhanH raph_ael femtogram
+*** Users on #emacs: vikraman theFam sigjuice CompanionCube shwouchk jml
+    codedmart kilimanjaro ggherdov`___ adgtl fokz marten ryansvihla_ drewland`
+    meta-coder arrsim rotty meena nhandler Oxyd pnkfelix dash martin_ yokel
+    delYsid watersoul atrus ohpesky whiteline pc-m avar APic cross epic fdv^
+    zanes wcummings_ krarkrrrc HashNuke chriswk ggherdov p_l poikon
+    justinabrahms sharkz levd bcardarella joschka the-kenny phschwartz cbmuser
+    s4kashya3 nikki93 jabot ijp hplar dbristow tommis
+*** Users on #emacs: larme nullie DerGuteMoritz bitflip_ davidmichaelkarr
+    markelite bazz solaraquarion johnsu01 carlf pent_ hamsheet_ iFire
+    TheCowboy stiell ozzloy mrkiko cthuluh mou bduc ljhms cryptomata Xof
+    lokydor ju Urfin_ dancn` remote arthurnn ordnungsw namidark_ greenhat-
+    bigfondue cold_sauce poindontcare brainfreeze koenvg Cathy molgrum Seb
+    creat Keitaro bigjust SpiderPig synic Sigma mach znpy paroneayea veikko
+    kh31d4r easye r4vi yunxing jeremyheiler jonathanchu cstrahan
+*** Users on #emacs: ocharles_ bbhoss schaary mjl avdi mcspiff_ Dr_Jazz_
+    zeroDivisible MindlessDrone gensym muep jgertm megalography BakaKuna
+    nullx002 kzar Posterdati ibex nielsk Satyajit dustfinger aspiers mbecroft
+    unbalancedparen dim Takumo TMA framling39485 nahra ringst auganov DrTaft
+    payphone heddwch tanuzzo w1gz paramourne minsky fhackdroid karstensrage
+    lberk qinusty visl bremner alfred-kneift musca les gnusosa AeroNotix
+    vrishab levarnu amackera ski Rome hiredman sheijk
+*** Users on #emacs: dsevil fds beaky krgn sahilsinha rxo nemesit|znc
+    angel_dark lyro Spritzgebaeck wasamasa kanru SebastianThorn sohail
+    northcode rhol prooftechnique jolamb j0ni talin nullx002- ClubMate telmich
+    offby1 skalra neeasade topi` slackorama jrdnull utkarsh shosti
+    chrisbdaemon ar1a brendyn quotemstr leo_song nexysno nitrix crshd akermu
+    broquaint newcup defanor akkad genpaku jrm mgaare c0dehero Tristan-Speccy
+    sm chrisdone Praise pmade mariorz zxv frobware deego dawik
+*** Users on #emacs: oly gcommer polilla isoraqathedh tensorpudding chee qlkzy
+    tgummerer jave Demosthenex da-x technomancy staticfox mood theBlackDragon
+    Shayanjm thomassgn thorkill tomaw wagle davexunit martinklepsch NaCl
+    rromans Pursuit mahnve runejuhl mrm OriansJ zellio Happy_Ente hodapp
+    pepesza Guest69994 penthief pankracy dxld solene cmr talyz vista ecraven
+    belak fhd sultanselephant Scorchin banjiewen atmc luis knobo Firedancer
+    benny Minttu ajp mt murr4y s4kashya x42
+*** Users on #emacs: AlexanderS trulsa alanz beneth dellavg Sketch toshik
+    DrPete e jory pkkm ktx sbrg kbtr arpunk hohum C-Keen zeus harleyk lhx
+    Kobaz ephess_ pacon kmicu binjured mfisher tephra n__dles Lenkh literal
+    Amadiro kloeri s4kashya_ codingquark ingenious murph dustinm` qsx jfojtl
+    zhangkun TheCritt1C dominikh neonfuz Trademark91 Sliim_ Athas gilbertw1_
+    vashirov shabble ReinH_ pd muep__ haaja bernalex ramnes edran aaron-em
+    gabiruh e0f taharqa workthrick correlr sohum
+*** Users on #emacs: lpaste cbaines jhulten npr MillerBoss sshirokov matburt
+    wizzo vincent42 tokik rudybot h12o copec benaiah relrod Swant llbg larsen
+    noptys theanalyst ldlework m1dnight1 mnemonikk hanDerPeder renard_
+*** #emacs URL: http://www.emacswiki.org/EmacsChannel
+*** davidh (~user@x4e34cb2e.dyn.telefonica.de) has joined channel #emacs
+*** #emacs modes: +npt
+*** #emacs was created on 2006-11-26 06:42:33
+*** diogenese (diogenese@diogenese.velotech.net) has quit: Read error:
+    Connection reset by peer
+<michaelrose> jusss, stop asking the same question  [14:26]
+*** duggiefresh (~duggiefre@97-126-41-115.tukw.qwest.net) has quit: Ping
+    timeout: 258 seconds
+<michaelrose> there are multiple modes in which you can run shell or shell
+	      like commands and see an immediate printout of the results
+								        [14:27]
+<bremner> jusss: ,,tias,,
+<fsbot> Try it and see! (then tell us what you saw)
+*** romerocesar (~cesar@c-50-159-44-90.hsd1.wa.comcast.net) has joined channel
+    #emacs  [14:28]
+<michaelrose> in ansi-term you can run a shell of your choosing, eshell is
+	      like a terminal + elisp
+<jlf> michaelrose: no, eshell is not a terminal.  [14:29]
+<bremner> that's why I just said but these damn kids and their ipods  [14:30]
+<michaelrose> I said like a terminal + elisp
+<jlf> you're still wrong
+<bremner> repl != terminal emulator
+<tali713> but it isn't a terminal emulator accept in the sense of a dumb
+	  terminal, but even that's not quite right.
+*** cyan__ (~cyan@217.170.162.68) has joined channel #emacs  [14:31]
+*** chomwitt2 (~chomwitt@athedsl-351753.home.otenet.gr) has quit: Ping
+    timeout: 248 seconds
+<michaelrose> how is it not like a terminal, the methodology of interaction is
+	      very similar
+<jlf> you may as well claim that a piece of paper is a terminal emulator
+<bremner> no u  [14:32]
+<tali713> michaelrose: terminal in your sentence is short for "terminal
+	  emulator".  eshell is not a "terminal emulator" it is a "shell
+	  written in elisp"
+<jlf> yo may as well claim that a piece of paper is a terminal emlator
+<bremner> well played sirrah
+<michaelrose> a piece of paper is a lot less like a terminal than eshell is
+* lemonpie mumbles something about teletypes
+* jlf doffs hat
+<bremner> if you can't run vim in it, it's not a terminal  [14:33]
+* bremner glares at lemonpie
+<tali713> lemonpie: indeed, but a typewriter is a teletype emulator, that only
+	  runs cat.
+<lemonpie> i've run vim on a teletype, and regretted it a few seconds later
+								        [14:34]
+<tali713> lemonpie: I've said it before, I'll say it again, ed is the standard
+	  editor for a reason.
+<lemonpie> (it just dumps you into ex, as any 'too dumb' terminal will if you
+	   run vim again)
+<lemonpie> well, vim's shitty emulation of ex
+<michaelrose> the original user wanted to know if emacs could provide a
+	      similar interface to a terminal, an interface in which you can
+	      interact with your system via a shell whereby you can enter a
+	      command and see the results  [14:35]
+<jusss> so what's terminal and termianl emulator? difference
+<michaelrose> I answered the question he was asking as if he had phrased it
+	      better
+*** tgips (~user@unaffiliated/tgips) has quit: Ping timeout: 246 seconds
+								        [14:36]
+<tali713> jusss: the first is how people who get tired of saying terminal
+	  emulator all the time say terminal emulator.
+*** davidh (~user@x4e34cb2e.dyn.telefonica.de) has quit: Remote host closed
+    the connection
+<tali713> jusss: a terminal emulator is a program that emulates a physical
+	  terminal.  for example a VT100
+<jusss> eshell is a shell not terminal, and xterm is a terminal emulator?
+								        [14:38]
+<tali713> so this is a Terminal
+	  https://pbs.twimg.com/media/CvHI105WcAA51K3.jpg
+<tali713> jusss: a terminal is a screen with a keyboard attached that talks to
+	  a host.  it's almost never what a person means when they say
+	  "terminal", at least not in this century.  [14:39]
+*** davidh (~user@78.52.203.46) has joined channel #emacs  [14:40]
+<lemonpie> a lifetime ago i used to have a wyse 30 in my bedroom so i could
+	   irc from bed :/
+<jlf> this century is overrated
+<tali713> jusss: so yes, xterm is a terminal emulator, since it emulates
+	  having an addressable screen and supports control codes that a
+	  physical terminal would.  it also supports more than any physical
+	  terminal I am aware of.  [14:41]
+*** smerdyakow (~user1@172.98.154.12) has quit: Quit: Leaving  [14:42]
+<tali713> jusss: similarly both M-x term and M-x ansi-term are terminal
+	  emulators, though not nearly as featureful as xterm.  almost
+	  anything can be a dumb terminal.  as long as it can send characters
+	  and receive them.  not a particularly interesting case to consider.
+	  unless you are looking for a teletype emulator.
+<lemonpie> the last of the DEC terminals were true beautys that would give
+	   xterm a run for it's money  [14:43]
+*** quazimodo (~quazimodo@45.56.158.75) has joined channel #emacs
+<hodapp> rudybot: can I borrow your slide rule?
+<rudybot> hodapp: I love how they just borrow at will from other cultures
+	  mythoi.
+<hodapp> rudybot: HEY YOU JACKASS I HEARD THAT  [14:44]
+<rudybot> hodapp: i have a dont. Hey! I had pho. Why you like a fucking b/c on
+	  yer teeth heh. i thing. ogod ever heard spit it is 37 and had the
+	  best jackass. i bettery sing on....Id be the tingle. dontist. i this
+	  racist jackass. i think its ok. 1187songs, 12hrs downloading has
+	  born in you are. forskin my of 23 year . tanks. talking thats not
+	  pink tree. i done. hes partied on to after his racist a done. what's
+<tali713> jusss: e.g. something like
+	  http://www.columbia.edu/cu/computinghistory/teletype.jpg
+<jusss> tali713: what's the connection between shell and terminal emulator?
+<tali713> jusss: a shell is a type of program that can run in a terminal.
+								        [14:45]
+<jlf> jusss: https://en.wikipedia.org/wiki/Terminal_emulator  [14:46]
+<lemonpie> ouch, VT525s are expensive on ebay :(
+<jlf> jusss: https://en.wikipedia.org/wiki/Shell_(computing)
+<tali713> but it may only need dumb terminal support, or it may be a program
+	  that runs outside of a terminal.  but typically they run in
+	  terminals and typically have some support for video terminal
+	  features.
+*** test1600 (~test1600@unaffiliated/test1600) has quit: Quit: Leaving
+* hodapp . o O ( what IS a lemon pie? )
+*** Wizek (~Wizek@catv-89-132-132-110.catv.broadband.hu) has joined channel
+    #emacs
+<lemonpie> hodapp: like a lemon merangue pie, but i can't have merangue
+	   because it would be like instant insulin death  [14:47]
+*** diogenese (diogenese@diogenese.velotech.net) has joined channel #emacs
+<jlf> delicious, that's what
+*** diogenese (diogenese@diogenese.velotech.net) has quit: Max SendQ exceeded
+<hodapp> mleh, meringue
+<tali713> jusss: eshell is a case of running in emacs, not in a terminal.
+	  (unless coincidentally your emacs is in a terminal or terminal
+	  emulator)
+<hodapp> sometimes I like it, sometimes I feel like it's basically just puffed
+	 sugar
+<lemonpie> it IS just puffed sugar  [14:48]
+<hodapp> and if I'm gonna eat that much sugar, it better damn well be
+	 something better than meringue
+<jusss> tali713: eshell is a shell?
+*** castlelore (~castlelor@cpe-66-8-186-100.hawaii.res.rr.com) has joined
+    channel #emacs
+*** castlelore (~castlelor@cpe-66-8-186-100.hawaii.res.rr.com) has quit:
+    Changing host
+*** castlelore (~castlelor@unaffiliated/castlelore) has joined channel #emacs
+<hodapp> however, pavlova is a lovely summer dessert
+<tali713> jusss: yes.  as the name suggests.
+<hodapp> and I've made that a couple times
+<parsnip> eshell is an alternative to terminal emulator? 
+<tali713> no.
+<parsnip> dangit
+<tali713> parsnip: unless you just want a shell.  fortunately eshell can farm
+	  out visual programs to term.  see `eshell-visual-commands'
+								        [14:49]
+<lemonpie> that lisp thread on HN is making me sad :(  [14:51]
+*** ngirard__ (~ngirard@gre92-3-82-225-207-24.fbx.proxad.net) has joined
+    channel #emacs
+*** castlelore (~castlelor@unaffiliated/castlelore) has quit: Client Quit
+<tali713> lolwut
+<michaelrose> you mean the "idea of lisp" in which they aren't exactly clear
+	      on the idea of lisp?  [14:52]
+<lemonpie> https://news.ycombinator.com/item?id=13192738   
+*** castlelore (~castlelor@unaffiliated/castlelore) has joined channel #emacs
+<lemonpie> michaelrose: yeah, but more the dismissive lisp-is-dead tone a lot
+	   of people have
+<jusss> tali713: what terminal connect?  [14:53]
+*** davidh (~user@78.52.203.46) has quit: Remote host closed the connection
+								        [14:54]
+*** castlelore (~castlelor@unaffiliated/castlelore) has quit: Client Quit
+<tali713> jusss: that is not a sentence.  [14:55]
+<lemonpie> it might be somewhere
+*** castlelore (~castlelor@cpe-66-8-186-100.hawaii.res.rr.com) has joined
+    channel #emacs
+<lemonpie> we mustn't dismiss the idea that there's a multiverse somewhere
+	   where it made sense
+*** castlelore (~castlelor@cpe-66-8-186-100.hawaii.res.rr.com) has quit:
+    Client Quit
+<parsnip> unless terminal is an adjective, but that is ambiguous. 
+<parsnip> er, still not a _proper_ sentence  [14:56]
+<parsnip> just, don't ask me about grammar, okay? 
+<tali713> parsnip: an improper sentence can still have meaningful information
+	  to extract.
+*** castlelore (~castlelor@cpe-66-8-186-100.hawaii.res.rr.com) has joined
+    channel #emacs
+*** castlelore (~castlelor@cpe-66-8-186-100.hawaii.res.rr.com) has quit:
+    Changing host
+*** castlelore (~castlelor@unaffiliated/castlelore) has joined channel #emacs
+<jusss> what the phisical terminal connect to? what the terminal emulator
+	connect to?  [14:57]
+<parsnip> berkely
+<tali713> jusss: a physical terminal is connected to a network, typically.  a
+	  terminal emulator is run on your computer.
+*** romerocesar_ (~cesar@c-50-159-44-90.hsd1.wa.comcast.net) has joined
+    channel #emacs
+*** gopar (~gopar@2601:642:c000:3190:297d:184b:2d89:bc43) has joined channel
+    #emacs  [14:58]
+*** venmx (~pactadmin@host31-52-122-20.range31-52.btcentralplus.com) has
+    joined channel #emacs
+*** davidh (~user@x4e34cb2e.dyn.telefonica.de) has joined channel #emacs
+<tali713> but it might just be connected to a phone line and dial into a
+	  remote network.
+<lemonpie> urgh, way to dig up an unpleasant memory  [14:59]
+<tali713> 400 baud is enough for anyone
+*** romerocesar (~cesar@c-50-159-44-90.hsd1.wa.comcast.net) has quit: Ping
+    timeout: 248 seconds  [15:00]
+<parsnip> by the way, does anyone on the chat line right now know how to query
+	  a specific index of an fsbot factoid? 
+<tali713> ,fsbot 2  [15:01]
+<fsbot> To see detailed notes about fsbot, privmsg me and type ,erbot .. +
+	other notes
+<parsnip> say i want to query ,dsl 2
+<tali713> ,dsl 2
+<fsbot> tali713, I think DSL is  digital subscriber line
+	<http://en.wikipedia.org/wiki/DSL> .. + other notes
+*** davidh (~user@x4e34cb2e.dyn.telefonica.de) has quit: Client Quit
+<parsnip> hmm, i thought i succeeded on /query but then failed on #emacs one
+	  day :(
+<tali713> parsnip: yes, you just do that.
+<tali713> parsnip: sometimes fsbot is broken.
+<parsnip> i really should be a tester, i can make anything not work  [15:02]
+<bremner> fsbot is genius
+<jusss> tali713: terminal emulator connect to some programs? or kernel stuff?
+<parsnip> the programs are on the kernel?   [15:03]
+*** romerocesar_ (~cesar@c-50-159-44-90.hsd1.wa.comcast.net) has quit: Ping
+    timeout: 248 seconds
+*** diogenese (diogenese@diogenese.velotech.net) has joined channel #emacs
+<jlf> ,jlfs-law  [15:04]
+<fsbot> jlfs-law is sufficiently advanced ignorance is indistinguishable from
+	trolling.
+*** diogenese (diogenese@diogenese.velotech.net) has quit: Max SendQ exceeded
+<tali713> jusss: wikipedia.
+*** rippa (~rippa@ppp-vpdn-37.1.85.157.yarnet.ru) has joined channel #emacs
+								        [15:05]
+<parsnip> C-h P eshell has an interesting commentary ";;;_* Philosophy..."
+*** venmx (~pactadmin@host31-52-122-20.range31-52.btcentralplus.com) has quit:
+    Ping timeout: 258 seconds  [15:06]
+<tali713> jusss: if you want to know about the history of terminals and
+	  terminal emulators there are better places to look.
+*** Sixmsj (~Sixmsj@c-73-223-134-226.hsd1.ca.comcast.net) has quit: Quit:
+    Sixmsj  [15:07]
+*** LucaTM (~LucaTM@unaffiliated/lucatm) has joined channel #emacs  [15:08]
+*** romerocesar (~cesar@c-50-159-44-90.hsd1.wa.comcast.net) has joined channel
+    #emacs
+<lemonpie> hitachi's dumb terminals were the worst  [15:09]
+*** castlelore (~castlelor@unaffiliated/castlelore) has quit: Ping timeout:
+    256 seconds  [15:10]
+*** hmw (~user@x59cc877f.dyn.telefonica.de) has joined channel #emacs  [15:11]
+*** castlelore (~castlelor@cpe-66-8-186-100.hawaii.res.rr.com) has joined
+    channel #emacs  [15:14]
+*** castlelore (~castlelor@cpe-66-8-186-100.hawaii.res.rr.com) has quit:
+    Changing host
+*** castlelore (~castlelor@unaffiliated/castlelore) has joined channel #emacs
+*** athinggoingon (~athinggoi@c-69-138-25-115.hsd1.va.comcast.net) has joined
+    channel #emacs  [15:16]
+*** jusss (~user@unaffiliated/jusss) has quit: Quit: time to go
+ERC> 
