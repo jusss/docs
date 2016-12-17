@@ -1,0 +1,5 @@
+$printenv 打印所有环境变量
+$echo $MAIL
+/var/spool/mail/jusss   mailx会检查$MAIL然后在terminal提示有新邮件
+
+$mutt -f ~/Mail/qq/INBOX/
