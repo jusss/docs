@@ -3,6 +3,23 @@ xterm也是一种terminal emulator, 当然也有physical terminal
 <tali713> jusss: a shell is a type of program that can run in a terminal.
 M-x eshell    M-x ansi-term
 
+term比ansi-term的颜色显示弱些 http://rawsyntax.com/blog/learn-emacs-term/
+ansi-term使用C-x做前缀， term使用C-c做前缀 https://www.emacswiki.org/emacs/AnsiTerm
+
+AnsiTerm mode is great for terminal emulation. It behaves like a full-featured terminal
+in term-char mode, and like a regular Emacs buffer in term-line mode. But it does have
+a few complications and annoyances.
+https://www.emacswiki.org/emacs/AnsiTermHints
+
+C-c C-j to enter term-line-mode, then you can move around the buffer like any other
+    	buffer and even use C-y to paste.
+C-c C-k to switch back to term-char-mode.
+https://www.reddit.com/r/emacs/comments/2rfe9r/three_ansiterm_tips_or_emacs/
+
+or paste use the common way Shift-insert
+also see http://oremacs.com/2015/01/01/three-ansi-term-tips/
+
+
 [Sat Dec 17 2016]
 *** You have joined channel #emacs  [14:24]
 *** Topic for #emacs: Please help the FSF meet its 2016 funding goal:
