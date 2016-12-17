@@ -1,0 +1,57 @@
+$printenv 打印所有环境变量
+$echo $MAIL
+/var/spool/mail/jusss   mailx会检查$MAIL然后在terminal提示有新邮件
+
+$mutt -f ~/Mail/qq/INBOX/
+
+server: postfix, dovecot(support imap idle)
+client: MUA emacs-gnus, MTA msmtp, offlineimap
+
+gnus如果不用offlineimap和msmtp，用它自己去同步邮箱会非常卡emacs
+
+export MAIL=/home/jusss/Mail/qq/INBOX/ 写进~/.bashrc(每新开一个terminal就设置这个变量)
+or export MAIL=~/Mail/qq/INBOX
+如果写/etc/profile会导致所有用户的MAIL变量全指向/home/jusss/Mail/qq/INBOX/
+然后offlineimap同步邮箱有新邮件后，在xterm里就会提示You have new mail in /home/jusss/Mail/qq/INBOX/
+this is on archlinux, 检查这个变量的应该是mailx或者mutt
+
+确保/etc/profile里没有unset MAILCHECK, 这个是取消邮件检查
+
+http://moper.me/linux-you-have-new-mail-in.html
+
+debian上有/etc/aliases
+/etc/aliases 设置 root: regular-user 把root的邮件发送到regular user邮箱里
+
+----------------------------------------------------------------------------------------------------
+
+I. 连服务器imap idel检查新邮件，或者判断uid 或recent 或message的数来判断是否有新邮件
+II. offlineimap下邮件以maildir保存而不要以mbox, 然后判断~/Mail/qq/INBOX/new/是否有文件来判断是否有新邮件
+或者~/Mail/qq/INBOX/cur/里的文件名2个时间段内的匹配判断是否有新邮件
+或者~/Mail/qq/INBOX/.nnmaildir/num/里面有邮件的总数，判断2个时间段内这个数字的不同也可以判断是否有新邮件
+
+os.listdir("/home/jusss/Mail/qq/INBOX/new") 返回文件名列表，没有文件，则返回空列表[]
+
+
+服务器支持imap idle的直接用idle判断是否有新邮件，但貌似只有gmail支持imap idle
+不支持imap idel的，就通过uid匹配也可以判断是否有新邮件，或者recent 或message返回的信息
+
+还有种就是每几分钟同步一次，然后判断同步之后的文件来判断是否有新邮件，如检查INBOX/new/
+mailx或许就是这样检查新邮件的(用$MAIL变量得到邮件存储路径)，当然还有thunderbird(同时再加上idle双重判断去检测新邮件)
+
+---------------------------------------------------------------------------------------------------
+~/lab/check-for-new-mail.py
+
+#!/usr/bin/env python3
+import os, subprocess, time, sys
+### use offlineimap download mail, and store as maildir type not mbox
+### check $MAIL/INBOX/new/, if it's empty directory then it means no new mail
+### */30 * * * * ~/lab/check-for-new-mail.py    write this into crontab with crontab -e
+mail_stored_path = "/home/jusss/Mail/qq/INBOX/new/"
+notifier_path = "/home/jusss/lab/notifier.py"
+a_list = os.listdir(mail_stored_path)
+if a_list == []:
+    sys.exit()
+else:
+    subprocess.Popen([notifier_path, "Mail", "New Mail"], shell=False)
+    ### prevent this script is too fast to end that make Popen have not done yet
+    time.sleep(3)
