@@ -1,0 +1,53 @@
+vim /etc/nginx/sites-enabled/default
+server {
+        root /usr/share/nginx/www;
+        }
+debian jessie 上 #root /var/www/html;
+设置nginx的根目录,如果不设置这个根目录，nginx就不知道去哪找文件
+
+http://stackoverflow.com/questions/10674867/nginx-default-public-www-location
+
+Run the command  nginx -V and look for the --prefix. Use that entry to locate your default paths.
+the --prefix value is the answer to the question
+------------------------------------------------------------------------
+
+find /usr/share/nginx/www -type d -exec chmod 755 {} ; 
+find /usr/share/nginx/www -type f -exec chmod 644 {} ; 
+chown -R www-data:www-data /usr/share/nginx/www/
+
+###chmod 3755 /usr/share/nginx/www/ 千万不要这么做!设set gid和set bit之后任意用户都能在这个位置创建文件
+
+/usr/share/nginx/www/这个nginx根目录里面的文件夹设权限为755, 文件设权限为644, 
+文件属于www-data组的www-data
+
+https://www.v2ex.com/t/169771
+
+----------------------------------------------------------------------------
+
+/etc/nginx/nginx.conf
+
+user www-data www-data; 以www-data账户运行nginx而非root
+
+-----------------------------------------------------------------
+or run it in chroot environment!
+
+https://wiki.archlinux.org/index.php/Nginx
+
+https://www.linode.com/docs/websites/nginx/how-to-configure-nginx/
+
+/etc/nginx/sites-available/example.com
+location / {}
+location /images/ {}    就是example.com/images/
+
+/etc/nginx/sites-available/example.com
+location / {
+        root /usr/sharg/nginx/what-you-want
+        index index.html
+}  指定example.com的root location(不明白与sites-enabled/default里server段的root有关系没?)
+难道是为同一ip的多域名做的不同根目录?
+
+----------------------------------------------
+debian系有sites-enabled和sites-available, enabled是当前启用的，available包含所有的甚至不启用的
+
+https://www.v2ex.com/t/168135
+-------------------------------------------------------
