@@ -1,3 +1,7 @@
+chmod u+s file
+chmod g+s directory
+chmod o+t directory
+
 set uid只能对文件操作 chmod u+s 一般是可执行文件，当别的用户执行这个文件时会以文件拥有者的身份去执行
 set gid 可以对目录操作 chmod g+s 比如B目录属于bbb用户组，而B目录的other权限是rwx,所以用户组aaa的用户A可以
 在B目录创建文件或目录，但创建的文件或目录，拥有者是用户A,所属的目录却是bbb
