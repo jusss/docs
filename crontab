@@ -1,3 +1,6 @@
+env EDITOR=/usr/bin/vim crontab -e
+或者写export EDITOR=/usr/bin/vim 进~/.bashrc
+
 crontab, systemd timer, sleep()  three ways to do something sometime
 
 从crontab调用gui script, 1. $xhost +local:  2. env DISPLAY=:0.0 your-gui-script
