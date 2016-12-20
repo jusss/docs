@@ -1,0 +1,57 @@
+screen -S new-session-name
+C-a C-a switch
+C-a c create new window
+C-a d detach
+C-a 0-9 switch window 0-9
+screen -ls      list session
+
+
+tmux -S xxx is not create a new session!!!
+
+tmux new -s session-name
+C-b s show session
+tmux ls    list session
+C-b d  detach
+tmux a -t session-name  attach
+
+man tmux, new is alias for new-session, ls is alias for list-sessions
+-S specify a path to the server socket! not session name like screen
+command
+
+
+tmux attach -t session
+tmux ls
+tmux new -s session-name
+
+C-b c create new window
+
+会话管理
+
+s 列出所有会话
+$ 重命名当前的会话
+d 断开当前的会话
+窗口管理
+
+c 创建一个新窗口
+, 重命名当前窗口
+w 列出所有窗口
+% 水平分割窗口
+" 竖直分割窗口
+n 选择下一个窗口
+p 选择上一个窗口
+0~9 选择0~9对应的窗口
+窗格管理
+
+% 创建一个水平窗格
+" 创建一个竖直窗格
+h 将光标移入左侧的窗格*
+j 将光标移入下方的窗格*
+l 将光标移入右侧的窗格*
+k 将光标移入上方的窗格*
+q 显示窗格的编号
+o 在窗格间切换
+} 与下一个窗格交换位置
+{ 与上一个窗格交换位置
+! 在新窗口中显示当前窗格
+x 关闭当前窗格> 要使用带“*”的快捷键需要提前配置，配置方法可以参考上文的“在窗格间移动光标”一节。
+http://blog.csdn.net/skykingf/article/details/46345057
