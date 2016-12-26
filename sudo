@@ -1,0 +1,31 @@
+/etc/sudoers
+root ALL=(ALL:ALL) ALL
+
+john ALL=(ALL) NOPASSWD:ALL 用户john运行sudo不需要密码(此时确保john所属的组运行sudo也不需要密码,否则还是需要密码)
+
+john ALL=(ALL) ALL 用户john运行sudo需要密码
+
+%wheel ALL=(ALL) NOPASSWD: ALL 用户组wheel的成员可以运行所有指令不需要密码,可以用gpasswd -a john wheel添加
+                                cat /etc/group|grep wheel查看wheel组成员
+
+john ALL=(root) useradd,wpa_supplicant   john以root身份运行这2个指令
+
+%john ALL=(ALL) NOPASSWD:wpa_supplicant  john用户组的成员以所有用户身份运行wpa_supplicant不需要密码
+
+%john ALL=(ALL) ALL 用户组john的成员可以运行所有指令但需要密码
+
+john ALL= NOPASSWD:/usr/bin/wpa_supplicant 用户john运行wpa_supplicant不需要密码
+
+john ALL= NOPASSWD:ALL 在 %john ALL=(ALL) ALL之前时，用户john还是需要密码,john属于john组
+
+http://blog.csdn.net/my_renzhibo/article/details/7616711
+
+需要注意的是，当我们为用户定义可以运行的命令时，必须使用完整的命令路径。这样做是完全出于安全的考虑，
+如果我们给出的命令只是简单的userad 而非 /usr/sbin/useradd，那么用户有可能创建一个他自己的脚本，也叫
+做userad，然后放在它的本地路径中，如此一来他就能够通过这个名为 useradd的本地脚本，作为root来执行任
+何他想要的命令了。这是相当危险的！
+
+http://www.2cto.com/os/201203/122820.html
+
+SUDO_RUN=/usr/bin/wpa_suplicant,/usr/bin/dhclient
+john ALL=(ALL) NOPASSWD:SUDO_RUN
