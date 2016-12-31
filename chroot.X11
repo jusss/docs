@@ -1,0 +1,303 @@
+Host(archlinux):
+
+john@tty2  
+vim .xinitrc
+添加exec twm
+startx -- :1
+xauth list $DISPLAY 得arch/unix:1  arch就是你的hostname, arch/unix:1是你的host的Xorg的cookie
+sudo xauth extract /bla2/jessie/root/.Xauthority arch/unix:1
+(sudo xauth extract /bla2/jessie/home/john/.Xauthority arch/unix:1)
+(或者直接在chroot环境里xauth add arch/unix:1 MIT-MAGIC-COOKIE-1 e055f9...)
+cd /bla2/jessie
+sudo mount -t proc proc ./proc
+sudo mount -t sysfs sysfs ./sys
+sudo mount -t devtmpfs devtmpfs ./dev
+sudo mount -t tmpfs tmpfs ./dev/shm
+sudo mount -t devpts devpts ./dev/pts
+(或者/bla2/jessie/mount.chroot.sh #!/bin/bash sudo mount ... 然后直接直接mount.chroot.sh)
+sudo chroot  .  /bin/bash
+
+Chroot(debian):
+
+echo $DISPLAY 得:1.0
+echo $XAUTHORITY 还是/home/john/.Xauthority
+这时直接xclock会得到No protocol specified Error: Can't display :1.0
+export XAUTHORITY=~/.Xauthority 把这个环境变量指向chroot环境里的位置(实际上是/bla2/jessie/root/.Xauthority)
+xclock就能在host环境的Xorg上显示了
+也可以运行conky桌面监视各种信息 :)
+
+因为chroot进来是root, 不想在chroot里使用root，就su 一个普通用户，然后用chsh把普通用户默认的sh变成/bin/bash即可
+而chroot里的这个普通用户是没有host的Xorg的.Xauthority cookie的，可以把chroot里/root/.Xauthority传给普通用户
+cp /root/.Xauthority ~/.Xauthority
+
+vim /etc/sudoers
+添加chroot的普通用户john进sudo里
+john ALL=(ALL:ALL) NOPASSWD:ALL
+
+sudo cp /root/.Xauthority ~/.Xauthority
+export XAUTHORITY=~/.Xauthority
+xclock 在chroot里以普通用户使用xclock显示在host环境的Xorg上
+
+reference: http://unix.stackexchange.com/questions/10743/what-to-do-to-run-gui-java-app-in-chrooted-environment
+---------------------------------------------------------------------------------------------------------
+# Mount Kernel Virtual File Systems
+TARGETDIR="/mnt/chroot"
+mount -t proc proc $TARGETDIR/proc
+mount -t sysfs sysfs $TARGETDIR/sys
+mount -t devtmpfs devtmpfs $TARGETDIR/dev
+mount -t tmpfs tmpfs $TARGETDIR/dev/shm
+mount -t devpts devpts $TARGETDIR/dev/pts
+
+# Copy /etc/hosts
+/bin/cp -f /etc/hosts $TARGETDIR/etc/
+
+# Copy /etc/resolv.conf 
+/bin/cp -f /etc/resolv.conf $TARGETDIR/etc/resolv.conf
+
+# Link /etc/mtab
+chroot $TARGETDIR rm /etc/mtab 2> /dev/null 
+chroot $TARGETDIR ln -s /proc/mounts /etc/mtab
+
+It is possible to run graphical applications on a chrooted environment, using methods such as:[9][10]
+
+#1. Use xhost (or copy the secret from .Xauthority)
+#2. Nested X servers like Xnest or the more modern Xephyr (or start a real X server from inside the jail)
+#3. Accessing the chroot via SSH using the X11 forwarding (ssh -X) feature
+#4. xchroot an extended version of chroot for users and Xorg/X11 forwarding (socat/mount)
+#5. An X11 VNC server and connecting a VNC client outside the environment.
+
+https://en.wikipedia.org/wiki/Chroot
+xchroot  http://www.elstel.org/xchroot/
+-----------------------------------------------------------------------------------
+http://unix.stackexchange.com/questions/10743/what-to-do-to-run-gui-java-app-in-chrooted-environment
+
+1. valid DISPLAY environment variable (like :0.0)
+2. proper Xauthority file (like .Xauthority)
+3. X11 use TCP socket or Unix Domain socket (/tmp/.X11-unix/X0)  
+
+默认startx开启的Xorg都用了-nolisten tcp
+/usr/lib/xorg-server/Xorg -nolisten tcp :0 vt1 -auth /tmp/serverauth.QntpJd2Lrl
+
+TCP sockets start at TCP port 6000 for display :0 up through 6063 for the last display.
+As long as TCP sockets are listening, you shouldn't need to do anything more with sockets. 
+You still need to worry about DISPLAY and Xauthority.
+Unix domain sockets require a little more work and, at least on Linux, reside 
+under /tmp/.X11-unix/X? where ? is a number from 0 to 63. 
+
+srwxrwxrwx 1 jusss jusss 0 Dec 31 12:00 /tmp/.X11-unix/X0
+
+If your chroot resided on the same filesystem as /tmp then you can use hard links, at least 
+on Linux. Symbolic links won't leave a chroot. Replace ? with the correct display number:
+
+mkdir /path/to/chroot/tmp
+chmod 1777 /path/to/chroot/tmp
+mkdir /path/to/chroot/tmp/.X11-unix
+chmod 1777 /path/to/chroot/tmp/.X11-unix
+ln -f /tmp/.X11-unix/X? /path/to/chroot/tmp/.X11-unix/X?
+
+1. If /tmp is not on the same file system, life is harder and you will need some kind of hackery 
+such as making /tmp/.X11-unix a symbolic link to the corresponding directory under the chroot. 
+
+2. make sure the DISPLAY environment variable is set and matches what is used by your terminal
+
+3. copy over the .Xauthority, Use `xauth list $DISPLAY` to print out cookies like 
+arch/unix:0  MIT-MAGIC-COOKIE-1  e055f942048fd2a3ad6927fdd911b5ae
+The name will look like host:? or host/unix:? where host is the hostname of the computer and ? is the display number. 
+The display number can be retrieved with echo $DISPLAY and it will be the number following the colon (:) and before any period (.) 
+To copy over the Xauthority, use something like this:
+
+xauth extract /path/to/chroot/.Xauthority host/unix:1
+xauth -f /path/to/chroot/.Xauthority list
+
+The second command simple list the copied entries. If you need to copy while using sudo or other command to change users, try something like this:
+
+xauth extract - host/unix:1 | sudo xauth -f /path/to/chroot/.Xauthority merge -
+If the place you put the .Xauthority file is not the home directory for the chrooted user, you will have to set the XAUTHORITY environment variable:
+
+export XAUTHORITY=/path/to/chroot/.Xauthority
+
+-------------------------------------------------------------------------------------------------------------------------------
+~/.Xauthority里面存的是cookie like arch/unix:0 MIT-MAGIC-COOKIE-1 ..., 用xauth list或 xauth list $DISPLAY可以显示
+/tmp/.X11-unix/X0 是个socket file
+而Xorg -auth /tmp/serverauth.QntpJd2Lrl  what's it?
+
+------------------------------------------------------------------------------------------------------------------------------
+jusss@tty1 use startx open Xorg :0 vt1 -nolisten
+john@tty2 use Xorg :1 vt2 
+jusss@tty1 `su john`; `xterm -display :1&`
+john@tty2 `fvwm2 -display :1`
+
+cd /bla2/jessie
+mount -t proc proc ./proc
+mount -t sysfs sysfs ./sys
+mount -t devtmpfs devtmpfs ./dev
+mount -t tmpfs tmpfs ./dev/shm
+mount -t devpts devpts ./dev/pts
+
+echo $DISPLAY, get your current DISPLAY, then `xauth list $DISPLAY`
+echo $XAUTHORITY 发现是 /home/jusss/.Xauthortiy 而不是 /home/john/.Xauthority
+
+而/home/john/.Xauthority is empty
+如果用startx -- :1 来开启Xorg，startx默认会开启nolisten
+开启nolisten tcp,没事，用unix domain socket
+
+ps aux|grep Xorg得:1为1859, kill 1859, startx -- :1
+
+echo $DISPLAY得:1 
+xauth list的 arch/unix:1 MIT-xxxx
+
+sudo xauth extract /bla2/jessie/root/.Xauthority arch/unix:1
+
+chroot /bla2/jessie /bin/bash
+echo $DISPLAY 得:1
+echo $XAUTHORITY得 /home/john/.Xauthority 
+export XAUTHORITY=~/.Xauthority
+xclock 就能正常显示了
+
+-------------------------------------------------------------------------------------------------------------------
+
+Xorg有2种socket，一种是TCP,另一种是unix domain, 而startx默认开启-nolisten tcp选项，所以只能用unix domain socket
+或者去startx脚本里注释掉-nolisten tcp选项， startx开启的一大堆东东里，有Xorg -auth /tmp/xxx, 有/tmp/.X11-unix/X0
+，这些或许不用去管，startx会生成~/.Xauthority还有DISPLAY和XAUTHORITY变量，而要在chroot环境里使用Xorg，就是把当前
+用户的.Xauthority文件传给chroot环境里的用户，然后在chroot环境里设置DISPLAY和XAUTHORITY变量，让chroot环境里的用户
+能使用host环境的Xorg, 靠.Xauthority里的Xorg cookie来访问Xorg
+
+把host环境的~/.Xauthority里的cookie传给chroot环境的用户，让chroot环境的用户能访问host环境的Xorg
+
+(或者tty chroot进去直接在chroot环境里开Xorg?)
+
+---------------------------------------------------------------------------------------------------------------
+http://unix.stackexchange.com/questions/10743/what-to-do-to-run-gui-java-app-in-chrooted-environment
+
+What to do to run GUI Java app in chrooted environment?
+In my case Java app is JDownloader. I prepared chroot environment as explained here:
+
+http://www.0x61.com/forum/post5240333.html#p5240333
+
+and here:
+
+http://interreality.org/~reed/java-chroot.html
+
+and here:
+
+http://www.elstel.com/openroot/
+
+So, I have java installed, added group and user, JDownload files copied, but when I try to run it (as regular user under chroot; I run chroot as root, but once I am in chroot, I switch to chroot regular user):
+
+java -Xmx512m -jar JDownloader.jar
+I got some positive messages like loading skins by JDownloader
+
+10 4/6/11 2:15:17 PM - FINER [jd.JDClassLoader()] -> Look and Feel JAR loaded: /mnt/jd/libs/laf/syntheticaSilverMoon.jar
+but that's end of the story -- app does not show up. No matter if I use chroot to run chroot environment or openroot, the outcome is the same.
+
+When I run JDownload as chroot-root I got a little more output but at then end exception occurs:
+
+10 4/6/11 2:39:23 PM - FINER [jd.config.DatabaseConnector()] -> Loading database
+
+10 4/6/11 2:39:23 PM - FINER [jd.config.DatabaseConnector(checkDatabaseHeader)] -> Checking database
+
+10 4/6/11 2:39:23 PM - INFO [jd.Main(main)] -> init Splash
+
+------------------------ Thread: 11 -----------------------
+
+11 4/6/11 2:39:25 PM - INFO [jd.gui.swing.laf.LookAndFeelController(setUIManager)] -> Use Look & Feel: de.javasoft.plaf.synthetica.SyntheticaSimple2DLookAndFeel
+
+11 4/6/11 2:39:25 PM - SEVERE [jd.controlling.JDLogger(exception)] -> SEVERE Exception occurred java.lang.reflect.InvocationTargetException
+
+at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
+I have the same Jave installed in chroot and normal system, I can run the same JDownloader in normal system, no problems here.
+
+QUESTION -- what I am missing here? How to run GUI Java app?
+
+Thank you in advance.
+
+x11 gui java chroot
+shareimprove this question
+asked Apr 6 '11 at 12:43
+
+greenoldman
+2,09332752
+1       
+Consider using cgroups or LXC, they might suit you better (and are much easier to deal with). – Let_Me_Be Apr 6 '11 at 13:54
+        
+@Let_Me_Be Many thanks. cgroups is pretty new I guess, because I didn't find anything to read really, but LXC looks VERY promising. However I will try to finish chroot approach first, and then move to LXC. – greenoldman Apr 7 '11 at 8:21
+        
+Actually LXC is built on top of cgroups :) – Let_Me_Be Apr 7 '11 at 9:35
+add a comment
+3 Answers
+active oldest votes
+up vote
+7
+down vote
+accepted
+If you're trying to get any chrooted app to show up in X11, you will need a couple of things set up correctly. One is a valid DISPLAY environment variable, second is a proper Xauthority file, and third and most important, access to the socket used by X11/Xorg. X11 can use either a TCP network socket or a Unix Domain socket. A TCP socket will be easier to use from a chroot, but most modern desktops have TCP turned off with -nolisten tcp or something similar set on the X server. TCP sockets start at TCP port 6000 for display :0 up through 6063 for the last display. As long as TCP sockets are listening, you shouldn't need to do anything more with sockets. You still need to worry about DISPLAY and Xauthority. Unix domain sockets require a little more work and, at least on Linux, reside under /tmp/.X11-unix/X? where ? is a number from 0 to 63. If your chroot resided on the same filesystem as /tmp then you can use hard links, at least on Linux. Symbolic links won't leave a chroot. Replace ? with the correct display number:
+
+mkdir /path/to/chroot/tmp
+chmod 1777 /path/to/chroot/tmp
+mkdir /path/to/chroot/tmp/.X11-unix
+chmod 1777 /path/to/chroot/tmp/.X11-unix
+ln -f /tmp/.X11-unix/X? /path/to/chroot/tmp/.X11-unix/X?
+mkdir and chmod only need to be done once, but the socket file will need to be recreated with ln on each X session. If /tmp is not on the same file system, life is harder and you will need some kind of hackery such as making /tmp/.X11-unix a symbolic link to the corresponding directory under the chroot. Next, make sure the DISPLAY environment variable is set and matches what is used by your terminal and other X11 apps. Lastly, to copy over the .Xauthority, use xauth. You need to find the matching cookie for your X11 session and this cookie will be different for every session. Use xauth list $DISPLAY to print out cookies for your DISPLAY. The name will look like host:? or host/unix:? where host is the hostname of the computer and ? is the display number. The display number can be retrieved with echo $DISPLAY and it will be the number following the colon (:) and before any period (.) To copy over the Xauthority, use something like this:
+
+xauth extract /path/to/chroot/.Xauthority host/unix:1
+xauth -f /path/to/chroot/.Xauthority list
+The second command simple list the copied entries. If you need to copy while using sudo or other command to change users, try something like this:
+
+xauth extract - host/unix:1 | sudo xauth -f /path/to/chroot/.Xauthority merge -
+If the place you put the .Xauthority file is not the home directory for the chrooted user, you will have to set the XAUTHORITY environment variable:
+
+export XAUTHORITY=/path/to/chroot/.Xauthority
+As you can probably tell, it's not typical to run a GUI app under a chroot.
+
+shareimprove this answer
+edited Apr 6 '11 at 17:35
+answered Apr 6 '11 at 17:05
+
+penguin359
+6,6772433
+        
+Many, many thanks. Thank to your tutorial I was able to run xterm without problems (btw. I thought that openroot is design to "hide" all those scary details from user), however when I run JDownloader -- no change, literally. It fails with exception (the one, I posted in question). – greenoldman Apr 7 '11 at 9:46
+1       
+chroot's can be difficult to debug. Obviously something's still missing, but I'm not sure what. Sometimes I can figure out by using strace or equivalent program. Comparing a working strace with a broken one. Mostly likely it's attempting to access some file, possibly a socket. strace -efile -oprog.trace prog limits tracing to only file access, stores the trace to prog.trace and runs prog. – penguin359 Apr 7 '11 at 19:06
+        
+Thank you once again, I will dig deeper :-) – greenoldman Apr 8 '11 at 7:09
+        
+Note: if your chroot is not on the same filesystem as /tmp, then you can bind mount .X11-unix – totaam Feb 23 '14 at 17:25
+add a comment
+up vote
+1
+down vote
+I don't think there's anything you need to do specifically for Java apps, but you do have to do something for GUI apps in general.
+
+I've done this on my home computer, but I'm not at home right now so bear with me. I have a script that mounts everything into my chroot like /dev and /proc, but it also copies ~/.X* as well. If I remember correctly, in your home folder there are files that start with .Xauth, and you copy those into the home folder of your chroot environment. In my experience these files need to be copied every time that X is restarted.
+
+What I would do to test this method out was I'd just run a simple X application like xterm. It was just a fast and simple app I could test with.  xterm should give you an error message if it can't connect to the X server.
+
+I happen to have the full X11 package installed into my chroot, but I don't know enough about X to know if chroot'd apps run on a chroot'd X server or on the host X server.
+
+shareimprove this answer
+answered Apr 6 '11 at 15:11
+
+jonescb
+1,480919
+        
+Good point. With openroot and root user within chroot environment I get error: "Invalid MIT-MAGIC-COOKIE-1 keyWarning: This program is an suid-root program or is being run by the root user." and with regular simply "xterm Xt error: Can't open display: :0". – greenoldman Apr 7 '11 at 9:29
+add a comment
+up vote
+1
+down vote
+That worked for me on an ArchLinux chrooting into a Debian. In the host:
+
+$ xauth list
+latitude/unix:0  MIT-MAGIC-COOKIE-1  d4474d13c
+Now in the chroot environment:
+
+# xauth add latitude/unix:0 MIT-MAGIC-COOKIE-1 d4474d13c
+# xcalc # works!
+shareimprove this answer
+answered Sep 8 '12 at 19:53
+
+tokland
+1113
+        
+Well that just telly me: xauth: error in locking authority file /tmp/kde-panzi/xauth-1000-_0 ... Ah, probably the env vars! – panzi Jul 9 '14 at 0:47
