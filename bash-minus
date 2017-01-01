@@ -1,0 +1,14 @@
+- 可以替代指令中的文件参数，此时 - 做stdin or stdout,当需要的是写入文件时，就是stdout
+当需要的是读取文件时就是stdin,   还可以用|把前一个指令的stdout传给后一个指令做stdin
+
+tar -cvf - /home | tar -xvf -
+
+tar -cvf - /home 此时 - 做stdout,把/home下的文件打包到stdout，也就是标准输出，显示出来
+然后 | 管道符号把stdout 传给后面的 tar -xvf - 把前面的stdout做|后面的stdin, 后面的-是stdin
+
+reference : http://bbs.csdn.net/topics/390183891
+
+
+xauth extract - $DISPLAY | sudo tee ./root/.Xauthority
+
+- means stdout 然后|把stdout 传给了 sudo tee, tee把stdout写入了./root/.Xauthority
