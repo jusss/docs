@@ -1,6 +1,9 @@
 https://wiki.archlinux.org/index.php/Network_configuration#Set_the_hostname
 Set the hostname
 
+1. /etc/hostname 设置hostname
+2. /etc/hosts  添加 127.0.0.1 your-hostname  (否则每次用sudo 都会提示 sudo: unable to resolve host your-hostname)
+
 A hostname is a unique name created to identify a machine on a network, configured in /etc/hostname—see hostname(5) and hostname(7) for details. The file can contain the system's domain name, if any. To set the hostname, edit /etc/hostname to include a single line with myhostname:
 /etc/hostname
 myhostname
