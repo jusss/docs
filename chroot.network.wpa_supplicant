@@ -1,3 +1,4 @@
 use wpa_supplicant to connect work in chroot env not host system
 you should use root account in chroot env to do this
 and maybe it need `ip link set wlp3s0(your-network-interface) up` in host system
+and you can find you can use network in the host system! even you use wpa in chroot env
