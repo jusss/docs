@@ -20,16 +20,19 @@ sudo mount -t devtmpfs devtmpfs ./dev
 sudo mount -t tmpfs tmpfs ./dev/shm
 sudo mount -t devpts devpts ./dev/pts
 (或者/bla2/jessie/mount.chroot.sh #!/bin/bash sudo mount ... 然后直接直接mount.chroot.sh)
+sudo cp /etc/hosts ./etc/hosts
+sudo cp /etc/resolv.conf  ./etc/resolv.conf
 sudo chroot  .  /bin/bash
 
 Chroot(debian):
-
+rm /etc/mtab
+ln -s /proc/mounts /etc/mtab (/etc/fstab, /etc/mtab, /proc/mounts, /proc/self/mounts 4个文件管挂载文件系统,且mount读取的是/etc/mtab)
 echo $DISPLAY 得:1.0
 echo $XAUTHORITY 还是/home/john/.Xauthority
 这时直接xclock会得到No protocol specified Error: Can't display :1.0
 export XAUTHORITY=~/.Xauthority 把这个环境变量指向chroot环境里的位置(实际上是/bla2/jessie/root/.Xauthority)
 xclock就能在host环境的Xorg上显示了
-也可以运行conky桌面监视各种信息 :)
+也可以运行conky桌面监视各种信息 :-)
 
 因为chroot进来是root, 不想在chroot里使用root，就su 一个普通用户，然后用chsh把普通用户默认的sh变成/bin/bash即可
 而chroot里的这个普通用户是没有host的Xorg的.Xauthority cookie的，可以把chroot里/root/.Xauthority传给普通用户
