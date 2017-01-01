@@ -5,8 +5,13 @@ vim .xinitrc
 添加exec twm
 startx -- :1
 xauth list $DISPLAY 得arch/unix:1  arch就是你的hostname, arch/unix:1是你的host的Xorg的cookie
-sudo xauth extract /bla2/jessie/root/.Xauthority arch/unix:1
-(sudo xauth extract /bla2/jessie/home/john/.Xauthority arch/unix:1)
+### sudo xauth extract /bla2/jessie/root/.Xauthority arch/unix:1
+### sudo xauth extract /bla2/jessie/home/john/.Xauthority arch/unix:1
+### sudo xauth extract your-chroot-path/$HOME/.Xauthority your-xauth-list-cookie
+### but this is not safe because use sudo for xauth means root's xauth, not yours
+### - mean stdout file here
+xauth extract - $DISPLAY | sudo tee ./root/.Xauthority
+
 (或者直接在chroot环境里xauth add arch/unix:1 MIT-MAGIC-COOKIE-1 e055f9...)
 cd /bla2/jessie
 sudo mount -t proc proc ./proc
