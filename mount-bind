@@ -12,7 +12,7 @@ mount -o bind /mnt  ~/
 
 为什么不mount -o bind ~/  /mnt呢？这样umount /mnt后所有的改动会保存在~/下，~/本来空间都不足，会撑爆的
 
-挂载A到B, B不变
+挂载A到B, A覆盖B, 卸载B, B不变, A保留所有变化
 
 so what if `sudo mount -o bind /bla2 /bla2/jessie/bla2` 这样就可以在chroot env里修改host系统的/bla2了
 (在朋友的mbp上玩过，它里面有个文件目录里包含整个系统目录，就好比/bla2/whatever里面又能看到/ /bla2 /home根目录，很神奇)
