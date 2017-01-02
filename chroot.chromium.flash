@@ -1,0 +1,5 @@
+debian jessie有个pepperflashplugin-nonfree的包，然后装完后提示没有找到
+libpepperflash.so这个文件，搜索了有人在2016.10.08提出过这个bug,但是现在
+都2017.01.02了还是遇到了。。。。（貌似没解决）
+直接把host系统的libpepperflash.so传给chroot的debian,然后用里面的chromium打开
+bilibili一切正常（默认html5播放器），一打开acfun就插件崩溃。。。
