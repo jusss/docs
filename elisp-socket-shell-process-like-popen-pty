@@ -1,0 +1,197 @@
+make-network-process return a process object, communicate with process-filter process-send-string 
+or read  read-from-string 
+http://stackoverflow.com/questions/6239362/emacs-lisp-network-connections-what-to-do-with-the-process-object/6239771
+or use open-network-stream to create socket
+http://stackoverflow.com/questions/6239362/emacs-lisp-network-connections-what-to-do-with-the-process-object/6239771
+(make-network-process :name "es" :buffer "es" :host "www.baidu.com" :service 80)
+
+http://www.slac.stanford.edu/comp/unix/gnu-info/elisp_34.html
+
+使用make-network-process创建时的filter或者buffer来读取这个process,用process-send-string发送给process
+emacs的make-network-process, 创建的process不是emacs的child process,没有pid
+可以用(list-processes)查看，用(delete-process)删除
+(setq es (make-network-process :name "es" :buffer "es" :host "www.baidu.com" :service 80))
+(setq msg-from-process nil)
+(defun my-read-from-process (process message)
+       (setq msg-from-process message))
+(set-process-filter es 'my-read-from-process)
+or (set-process-filter (get-process "es") 'my-read-from-process)
+
+set-process-file给process设置filter,它的第二个参数是个函数，这个函数有2个参数，第一个是process，第二个是从process读取
+的信息
+
+
+Here is an example of use of a filter function: 
+
+
+(defun keep-output (process output)
+   (setq kept (cons output kept)))
+     => keep-output
+(setq kept nil)
+     => nil
+(set-process-filter (get-process "shell") 'keep-output)
+     => keep-output
+(process-send-string "shell" "ls ~/other\n")
+     => nil
+kept
+     => ("lewis@slug[8] % "
+"FINAL-W87-SHORT.MSS    backup.otl              kolstad.mss~
+address.txt             backup.psf          
+
+
+--------------------------------------------------------------------------------------------------------
+<forcer> In the case of irc.freenode.net:6665, I suspect jusss evaluated the
+	 `make-network-process' call before evaluating `set-process-filter',
+	 so the output will be in the "es" buffer, not passed to the
+	 filter. You can set the process filter directly from
+	 `make-network-process' using the :filter argument.
+(setq msg-from-process nil)
+(defun my-read-from-process (process msg)
+       (message msg))
+(setq es (make-network-process :name "es" :buffer "es" :host "www.baidu.com" :service 80 :filter 'my-read-from-process))
+
+
+
+_____________________________________________________________________________
+<marcx> my understanding defvar - defining top-level variable. let - defining
+	local variable. setq - setting variable (either top level or
+	local). setf a superset of setq that can set a place, like (setf (car
+	list) x)
+
+--------------------------------------------------------------------------------------
+
+(defun my-read-from-process (process msg)
+       (message msg))
+
+(make-network-process :name "es" :buffer "es" :host "irc.freenode.net" :service 6665 :filter 'my-read-from-process)
+
+然后在modeline minibuffer就会自动的不停的显示每次接收到的字符串
+
+--------------------------------------------------------------------------------------
+
+(setq msg-list nil)
+
+(defun my-read-from-process (process msg)
+       (setq msg-list (cons msg msg-list)))
+
+(make-network-process :name "es" :buffer "es" :host "irc.freenode.net" :service 6665 :filter 'my-read-from-process)
+
+---------------------------------------------------------------------------------------------------------------------
+
+(setq f nil)
+
+(defun my-read-from-process (process msg)
+  (setq f (cons (message msg) f)))
+
+(make-network-process :name "es" :buffer "es" :host "irc.freenode.net" :service 6665 :filter 'my-read-from-process)
+此时emacs会阻塞5秒左右，然后modeline minibuffer上就开始显示了
+f
+(":sinisalo.freenode.net NOTICE * :*** No Ident response
+" ":sinisalo.freenode.net NOTICE * :*** Couldn't look up your hostname
+" ":sinisalo.freenode.net NOTICE * :*** Checking Ident
+" ":sinisalo.freenode.net NOTICE * :*** Looking up your hostname...
+")
+f
+("ERROR :Closing Link: 127.0.0.1 (Connection timed out)
+" ":sinisalo.freenode.net NOTICE * :*** No Ident response
+" ":sinisalo.freenode.net NOTICE * :*** Couldn't look up your hostname
+" ":sinisalo.freenode.net NOTICE * :*** Checking Ident
+" ":sinisalo.freenode.net NOTICE * :*** Looking up your hostname...
+")
+
+如果你先make-network-process而没有在里面设置filter参数，然后再用process-filter设置filter,你应该在es buffer里看到这些收到的字符串,而f应该为nil
+---------------------------------------------------------------------------------------------------------------------
+
+<forcer> Next, jusss will be confused because the callback is not sent lines
+	 individually. Or maybe even half lines.  [20:22]
+<forcer> jusss: No idea who designed it. It's not too different from other
+	 callback-based systems, like nodejs.
+
+<hmw> Half lines, hahaha. One anecdote from my past: I worked with a closed
+      source system that sent a couple of kB over the network and all was fine
+      for years. Then I came along and wanted to send a couple of MB (you
+      know, progress in technology etc.) and suddenly things started behaving
+      strange. I got the source code and after little debugging I found
+<hmw> out that they did just one read(2) from the socket ;). I still have
+      trouble to understand why it worked so well in the kB range.
+<jusss> forcer: then how I can read it again and again? I mean the server
+	maybe sent multi strings not just once, how I can read it then read it
+	again  [20:31]
+<forcer> hmw: Probably Nagle's that rescued that there :-D
+<forcer> What do I win?
+<forcer> jusss: The callback is called repeatedly. 
+
+<defanor> jusss: it may help if you'll describe what you are trying to do with
+	  that. if you are not used to async/callbacks-based approach, i guess
+	  that may be the source of confusion here  [20:40]
+
+<forcer> The confusion is most likely that they use `setq' there, and get
+	 confused because the old value of the variable is overwritten by
+	 later calls to the function.
+
+<forcer> But that's just a wild guess.
+<forcer> "It does not work" always makes it so easy to help people! :-D
+								        [20:41]
+<defanor> yup, thought that too. probably guessing may be useful to not get
+	  stuck in misunderstanding
+<jusss> defanor: a basic simple socket usage of elisp, read from socket and
+	send to it, I just want a simple example
+<forcer> defanor: Yeah. It's a great way of getting stuck in x-y-problems! :-D
+
+<jusss> it's setq problems?
+<defanor> jusss: well, you read with a filter function. try to use `message'
+	  instead of `setq' there, maybe it'll clarify things
+<defanor> also try to use netcat instead of http/irc servers, to control what
+	  a server sends  [20:43]
+<defanor> and to see what a client sends, too
+<forcer> jusss: You might want to explain what exactly you are seeing, and
+	 what exactly you expected to see.
+<jusss> setq setf defvar defparameter let, so confused about how to define a
+	variable and change it now, why not to try like scheme use define to
+	define a function and variable and set! to change a variable
+<forcer> setq is pretty much exactly like set!  [20:46]
+<forcer> Your confusion is greater than just that
+
+<marcx> my understanding defvar - defining top-level variable. let - defining
+	local variable. setq - setting variable (either top level or
+	local). setf a superset of setq that can set a place, like (setf (car
+	list) x)  
+
+-----------------------------------------------------------------------------------------
+reference: http://stackoverflow.com/questions/6162967/simple-tcp-client-examples-in-emacs-elisp
+
+#!/usr/bin/emacs --script
+
+(defvar listen-port 9999
+    "port of the server")
+
+(defvar listen-host "127.0.0.1"
+    "host of the server")
+
+(defun listen-start nil
+    "starts an emacs tcp client listener"
+    (interactive)
+    (make-network-process :name "listen" :buffer "*listen*" :family 'ipv4 :host listen-host :service listen-port :sentinel 'listen-sentinel :filter 'listen-filter))
+
+(defun listen-stop nil
+  "stop an emacs tcp listener"
+  (interactive)
+  (delete-process "listen"))
+
+(defun listen-filter (proc string)   
+  (message string))
+
+(defun listen-sentinel (proc msg)
+  (when (string= msg "connection broken by remote peer\n")
+    (message (format "client %s has quit" proc))))
+
+(listen-start)
+(sleep-for 300)
+(listen-stop)
+
+---------------------------------------------------------------------------
+
+reference:
+http://stackoverflow.com/questions/6162967/simple-tcp-client-examples-in-emacs-elisp
+http://stackoverflow.com/questions/13888555/how-to-make-a-socket-listening-server-by-make-network-process-in-elisp-provide
+https://www.gnu.org/software/emacs/manual/html_node/elisp/Network-Processes.html
