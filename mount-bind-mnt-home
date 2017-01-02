@@ -1,3 +1,35 @@
+sudo mount -o bind ~/tmp ~/tmp2/
+~/tmp有的， ~/tmp2全有
+touch tmp/test2  tmp2下也会有test2
+touch tmp2/test  tmp下也会有test
+sudo umount ~/tmp2
+~/tmp会有test test2,而tmp2会恢复原状
+
+mount -o bind /mnt  ~/
+解决/home空间不足，可以把/mnt挂载到~/,这样/mnt有的，~/全有(覆盖，原本的~/会隐藏？所以建议把~/的配置文件复制到/mnt)
+写入/mnt的会写入到/mnt并且~/下也有，写入~/的也会写入到/mnt,一旦卸载~/, 所有的改动
+都会保存在/mnt, 而原本的~/会不变
+
+为什么不mount -o bind ~/  /mnt呢？这样umount /mnt后所有的改动会保存在~/下，~/本来空间都不足，会撑爆的
+
+挂载A到B, B不变
+
+so what if `sudo mount -o bind /bla2 /bla2/jessie/bla2` 这样就可以在chroot env里修改host系统的/bla2了
+(在朋友的mbp上玩过，它里面有个文件目录里包含整个系统目录，就好比/bla2/whatever里面又能看到/ /bla2 /home根目录，很神奇)
+------------------------------------------------------------------
+<SysGhost> jusss: That is also possible. And if it would prevent you to mount
+       it directly, you can always do a "bind mount": mount -o bind /bla2
+       /bla2/whatevever.
+<jusss> SysGhost: I used my friends mbp latop, and I found there's a directory
+    I forgot that I can see whole / directory, I don't know why
+<jusss> SysGhost: I mean cd /bla2 and ls I saw / /boot /home ... whole /
+    directory show in /bla2, but /bla2 is under /
+<Namarrgon> jusss: you can mount the same filesystem in more than one place 
+<jusss> Namarrgon: with -o bind option?
+<Namarrgon> jusss: yes but they will be implicetly bind-mounts even if you
+        don't specifiy - o bind  
+<Namarrgon> *implicitly
+--------------------------------------------------------------------
 mount -o bind 解决home空间不足
 mount /dev/mmcblk1p1 /mnt
 mount -o bind /mnt ~
