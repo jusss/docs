@@ -1,3 +1,8 @@
+in host system `ip link set wlp3s0 up`  wlp3s0 is your device interface
+in chroot env, you can use `wpa_supplicant -iwlp3s0 -c your-ssid.conf -d` 
+`dhclient wlp3s0` connect to network, then you can use network in chroot env and 
+host system both
+------------------------------------------------------------------------------------
 use wpa_supplicant to connect work in chroot env not host system
 you should use root account in chroot env to do this
 and maybe it need `ip link set wlp3s0(your-network-interface) up` in host system
