@@ -20,6 +20,7 @@ sudo mount -t devtmpfs devtmpfs ./dev
 sudo mount -t tmpfs tmpfs ./dev/shm
 sudo mount -t devpts devpts ./dev/pts
 (或者/bla2/jessie/mount.chroot.sh #!/bin/bash sudo mount ... 然后直接直接mount.chroot.sh)
+(sudo mount -o bind /bla2  /bla2/jessie/bla2 把host系统的/bla2挂载到chroot env里，然后可以在chroot env里修改host的/bla2)
 sudo cp /etc/hosts ./etc/hosts
 sudo cp /etc/resolv.conf  ./etc/resolv.conf
 sudo chroot  .  /bin/bash
