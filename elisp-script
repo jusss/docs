@@ -1,0 +1,4 @@
+#!/usr/bin/emacs --script
+(defvar bla 2)
+...
+(...)
