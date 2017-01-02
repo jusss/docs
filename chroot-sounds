@@ -4,6 +4,6 @@ aptitude install alsa-utils kmod{a} will solve this.
 or try use root account to play
 
 chroot进debian jessie,然后用普通用户播放mp4没声音（装着pulseaudio和alsa，默认
-是pulseaudio，alsamixer显示的声卡是pulseaudio...但是即使选择成正确的声卡还是没声音）
+是pulseaudio，alsamixer显示的声卡是pulseaudio...但是即使选择成正确的声卡还是没声音,已加audio组）
 用root账户播放没有问题，普通用户即使指定-ao alsa还是没声音，然后卸载pulseaudio，然后
 就有声音了。。。
