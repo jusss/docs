@@ -16,3 +16,9 @@ dpkg -i google-chrome-stable.deb
 装完后用google-chrome-stable打开chrome
 
 (chrome自带flash不用像chromium一样安装pepperflash)
+
+debian的chrome，播放bilibili（默认html5播放器）正常，播放acfun的提示adobe flash player is out of date
+使用参数  --allow-outdated-plugins也不行。。。
+使用m.acfun.tv倒是可以播放。。。
+
+使用about:plugins禁用adobe flash，也是可以看bilibili视频的。。。
