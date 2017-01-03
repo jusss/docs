@@ -1,0 +1,18 @@
+chromium安装pepperflashplugin-nonfree一直提示找不到libpepperflash.so
+直接从archlinux里面复制libpepperflash.so给chroot的debian然后访问bilibili正常
+acfun就插件崩溃
+直接从google下载chrome for debian,然后apt-get install google-chrome-stable.deb
+提示一堆依赖没装，然后此时装依赖又一直提示装不上建议用-f install
+原因是此时google-chrome-stable已经装了一堆包了，然后缺的包装不上了（不知道为啥）
+直接apt-get purge google-chrome-stable，然后重新装依赖的包，装上了
+apt-get update （类似pacman -Sy）
+apt-get upgrade （类似pacman -Syu）
+apt-cache search packages-name   or aptitutde search packages-name (like pacman -Ss packages-man)
+apt-get -f install packages-name 自动安装依赖的包
+
+有3个包提示依赖，fonts-liberation libpango 还有个忘了
+apt-get -f install fonts-liberation libpango*
+dpkg -i google-chrome-stable.deb
+装完后用google-chrome-stable打开chrome
+
+(chrome自带flash不用像chromium一样安装pepperflash)
