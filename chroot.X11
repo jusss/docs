@@ -352,3 +352,153 @@ tokland
 1113
         
 Well that just telly me: xauth: error in locking authority file /tmp/kde-panzi/xauth-1000-_0 ... Ah, probably the env vars! – panzi Jul 9 '14 at 0:47
+---------------------------------------------------------------------------------------------------------------------------------------
+
+http://superuser.com/questions/688766/how-to-start-xorg-server-inside-plain-chroot
+There is an article on Gentoo wiki that details the required procedure :
+HOWTO_startx_in_a_chroot.
+The article details how to first sett up the chroot, then how to enter the chroot and configure mainsystem.
+
+Another such article comes from Arch Linux :
+Running graphical applications from chroot.
+
+More for Ubuntu :
+Accessing graphical applications inside the chroot
+Creating a chroot jail with sound and X11
+
+For KDE : Kde4schroot. Since that's the one that's demanded, here are some details:
+
+Replace /etc/schroot/schroot.conf with :
+
+# schroot chroot definitions.
+# See schroot.conf(5) for complete documentation of the file format.
+#
+# Please take note that you should not add untrusted users to
+# root-groups, because they will essentially have full root access
+# to your system.  They will only have root access inside the chroot,
+# but that's enough to cause malicious damage.
+#
+[experimental]
+type=directory
+description=Debian experimental (unstable)
+priority=4
+groups=sbuild,root
+users=kde4
+#root-groups=root,sbuild
+aliases=unstable,default
+#device=/dev/hda_vg/experimental_chroot
+mount-options=-o atime,sync,user_xattr
+location=/home/chroot
+run-setup-scripts=true
+run-exec-scripts=true
+Then replace /etc/schroot/mount-defaults :
+
+# mount.defaults: static file system information for chroots.
+# Note that the mount point will be prefixed by the chroot path
+# (CHROOT_PATH)
+#
+# <file system> <mount point>   <type>  <options>       <dump>  <pass>
+proc            /proc           proc    defaults        0       0
+/dev            /dev            none    rw,bind         0       0
+/dev/pts        /dev/pts        none    rw,bind         0       0
+tmpfs           /dev/shm        tmpfs   defaults        0       0
+/home           /home           none    rw,bind         0       0
+/tmp            /tmp            none    rw,bind         0       0
+Switch to kde4 user:
+
+su - kde4
+Then schroot and type root passwd:
+
+schroot -u root
+Add lenny and experimental repositories to /etc/apt/sources.list:
+
+echo "deb http://ftp.us.debian.org/debian experimental main non-free contrib" >> /etc/apt/sources.list
+echo "deb http://ftp.us.debian.org/debian lenny main" >> /etc/apt/sources.list
+Set up pinning by editing /etc/apt/preferences and adding:
+
+ Package: *
+ Pin: release a=experimental
+ Pin-Priority: 800
+ Package: *
+ Pin: release a=unstable
+ Pin-Priority: 400
+ Package: *
+ Pin: release a=lenny
+ Pin-Priority: 200
+Then run update and install kde4:
+
+aptitude update && aptitude install -t experimental kde4 xorg
+Install kdm:
+
+aptitude install -t experimental kdm
+Then edit /etc/kde4/kdm/kdmrc and change StaticServers and ReserveServers:
+
+StaticServers=:1
+ReserveServers=:2,:3
+Or use gdm (gdm will ask to use another display if DISPLAY :0 is already in use.
+
+aptitude install gdm
+To run a full kde4 session, go to a text virtual terminal(vt) outside the current X session, for example vt2 (ctrl-alt-F2). To login to a full kde4 session run the following:
+
+su - kde4
+schroot
+su (use root passwd here)
+invoke-rc.d kdm start
+And now you should see kdm and should be able to login as kde4 to kde4!
+For more details see the above article.
+
+shareimprove this answer
+edited Jun 30 '14 at 10:32
+community wiki
+3 revs
+harrymc
+        
+Shouldn't this have been a comment instead of an answer? In the best case it's a link only answer. – Cristian Ciupitu Jun 28 '14 at 13:13 
+        
+@CristianCiupitu: As I said above, I'm waiting for his feedback in order to flesh it out with the answer for his (unspecified) Linux distribution. – harrymc Jun 28 '14 at 13:42
+2       
+The problem is all the links are about plain chroot, while the problem is happening using schroot. Moreover, the second two links talk about how to run a chrooted graphical application on a running X server, while the question is about how to run a standalone X-server inside schroot. I tried to get something out of the first link, but so far I've had no success. (My distribution is Debian Wheezy.) – Petr Pudlák Jun 29 '14 at 9:43 
+        
+Some more promising sources : Kde4schroot and chroot jail with sound and X11. Also, have you given thoughts to accounts and permissions? – harrymc Jun 29 '14 at 10:02
+        
+eh, if the original question is in 2013, chances are there's not going to be feedback from the OP. I'd consider having the main points here essential. I'd like to roll back the tag edits however - the instructions are likely to be broadly the same, with distro specific changes and the OP's intentions arn't clear.I'd add that as is, this is a link only answer, and we all tend to hate that. – Journeyman Geek♦ Jun 29 '14 at 14:44
+show 11 more comments
+up vote
+1
+down vote
+I realize this question is old, but for reference:
+
+The screen is displayed and programs run normally, except I got no mouse nor keyboard and I can't switch to a local terminal, forcing me to hard reboot.
+
+I correctly --bind mounted /dev/ /dev/pts /dev/shm /proc /sys /tmp
+In addition to mounting the above, I also had to bind mount /run/udev to make the mouse and keyboard work in my chroot. I did not use an xorg.conf*, and Xorg was able to correctly detect my settings.
+
+Entry in my /etc/schroot/default/fstab:
+
+/run/udev  /run/udev   none    rw,bind     0   0
+
+If you are doing a standard chroot you could obviously put it in your /etc/fstab instead:
+
+/run/udev  /path/to/chroot/run/udev    none    rw,bind     0   0
+
+...or mount --bind it.
+
+*Well-- I tried using an xorg.conf initially, but it didn't work. I also tried adding
+
+
+Section "ServerFlags"
+        Option "AutoAddDevices" "false"
+EndSection
+in xorg.conf, which made my mouse work, but not the keyboard.
+
+shareimprove this answer
+edited Aug 3 '14 at 1:14
+answered Aug 2 '14 at 20:30
+
+transistor1
+1114
+        
+fstab is not a help. It is the same as specifying commands manually. I don't accept answer which say they didn't solve the error. Also, there are no Xorg.conf on gentoo. (If you want to use hand written files, you have to it differently). Last question : how to start a session if you have no virtual keyboard? – user2284570 Aug 2 '14 at 23:56 
+        
+I did solve the error. Are you sure you read this answer completely? The soluton was not fstab. The solution for me was to bind mount /run/udev... I also stated I did not use an xorg.conf. Furthermore -- I did state you could also mount --bind it if you wanted to. – transistor1 Aug 3 '14 at 1:05 
+
