@@ -1,3 +1,38 @@
+挂载点标记 shared, private, slave, unbindable
+shared共享挂载，从共享挂载克隆的挂载对象也是共享的挂载；它们相互传播挂载事件。
+如果两个挂载对象具有共享关系，那么一个挂载对象中的挂载事件会传播到另一个挂载对象，反之亦然。
+private私有挂载，在默认情况下，所有挂载都是私有的。可以用以下命令将挂载对象显式地标为共享挂载：
+mount --make-shared <mount-object>    标为共享
+mount --make-private <mount-object>   标为私有
+mount --make-unbindable <mount-object> 标为不可绑定
+slave从属挂载，如果两个挂载对象形成从属（slave）关系，那么一个挂载对象中的挂载事件会传播到另一个挂载对象
+但是反过来不行；在这种关系中，从属对象是事件的接收者。
+从从属挂载克隆的挂载对象也是从属的挂载，它也从属于原来的从属挂载的主挂载对象。
+mount --make-slave <shared-mount-object>
+递归应用所有子目录
+mount --make-rslave <shared-mount-object>
+
+
+-B, --bind
+      将某个目录树绑定挂载到其它地方，这样就可以同时从两个地方进行访问。
+-R, --rbind
+      将某个目录树绑定挂载到其它地方，并且其子目录如果是挂载点的话也递归的进行绑定。
+
+ mount -t tmpfs tmpfs /tmp
+
+http://www.ibm.com/developerworks/cn/linux/l-mount-namespaces.html
+http://www.jinbuguo.com/man/mount.html
+http://blog.csdn.net/quqi99/article/details/43087001
+https://wiki.gentoo.org/wiki/Chroot
+
+root #mount --rbind /dev /mnt/mychroot/dev
+root #mount --make-rslave /mnt/mychroot/dev
+root #mount -t proc /proc /mnt/mychroot/proc
+root #mount --rbind /sys /mnt/mychroot/sys
+root #mount --make-rslave /mnt/mychroot/sys
+root #mount --rbind /tmp /mnt/mychroot/tmp
+
+-------------------------------------------------------------------------------------------------------
 sudo mount -o bind ~/tmp ~/tmp2/
 ~/tmp有的， ~/tmp2全有
 touch tmp/test2  tmp2下也会有test2
