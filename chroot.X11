@@ -1,3 +1,25 @@
+### use host user 'jusss' to chroot into it, I can play music with mpv, but use host user 'john' to chroot into it, I can't, so weird!
+### what's the different?
+
+### touchpad doesn't work, install synaptics and cp xorg.conf.eeepc to /etc/X11/xorg.conf, config it will be fine!
+### Section "InputClass"
+###         Identifier "touchpad"
+###         Driver "synaptics"
+###         MatchIsTouchpad "on"
+###                 Option "TapButton1" "1"
+###                 Option "TapButton2" "2"
+###                 Option "TapButton3" "3"
+###                 Option "VertEdgeScroll" "on"
+###                 Option "VertTwoFingerScroll" "on"
+###                 Option "HorizEdgeScroll" "on"
+###                 Option "HorizTwoFingerScroll" "on"
+###                 Option "CircularScrolling" "on"
+###                 Option "CircScrollTrigger" "2"
+###                 Option "EmulateTwoFingerMinZ" "40"
+###                 Option "EmulateTwoFingerMinW" "8"
+### EndSection
+                                                     
+-----------------------------------------------------------------------------------------------------------
 chroot里打开Xorg, 不使用host的Xorg
 jusss@tty1 Xorg :0 vt1
 john@tty2 Xorg :1 vt2 (startx -- :1 vt2)
