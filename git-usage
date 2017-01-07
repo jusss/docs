@@ -1,3 +1,39 @@
+修改文件后
+git checkout -- <file> 不保存working tree的修改,回滚到改变前
+
+git add 把working tree修改过的文件添加进index file
+git add之后不想提交分支,就git reset HEAD <file> 
+
+git commit 把index file添加进commit
+commit之后想回滚，就用git reset --hard HEAD <file>回滚到上一次提交
+
+------------------------------------------------------------------------
+git diff 看working tree和index file的区别
+git diff --cached  看index file和commit的区别
+git diff HEAD 看working tree和commit的区别 HEAD代表最近一次commit
+用git reset回滚文件版本
+---------------------------------------------------------------------------------
+git reset --soft  index和working tree不作改变，可以重新commit
+git reset --mixed 只重置index，不重置working tree
+--hard 重置index和working tree, 从给的<commit>之后所有的改变都不保存
+git reset HEAD^ 回到上一个版本(默认working tee不变，只重置index)
+git reset HEAD^ a.py  文件a.py回到上一个版本
+git reset --hard origin/master 将本地的仓库回到和远程的一样
+git reset --hard HEAD~3 a.py 回到3次更改前
+git reset 之前记住当前的commit id(用git log得) 然后git reset --hard HEAD^回到
+上次提交前，可以再用git reset --hard commit-id返回到最新
+----------------------------------------------------------------------
+使用图形化查看工具gitk
+
+git目录里建的文件应该是在working tree, git add之后就是在index file, git commit之后就是在commit
+
+git log --stat a.py看a.py的修改记录
+git log --since=2.weeks 最近2周的提交
+git log --since="2017-01-01" --stat
+git log --stat 查看最近更改的文件
+git log -p -2 查看最近2次的修改
+http://blog.csdn.net/wh_19910525/article/details/7468549
+----------------------------------------------------------------------------
 git log --pretty=oneline file-name 查看文件的commit和commit-hash-id
 git show commit-hash-id 可以看那次commit修改什么
 
