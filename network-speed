@@ -1,0 +1,15 @@
+http://www.binarytides.com/linux-commands-monitor-network/
+
+nethogs wlp3s0 能显示程序 下载速度 上传速度
+
+iftop, tcptrack, netwatch, trafshow,  显示速度 和 连接的ip地址
+
+pktstat 显示连接的ip地址 程序 速度（但是没在archlinux仓库里找到这个包...aur里面有 git clone下载然后make -s编译pacman -U安装）
+
+iptraf-ng 没看明白。。。
+
+bmon, slurm, bwm-ng, nload, cbm, speedometer, netload 显示当前的速度，不显示程序和连接的ip地址
+
+vnstat 记录显示每天每月总流量
+
+ifstat, dstat, collectl 记录每分钟的流量
