@@ -1,0 +1,5 @@
+screen -S session-name -d -m  command
+command结束后screen会自动结束, screen vim 或 screen emacs这样程序阻塞，screen就不会结束
+-d -m 是直接detatch
+screen echo "hi" 就会执行玩echo "hi"直接结束screen
+这样可以用于检测某些程序的结束，当然也可以用bash的符号;
