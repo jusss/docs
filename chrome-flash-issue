@@ -1,0 +1,12 @@
+从google下载的google-chrome-stable.deb，安装后提示
+adobe flash player is out of date
+
+chrome://components
+
+adobe flash player version 0.0.0.0
+
+check for update
+
+if it doesn't work, chrome://plugins  re-enable adobe flash
+
+http://techdows.com/2015/07/fix-chrome-adobe-flash-player-was-blocked-because-it-is-out-of-date-error.html
