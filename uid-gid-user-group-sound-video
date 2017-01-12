@@ -55,9 +55,12 @@ groupmod -g new-gid group-name
 
 sudo groupmod -g 91 video
 sudo groupmod -g 92 audio
+or directly change /etc/group
 
 sound card, ls -l /dev/snd   root 92
 video card, ls -l /dev/dri   root 91
 
 useradd, passwd, usermod, finger, w, who, id, 
-groupadd, groupdel, groupmod, groups
+gpasswd, groupadd, groupdel, groupmod, groups
+
+
