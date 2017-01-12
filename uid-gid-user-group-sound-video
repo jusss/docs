@@ -1,0 +1,63 @@
+$groups john  #see which group john joined, and make sure john is in audio group
+$gpasswd -a john audio
+
+cat /proc/asound/pcm  get the sound card info
+
+no /dev/dsp and /dev/sound
+
+/dev/snd 
+
+https://bbs.archlinux.org/viewtopic.php?id=99234
+
+snd_pcm_oss module provides the /dev/dsp and /dev/sound/dsp stuff.
+
+http://forums.debian.net/viewtopic.php?f=5&t=56038
+
+make the user have right to access /dev/snd/ files, even in chroot environment
+
+<jusss> ls -l /dev/snd , and got crw-rw----+ 1 root   92 116,  2 Jan 12 12:52
+	controlC0, what is 92 116?
+<grawity> you realize that's not actually in the manpage
+<grawity> either way, for chardevs & blockdevs, those are the device's
+	  major/minor number
+<jusss> grawity: and the '+' means ? 
+<grawity> it's got ACLs
+<grawity> `info ls verbose` describes most of it
+<grawity> actually no – 92 is the group ID, 116 is the device major, 2 is the
+	  device minor
+<grawity> (group 92 is 'audio' on non-broken arch systems)
+<jusss> grawity: I use user 'jusss' chroot into a environment, and I can play
+	music, but I use user 'john' chroot into it, and it said 'libGL error:
+	failed to open drm device: Permission denied, libGL error: failed to
+	load driver: 3'   do you know why? john and jusss are both regular
+	user of host system
+<grawity> access to these devices is granted based on what user logged in to
+	  the host system
+<grawity> if you logged in to the host system as 'juss' (UID 1000), then the
+	  audio device has ACLs allowing it to be used by the same 'juss' only
+
+
+libGL error: failed to open drm device: Permission denied
+
+I can already tell your problem is that the login hasn't set correct permissions on /dev/dri/*. This is normal (not a bug) for tty logins, but should be resolved automatically with graphical logins (lightdm).
+
+https://bugs.launchpad.net/compiz/+bug/1302270
+
+http://unix.stackexchange.com/questions/33844/change-gid-of-a-specific-group
+
+groupmod -g new-gid group-name
+
+91 is audio, 92 is video
+
+/etc/group  group id
+/etc/passwd  user id
+/etc/shadow  user password
+
+sudo groupmod -g 91 video
+sudo groupmod -g 92 audio
+
+sound card, ls -l /dev/snd   root 92
+video card, ls -l /dev/dri   root 91
+
+useradd, passwd, usermod, finger, w, who, id, 
+groupadd, groupdel, groupmod, groups
