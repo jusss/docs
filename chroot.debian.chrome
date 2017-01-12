@@ -22,3 +22,6 @@ debian的chrome，播放bilibili（默认html5播放器）正常，播放acfun�
 使用m.acfun.tv倒是可以播放。。。
 
 使用about:plugins禁用adobe flash，也是可以看bilibili视频的。。。
+
+sometimes, just run `apt-get -f install`  without any package
+apt-get autoremove
