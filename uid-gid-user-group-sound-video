@@ -81,9 +81,12 @@ because /bla2 is owned by uid 1000 gid 1000, rw-r--r--
 in chroot, groupadd -g 1000 host_group
 gpasswd -a john host_group
 
-in host, chmod 770 /bla2
-chmod -R 770 /bl2
+in host
+chmod 660 /bl2/*
+cd /bla2
+find . -maxdepth 1 -type d | xargs chmod 770 -
 
 or chmod -R 740 /bla2,  user in chroot can read /bla2 but can't write /bla2
 
 maybe set /bla2  sgid and sbit will be better than this for sharing one partition
+
