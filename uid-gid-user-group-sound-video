@@ -73,3 +73,17 @@ so change john's id with usermod and groupmod
 man usermod, uid range is 1000 to 60000, 
 groupmod -g 60000 john
 usermod -u 60000 -g 60000 john
+
+now, chroot user john is uid 60000 and gid 60000
+john can't change anything in /bla2
+because /bla2 is owned by uid 1000 gid 1000, rw-r--r--
+
+in chroot, groupadd -g 1000 host_group
+gpasswd -a john host_group
+
+in host, chmod 770 /bla2
+chmod -R 770 /bl2
+
+or chmod -R 740 /bla2,  user in chroot can read /bla2 but can't write /bla2
+
+maybe set /bla2  sgid and sbit will be better than this for sharing one partition
