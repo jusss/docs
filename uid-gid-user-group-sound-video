@@ -64,3 +64,12 @@ useradd, passwd, usermod, finger, w, who, id,
 gpasswd, groupadd, groupdel, groupmod, groups
 
 
+in chroot, john uid is 1000, in host system jusss id is 1000
+and they gid also are same 1000
+so john touch files, it will be jusss's
+because they have same user id and same group id
+so change john's id with usermod and groupmod
+
+man usermod, uid range is 1000 to 60000, 
+groupmod -g 60000 john
+usermod -u 60000 -g 60000 john
