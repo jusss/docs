@@ -1,0 +1,10 @@
+find . -maxdepth 1 -f d     will output  like  
+./a
+./b
+./c
+
+not ./a ./b ./c  so find . -maxdepth 1 -f d | ls -l - will not work proper
+
+so use xargs, filter new-line
+
+find . -maxdepth 1 -f d | xargs ls -l -
