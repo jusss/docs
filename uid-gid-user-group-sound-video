@@ -85,8 +85,11 @@ in host
 chmod 660 /bl2/*
 cd /bla2
 find . -maxdepth 1 -type d | xargs chmod 770 -
+run find command where you want share with chroot user, then use chroot user touch file,
+and the file will be owned by uid 60000 gid 60000 even in the host system
 
 or chmod -R 740 /bla2,  user in chroot can read /bla2 but can't write /bla2
 
 maybe set /bla2  sgid and sbit will be better than this for sharing one partition
+
 
