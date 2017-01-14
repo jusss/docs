@@ -1,0 +1,42 @@
+$ cat /proc/asound/cards  find your second sound card
+$aplay -l  find your second sound card's id and device id
+
+**** List of PLAYBACK Hardware Devices ****
+card 0: PCH [HDA Intel PCH], device 0: ALC270 Analog [ALC270 Analog]
+  Subdevices: 1/1
+  Subdevice #0: subdevice #0
+card 0: PCH [HDA Intel PCH], device 3: HDMI 0 [HDMI 0]
+  Subdevices: 1/1
+  Subdevice #0: subdevice #0
+card 1: Device [USB Audio Device], device 0: USB Audio [USB Audio]
+  Subdevices: 0/1
+  Subdevice #0: subdevice #0
+
+card 1, device 0
+
+$vim ~/.asoundrc 
+pcm.!default{
+        type hw
+        card 1
+}
+
+ctl.!default{
+        type hw 
+        card 1
+}
+
+it's done! this is for alsa
+-----------------------------------------------------------------------------------------
+or 
+$ sudo vim /etc/asound.conf 
+defaults.pcm.card 1
+defaults.pcm.device 3
+defaults.ctl.card 1
+
+----------------------------------------------------------------------------------
+
+http://blog.csdn.net/lophyxp/article/details/14228735
+https://wiki.archlinux.org/index.php/Advanced_Linux_Sound_Architecture_%28%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87%29#.E8.AE.BE.E7.BD.AE.E9.BB.98.E8.AE.A4.E5.A3.B0.E5.8D.A1
+
+Warning: Simply setting a type hw as default card is equivalent to addressing hardware directly, which leaves the device unavailable to other applications. This method is only recommended if it is a part of a more sophisticated setup ~/.asoundrc or if user deliberately wants to address sound card directly (digital output through eic958 or dedicated music server for example).
+
