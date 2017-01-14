@@ -1,0 +1,12 @@
+bl-d88 mediatek mt7601u
+kernel 4.2 have already contained mt7601u, and plugin bl-d88 wifi card
+see dmesg says 'load mt7601u.bin failed,
+on debian install firmware-misc-nonfree
+on archlinux install linux-firmware (you can use pacman -Fs mt7601u.bin get it)
+
+/lib/firmware/mt7601u.bin
+
+ip link or ifconfig -a get the interface name
+wpa_suplicant -i interface-name -c wpa.conf -d
+
+oh fuck, I forget my router has MAC address filter...
