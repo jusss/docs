@@ -1,0 +1,26 @@
+sound card, UGREEN 30143, chips C-Media HS-100B, linux kernel contains this driver
+plug it in, then `aplay -l` get card id, then config ~/.asoundrc, if card id is 1, then
+pcm.!default{
+        type hw
+        card 1
+}
+
+ctl.!default{
+        type hw 
+        card 1
+}
+
+
+wifi card, netcore nw360, linux driver r8712u, linux kernel contains this driver
+plug it in, `ifconfig -a` or `ip link` will show the interface name
+
+wifi card, B-LINK BL-D88, chips Mediatek mt7601u, linux kernel > 4.2 contains this driver
+but if you get 'load mt7601u.bin failed' from dmesg, then 
+on debian install firmware-misc-nonfree
+on archlinux install linux-firmware
+then `ip link` will show the interface name
+you can use `wpa_supplicant -i interface-name -c wpa.conf -d connect to the network.
+
+and don't forget check your router MAC address filter if you set that
+
+
