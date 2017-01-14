@@ -24,3 +24,24 @@ reference:
 http://lnmcc.net/2013/03/28/%E7%BC%96%E8%AF%91%E5%8D%95%E4%B8%AAlinux-kernel-%E6%A8%A1%E5%9D%97/
 https://wiki.centos.org/HowTos/BuildingKernelModules
 
+-----------------------------------------------------------------------------------------------
+compile mt7601u for bl-d88 wifi wireless card
+
+kernel 4.2 contains a driver for mediatek mt7601u
+
+cd  linux-4.4.1/drivers/net/wireless/mediatek/mt7601u
+
+vim Makefile and know it's CONFIG_MT7601U
+
+search linux-4.4.1/.config and not found CONFIG_MT7601U
+
+add 'CONFIG_MT7601U=m' into .config
+
+then make M=drivers/net/wireless/mediatek/mt7601u
+ 
+forget that, 4.2 have already contain mt7601u, and plugin bl-d88 wifi card
+see dmesg says 'load mt7601u.bin failed,
+on debian install firmware-misc-nonfree
+on archlinux install linux-firmware (you can use pacman -Fs mt7601u.bin get it)
+
+/lib/firmware/mt7601u.bin
