@@ -23,4 +23,5 @@ you can use `wpa_supplicant -i interface-name -c wpa.conf -d connect to the netw
 
 and don't forget check your router MAC address filter if you set that
 
-
+b-link bl-d88 mt7601u can use wpa_supplicant -D nl80211
+netcore nw360 r8712u only use wpa_supplicant -D wext
