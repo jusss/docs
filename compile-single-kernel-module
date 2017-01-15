@@ -45,3 +45,31 @@ on debian install firmware-misc-nonfree
 on archlinux install linux-firmware (you can use pacman -Fs mt7601u.bin get it)
 
 /lib/firmware/mt7601u.bin
+
+---------------------------------------------------------------------
+
+netcore nw360 rtl8191s
+vim drivers/net/wireless/realtek/  know rtl8191s is rtl8xxxu
+CONFIG_RTL8XXXU=m in .config
+make prepare
+make scripts
+make -j `nproc`
+rtl8xxxu.ko will be compiled
+
+-----------------------------------------------------------------------
+make menuconfig 
+press '/' search MT7601 then get WL_MEDIATEK should be y or m
+in .config
+CONFIG_WL_MEDIATEK=y 
+CONFIG_MT7601U=m
+
+make prepare
+make scripts
+make -j `nproc`
+
+because WL_MEDIATEK is y, so you need change the kernel for mt7601u
+
+-------------------------------------------------------------------------
+copy bzImage and those two modules rtl8xxxu.ko and mt7601u.ko to the system
+replace kernel, and try insert ko, then get Unknown symbol in module 
+so try replace all modules with make xxx
