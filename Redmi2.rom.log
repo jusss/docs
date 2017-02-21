@@ -87,9 +87,6 @@ xsdl就不会卡了, fcitx记得用fcitx-configtool把Trigger Input Method由Ctr
 就是改下fcitx的字体为文泉译正黑，字体大小为10,fcitx里只留english and pinyin即可
 
 
-
-
-
-
-
-
+安装aicp nightly 2017.02.20包，用音量-+电源键 三个键一起按进入recovery mode,把gapps 7.1.1和supersu一起装了在recovery mode
+这个包在设置里一点开发者模式就死机
+包和gapps从xda下载
