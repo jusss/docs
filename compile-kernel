@@ -27,3 +27,9 @@ the name 4.9.3 it's /lib/modules/4.9.3
 mkinitramfs -o initrd.img-4.9.3 4.93
 
 mkinitramfs is for debian, and mkinitcpio is for archlinux
+
+blkid /dev/mmcblk0p20 get the uuid
+then use 
+`search --no-floppy --fs-uuid --set=root your-uuid`
+`linux root=UUID=xxxx` in grub
+
