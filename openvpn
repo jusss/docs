@@ -2,6 +2,8 @@ https://www.linode.com/docs/networking/vpn/set-up-a-hardened-openvpn-server
 https://www.linode.com/docs/networking/vpn/configuring-openvpn-client-devices
 https://www.linode.com/docs/networking/vpn/tunnel-your-internet-traffic-through-an-openvpn-server
 
+https://www.linode.com/docs/networking/vpn/secure-communications-with-openvpn-on-ubuntu-12-04-precise-and-debian-7
+
 记得把ta.key放到/etc/openvpn/  因为/etc/openvpn/server.conf tls-auth ta.key 0所以要放到/etc/openvpn/下
 生成或许是在/etc/openvpn/easy-rsa/keys/
 
