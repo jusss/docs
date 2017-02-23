@@ -1,0 +1,91 @@
+https://www.linode.com/docs/networking/vpn/set-up-a-hardened-openvpn-server
+https://www.linode.com/docs/networking/vpn/configuring-openvpn-client-devices
+https://www.linode.com/docs/networking/vpn/tunnel-your-internet-traffic-through-an-openvpn-server
+
+记得把ta.key放到/etc/openvpn/  因为/etc/openvpn/server.conf tls-auth ta.key 0所以要放到/etc/openvpn/下
+生成或许是在/etc/openvpn/easy-rsa/keys/
+
+journalctl |grep vpn 查看vpn log
+systemctl start openvpn
+systemctl enable openvpn
+
+client need five files: ca.crt client1.crt client1.key client.ovpn ta.key
+this five files should stored in sdcard root path
+手机 setting-security-install certificates from sdcard, install ca.crt
+open openvpn and import client.ovpen then click connect will be ok
+
+
+https://www.linode.com/docs/networking/vpn/set-up-a-hardened-openvpn-server
+
+apt-get install openvpn
+gunzip -c /usr/share/doc/openvpn/examples/sample-config-files/server.conf.gz > /etc/openvpn/server.conf
+make-cadir /etc/openvpn/easy-rsa && cd /etc/openvpn/easy-rsa/
+ln -s openssl-1.0.0.cnf openssl.cnf
+
+/etc/openvpn/server.conf
+ca /etc/openvpn/easy-rsa/keys/ca.crt
+cert /etc/openvpn/easy-rsa/keys/server.crt
+key /etc/openvpn/easy-rsa/keys/server.key  # This file should be kept secret
+dh /etc/openvpn/dh4096.pem
+
+/etc/openvpn/easy-rsa/vars
+export KEY_COUNTRY="US"
+export KEY_PROVINCE="CA"
+export KEY_CITY="SanFrancisco"
+export KEY_ORG="Fort-Funston"
+export KEY_EMAIL="me@myhost.mydomain"
+export KEY_OU="MyOrganizationalUnit"
+
+cd /etc/openvpn/easy-rsa && source ./vars
+./clean-all
+openssl dhparam 4096 > /etc/openvpn/dh4096.pem
+
+/etc/openvpn/server.conf
+tls-auth /etc/openvpn/easy-rsa/keys/ta.key 0 # This file is secret
+
+openvpn --genkey --secret /etc/openvpn/easy-rsa/keys/ta.key
+adduser --system --shell /usr/sbin/nologin --no-create-home openvpn_server
+
+cp /etc/openvpn/easy-rsa/keys/ta.key to /etc/openvpn/  #because in server.conf, it's tls-auth ta.key it will find it on /etc/openvpn/
+
+/etc/openvpn/server.conf
+user openvpn_server
+group nogroup
+
+echo 'cipher AES-256-CBC' >> /etc/openvpn/server.conf
+echo 'auth SHA512' >> /etc/openvpn/server.conf
+echo 'tls-cipher TLS-DHE-RSA-WITH-AES-256-GCM-SHA384:TLS-DHE-RSA-WITH-AES-128-GCM-SHA256:TLS-DHE-RSA-WITH-AES-256-CBC-SHA:TLS-DHE-RSA-WITH-CAMELLIA-256-CBC-SHA:TLS-DHE-RSA-WITH-AES-128-CBC-SHA:TLS-DHE-RSA-WITH-CAMELLIA-128-CBC-SHA' >> /etc/openvpn/server.conf        
+
+cd /etc/openvpn/easy-rsa
+./build-ca
+./build-key-server server
+cd /etc/openvpn/easy-rsa && source ./vars && ./build-key client1
+
+cp /usr/share/doc/openvpn/examples/sample-config-files/client.conf /etc/openvpn/easy-rsa/keys/client.ovpn
+/etc/openvpn/easy-rsa/keys/client.ovpn
+remote your-server-ip 1194
+
+/etc/openvpn/easy-rsa/keys/client.ovpn
+user nobody
+group nogroup
+
+ca /path/to/ca.crt
+cert /path/to/client1.crt
+key /path/to/client1.key
+tls-auth /path/to/ta.key 1
+cipher AES-256-CBC
+auth SHA512
+tls-cipher TLS-DHE-RSA-WITH-AES-256-GCM-SHA384:TLS-DHE-RSA-WITH-AES-128-GCM-SHA256:TLS-DHE-RSA-WITH-AES-256-CBC-SHA:TLS-DHE-RSA-WITH-CAMELLIA-256-CBC-SHA:TLS-DHE-RSA-WITH-AES-128-CBC-SHA:TLS-DHE-RSA-WITH-CAMELLIA-128-CBC-SHA
+
+now, get these five files to your android phone: 
+/etc/openvpn/easy-rsa/keys/ca.crt
+/etc/openvpn/easy-rsa/keys/client1.crt
+/etc/openvpn/easy-rsa/keys/client1.key
+/etc/openvpn/easy-rsa/keys/client.ovpn
+/etc/openvpn/easy-rsa/keys/ta.key
+
+systemctl start openvpn
+
+
+install ca.crt on phone , settings-security-install certificates from sdcard
+install openvpn from google play, open it and import client.ovpn 
