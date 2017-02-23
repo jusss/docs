@@ -91,3 +91,54 @@ systemctl start openvpn
 
 install ca.crt on phone , settings-security-install certificates from sdcard
 install openvpn from google play, open it and import client.ovpn 
+
+----------------------------------------------------------------------------------------------------------------
+搞完上面这些发现可以连到openvpn server,但不进行网络转发，需要配置下iptables
+
+cat /dev/net/tun 如果返回File descriptor in bad state说明tun/tap已经可以使用
+如果是No such device就说明没有被正确配置，发ticket给客服联系开头tun/tap
+
+https://www.linode.com/docs/networking/vpn/secure-communications-with-openvpn-on-ubuntu-12-04-precise-and-debian-7
+
+vim /etc/openvpn/server.conf
+push "redirect-gateway def1 bypass-dhcp"
+
+开启ip转发
+nano /etc/sysctl.conf
+net.ipv4.ip_forward=1
+
+echo 1 > /proc/sys/net/ipv4/ip_forward
+
+用ifconfig可知tun0接口是10.8.0.1 
+
+iptables -A FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT
+iptables -A FORWARD -s 10.8.0.0/24 -j ACCEPT
+iptables -A FORWARD -j REJECT
+iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -o eth0 -j MASQUERADE
+iptables -A INPUT -i tun+ -j ACCEPT
+iptables -A FORWARD -i tun+ -j ACCEPT
+iptables -A INPUT -i tap+ -j ACCEPT
+iptables -A FORWARD -i tap+ -j ACCEPT
+
+把上面这段iptables保存成openvpn.iptables.sh方便重新后运行
+
+服务器上装个dnsmasq，开启dns server功能
+apt-get install dnsmasq resolvconf
+nano /etc/dnsmasq.conf
+server=8.8.8.8
+listen-address=10.8.0.1
+bind-interfaces
+
+systemctl restart dnsmasq
+systemctl enable dnsmasq
+systemctl enable openvpn
+
+服务器给客户端指定dns为10.8.0.1即服务器自身，而服务器开着dnsmasq监听自身，这样就会由服务器来当客户端的dns服务器
+nano /etc/openvpn/server.conf
+push "dhcp-option DNS 10.8.0.1"
+
+systemctl restart openvpn
+
+从服务器上把/etc/openvpn/easy-rsa/keys/里的ca.crt client1.crt client1.key client.ovpn ta.key
+都下载到手机sdcard根目录里，设置-安全-安装证书 安装ca.crt然后用openvpn导入client.ovpn文件,点击connect即可连接成功并转发
+
