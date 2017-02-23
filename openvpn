@@ -142,3 +142,7 @@ systemctl restart openvpn
 从服务器上把/etc/openvpn/easy-rsa/keys/里的ca.crt client1.crt client1.key client.ovpn ta.key
 都下载到手机sdcard根目录里，设置-安全-安装证书 安装ca.crt然后用openvpn导入client.ovpn文件,点击connect即可连接成功并转发
 
+-------------------------------------------------------------------------------------------
+linux 配置openvpn client
+https://www.linode.com/docs/networking/vpn/configuring-openvpn-client-devices
+
