@@ -122,15 +122,20 @@ iptables -A FORWARD -i tap+ -j ACCEPT
 
 把上面这段iptables保存成openvpn.iptables.sh方便重新后运行
 
-服务器上装个dnsmasq，开启dns server功能,登录你的linode从remote access查到你的dns resolvers,比如是1.1.1.1
+服务器上装个dnsmasq，开启dns server功能,登录你的linode从remote access查到你的dns resolvers,比如是1.1.1.1, 2.2.2.2
+参考http://www.knowsky.com/888297.html
 apt-get install dnsmasq resolvconf
 nano /etc/dnsmasq.conf
 server=1.1.1.1
-resolv-file=/etc/resolv.conf
+resolv-file=/etc/resolv.dnsmasq.conf
+strict-order
 listen-address=10.8.0.1
 bind-interfaces
 
-/etc/resolv.conf改成查到的dns resolvers,或者不改
+vim /etc/resolv.dnsmasq.conf
+nameserver 1.1.1.1
+nameserver 2.2.2.2
+nameserver 8.8.8.8
 
 systemctl restart dnsmasq
 systemctl enable dnsmasq
