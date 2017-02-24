@@ -1,0 +1,49 @@
+there's also the openvpn-client@.service unit for openvpn client, not just network-manager-gnome stuff gui.
+OpenVPN is an extremely versatile piece of software and many configurations are possible, in fact machines can be both "servers" and "clients", blurring the distinction between server and client.
+With the release of v2.4, server configurations are stored in /etc/openvpn/server and client configurations are stored in /etc/openvpn/client and each mode has its own respective systemd unit, namely,  openvpn-client@.service and openvpn-server@.service.
+
+the default server port is udp 1194, and you can change it in server.conf, and 
+remember change the client.conf at the same time, try port 443 proto tcp maybe is a better idea because it confused some sniffers, but tpc is really slowly, so use udp
+the config files are not same path in Debian and Archlinux, it's /etc/openvpn/server.conf on Debian, but /etc/openvpn/server/server.conf on Archlinux
+
+/etc/openvpn/server.conf
+    port 1194
+    proto udp
+    server 10.8.0.0 255.255.255.0
+push "redirect-gateway def1 bypass-dhcp"
+ push "dhcp-option DNS 10.8.0.1"
+
+https://wiki.debian.org/openvpn%20for%20server%20and%20client
+https://wiki.archlinux.org/index.php/Openvpn
+
+
+iptables
+In order to allow VPN traffic through your iptables firewall of your server, first create an iptables rule for NAT forwarding [3] on the server, assuming the interface you want to forward to is named eth0:
+iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -o eth0 -j MASQUERADE
+If you have difficulty pinging the server through the VPN, you may need to add explicit rules to open up TUN/TAP interfaces to all traffic. If that is the case, do the following [4]:
+Warning: There are security implications for the following rules if you do not trust all clients which connect to the server. Refer to the OpenVPN documentation on this topic for more details.
+iptables -A INPUT -i tun+ -j ACCEPT
+iptables -A FORWARD -i tun+ -j ACCEPT
+iptables -A INPUT -i tap+ -j ACCEPT
+iptables -A FORWARD -i tap+ -j ACCEPT
+---------------------------------------------------------------
+run openvpn via systemctl start openvpn or openvpn /etc/openvpn/server.conf
+for ip forward run 'echo 1 > /proc/sys/net/ipv4/ip_forward'
+or change it 'net.ipv4.ip_forward = 1' in /etc/sysctl.conf
+then do the NAT
+iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -o eth0 -j MASQUERADE
+This assumes you have set up your openvpn server with the IP 10.8.0.0 in the server.conf file as described above.
+----------------------------------------------------------------------
+run the client on Debian
+aptitude install openvpn resolvconf
+/etc/openvpn/easy-rsa/keys/client.ovpn
+up /etc/openvpn/update-resolv-conf
+down /etc/openvpn/update-resolv-conf
+
+then run openvpn --script-security 2 --config /etc/openvpn/client.conf &
+-------------------------------------------------------------------
+cp ca.crt client.ovpn client1.crt client1.key ta.key to the same directory
+sudo openvpn --script-security 2 --config ./client.ovpn 
+it works!
+
+You'll need the --script-security setting to get the update-resolv-conf script to execute. You can place this setting in the client.conf file if you like.
