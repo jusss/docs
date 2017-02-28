@@ -206,3 +206,9 @@ sudo openvpn --script-security 2 --config ./client.ovpn
 it works!
 
 You'll need the --script-security setting to get the update-resolv-conf script to execute. You can place this setting in the client.conf file if you like.
+----------------------------------------------------------------------------------------------------------------------
+issues 1. run --script-security 2 get error  on Archlinux, but no error on Debian
+ /usr/bin/ip route add x via x
+ ERROR: Linux route add command failed: external program exited with error status: 2
+so try vim /etc/resolv.conf  and change nameserver 10.8.0.1   it will works fine
+
