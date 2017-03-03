@@ -1,0 +1,90 @@
+StartSSL free certificate, valid for one year
+Let's Encrypt, valid for three months, but auto-renewal with certbot or letsencrypt.sh
+on Debian vim /etc/apt/sources.list add deb http://httpredir.debian.org/debian jessie-backports main contrib non-free 
+then apt-get update
+apt-get install certbot
+#pacman -S letsencrypt
+#mkdir /etc/letsencrypt/configs
+#vim /etc/letsencrypt/configs/example.com.conf
+ domains = example.com
+ rsa-key-size=2048
+ email=x@x.com
+ text=True
+ authenticator=webroot
+ webroot-path=/var/www/example (like /usr/share/nginx/www)
+    
+it will generate /var/www/example/.well-known/acme-challenge
+and it will auto visit http://www.example.com/.well-known/acme-challenge for auth
+
+(#certbot -c /etc/letencrypt/configs/example.com.con certonly)
+#letsencrypt -c /etc/letencrypt/configs/example.com.conf certonly
+the certificate will generate in /etc/letencrypt/live/example.com/
+cert.pem  server cert only
+privkey.pem private key
+chain.pem intermediates
+fullchain.pem server cert + intermediates
+------------------------------------------------------------------------------
+auto-renewal
+#vim /etc/systemd/system/letsencrypt.service
+[Unit]
+Description=Let's Encrypt renewal
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/letsencrypt renew  #or /usr/bin/certbot on Debian
+ExecStartPost=/bin/systemctl reload nginx.service
+
+vim /etc/systemd/system/letsencrypt.timer
+[Unit]
+Description=monthly renewal of letsencrypt
+
+[Timer]
+OnCalendar=daily  ##or use weekly
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+
+systemctl enable letsencrypt.timer
+systemctl start letsencrypt.timer
+-----------------------------------------------------------------------
+Config for Nginx
+
+#mkdir /etc/nginx/ssl
+#openssl dhparam -out /etc/nginx/ssl/dhparam.pem 2048
+
+use mozilla.github.io/server-side-tls/ssl-config-generator to generate config file for nginx
+copy them to /etc/nginx/site-available/default and remeber root /usr/share/nginx/www;  index index.html
+
+vim /etc/nginx/site-available/example.com
+server{
+root /usr/share/nginx/www;
+index index.html;
+listen 443 ssl;    ###enable http2 module, but nginx on Debian don't enable http2 module defaultly
+ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem;  ### change example.com to your domain
+ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
+ssl_dhparam /etc/nginx/ssl/dhparam.pem;
+ssl_trusted_certificate /etc/letsencrypt/live/example.com/root_ca_cert_plus_intermediates; ###this line can be comment, otherwise you need down load Lets Encrypt's root certificate and run the next section
+resolver your.vps's.dns.server; ###like resolver 106.187.90.5;
+}
+
+#cd /etc/letsencrypt/live/example.com
+#wget https://letsencrypt.org/certs/isrgrootx1.pem
+#mv isrgrootx1.pem root.pem
+#cat root.pem chain.pem > root_ca_cert_plus_intermediates
+
+#systemctl restart nginx
+
+reference: ksmx.me/letsencrypt-ssl-https/amp/
+-------------------------------------------------------------------------
+another way without certbot
+
+#openssl genrsa 4096 > account.key
+#openssl genrsa 4096 > domain.key
+#openssl req -new -sha256 -key domain.key -out domain.csr
+
+the traditional auth way is sending mail to you mailbox, but Let's Encrypt is generate a random file on your server,
+then you need visit your domain that your CSR wrote
+
+use acme-tiny.py to generate signed.crt
+
+see https://imququ.com/post/letsencrypt-certificate.html
