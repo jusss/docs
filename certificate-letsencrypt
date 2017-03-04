@@ -53,9 +53,9 @@ Config for Nginx
 #openssl dhparam -out /etc/nginx/ssl/dhparam.pem 2048
 
 use mozilla.github.io/server-side-tls/ssl-config-generator to generate config file for nginx
-copy them to /etc/nginx/site-available/default and remeber root /usr/share/nginx/www;  index index.html
+copy them to /etc/nginx/sites-available/example.com 
 
-vim /etc/nginx/site-available/example.com
+vim /etc/nginx/sites-available/example.com and symlink it to sites-enable/ to enable it
 server{
 root /usr/share/nginx/www;
 index index.html;
@@ -67,12 +67,17 @@ ssl_trusted_certificate /etc/letsencrypt/live/example.com/root_ca_cert_plus_inte
 resolver your.vps's.dns.server; ###like resolver 106.187.90.5;
 }
 
+#ln -s /etc/nginx/sites-available/example.com /etc/nginx/sites-enabled/sites-enable/example.com
+
 #cd /etc/letsencrypt/live/example.com
 #wget https://letsencrypt.org/certs/isrgrootx1.pem
 #mv isrgrootx1.pem root.pem
 #cat root.pem chain.pem > root_ca_cert_plus_intermediates
 
 #systemctl restart nginx
+
+I don't know why ../sites-available/example.com doesn't work, but I change its name to ../sites-available/default, it works.
+try use ln -s with full path not relative path, it works!
 
 reference: ksmx.me/letsencrypt-ssl-https/amp/
 -------------------------------------------------------------------------
