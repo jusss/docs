@@ -1,3 +1,4 @@
+or use xrandr --output your-screen --brightness 0.5  
 [jusss@arch ~]$ cat /sys/class/backlight/intel_backlight/brightness 
 3905
 [jusss@arch ~]$  cat /sys/class/backlight/intel_backlight/max_brightness 
