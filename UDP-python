@@ -1,0 +1,36 @@
+https://wiki.python.org/moin/UdpCommunication
+
+sending
+
+import socket
+udp_addr=('127.0.0.1',5000)
+msg='hello'
+sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+sock.sendto(msg,udp_addr)
+
+不用建立连接，不用connect, 直接写地址发信息
+
+receiving
+import socket
+udp_addr=('127.0.0.1',5000)
+sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+sock.bind(udp_addr)
+while True:
+      data, addr = sock.recvfrom(1024) # buffer size is 1024 bytes
+      print "received message:", data
+接收信息直接bind端口就可以接收信息了，不用listen accept
+
+
+只有当server bind之后，才可以直接在client里用sendto发信息给server,
+然后client里不需要bind也可以直接从client的socket里读取server返回的信息,server会用sendto发信息给client
+
+对于client来说，直接用sendto向服务器地址发信息，直接从socket里recvfrom读取信息
+
+对于server来说，bind地址和端口后，可以从socket里recvfrom读信息和地址,不可以直接向
+socket里写信息，需要用sendto发信息给client, 
+
+client: 建立socket，这个socket的sendto直接向server发信息，直接从这个socket recvfrom读信息和地址
+server: 建立socket, bind地址和端口，直接从socket recvfrom读信息，不能像tcp一样直接向socket写信息,而是用sendto发信息
+UDP发包必须提供目的地址
+
+就是在内网里，因为有NAT, 所以还是可以在服务器上用sendto发信息给客户端的，只要不关闭socket就行
