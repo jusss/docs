@@ -1,7 +1,38 @@
+mkdir ~/.ssh
+chmod 700 ~/.ssh
+cd ~/.ssh
+ssh-keygen -t rsa -b 4096 -f ./key-file-name
 1.把openssh生成的公钥~/.ssh/id_rsa.pub内容复制到github.com上,settings-SSH Keys-Add SSh key然后把id_rsa.pub的内容粘帖
   如果id_rsa.pub没在本地存放,就去vps上把~/.ssh/authorized_keys的内容复制到github上
 2.ssh -T git@github.com测试下,看到Hi username! You've successfully authenticated, but GitHub does
   not provide shell access.说明可以用了
+如果是多个用户用-i指定密钥
+ssh -T git@github.com -i ./.ssh/key-file-name
+
+2.5  cd .ssh
+    eval $(ssh-agent)
+    ssh-add -l
+    
+vim .ssh/config
+# Default GitHub
+Host github.com
+    HostName github.com
+    PreferredAuthentications publickey
+    IdentityFile ~/.ssh/id_rsa
+
+# Work GitHub
+Host work.github.com
+    HostName github.com
+    PreferredAuthentications publickey
+    IdentityFile ~/.ssh/id_rsa_work
+
+ssh-add ~/.ssh/your-second-ssh-key-file-for-github
+ssh -T git@github.com
+ssh -T git@work.github.com    
+http://stackoverflow.com/questions/3225862/multiple-github-accounts-ssh-config
+把下面的git@github.com改成git@work.github.com for the second account on github
+ like git remote set-url dns-proxy git@dimensions47.github.com:dimensions47/dns-proxy.git
+
 3.改变https登录为ssh
 [jusss@localhost tmp]$ git remote -v
 tmp     https://github.com/jusss/tmp.git (fetch)
