@@ -1,0 +1,8 @@
+archlinux python3.5.1
+local_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM
+ query_data, query_addr = local_socket.recvfrom(recv_send_size)
+
+debian python3.4.2
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+query_addr, query_data = client_socket.recvfrom(recv_send_size)[::-1]
+
