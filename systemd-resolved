@@ -6,3 +6,5 @@ https://www.reddit.com/r/linux/comments/2m2ofi/systemdresolved_dns_cache_poisoni
 
 systemctl stop systemd-resolved
 systemctl disable systemd-resolved
+
+if you enable it, it will overwrite /etc/resolv.conf nameserver 127.0.0.53
