@@ -1,3 +1,5 @@
+awesome会强制自动调整窗口大小适应屏幕，即使你指定了窗口尺寸和位置也不行
+窗口被auto-resized, fuck! 使用python脚本弹个窗，直接占了半个屏幕
 Mod4 + Enter 打开一个终端
 Mod4 + r 运行命令
 Mod4 + Shift + c 关掉当前窗口
