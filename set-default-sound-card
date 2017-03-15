@@ -1,3 +1,26 @@
+set ~/.asoundrc just work for mpv not chromium
+set /etc/asound.conf work for mpv and chromium
+
+$aplay -l 
+card 1: bytcrrt5640 [bytcr-rt5640], device 0: 1 []
+card 1: bytcrrt5640 [bytcr-rt5650], device 1: Deep-Buffer Audio (*) []
+
+~/.asoundrc
+pcm.!default{
+    type hw
+    card 1
+}
+ctl.!default{
+    type hw
+    card 1
+}
+
+/etc/asound.conf
+defaults.pcm.card 1
+defaults.pcm.device 1
+defaults.ctl.card 1
+
+----------------------------------------------------------------------------
 if next sections don't work, then remove pulseaudio, just leave alsa alone
 -------------------------------------
 $ cat /proc/asound/cards  find your second sound card
