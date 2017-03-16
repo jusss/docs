@@ -1,0 +1,3 @@
+find /path/you/want |cpio -o > x.cpio
+
+cpio -i < x.cpio
