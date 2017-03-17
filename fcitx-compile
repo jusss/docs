@@ -1,3 +1,7 @@
+不是fcitx-qimpanel-configtool的问题，fcitx-config-gtk依然没字体设置选项
+但是fcitx-config-gtk3是有字体设置选项的，奇怪的是fcitx-configtool在没装fcitx-qimpanel-configtool之前和fcitx-config-gtk一样，装了之后和fcitx-config-gitk3一样
+就不能直接用配置文件配置字体吗？ 以后还是用fcitx-config-gtk3好了
+--------------------------------------------------------------------
 编译玩发现fcitx-configtool还是没有字体选项,询问了CSSlayer,发现装fcitx-qimpanel-configtool之后运行下fcitx-qimpanel-configtool,再运行fcitx-configtool就有字体选项了
 ----------------------------------------------------------------------
 compile fcitx on lubuntu 17.04 because fcitx don't have font option on lubuntu
