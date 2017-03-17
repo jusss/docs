@@ -1,3 +1,36 @@
+[ClassicUI]
+# Status Panel Position X
+#MainWindowOffsetX=500
+# Status Panel Position Y
+#MainWindowOffsetY=40
+# Font Size
+FontSize=25
+# Font
+Font=文泉驿等宽正黑 Medium
+# Menu Font
+MenuFont=文泉驿点阵正黑 Medium
+# Font Locale to display
+#FontLocale=zh_CN.UTF-8
+# Use System Tray Icon
+# Available Value:
+# True False
+#UseTray=True
+# Status Panel Hide Mode
+# Available Value:
+# Show
+# Auto
+# Hide when tray icon is available
+# Hide
+#MainWindowHideMode=Hide when tray icon is available
+# Vertical Candidate Word List
+# Available Value:
+# True False
+#VerticalList=False
+# Skin Name
+#SkinType=default
+---------------------------------------------------------------------------
+fcitx-configtool是个脚本，有gtk3会优先gtk3,可能ubuntu的fcitx没依赖上fcitx-config-gtk3  字体设置也可以直接用配置文件 ~/.config/fcitx/conf/fcitx-classic-ui.config
+-----------------------------------------------------------------------
 不是fcitx-qimpanel-configtool的问题，fcitx-config-gtk依然没字体设置选项
 但是fcitx-config-gtk3是有字体设置选项的，奇怪的是fcitx-configtool在没装fcitx-qimpanel-configtool之前和fcitx-config-gtk一样，装了之后和fcitx-config-gitk3一样
 就不能直接用配置文件配置字体吗？ 以后还是用fcitx-config-gtk3好了
