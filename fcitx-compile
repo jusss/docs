@@ -1,0 +1,18 @@
+编译玩发现fcitx-configtool还是没有字体选项,询问了CSSlayer,发现装fcitx-qimpanel-configtool之后运行下fcitx-qimpanel-configtool,再运行fcitx-configtool就有字体选项了
+----------------------------------------------------------------------
+compile fcitx on lubuntu 17.04 because fcitx don't have font option on lubuntu
+aptitude search fcitx|grep install
+apt remove fcitx fcitx-pinyin
+
+git clone https://github.com/fcitx/fcitx.git -b master
+cd fcitx
+mkdir build
+cd build
+cmake ..
+make
+sudo make install
+sudo make unstall  if you want remove it
+
+http://forum.ubuntu.org.cn/viewtopic.php?t=352738
+
+some depend packages: extra-cmake-modules libgettextpo-dev doxygen libenchant-dev libxml2-dev libpresage-dev libqt4-dev libopencc-dev libgirepository libgirepository1.0-dev  gcc build-essential automake libxtst6 libxtst-dev xorg-dev gettext libtool intltool libgtk2.0-dev cmake libdbus-glib-1-dev libx11-dev libcairo2-dev libpango1.0-dev
