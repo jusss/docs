@@ -2,15 +2,14 @@ mkdir docs
 cd docs
 git init
 git remote add docs https://github.com/jusss/docs.git
-git pull docs master
 git pull docs bla2
+git branch
+git checkout bla2
 git config --local user.name "john"
 git config --local user.email "x"
 ssh -T git@github.com
 git remote set-url docs git@github.com:jusss/docs.git
 git remote -v
-git branch
-git checkout bla2
 --------------------------------------------------------------------
 修改文件后
 git checkout -- <file> 不保存working tree的修改,回滚到改变前
