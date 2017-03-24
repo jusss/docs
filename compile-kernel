@@ -1,3 +1,13 @@
+make defconfig
+make localmodconfig
+make menuconfig
+only use current modules, or use modprobed-db
+
+make modules_install INSTALL_MOD_PATH=~/lib
+make install DESTDIR=~/lib
+
+make install will auto update grub and initramfs, so don't use it, just cp bzImage to /boot
+---------------------------------------------------------------------
 cp .config to new kernel source directory
 make oldconfig
 make menuconfig   press / search
