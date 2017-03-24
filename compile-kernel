@@ -1,3 +1,6 @@
+make headers_install    install headers to ./usr/include
+make headers_install ARCH=i386 INSTALL_HDR_PATH=/usr/include   install to /usr/include
+------------------------------------------------
 make defconfig
 make localmodconfig
 make menuconfig
