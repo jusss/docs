@@ -1,0 +1,14 @@
+http://cncc.bingj.com/cache.aspx?q=awesome+wm+focus&d=4713861418592213&mkt=zh-CN&setlang=en-US&w=72c5IyH7HB1fneJTPDi-ImqbRt5fiL3T
+
+it is possible set awesome wm focus to "do not force focus by new window?" .. 
+
+ { rule = { instance = "gmail something or other" },
+      properties = { floating = true, focus = false }  },
+
+thnx .. and how to set it to "all" new upcoming windows?
+
+At the beginning of your rules, there should be a rule that begins "{ rule = { },". It applies to all windows so simply add "focus = false" to the list.
+
+
+$ mkdir -p ~/.config/awesome/
+$ cp /etc/xdg/awesome/rc.lua ~/.config/awesome/
