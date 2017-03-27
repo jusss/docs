@@ -70,7 +70,7 @@ systemd配置文件可放任意位置,反正最后都是ln到/etc/systemd/system
 systemd同名很重要! x.timer x.service 都是对应的
 
 创建自动挂载,想挂载到/home/john/mnt里面
-建2个文件home-john-mnt.mount和home-john-mnt.automount 文件名要和挂载路径对应,但home-john-mnt.mount这个配置文件should be /etc/systemd/system/ because systemctl start will find them there
+建2个文件home-john-mnt.mount和home-john-mnt.automount 文件名要和挂载路径对应,但home-john-mnt.mount这个配置文件should be /etc/systemd/system/ because systemctl start will find them there or use systemctl link /absolutely/path/anywhere
 然后systemctl start home-john-mnt.automount
               enable
 /home/john/mnt 如果不存在,会自动创建
@@ -121,7 +121,9 @@ set user's environment ~/.config/systemd/user.conf with DefaultEnvironment
 https://wiki.archlinux.org/index.php/Systemd/User
 
 systemctl --user link ./home-john-mnt.mount doesn't work!
-
+because it needs to be absolutely path!
+systemctl link /home/john/home-john-mnt.mount works!
+systemctl start home-john-mnt.mount
 -----------------------------------------------------------------------------
 so save home-john-mnt.mount into ~/.config/systemd/user/
 then systemctl --user enable/start home-john-mnt.mount  failed!
