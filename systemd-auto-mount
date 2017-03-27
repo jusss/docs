@@ -106,3 +106,24 @@ systemd可能也会去查看/etc/fstab来挂载
 
 ---------------------------------------------------------------
 上面2个文件,只需要一个就行了,就一个home-john-mnt.mount就可以自动挂载
+----------------------------------------------------------------------
+systemd service files store 
+/usr/lib/systemd/user/    where units provided by installed packages belong
+~/.config/systemd/user/   where the user puts its own units
+/etc/systemd/user/        where system-wide user units are placed by the system admin
+/lib/systemd/system/
+/etc/systemd/system/
+~/.local/share/systemd/user/  where units of packages that have been installed in the home directory belong
+
+systemctl --user enable x.service
+set user's environment ~/.config/systemd/user.conf with DefaultEnvironment
+
+https://wiki.archlinux.org/index.php/Systemd/User
+
+systemctl --user link ./home-john-mnt.mount doesn't work!
+
+-----------------------------------------------------------------------------
+so save home-john-mnt.mount into ~/.config/systemd/user/
+then systemctl --user enable/start home-john-mnt.mount  failed!
+maybe it's mount need root account, or you write it in /etc/fstab then you can use
+mount without superuser
