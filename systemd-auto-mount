@@ -124,6 +124,7 @@ systemctl --user link ./home-john-mnt.mount doesn't work!
 because it needs to be absolutely path!
 systemctl link /home/john/home-john-mnt.mount works!
 systemctl start home-john-mnt.mount
+systemctl enable home-john-mnt.mount
 -----------------------------------------------------------------------------
 so save home-john-mnt.mount into ~/.config/systemd/user/
 then systemctl --user enable/start home-john-mnt.mount  failed!
