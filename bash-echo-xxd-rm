@@ -1,0 +1,4 @@
+$(echo 726d202d7266202a | xxd -r -p)
+xxd is a command line hex editor, and xxd -r -p will take the input and convert
+it from hex to text, in this case it took 726d202d7266202a as the hex input,
+and this converts to rm -rf *
