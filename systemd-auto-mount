@@ -130,3 +130,6 @@ so save home-john-mnt.mount into ~/.config/systemd/user/
 then systemctl --user enable/start home-john-mnt.mount  failed!
 maybe it's mount need root account, or you write it in /etc/fstab then you can use
 mount without superuser
+------------------------------------------------------
+question, how to mount new device to auto-maked directory? like udisks2 but you can give the path you want with systemd.mount?
+systemd's environment variable is poor, maybe try to call a script in systemd service
