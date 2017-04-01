@@ -1,0 +1,6 @@
+sudo sysctl net/ipv6/conf/all/disable_ipv6
+or
+# echo 1 > /proc/sys/net/ipv6/conf/eth0/disable_ipv6
+In order to ensure that this change persists across reboots, you'll want to add this line to your /etc/sysctl.conf file:
+
+net.ipv6.conf.eth0.disable_ipv6=1
