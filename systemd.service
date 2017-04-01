@@ -1,3 +1,10 @@
+Type=  
+oneshot, just exit after run, don't block terminal
+simple, input or output something on terminal, block terminal
+fork, like exec in bash, new sub-pid and  exit, give it pid-file
+dbus,
+notify,
+--------------------------------------------------------------
 http://www.jinbuguo.com/systemd/systemd.service.html
 http://www.ruanyifeng.com/blog/2016/03/systemd-tutorial-commands.html
 https://zh.opensuse.org/openSUSE:How_to_write_a_systemd_service
