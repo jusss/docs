@@ -1,3 +1,6 @@
+systemd.service的Type=simple感觉比system v init持续输出信息到log文件里好用
+就像开了screen一样
+-----------------------------------------------------------
 Type=  
 oneshot, just exit after run, don't block terminal
 simple, input or output something on terminal, block terminal
