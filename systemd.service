@@ -1,3 +1,7 @@
+man systemd.service
+systemctl list-units -all
+systemctl status
+---------------------------------
 systemd.service的Type=simple感觉比system v init持续输出信息到log文件里好用
 就像开了screen一样
 -----------------------------------------------------------
