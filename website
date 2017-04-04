@@ -132,3 +132,6 @@ http://space.bilibili.com/4111791/#!/index
 http://space.bilibili.com/11112949/#!/index
 http://space.bilibili.com/11805472/#!/index
 
+ubuntu 17.04
+deb http://mirrors.aliyun.com/ubuntu zesty main universe restricted non-free multiverse
+
