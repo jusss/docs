@@ -1,4 +1,5 @@
 unrar-free not work!
 install p7zip p7zip-full p7zip-rar
+use '7z x your.file.rar' to extract rar file
 or bsdtar
 p7zip-rar is in ubuntu 'multiverse' repo
