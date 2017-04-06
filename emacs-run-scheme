@@ -1,0 +1,4 @@
+M-x run-scheme can run scheme on emacs
+C-h f run-scheme  know you need set variable of 'scheme-program-name'
+(setq scheme-program-name "racket") in *scratch* buffer
+then M-x run-scheme
