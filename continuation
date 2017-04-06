@@ -1,0 +1,10 @@
+使用continuation回溯时,不会带着现在变量的值回去,在过去那个
+命名空间里变量的值是啥,依然是啥,不会被现在的更改,除非
+用(k variable)方式带着现在变量的值回去,且在过去是(set! variable (k variable))
+才能改变
+ (let ((a 1)
+	(b (call/cc (lambda (k) k))))
+    (set! a (+ a 3))
+    (display a)
+    (b b))
+4444444444444444444444444444444
