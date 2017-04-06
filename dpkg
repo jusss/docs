@@ -1,0 +1,3 @@
+dpkg -i x.deb    install 
+dpkg -r x        remove
+dpkg -l or -s see files
