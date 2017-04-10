@@ -1,3 +1,17 @@
+man systemd.service
+systemctl list-units -all
+systemctl status
+---------------------------------
+systemd.service的Type=simple感觉比system v init持续输出信息到log文件里好用
+就像开了screen一样
+-----------------------------------------------------------
+Type=  
+oneshot, just exit after run, don't block terminal
+simple, input or output something on terminal, block terminal
+fork, like exec in bash, new sub-pid and  exit, give it pid-file
+dbus,
+notify,
+--------------------------------------------------------------
 http://www.jinbuguo.com/systemd/systemd.service.html
 http://www.ruanyifeng.com/blog/2016/03/systemd-tutorial-commands.html
 https://zh.opensuse.org/openSUSE:How_to_write_a_systemd_service

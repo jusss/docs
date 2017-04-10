@@ -1,0 +1,135 @@
+<jusss> if I put one usb-stick into my pc, and what will name it? udev or
+	systemd?
+<sheep> jusss: udev
+<jusss> sheep: and systemd can do that?
+<sheep> jusss: udev does it
+<sheep> jusss: systemd uses udev to do it
+<jusss> sheep: systemd take over udev?
+<sheep> jusss: udev is now maintained in the same repository as systemd, a lot
+	of the stock udev rules interact with systemd, and systemd interacts
+	with udev, but udev can still run totally separate from systemd
+
+<sheep> per-user units should go in /etc/systemd/user or
+	~/.config/systemd/user
+
+Udev is now part of systemd and is installed by default. See systemd-udevd.service(8) for information.
+
+A standalone fork is available in AUR: eudev.
+
+https://wiki.archlinux.org/index.php/Udev
+
+udev规则保存在/etc/udev/rules.d/目录，其文件名必须以.rules结尾。
+各种软件包提供的规则文件位于/lib/udev/rules.d/
+
+https://wiki.archlinux.org/index.php/Udev_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)
+
+http://www.cnitblog.com/luofuchong/archive/2007/12/18/37831.html
+
+
+# udevadm info -a -p $(udevadm info -q path -n /dev/mmcblk1p1)
+
+lubuntu 17.04 pcmanfm管理自动挂载,应该是用udisks2
+/lib/udev/rules.d/80-udisks2.rules
+# TODO: figure out if the drive supports SD and SDHC and what the current
+# kind of media is - right now we just assume SD
+KERNEL=="mmcblk[0-9]", SUBSYSTEMS=="mmc", ENV{DEVTYPE}=="disk", ENV{ID_DRIVE_FLASH_SD}="1", ENV{ID_DRIVE_MEDIA_FLASH_SD}="1"
+# ditto for memstick
+KERNEL=="msblk[0-9]|mspblk[0-9]", SUBSYSTEMS=="memstick", ENV{DEVTYPE}=="disk", ENV{ID_DRIVE_FLASH_MS}="1", ENV{ID_DRIVE_MEDIA_FLASH_MS}="1"
+
+man udisks
+UDISKS_FILESYSTEM_SHARED
+           If set to 1, the filesystem on the device will be mounted in a shared
+           directory (e.g.  /media/VolumeName) instead of a private directory
+           (e.g.  /run/media/$USER/VolumeName) when the Filesystem.Mount() method
+           is handled.
+
+/dev/mmcblk1p1 /media/john/xxx
+
+udisks2 can't mount device to special position, it just mount them into /media not where else, and pcmanfm use udisks2 to auto mount devices, so I decide to remove them
+and use udev to do this
+sudo apt remove udisks2
+
+The udev "RUN+=" command only works for very short-running foreground events, so don't use mount in udev
+
+You cannot mount filesystems from udev rules. Period. The final nail in the coffin was in systemd 212, with this commit:
+http://cgit.freedesktop.org/systemd/sys … 42e0691aec
+Effectively, mounting takes place, but in a separate namespace which you will never see as a user.
+
+rwilson, I have a workaround for you.  The cause of the trouble is that systemd's udev daemon runs in a different namespace from the rest of the system from which new mounts do not propagate back.  This is configured by the following line in /usr/lib/systemd/system/systemd-udevd.service:
+MountFlags=slave
+To change this, copy this file to /etc/systemd/system/ , remove this line in the copy and reboot the system.  Your mount script should work as before.  (Mine did.)
+Obvious risk: If /usr/lib/systemd/system/systemd-udevd.service is updated, the one in /etc will still be used, so check for changes after every systemd update, before rebooting.
+Less obvious risk: The systemd folks seem to think running mounts from udev is a Bad Thing(TM), though I have not yet seen anyone give a reason.  If they are right, you (and I) may be in trouble at some point in the future.
+PS: If you want to mount FUSE-based filesystems like NTFS, your script has to quit the control group in which udev puts it in order to avoid getting killed prematurely:
+echo $$ > /sys/fs/cgroup/systemd/tasks
+
+from: https://bbs.archlinux.org/viewtopic.php?id=179267
+
+systemd配置文件可放任意位置,反正最后都是ln到/etc/systemd/system/所依赖的目标 比如multi-user.target.wants
+或者 /lib/systemd/system/
+systemd同名很重要! x.timer x.service 都是对应的
+
+创建自动挂载,想挂载到/home/john/mnt里面
+建2个文件home-john-mnt.mount和home-john-mnt.automount 文件名要和挂载路径对应,但home-john-mnt.mount这个配置文件should be /etc/systemd/system/ because systemctl start will find them there or use systemctl link /absolutely/path/anywhere
+然后systemctl start home-john-mnt.automount
+              enable
+/home/john/mnt 如果不存在,会自动创建
+把这2文件复制到/etc/systemd/system/ 然后systemctl daemon-reload
+systemctl enable home-john-mnt.mount and .automount and start them
+------------------------------------------------------------------
+/etc/systemd/system/home-john-mnt.mount
+
+[Unit]
+Description=automount
+[Mount]
+What= /dev/mmcblk2p1
+Where=/home/john/mnt
+DirectoryMode= 3757
+[Install]
+WantedBy=multi-user.target
+-------------------------------------------------------------------
+/etc/systemd/system/home-john-mnt.automount
+
+[Unit]
+Description = auto mount
+[Automount]
+What = /dev/mmcblk2p1
+Where = /home/john/mnt
+Type = ext4
+[Install]
+WantedBy = multi-user.target
+-------------------------------------------------------------------------
+
+如果不想挂载了,需要systemctl stop home-john-mnt.automount or .mount就行,不需要umount 
+
+systemd可能也会去查看/etc/fstab来挂载
+
+---------------------------------------------------------------
+上面2个文件,只需要一个就行了,就一个home-john-mnt.mount就可以自动挂载
+----------------------------------------------------------------------
+systemd service files store 
+/usr/lib/systemd/user/    where units provided by installed packages belong
+~/.config/systemd/user/   where the user puts its own units
+/etc/systemd/user/        where system-wide user units are placed by the system admin
+/lib/systemd/system/
+/etc/systemd/system/
+~/.local/share/systemd/user/  where units of packages that have been installed in the home directory belong
+
+systemctl --user enable x.service
+set user's environment ~/.config/systemd/user.conf with DefaultEnvironment
+
+https://wiki.archlinux.org/index.php/Systemd/User
+
+systemctl --user link ./home-john-mnt.mount doesn't work!
+because it needs to be absolutely path!
+systemctl link /home/john/home-john-mnt.mount works!
+systemctl start home-john-mnt.mount
+systemctl enable home-john-mnt.mount
+-----------------------------------------------------------------------------
+so save home-john-mnt.mount into ~/.config/systemd/user/
+then systemctl --user enable/start home-john-mnt.mount  failed!
+maybe it's mount need root account, or you write it in /etc/fstab then you can use
+mount without superuser
+------------------------------------------------------
+question, how to mount new device to auto-maked directory? like udisks2 but you can give the path you want with systemd.mount?
+systemd's environment variable is poor, maybe try to call a script in systemd service

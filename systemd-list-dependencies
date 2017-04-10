@@ -1,0 +1,27 @@
+systemctl list-dependencies dns.service 查看dns.service依赖什么服务
+systemctl list-dependencies dns.service --reverse 查看什么服务依赖dns.servfice
+--befor and --after
+
+
+<jusss> MrElendig: know what service depend it and it depend what service
+								        [22:25]
+<jusss> MrElendig: like my.service, I'd like to know my.service depend what
+	service, also what service depend my.service  [22:26]
+<MrElendig> systemctl list-dependencies my.service for the former and with
+	    --reverse for the later  [22:27]
+<MrElendig> and yes, the former will be quite verbose, as it does expand
+	    (some) of the deps
+
+<MrElendig> --before is quite useful too, example: --before  network.target
+
+<MrElendig> jusss:
+	    https://www.digitalocean.com/community/tutorials/how-to-use-systemctl-to-manage-systemd-services-and-units
+	    and similar tutorials are useful
+<phrik> Title: How To Use Systemctl to Manage Systemd Services and Units |
+	DigitalOcean (at www.digitalocean.com)
+<jusss> MrElendig: thanks
+
+<MrElendig> jusss: reference for the dots btw
+	    https://bugs.freedesktop.org/show_bug.cgi?id=90727
+<phrik> Title: 90727 – systemctl list-dependencies colors should match
+	systemctl (at bugs.freedesktop.org)
