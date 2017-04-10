@@ -1,0 +1,6 @@
+<jusss> sheep: echo "s" >> text, is there a command can do that instead of
+	'>>', because systemd don't support bash
+
+<sheep> jusss: just run a bash script from systemd
+<rnabinger> /bin/sh -c 'echo s >>text' actually ...   [16:01]
+<jusss> fine

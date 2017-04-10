@@ -1,0 +1,8 @@
+<jusss> how to know tha last init unit in systemd?
+<sheep> jusss: there's no reliable way, but you could check journalctl -t
+	systemd
+
+<jusss> sheep: why they don't give them a number like system v init?  [15:49]
+<sheep> jusss: because it's parallelized
+<sheep> and there's stuff like timer units where the services may or may not
+	be started during init

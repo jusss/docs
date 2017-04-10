@@ -1,3 +1,8 @@
+systemctl show dns.service
+systemctl edit dns.service
+https://www.digitalocean.com/community/tutorials/how-to-use-systemctl-to-manage-systemd-services-and-units
+systemctl list-dependencies --reverse dns.service 谁依赖dns.servicve
+-----------------------------------
 from: https://blog.linuxeye.com/400.html
 systemd详解
 
