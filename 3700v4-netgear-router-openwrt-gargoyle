@@ -1,0 +1,77 @@
+WDS repeater, not client mode, same SSID, same password, same LAN, use BGN not AN operation mode
+QoS and DHCP使用上级SSID的规则
+------------------------------------------------------------
+openwrt没QoS, gargoyle 1.9.2无线桥接 WDS好还是client mode好？
+如果用client mode创建新SSID 密码只能和上级SSID密码相同？因为gargoyle网页设置里只有一个密码选项
+因为用了WDS桥接，所以和上级SSID在一个网段，而且SSID同名，DHCP也是由上级SSID决定，过滤规则也是
+这样的话openwrt没QoS，只要上级SSID有QoS,openwrt用WDS桥接不就可以了？
+---------------------------------------------------------------
+配置完成后，需要等几分钟，再次dhcpcd才行
+Connection - Basic
+选Wireless Bridge/Repeater不是Gateway
+Bridge IP 192.168.1.2 路由器在上级网络的地址,也是以后路由器的登录地址
+AP/Gateway IP 192.168.1.1 上级路由器的网关
+Subnet Mask 255.255.255.0和上级路由器相同
+
+connect via WDS 不创建新网段，和上级网络同一网段
+repeater enabled
+operation mode B+G+N 不要用A+N
+SSID to join wifi上级网络ssid
+SSID to broadcast wifi本路由器ssid，可以和上级网络ssid同名
+password 上级网络密码，同本路由器ssid密码
+1.9.2, 据说1.7.x之后版本都无法设置不同的密码了
+
+WDS  bridge, same SSID, same LAN, different channels, 2个相同的路由应该用WDS bridge,不同的用repeater client mode 
+client mode  repeater, another LAN to another LAN
+
+WDS, BGN, repeater enabled, same SSID
+-------------------------------------------------------
+wireless bridge/repeater
+bridge WDS不会创建新网段 ssid应该和上级的ssid相同
+client mode, 创建新网段， ssid可以和上级的ssid不同
+
+bridge ip:192.168.1.2
+ap/gatewayip: 192.168.1.1
+connect via client mode
+ssid to join wifi
+ssid to broadcast gargoyle
+
+it works!
+--------------------------------------------------------------------------------------
+use x.img from openwrt.org flash on 3700v4
+then use gargoyle.sysupgrade.tar from https://www.gargoyle-router.com/download.php flash on 3700v4
+openwrt无线桥接tp-link用的是client模式，tplink是192.168.1.1网段 openwrt用的是192.168.2.1网段
+石像鬼的无限中继有client模式和WDS模式, WDS是同网段的无线中继， client模式是不同网段的无线中继
+openwrt没有提供QoS, 石像鬼有QoS
+http://www.right.com.cn/forum/thread-192452-1-1.html
+
+connection basic里wireless bridge/repeater
+Bridge IP: 192.168.1.254 和上级网络同一网段
+Subnet Mask: 255.255.255.0 和上级网络同一掩码
+AP/GatewayIP: 192.168.1.1
+
+connect via client bridge
+当前这个路由器的ssid设置,会和上级网络不再同一网段
+
+connect via WDS 和上级网络同一网段
+SSID to Join 上级无线网络的ssid
+Encryption WPA2 PSK
+Password 上级网络的密码
+SSID to Broadcast 当前路由的ssid
+
+如果连不上，可以用针捅路由器后面的重置孔，因为已经刷了石像鬼，重置后还是石像鬼
+---------------------------------------------------------------------------------------
+connection Basic 用上面的方法一直连不上。。。
+用Gateway不用Wireless Bridge
+Internet/WAN connect via Static IP wireless 192.168.1.222 本路器器在上级网络的地址
+Local network 192.168.2.1 本路由器的网络段
+Wireless  SSID to Join 上级网络
+
+保存应用之后，电脑需要重新dhcpcd才能连上路由器！！！
+这样就可以了
+
+https://wiki.openwrt.org/doc/howto/clientmodeo
+
+tftp是刷x.img的方法，用sysupgrade.tar可以从web ui方式刷
+
+----------------------------------------------------------------------------------
