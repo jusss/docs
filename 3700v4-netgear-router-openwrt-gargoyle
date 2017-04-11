@@ -1,5 +1,6 @@
 WDS repeater, not client mode, same SSID, same password, same LAN, use BGN not AN operation mode
 QoS and DHCP使用上级SSID的规则
+openwrt也可以手写tc来限速，参考 https://www.ibm.com/developerworks/cn/linux/1412_xiehy_tc/
 ------------------------------------------------------------
 openwrt没QoS, gargoyle 1.9.2无线桥接 WDS好还是client mode好？
 如果用client mode创建新SSID 密码只能和上级SSID密码相同？因为gargoyle网页设置里只有一个密码选项
