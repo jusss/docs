@@ -1,3 +1,5 @@
+WDS can not hide SSID to broadcast in web ui config, leave it empty in 'ssid to broadcast', there's an error
+-----------------------------------------------------------------
 WDS repeater, not client mode, same SSID, same password, same LAN, use BGN not AN operation mode
 QoS and DHCP使用上级SSID的规则
 openwrt也可以手写tc来限速，参考 https://www.ibm.com/developerworks/cn/linux/1412_xiehy_tc/
