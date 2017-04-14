@@ -1,2 +1,11 @@
 setxkbmap -option ctrl:swapcaps
 or setxkbmap -layout us -option ctrl:nocaps
+
+in tty:
+dumpkeys | head - > ./key.map
+vim key.map
+keycode 58 = Control
+sudo loadkeys ./key.map
+
+http://blog.csdn.net/csfreebird/article/details/51069348
+https://www.emacswiki.org/emacs/MovingTheCtrlKey#toc5
