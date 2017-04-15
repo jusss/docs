@@ -1,0 +1,18 @@
+ubuntu
+apt install shadowsocks
+ssserver is a python script
+ExecStart=/usr/bin/ssserver will exit
+you should use ExecStart= /usr/bin/python /usr/local/bin/ssserver -s your-ip -p your-port -k your-password -m your-method -t 300
+
+root@localhost:/etc/systemd/system# cat shadowsocks.service 
+[Unit]
+Description= shadowsocks
+After= network.target
+
+[Service]
+Type= simple
+ExecStart= /usr/bin/python /usr/local/bin/ssserver -s server-ip -p server-port -k password -m method -t timeout
+
+[Install]
+WantedBy= multi-user.target
+
