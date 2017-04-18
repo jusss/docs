@@ -1,3 +1,11 @@
+bandwagonhost用的是OpenVZ, 换不了内核！！！
+root@localhost:/lib/modules# modprobe tun
+modprobe: ERROR: ../libkmod/libkmod.c:514 lookup_builtin_file() could not open builtin file '/lib/modules/2.6.32-042stab116.1/modules.builtin.bin'
+modprobe: FATAL: Module tun not found in directory /lib/modules/2.6.32-042stab116.1
+这内核又没法换，/lib/modules/里根本就没模块。。。 wtf!
+bandwagonhost的VPS用的OpenVZ，换不了内核, modprobe tun直接提示没找到，/lib/modules/里啥模块也没有。。。配置openvpn,访问总提示端口拒绝，iptables也没写啥规则，虽然很便宜，但是没linode(xen)操作简单。。。
+bandwagonhost只有centos可以在kiwi面板里直接配置openvpn和shadowsocks...
+-------------------------------------
 install openvpn on bandwagonhost VPS, opevVZ not Xen or kvm, iptables rules are different for them
 use 'server 10.8.0.0 225.225.225.0' config subnet over VPN in /etc/openvpn/server.conf
 
@@ -98,8 +106,8 @@ sudo openvpn --config ./client.ovpn
 Tue Apr 18 21:03:33 2017 TLS Error: TLS handshake failed
 在server.conf里设置local server-ip,不行，把udp改成tcp,不行，关闭ufw,没有ufw...
 OpenVZ的网络接口不是tun0, 是venet0, ip addr看venet0地址，把server.conf的网段改成那个地址,然后发现还是不行
-lsmod|grep tun,没有, modprobe tun提示错误，发现内核是别人自己编译的，貌似没编译tun模块。。。
-升级他人的内核至官方内核，或者编译tun模块...(因为是别人送的VPS，就不鼓捣那么多了)
+lsmod|grep tun,没有, modprobe tun提示错误，貌似没编译tun模块。。。
+升级内核，或者编译tun模块...(因为是别人送的VPS，就不鼓捣那么多了)
 -----------------------------------------------------------------
 https://www.linode.com/docs/networking/vpn/set-up-a-hardened-openvpn-server
 https://www.linode.com/docs/networking/vpn/configuring-openvpn-client-devices
