@@ -1,3 +1,106 @@
+install openvpn on bandwagonhost VPS, opevVZ not Xen or kvm, iptables rules are different for them
+use 'server 10.8.0.0 225.225.225.0' config subnet over VPN in /etc/openvpn/server.conf
+
+apt install openvpn easy-rsa
+gunzip -c /usr/share/doc/openvpn/examples/sample-config-files/server.conf.gz > /etc/openvpn/server.conf
+make-cadir /etc/openvpn/easy-rsa && cd /etc/openvpn/easy-rsa/
+ln -s openssl-1.0.0.cnf openssl.cnf
+
+vim /etc/openvpn/server.conf
+ca /etc/openvpn/easy-rsa/keys/ca.crt
+cert /etc/openvpn/easy-rsa/keys/server.crt
+key /etc/openvpn/easy-rsa/keys/server.key  # This file should be kept secret
+dh /etc/openvpn/dh4096.pem
+
+cd /etc/openvpn/easy-rsa && source ./vars
+./clean-all
+openssl dhparam 4096 > /etc/openvpn/dh4096.pem
+
+/etc/openvpn/server.conf
+tls-auth /etc/openvpn/easy-rsa/keys/ta.key 0 # This file is secret
+
+openvpn --genkey --secret /etc/openvpn/easy-rsa/keys/ta.key
+adduser --system --shell /usr/sbin/nologin --no-create-home openvpn_server
+
+cp /etc/openvpn/easy-rsa/keys/ta.key to /etc/openvpn/  #because in server.conf, it's tls-auth ta.key it will find it on /etc/openvpn/
+
+/etc/openvpn/server.conf
+user openvpn_server
+group nogroup
+
+echo 'cipher AES-256-CBC' >> /etc/openvpn/server.conf
+echo 'auth SHA512' >> /etc/openvpn/server.conf
+echo 'tls-cipher TLS-DHE-RSA-WITH-AES-256-GCM-SHA384:TLS-DHE-RSA-WITH-AES-128-GCM-SHA256:TLS-DHE-RSA-WITH-AES-256-CBC-SHA:TLS-DHE-RSA-WITH-CAMELLIA-256-CBC-SHA:TLS-DHE-RSA-WITH-AES-128-CBC-SHA:TLS-DHE-RSA-WITH-CAMELLIA-128-CBC-SHA' >> /etc/openvpn/server.conf        
+
+cd /etc/openvpn/easy-rsa
+./build-ca
+./build-key-server server
+cd /etc/openvpn/easy-rsa && source ./vars && ./build-key client1
+
+cp /usr/share/doc/openvpn/examples/sample-config-files/client.conf /etc/openvpn/easy-rsa/keys/client.ovpn
+/etc/openvpn/easy-rsa/keys/client.ovpn
+remote your-server-ip 11940
+
+/etc/openvpn/easy-rsa/keys/client.ovpn
+user nobody
+group nogroup
+
+ca /path/to/ca.crt
+cert /path/to/client1.crt
+key /path/to/client1.key
+tls-auth /path/to/ta.key 1
+cipher AES-256-CBC
+auth SHA512
+tls-cipher TLS-DHE-RSA-WITH-AES-256-GCM-SHA384:TLS-DHE-RSA-WITH-AES-128-GCM-SHA256:TLS-DHE-RSA-WITH-AES-256-CBC-SHA:TLS-DHE-RSA-WITH-CAMELLIA-256-CBC-SHA:TLS-DHE-RSA-WITH-AES-128-CBC-SHA:TLS-DHE-RSA-WITH-CAMELLIA-128-CBC-SHA
+
+vim /etc/openvpn/server.conf
+port 11940
+server 10.8.0.0 255.255.255.0 设置VPN内网地址
+push "redirect-gateway def1 bypass-dhcp"
+
+开启ip转发
+nano /etc/sysctl.conf
+net.ipv4.ip_forward=1
+
+echo 1 > /proc/sys/net/ipv4/ip_forward
+
+systemctl start openvpn
+systemctl enable openvpn
+/etc/openvpn/easy-rsa/keys# ls .|cpio -o > ~/band.openvpn.cpio
+
+vim openvpn.iptables.sh
+#!/bin/bash
+### this is for OpenVZ
+iptables -A FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT
+iptables -A FORWARD -s 10.8.0.0/24 -j ACCEPT
+iptables -A FORWARD -j REJECT
+iptables -t nat -A POSTROUTING -o venet0 -j SNAT --to-source <YOUR VPS IPV4 ADDR>
+iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -j SNAT --to-source <YOUR VPS IPV4 ADDR>
+iptables -t nat -A POSTROUTING -j SNAT --to-source <YOUR VPS IPV4 ADDR>
+
+chmod +x openvpn.iptables.sh
+./openvpn.iptables.sh
+
+### this is for not OpenVZ like Xen KVM
+iptables -A FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT
+iptables -A FORWARD -s 10.8.0.0/24 -j ACCEPT
+iptables -A FORWARD -j REJECT
+iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -o eth0 -j MASQUERADE
+iptables -t nat -A POSTROUTING -j SNAT --to-source <YOUR VPS IPV4 ADDR>
+
+http://kunsland.github.io/blogs/2015/03/22/vps-openvpn/
+http://blog.csdn.net/demontfx/article/details/44749129
+
+pass band.openvpn.cpio to your PC or Android
+cpio -i -F band.openvpn.cpio
+sudo openvpn --config ./client.ovpn
+一直提示 TLS Error: TLS key negotiation failed to occur within 60 seconds (check your network connectivity)
+Tue Apr 18 21:03:33 2017 TLS Error: TLS handshake failed
+在server.conf里设置local server-ip,不行，把udp改成tcp,不行，关闭ufw,没有ufw...
+OpenVZ的网络接口不是tun0, 是venet0, ip addr看venet0地址，把server.conf的网段改成那个地址,然后发现还是不行
+lsmod|grep tun,没有, modprobe tun提示错误，发现内核是别人自己编译的，貌似没编译tun模块。。。
+升级他人的内核至官方内核，或者编译tun模块...(因为是别人送的VPS，就不鼓捣那么多了)
+-----------------------------------------------------------------
 https://www.linode.com/docs/networking/vpn/set-up-a-hardened-openvpn-server
 https://www.linode.com/docs/networking/vpn/configuring-openvpn-client-devices
 https://www.linode.com/docs/networking/vpn/tunnel-your-internet-traffic-through-an-openvpn-server
