@@ -1,3 +1,6 @@
+ls |cpio -o > x.cpio
+cpio -i -F x.cpio
+-----------------------------------
 find /path/you/want |cpio -o > x.cpio
 
 cpio -i < x.cpio
