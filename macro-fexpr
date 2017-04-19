@@ -1,0 +1,117 @@
+1. fexpr用于动态作用域
+2. fexpr 运行在run time和函数一样，macro运行在compile time
+3. fexpr 太难编译
+4. 不论是fexpr还是macro都不要用递归，比如macro里递归调用macro自身
+--------------------------------------------------------------------------
+racket:
+> (define (a) 1)
+> (define (alpha) (a))
+> (alpha)
+1
+
+> (define (a) -1)
+> (alpha)
+-1
+
+> (define-syntax z (syntax-rules () ((z) 2)))
+> (z)
+2
+> (define (y) (z))   
+> (y)
+2
+> (define-syntax z (syntax-rules () ((z) -2)))
+> (y)
+2
+> (z)
+-2
+> (y)
+2
+
+from lambda-the-ultimate.org/node/3640
+
+函数a变化，会影响调用它的函数alpha
+但y定义时，会展开z，且重新定义z不会影响y,   因为定义y时，z会自动求值，被展开, 函数的参数自动求值！ (应用序 正则序)
+sbcl:
+* (defmacro z () 2)
+* (z)
+2
+* (defun y () (z))
+* (y)
+2
+* (defmacro z () 3)
+* (y)
+2
+* (z)
+3
+
+(defun y1 () (z1))
+(defmacro z1 () 3)
+(z1)
+3
+(y1)
+error: z1 undefined
+不要在宏里使用递归，也不要在 Fexpr里使用递归
+
+-----------------------------------------------
+elisp:
+(defmacro a () 3)
+a
+a
+(a)
+3
+(defun b () (a))
+b
+(b)
+3
+(defmacro a () 4)
+a
+(a)
+4
+(b)
+3
+即使是在动态作用域里，macro也不会那么灵活，因为macro是在编译期
+而fexpr是和函数一样在运行期，所以可以很灵活，太难确定，无法编译
+
+newlisp 有F表达式， (define-macro ...)就是F表达式
+(define-macro (z) 2)
+(define (y) (z))
+(y) => 2
+(define-macro (z) 3)
+(y) => 3
+
+
+<john> what is F-expr?  [16:59]
+<john> and what's the different between F-expr and macro?
+<Bill> john: they're close. But F-expr are functions executed at run-time,
+	  while macros are functions executed at macro-expansion time, which
+	  is usually included in compilation-time.  [17:01]
+<Bill> john:  the difficulty here is that when you compile code with
+	  F-expr, the F-expr won't have access to the compilation environment,
+	  so it won't have access to lexcial bindings.  It was no problem in
+	  lisp with F-expr because they didn't have lexical bindings!
+								        [17:02]
+<Bill> (cf. the funarg problem).
+<Bill> john: but since CL has lexical binding, F-expr would be quite
+	  problematic.  Notice how macros have an optional &environment
+	  argument, which let them have some access to the lexical bindings
+	  determined at compilation time (notably for lexical macros bound
+	  with symbol-macrolet and macrolet).
+<john> Bill: I saw a website about newlisp, it uses F-expr for macro, I
+	google it, and I found people argued F-expr and macro  [17:06]
+<Bill> newlisp is an old lisp that hasn't learned the lessons of 40 years.
+	  It's stuck in the 50s.
+<Bill> Forget about it, and use Common Lisp.  [17:07]
+<john> Bill: which common lisp implement provide good libraries like
+	multi-thread and GUI?  [17:09]
+<john> multi-thread, GUI, socket
+<White> all the major ones do multi-threaded and sockets  [17:10]
+<p> john: there are cross-implementation packages for these.
+<White> the commercial ones have GUI builders built in
+<White> otherwise, there's plenty of bindings to external GUI libraries
+<p> Bordeaux-Threads does threads, USOCKET does sockets, CommonQT and
+	others do UIs.
+<p> All of these are cross-implementation.
+<p_> So it doesn't really matter whether you use SBCL or CCL or ECL or
+	CLISP or whatever else is supported by them.  [17:11]
+<p_> Though, if you're beginning, grab SBCL or CCL.
+<john> wow, that sound better than scheme's SRFI!
