@@ -1,0 +1,4 @@
+$a.py -a b -c d -e
+-a b -c d -e should be in a list
+1. pop -a就pop -a的下一个元素b
+2. pop -e 就检查是否有-e选项
