@@ -1,0 +1,96 @@
+<x> there's macro in elisp, so I wonder is there fexpr in elisp?
+<y> lol  [22:51]
+<y> that's some excellent line of reasoning you got there
+<y> counter-example: if a language has lisp macros, why would it have
+	   fexprs?
+<r> can't you implement fexprs with macros, quote and apply?  [22:52]
+<x> I'm just curious  [22:55]
+<y> show me a lisp that got both macros and fexprs  [22:56]
+<x> fexpr is ancient, also elisp is ancient, and elisp use dynamic scope
+<p> we  [22:57]
+<p> y: macros on top of fexpr ?
+<y> python476: I doubt that is possible
+<b> the list of languages supporting fexprs is a kindof rogues gallery
+<p> gah, I thought that was the goal  [22:58]
+<x> fexpr is more like defun I think  [23:00]
+<y> anyway, elisp got rid of these  [23:03]
+<o> parsnip: yes -- insert-char indeed is broken because it insists that
+	 I type stuff in all caps, despite some setting that says that
+	 completion should ignore case.
+<y> if you want to use a more modern lisp still wed to the idea of
+	   fexprs, try picolisp
+<b> or newLISP. it has new in the name, so you know it is modern  [23:04]
+<o> parsnip: this doesn't repro with -Q; it must have something to do
+	 with how I've configured ido, but I've never pinpointed it
+<y> b: I don't think I'll try that one  [23:05]
+
+<x> what's the different? picolisp and newlisp?
+<x> y: why not newlisp?
+<y> there is no point to it
+<y> ,apropos-perlis worth  [23:07]
+<fsbot> A language that doesn't affect the way you think about programming, is
+	not worth knowing.
+<y> unlike picolisp, I see no novel/different approaches to programming
+	   with picolisp  [23:08]
+<y> err, newlisp
+<b> lol, wikipedia agrees newLISP is not notable ;)
+
+<b> y: "dynamic scoping inside isolated namespaces" sounds
+	  potentially novel. Although I don't really fully understand newLISP
+	  contexts  [23:28]
+<y> meh
+<y> picolisp did it better
+<y> they also allow you creating read-only and read-write closures
+								        [23:29]
+<T> Can someone tell me the functions referred to in the introduction
+	     of https://www.emacswiki.org/emacs/ChangingEncodings ? I'm not
+	     seeing them obviously via apropos of 'encod' and the mentioned
+	     keybindings aren't set for me (I get a mail composer when I hit
+	     C-c C-m).
+<x> picolisp newlisp elisp's list are same? I know scheme and common lisp
+	have proper list  [23:43]
+<x> (a . b) is improper list
+<b> elisp has pretty standard lisp lists  [23:45]
+<b> newlisp looks weird in that respect
+<y> picolisp only has lists
+<y> no vectors or other newfangled stuff  [23:46]
+<y> cons cells, numbers and symbols are all what you need!
+<b> newlisp doesn't really seem to have cons cells in the usual sense.
+								        [23:47]
+<y> neither does clojure
+<x> what's cons cells?  [23:49]
+<y> m(
+<b> what you are calling improper lists, basically
+<B> You don’t need numbers, either—you can use pure lambda
+	      calculus.
+<b> no, I really can't.
+
+<x> what cons cells used for? actually I really don't know where I should
+	use cons cells not proper list?  [23:51]
+<y> the list is a lie
+<x> wat...?  [23:52]
+<y> what you call list is just a collection of cons cells linked
+	   together
+
+<x> aha, so can I say cons cells just a collection of atom linked
+	together?  [23:56]
+<b> not a collection, a pair. And atoms is probably just confusing
+	  things here, since cons cells can have cons cells in them
+								        [23:57]
+<b> ,(cons (cons 1 2) (cons 3 4))  [23:58]
+<fsbot> ((1 . 2) 3 . 4)  ..(cons)
+<x> why it's not ((1 . 2) . (3 . 4))?  [00:00]
+
+<x> this basic knowledge is blowing my mind, they should be wrote on the
+	beginning of lisp  [00:02]
+<b> uh, it is?
+<b> that's just pretty printing, attempting to interpret as a list
+								        [00:03]
+<b> rudybot: DSS 43 receiving data from Voyager 2 at 160b/s.  [00:04]
+<a> to make lists look prettier, (1 . (2 . (3 . nil))) is printed as
+	    (1 2 3), so (1 . (2 . (3 . 4))) as (1 2 3 . 4), and ((1 . 2) . (3
+	    . 4)) as ((1 . 2) 3 . 4)
+<rudybot> b: Thank you tali713, quotemstr, parolang and dss for the
+	  enthusiasm.
+<x> pretty printing, but not pretty easy to understand for me... ((1 . 2)
+	(3 . 4)) is easy to understand  [00:06]
