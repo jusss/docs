@@ -1,0 +1,10 @@
+cl的这些库都是跨工具的，不像scheme各个工具来一套，SRFI现在还没补完
+Bordeaux-Threads does threads, USOCKET does sockets, CommonQT and others do UIs.
+GUI: CommonQT, McCLIM, pgl
+
+关闭大小写 (setf *print-case* :downcase)
+一直输出大写，是跟reader有关
+
+TCO, 个别工具提供TCO，不是被标准要求, SBCL提供
+
+full continuation, delimited continuation, 不提供，可以emulated with cl-cont library
