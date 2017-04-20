@@ -1,0 +1,204 @@
+https://www.oschina.net/question/565376_62226
+newlisp use fexpr instead of macro, fexpr is special form that don't evaluate parameters
+it uses dynamic scope, not lexical scope
+http://www.newlisp.cn/
+
+newlisp 没有cons cells, (2 . 3) improper list,没有car cdr，因为没有pair, 用first rest替代
+动态作用域, fexpr代替macro, 猜测是lisp-1,
+
+namespace or environment called context in newlisp
+默认context为MAIN,求值一个没绑定值的符号，返回nil
+(begin ...)
+
+调用外部库接口 FFI
+(import "user32.dll" "MessageBoxA")
+
+(MessageBoxA 0 "Hello World!"
+"newLISP Scripting Demo" 0)
+
+(set 'y 'x) or (setq y 'x) also (define y 'x) (setq x 3 y 4)
+
+很显然，函数 set, setq, 和 define 都有副作用，并且返回一个值。而副作用就是在当前的命名空间里的隐含的符号表中，建立变量和值的关联。
+我们可以把这个隐含的符号表想象成一个关联列表。
+
+> '((x 1) (y 2))
+((x 1) (y 2))
+> _
+(first ...)返回列表的第一个元素，类似car
+(last ...)返回列表的最后一个元素
+(rest ...)返回除第一个元素后的剩余元素，类似cdr
+scheme提供a-list, common-lisp提供p-list, newlisp和scheme一样
+(assoc 'x '((x 1) (y 2) (x 3))) 返回第一个关联的列表(x 1)
+(lookup 'x '((x 1) (y 2) (x 3))) 返回第一个关联的列表的对应的值1
+因为newlisp的list不是cons cells, (rest '()) => (), (first '())=> nil, (last '())=> nil
+(length '(1 2 3)) 返回列表长度
+
+一个隐式的符号表可以被看成是已经被计算过的一个关联列表
+> (set 'x 1)
+1
+> (+ x 1)
+2
+因为副作用通常会影响输出流或隐式的命名空间 。一个关联列表只是描述这个隐式符号表的一种形式。
+假设，我们想随时改变一个变量所绑定的值，而又不改变它以前的值：
+
+> (set 'x 1 'y 2)
+2
+>
+(let  ((x 3) (y 4))
+  (println x)
+  (list x y))
+
+3
+(3 4)
+> x
+1
+> y
+2
+
+let 表达式处理的是一个关联列表，而且按照顺序一个一个的处理里面的绑定表达式。
+let 形式和 begin 形式很像，除了它在 let 块中有一个临时的符号表记录。因为 let 中的表达式参数是惰性的，
+只在 let 的 context 中被展开。如果我们在 let 块中查看符号表，它看起来就像下面的关联列表：
+
+'((y 4) (x 3) (y 2) (x 1))
+既然 lookup 从左向右查找绑定的 x 和 y 的值，那么就屏蔽了 let 表达式以外的值。当 let 表达式结束后，符号表就会恢复成下面的样子：
+
+'((y 2) (x 1))
+离开 let 表达式后，后面对 x 和 y 的计算，就会按照它们以前的值进行操作了。
+
+请记住 lambda 和 let 表达式在本质上对符号表的操作行为是相同的.
+
+> (setq x 3 y 4)
+> ((lambda (y) (setq x 5 y 6) (+ x y)) 1 2)
+11
+> x
+5
+> y
+4
+在上面的代码中，参数 1 和 2 是多余的. lambda 表达式外面传递进来的形参 y 的定义被屏蔽，因为 x 等于 5 是在表达式内部唯一起作用的定义.
+
+fn 是 lambda 的缩写.
+
+(map funtion list) 把function作用在list里每一个元素上面,返回作用后的列表
+(filter condition-function list)把function作用在list每个元素上面，返回符合条件的列表
+(index condition-function list)返回符合条件的元素在list中的位置
+(apply function list)把function作用在list上
+
+lambda list a special form list, also fexpr 
+> (define f (lambda (x) (+ x 1)))
+(lambda (x) (+ x 1))
+> (first f)
+(x)
+如果是在racket或sbcl里这种运行都是不会成功的
+> (let ((z 2)) (expand f 'z))
+(lambda (x y) (+ x y 2 1))
+> _
+函数 expand 接受一个列表，并将剩下的符号参数所对应的这个列表中的符号替换掉。
+
+(define f
+(let ((x 1) (y 2))
+  (lambda (z) (list x y z))))
+> (setq x 3 y 4 z 5)
+5
+> (f 1)
+(3 4 1)
+> (let ((x 5)(y 6)(z 7)) (f 1))
+(5 6 1)
+动态作用域，全局就一个env,就算创建函数时使用了外部变量也不会创造env
+我们可以使用之前讲过的函数 expand 将一个 lambda 表达式中所有的自由变量进行强制绑定，从而让这个匿名函数被“关闭”。
+
+>
+(define f
+(let ((x 1) (y 2))
+  (expand (lambda (z) (list x y z)) 'x 'y)))
+
+(lambda (z) (list 1 2 z))
+> _
+注意现在这个 lambda 表达式已经没有任何自由变量了。
+
+使用函数 expand "关闭"一个 lambda 表达式和 Common Lisp 和 Scheme 中的词法作用域的 lambda 闭包不同，实际上，newLISP 有词法闭包
+在一个context里调用另一个context里的函数，并且在当前context里重命名那个函数所需的变量
+
+define-macro就是fexpr,和正常函数没啥区别，就是参数不自动求值
+(define-macro (my-setq _key _value)
+    (set _key (eval _value)))
+> (my-setq _key 1)
+1
+> _key
+nil
+语句 (set _key 1) 只是将 _key 设置为局部变量。我们说变量 _key 被宏的扩展所占用。Scheme 有“健康”宏可以有效的保证不会发生变量的冲突。
+宏作用在和内部变量重名的变量上，就game over了，非卫生宏
+
+默认的context是MAIN,context就是命名空间
+(setq x 1)
+MAIN:x
+
+(context 'FOO)创建新的命名空间FOO
+函数 set, setq, 和 define 会在当前的 context 也就是命名空间中绑定一个符号的关联值。
+context 不能嵌套 -- 他们都住在一起，之间是平等的。
+变量在MAIN中定义的不会存在FOO中，但所有内置的函数名称都保存在一个全局的名称空间中，就像是在 MAIN context 中定义的一样.
+内置函数 println 在 MAIN 和 FOO 的命名空间内都能被识别. 函数 println 是一种被 "导出" 到全局状态的一个名称.
+(global 'var)可以把变量var导入到所有命名空间，但var只能在MAIN中定义
+函数 symbols 会返回当前命名空间所有绑定的符号名称。
+
+context F里有x y, context B里有x y
+
+> (define x 1)
+> (define y 2)
+> (define foo (let ((x 3)) (lambda () (list x y))))
+> (foo)
+'(3 2)
+newlisp动态作用域(foo)是(1 2),因为定义时并没有创建新的env,如果是词法作用域，会创建env, ((x 3) (y 2)),
+因为没有创建env, (foo)执行时从当前env里取得((x 1) (y 2)) 返回(1 2)
+> (setq x 1 y 2)
+2
+> (define foo (let ((x 3)) (lambda () (list x y))))
+(lambda () (list x y))
+> (foo)
+(1 2)
+> (let ((x 3)) (list x y))
+(3 2)
+但是直接执行(let ((x 3)) (list x y))会返回(3 2)因为let在运行时创建了env ((x 3))
+> (let ((x 4)) (foo))
+(4 2)
+
+切换个context实现闭包
+FOO> (let ((x 5)) (MAIN:foo))
+(1 2)
+原来 MAIN:foo 的动态范围只是限定于命名空间 MAIN 中. 既然在表达式 let 中的命名空间是 FOO，MAIN:foo 就不会把 FOO:x => 5 拿过来用。
+所以尽管在空间 FOO 中的 lambda 表达式有一个自由变量 FOO:x, 我们可以看到现在 MAIN:foo 只会在主命名空间中查找自由变量的绑定, 就再也找不到这个自由变量了.
+
+FOO> (let ((MAIN:x 5)) (MAIN:foo))
+(5 2)
+
+(context 'FOO)
+(setq r 1 s 2)这个会在FOO中绑定
+但> (begin (context 'FOO) (setq z 5)) z会在MAIN中绑定,但命名空间切换到FOO
+
+new可以克隆context, (new FOO 'new-context)把FOO的符号表复制到新context new-context里
+下面的函数将一个命名空间的名字转换成字符串
+
+(define (context->string _ctx)
+(let ((str (list (format "#S(%s" (string _ctx)))))
+(dotree (slot _ctx)
+  (push (format " %s:%s" (term slot)
+    (string (eval (sym (term slot) _ctx))))
+    str -1))
+  (push ")" str -1)
+(join str)))
+现在我们可以验证一下，输入参数 r.
+
+> (context 'r)
+> (setq height 2 width 1 x 2 y 0)
+> (context->string 'r)
+"#S(r height:2 width:1 x:2 y:0)"
+
+from: http://www.newlisp.cn/
+http://www.ituring.com.cn/article/111019
+
+newlisp在env A里调用env B的函数，这个函数去env B里找绑定，构造闭包，正常闭包是在函数创建时，创建新env,
+但newlisp这种不是在函数创建时创建新env,而是从另一个env里调用函数，函数去创建它的env里找绑定，不知道算不算闭包？而且是动态作用域的env
+
+http://www.ituring.com.cn/article/111019
+http://www.newlisp.org/CodePatterns-cn.html#toc-1
+http://blog.csdn.net/csfreebird/article/details/48729731
+
