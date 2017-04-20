@@ -11,3 +11,5 @@ dynamic scope就是只有一个env, 创建函数也不会创建新env
 env就是environment or namespace or context,里面就是符号和值的绑定，比如
 lisp-1的env: ((variable value) (function lambda-list))
 lisp-2的env: ((variable value) (variable value))  ((function lambda-list) (function lambda-list))
+newlisp在env A里调用env B的函数，这个函数去env B里找绑定，构造闭包，正常闭包是在函数创建时，创建新env,
+但newlisp这种不是在函数创建时创建新env,而是从另一个env里调用函数，函数去创建它的env里找绑定，不知道算不算闭包？而且是动态作用域的env
