@@ -1,3 +1,117 @@
+<jusss> (a b) is (a b . nil)    ((lambda (x) x) 3) how turn to dot-pair?
+								        [23:53]
+<Bike> ((lambda (x) x) 3 . nil)?
+*** stardiviner (~stardivin@unaffiliated/stardiviner) has joined channel #lisp
+								        [23:54]
+<jusss> Bike: wow, ((lambda (x) x) 3 . nil) can run  [23:55]
+*** strykerkkd (~StrykerKK@catv-217-21-30-23.szelmalomktv.net) has joined
+    channel #lisp
+<TMA> jusss: ((lambda . ((x . nil) . (x . nil))) . (3 . nil))  [23:56]
+*** p9s_ (~p9s@61.145.33.82) has quit: Remote host closed the connection
+*** p9s (~p9s@61.145.33.82) has joined channel #lisp  [23:57]
+<jusss> TMA: wow, this can run too
+*** p9s (~p9s@61.145.33.82) has quit: Remote host closed the connection
+<beach> Amazing!
+*** p9s (~p9s@61.145.33.82) has joined channel #lisp
+<Ukari> (list 1 2) eql  (cons 1 (cons 2 nil))  [23:58]
+*** p9s (~p9s@61.145.33.82) has quit: Remote host closed the connection
+*** p9s (~p9s@61.145.33.82) has joined channel #lisp
+*** p9s (~p9s@61.145.33.82) has quit: Remote host closed the connection
+								        [23:59]
+*** p9s (~p9s@61.145.33.82) has joined channel #lisp
+<beach> Ukari: Not in general, no.  EQL can not be used to compare lists,
+	other than for identity.
+
+[Sat Apr 22 2017]
+*** p9s (~p9s@61.145.33.82) has quit: Remote host closed the connection
+								        [00:00]
+<jusss> ((lambda (x . nil) x . nil) 3 . nil)
+<Ukari> you are right, it seems should use equal  [00:01]
+*** Karl_Dscc (~localhost@p5DD9E138.dip0.t-ipconnect.de) has joined channel
+    #lisp
+*** scymtym (~user@ip-176-198-240-143.hsi05.unitymediagroup.de) has joined
+    channel #lisp
+*** sellout- (~Adium@c-67-176-59-129.hsd1.co.comcast.net) has joined channel
+    #lisp  [00:02]
+*** stee_3_ (~stee_3@66.252.139.92) has joined channel #lisp  [00:03]
+<jusss> and why this can't run in lisp-1?
+*** vtomole (81bafb99@gateway/web/freenode/ip.129.186.251.153) has joined
+    channel #lisp
+<beach> jusss: What makes you think it can't?  [00:04]
+<jusss> beach: ((lambda (x) x) 3 . '())
+*** stardiviner (~stardivin@unaffiliated/stardiviner) has quit: Ping timeout:
+    260 seconds
+<shka> jusss: lisp-1 == single namespace for variables and functions
+*** karswell` (~user@36.91.199.146.dyn.plus.net) has quit: Ping timeout: 260
+    seconds
+<jusss> shka: beach , fine, I mean scheme  [00:05]
+<beach> jusss: What makes you think it won't run in Scheme?
+*** gargaml (~js@2a01:e35:2e25:4d40:ea2a:eaff:fede:7510) has quit: Ping
+    timeout: 240 seconds
+<beach> jusss: Your last example is not equivalent to the previous one.
+<shka> so stuff like (let ((l (list 1 2 3))) (flet ((l (a) (elt l a)))
+       (call-me-maybe l) (l 1)) is complete crap in lisp-1  [00:06]
+*** ogamita (~t@194.206.41.219) has quit: Ping timeout: 260 seconds
+<jusss> beach: what?
+*** stardiviner (~stardivin@unaffiliated/stardiviner) has joined channel #lisp
+*** stee_3 (~stee_3@66.252.139.92) has quit: Ping timeout: 252 seconds  [00:07]
+*** dstatyvka (ejabberd@pepelaz.jabber.od.ua) has joined channel #lisp
+<beach> jusss: ((lambda (x) x) 3 . nil) is not the same as ((lambda (x) x) 3
+	. '())
+<phoe> ((lambda (x) x) 3 . nil) vs ((lambda (x) x) 3 . (quote nil))
+<shka> jusss: 3 . nil -> cons cell wirth first set to 3 and rest to nil
+<beach> jusss: But (lambda (x) x) 3 . nil) should work fine.
+<jusss> beach: but scheme don't have nil
+*** karswell` (~user@61.91.199.146.dyn.plus.net) has joined channel #lisp
+								        [00:08]
+<phoe> jusss: replace all nil with ()
+<jusss> phoe: aha, you're right
+<beach> jusss: Fine, () then.  [00:09]
+<beach> jusss: But not '()
+<jusss> ((lambda (x . ()) x . ()) 3 . ())  works!  [00:10]
+*** scottj (~s@unaffiliated/scottj) has quit: Quit: leaving
+*** attila_lendvai (~attila_le@catv-89-133-164-139.catv.broadband.hu) has
+    joined channel #lisp  [00:11]
+*** attila_lendvai (~attila_le@catv-89-133-164-139.catv.broadband.hu) has
+    quit: Changing host
+*** attila_lendvai (~attila_le@unaffiliated/attila-lendvai/x-3126965) has
+    joined channel #lisp
+*** dstatyvka (ejabberd@pepelaz.jabber.od.ua) has left channel #lisp: #lisp
+								        [00:13]
+*** psacrifice (~psacrific@27.7.169.30) has quit: Remote host closed the
+    connection  [00:14]
+*** psacrifice (~psacrific@27.7.169.30) has joined channel #lisp  [00:16]
+<jusss> can we turn ((lambda ...) 3) into (lambda ...) form?  [00:17]
+<jusss> turn to
+<beach> jusss: Can you be more specific about what you want to do?
+*** dstatyvka (ejabberd@pepelaz.jabber.od.ua) has joined channel #lisp  [00:18]
+<beach> jusss: Is the "turning into" supposed to be done by a computer or by a
+	human?
+<presiden> human compiler ftw!
+<beach> jusss: Furthermore, a "lambda form" is just data.  Perhaps you mean "a
+	function"?  They are not the same.  [00:19]
+<jusss> beach: ((lambda (x) x) 3) turn to (lambda .. 3 . nil) just one brace
+<shka> jusss: sure, but why?
+<beach> jusss: Sure, remove the first parenthesis.
+<beach> It won't be the same thing of course.  [00:20]
+<shka> jusss: what exactly do you want to write?
+<jusss> shka: just do it for fun
+<beach> jusss: Oh, you want them to mean the same to READ?  No that can't be
+	done.
+<beach> jusss: When READ has processed the first one, it is a list with the
+	CAR being another list.  But when READ has processed the second one,
+	it is a list with the CAR being the symbol LAMBDA.  [00:21]
+*** shka (~herr@130.180.197.114) has quit: Quit: Konversation terminated!
+*** rjid (557327b4@gateway/web/freenode/ip.85.115.39.180) has joined channel
+    #lisp
+<jusss> beach: yes, you're right  [00:22]
+*** yeticry_ (~yeticry@60.168.173.129) has joined channel #lisp
+*** yeticry (~yeticry@223.240.249.242) has quit: Read error: Connection reset
+    by peer  [00:23]
+*** muyinliu (~muyinliu@114.252.41.38) has joined channel #lisp
+
+---------------------------------------------------------------------------------
+
 <x> there's macro in elisp, so I wonder is there fexpr in elisp?
 <y> lol  [22:51]
 <y> that's some excellent line of reasoning you got there
