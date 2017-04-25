@@ -1,3 +1,22 @@
+QoS
+先创建限速规则，比如上次速度多少，和名字 创建slow规则限速上传240kbits/s 总带宽去speedtest.net测试
+然后创建限速网段 我猜和iptables的规则一样从上到下匹配 
+192.168.2.1 Fast
+192.168.2.240 Fast
+192.168.2.239 Fast
+192.168.2.0/24 slow
+记得一定要设置总带宽，否则会按默认值限速，50M电信光纤下载50000kbits/s 上传5000kbits/s
+-----------------------------------------
+无限桥接WDS或client模式本来工作好好的，但是在笔记本上经常出现ping 192.168.1.1不通，但192.168.1.2通
+不得已把无线桥接模式改成了网关模式
+网关模式可以配置本地网段和ssid密码和隐藏问题, AP是配置无线子网段的
+无线桥接WDS client的本来意义或许就是作为上级网络的延伸，所以ssid和密码都要和上级网络一样
+而网关模式，就是再建个新局域网，接入上级网络
+因为上级网络做了QoS记得，在上级路由器给这个路由器做静态DHCP分配，然后这个路由器做个QoS
+-----------------------------------
+有点ironic不是吗？刷石像鬼是为了QoS,然后发现石像鬼执行WDS桥接，而不需要设置QoS,由上层路由器设置就行
+刷OpenWRT，没有QoS，也没有WDS桥接
+----------------------------------------------------------
 WDS can not hide SSID to broadcast in web ui config, leave it empty in 'ssid to broadcast', there's an error
 -----------------------------------------------------------------
 WDS repeater, not client mode, same SSID, same password, same LAN, use BGN not AN operation mode
