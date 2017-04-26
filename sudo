@@ -1,7 +1,12 @@
+john    ALL=NOPASSWD:ALL 之所以需要后面的john所属组也设置不要密码，是因为后面的john组或john所属的组的设置会覆盖这条
+
+直接把john    ALL=NOPASSWD:ALL写到/etc/sudoers所有规则最后面，就不需要设置john所属的组了!
+
+-----------------------------------------------------------
 /etc/sudoers
 root ALL=(ALL:ALL) ALL
 
-john ALL=(ALL) NOPASSWD:ALL 用户john运行sudo不需要密码(此时确保john所属的组运行sudo也不需要密码,否则还是需要密码)
+john ALL=(ALL) NOPASSWD:ALL 用户john运行sudo不需要密码(此时确保john所属的组运行sudo也不需要密码,否则还是需要密码,因为这条在john组前面，会被john组覆盖)
 
 john ALL=(ALL) ALL 用户john运行sudo需要密码
 
