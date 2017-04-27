@@ -1,3 +1,10 @@
+
+A closure is an encoding of a function that pairs a (possibly open) lambda expression with an environment to define its free variables. In other words, a closure closes an open term.
+
+在env里用dot-pair连接函数和env形成closure
+
+--------------------------------------------------------
+
 * (defun als () (let ((m 0)) (lambda () (setq m (+ m 2)) m)))
 
 0] (funcall (als))
