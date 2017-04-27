@@ -1,4 +1,24 @@
+动态作用域就是整个程序运行的时候只有一个env。什么是env呢？env就是一组binding。binding是什么呢？
+binding就是从identifer到value的映射。dynamic scope在每次函数求值的时候都会在这唯一的一个env里查询或更新
+而static scope是每次函数求值的时候都创建一个新的env，包含了函数定义时候的所能访问到的各种binding。
+这个新的env连同那个函数一起，俗称闭包Closure。
+链接：https://www.zhihu.com/question/20032419/answer/49183240
 
+定义一个函数时，函数使用了env的变量，这样env的变量就会和函数一起绑定，就是closure
+定义函数时，如果函数使用了定义时的env里的变量或函数，就会创建新的env(里面包含使用的变量或函数), 就是lexical scope
+dynamic scope就是只有一个env, 创建函数也不会创建新env
+
+env就是environment or namespace or context,里面就是符号和值的绑定，比如
+lisp-1的env: ((variable value) (function lambda-list))
+lisp-2的env: ((variable value) (variable value))  ((function lambda-list) (function lambda-list))
+newlisp在env A里调用env B的函数，这个函数去env B里找绑定，构造闭包，正常闭包是在函数创建时，创建新env,
+但newlisp这种不是在函数创建时创建新env,而是从另一个env里调用函数，函数去创建它的env里找绑定，不知道算不算闭包？而且是动态作用域的env
+
+A closure is an encoding of a function that pairs a (possibly open) lambda expression with an environment to define its free variables. In other words, a closure closes an open term.
+
+在env里用dot-pair连接函数和函数创建时的env形成closure然后存env里
+
+在env里用dot-pair连接函数和函数创建时的env形成closure然后存env里
 A closure is an encoding of a function that pairs a (possibly open) lambda expression with an environment to define its free variables. In other words, a closure closes an open term.
 
 在env里用dot-pair连接函数和env形成closure
