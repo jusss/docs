@@ -1,4 +1,4 @@
-QoS
+QoS 不支持192.168.2.1-192.168.2.200这种写法，在restriction里面可以这样写,qos里面不行，qos里面可以用CIDR写法
 先创建限速规则，比如上次速度多少，和名字 创建slow规则限速上传240kbits/s 总带宽去speedtest.net测试
 然后创建限速网段 我猜和iptables的规则一样从上到下匹配 
 192.168.2.1 Fast
