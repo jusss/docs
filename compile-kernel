@@ -1,3 +1,40 @@
+USB_PHY depend USB_OTG_FSM   use /USB_OTG_FSM search and got it's in Device.../USB.../USB 2.0 OTG FSM implementation and press ? on it you will see
+it is the config of USB_OTG_FSM
+then use /288 search and find EXTCON_AXP288 is n and it's in Device.../Exter... change it there!
+then use /288 search AXP288_CHARGER and find it is in Device.../Power.../ change it there!
+one by one change, 用/288搜索所有288依赖选项,然后根据Location找到依赖选项的位置，然后去那个位置用space启动
+等都启用后，再去AXP288_CHARGER的Location那启用,等所有依赖项都启用后，menuconfig才会显示出你想要修改的项，你才能用space修改
+make menuconfig 用/搜索项,等depends on的选项全启用后，再去Location那启用这个项,一个个依赖启用,一步步重复这个步骤,查depends on然后去Location启用,在
+Location项前用?可以显示对应的CONFIG名
+/ search,  ? show config,  upper case for auto jump,    in make menuconfig
+-----------------------------------
+复制内核模块
+make modules_install INSTALL_MOD_PATH=/mnt/4.11rc8-modules
+
+内核headers
+make headers_install INSTALL_HDR_PATH=/mnt/4.11rc8-headers/
+
+复制内核
+cp arch/boot/bzImage /mnt/4.11-rc8-kernel/
+
+sudo cp -r /mnt/4.11rc8-modules/lib/modules/4.11.0-rc8/   /lib/modules
+
+sudo cp /mnt/4.11rc8-kernel/bzImage  /boot/vmlinuz-4.11.0-rc8
+
+sudo mkdir /usr/src/linux-headers-4.11.0-rc8
+sudo cp -r /mnt/4.11rc8-headers/include   /usr/src/linux-headers-4.11.0-rc8/
+sudo ln -s /usr/src/linux-headers-4.11.0-rc8  /lib/modules/4.11.0-rc8/build   
+
+sudo mkinitramfs -o /boot/initrd.img-4.11.0-rc8   /lib/modules/4.11.0-rc8
+
+sudo update-grub  or change in /boot/grub/grub.cfg
+
+但是不知道为什么在新内核上编译模块时make提示no target 'module',应该是headers安装有问题
+/lib/modules/$(uname -r)/build是个软连接指向/usr/src/$(uname -r)/
+本来这个build是指向编译内核目录的，现在发现编译网卡模块有问题，就还是用编译内核目录来编吧
+但是不打网卡补丁，网卡补丁涉及mmc,但是现在4.11rc8因为mmc可以suspend了，怕打mmc补丁影响
+而且rtl8723bs网卡已经进4.12rc1了，就直接编译个模块算了，然后等马上出来的4.12rc1
+-----------------------------------------------------
 make headers_install    install headers to ./usr/include
 make headers_install ARCH=i386 INSTALL_HDR_PATH=/usr/include   install to /usr/include
 ------------------------------------------------
