@@ -1,3 +1,6 @@
+guide http://www.newlisp.org/CodePatterns-cn.html#toc-1
+difference with other lisp http://www.newlisp.org/index.cgi?page=Differences_to_Other_LISPs
+---------------------------------------
 https://www.oschina.net/question/565376_62226
 newlisp use fexpr instead of macro, fexpr is special form that don't evaluate parameters
 it uses dynamic scope, not lexical scope
