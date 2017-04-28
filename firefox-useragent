@@ -1,3 +1,6 @@
+QQ浏览器
+Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; WOW64; Trident/6.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; InfoPath.2; .NET4.0C; .NET4.0E; QQBrowser/7.3.9825.400)
+------------------------
 电脑上firefox可通过修改useragent访问手机网站，手机平板android上的firefox也可以通过修改
 useragent访问桌面网站
 
