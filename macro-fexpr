@@ -1,4 +1,295 @@
-1. fexpr用于动态作用域
+scheme 有卫生宏syntax-rules和非卫生宏syntax-case
+----------------------------------------------
+非健康宏，宏调用时使用了和宏定义时同名的变量，就boom了
+http://ju.outofmemory.cn/entry/140479
+
+(define-syntax swap!
+  (lambda (x)
+    ;;we don't have any keywords this time
+      (syntax-case x ()
+        (
+          (swap! a b)
+          (syntax
+            (let ((c a))
+              (set! a b)
+              (set! b c)))
+        )
+)))
+--------------------------------------------
+r6rs 提供了非健康宏 syntax-case
+(syntax-case input-expr (literal...) clause...)
+each clause takes one of the following two forms
+(pattern output-expr)
+(pattern fender output-expr)
+http://www.cs.indiana.edu/~dyb/pubs/tr356.pdf
+(syntax-rules (literal...) ((pattern) (template)))
+http://thzt.github.io/blog/2015/09/21/define-syntax/
+syntax-rules会被展开成syntax-case
+语法对象由syntax特殊形式创建，(syntax e)  #‘e是它的简写，在程序的读取阶段会被展开为(syntax e)。
+语法对象，包装了标识符的作用域信息。宏展开后的标识符还处在其来源处的词法作用域中，
+直接定义宏transform函数
+(define-syntax r
+
+    (lambda (x)
+
+        (display x)
+
+        (display “\n”)
+
+        #t))
+(syntax r) => #t
+
+(define-syntax or
+    (lambda (x)
+        (syntax-case x ()
+            [(_) #‘#f]
+            [(_ e) #‘e]
+            [(_ e1 e2 e3 …)
+             #‘(let ([t e1]) (if t t (or e2 e3 …)))])))
+它使用了与syntax-rules相同的模式匹配规则，不同的是，我们还需要显式构造模板中的语法对象。
+对于宏调用(or a b)来说，x的值是#<syntax (or a b)>，syntax-case会先求值x，然后解开语法对象的封装，得到(or a b)，再进行模式匹配。
+(what the fuck I'm reading!)
+-------------------------------------------------------------------------------
+macro的参数调用时不自动求值，当macro展开后自动求值，但fexpr的参数不管是调用时，还是运算时，总不自动求值
+(defmacro test ((this is a test) aha) `(,aha))
+----------------------------------------------------------------------
+把函数写进列表，然后用assq匹配名字取出函数
+(define my-macro-namespace ((function-f (lambda ...))
+		      (function-q (lambda ...))
+		      (display (lambda (x) (display 'x)))
+		      	       (variable-a value)))
+
+(assq function-f my-namespace)
+
+(mydsl)
+LOOP 10 WHAT
+WAIT 10 s
+
+
+(wait 3 s for run you clever boy and remember) 哈哈
+#################################
+according 7 lines interpreter,用assq把宏调用时的参数匹配出来，得值，和case差不多
+> (define-syntax what
+(syntax-rules ()
+((what n unit)
+(let ((time-table '((s . 60) (m . 3600)))) (assq 'unit time-table)))))
+> (what 3 s)
+'(s . 60)
+#################################
+返回一个参数列表先, 用letrec构造一个列表并返回
+> (letrec ((a 1) (b (* a 2))) `((a . 1) (b . ,b)))
+'((a . 1) (b . 2))
+
+(letrec ((s 60)
+	 (m (* 60 s))
+	 (h (* 60 m))
+	 (d (* 24 h))
+	 (month (* 30 d))
+	 (y (* 12 month)))
+	 `((s . ,s) (m . ,m) (h . ,h) (d . ,d) (month . ,month) (y . ,y)))
+######################################
+第二个展开模板，直接调用第一个匹配模板然后加以变化，调用第一个匹配模板来展开第二个展开模板
+(define-syntax wait
+  (syntax-rules (for)
+		((wait n unit)
+		(let ((time-table
+			(letrec ((s 1)
+				 (m (* 60 s))
+			 	 (h (* 60 m))
+			 	 (d (* 24 h))
+			 	 (month (* 30 d))
+			 	 (y (* 12 month)))
+			 `((s . ,s) (m . ,m) (h . ,h) (d . ,d) (month . ,month) (y . ,y)))))
+		  (sleep (* n (cdr (assq 'unit time-table))))))
+		  ((wait n unit for function)
+		   (begin (wait n unit)
+		   	  function))))
+
+(wait 1 m for (display 'hi))
+hi>
+
+###################
+把(wait 3 m for (display hi))去括号， 匹配(wait n unit for function ...) 展开  (function ...)
+
+(define-syntax wtf (syntax-rules (you) ((wtf are you doing ...) (doing ...))))
+> (wtf are you display 'hi)
+hi
+
+(define-syntax wait
+  (syntax-rules (for)
+		((wait n unit)
+		(let ((time-table
+			(letrec ((s 1)
+				 (m (* 60 s))
+			 	 (h (* 60 m))
+			 	 (d (* 24 h))
+			 	 (month (* 30 d))
+			 	 (y (* 12 month)))
+			 `((s . ,s) (m . ,m) (h . ,h) (d . ,d) (month . ,month) (y . ,y)))))
+		  (sleep (* n (cdr (assq 'unit time-table))))))
+		  ((wait n unit for function ...)
+		   (begin (wait n unit)
+		   	  (function ...)))))
+
+(wait 3 s for display 'hi)
+hi
+
+#####################################
+再把'hi换成 hi
+(display 'hi)  匹配里面变成(function 'para) 但是...得有一个参数para ... 或者新建个echo宏做去掉'
+
+
+################################################################
+Below is the 7-line, 3-minute interpreter for the lambda calculus
+
+; eval takes an expression and an environment to a value
+(define (eval e env) (cond
+  ((symbol? e)       (cadr (assq e env)))
+  ((eq? (car e) 'λ)  (cons e env))
+  (else              (apply (eval (car e) env) (eval (cadr e) env)))))
+
+; apply takes a function and an argument to a value
+(define (apply f x)
+  (eval (cddr (car f)) (cons (list (cadr (car f)) x) (cdr f))))
+
+; read and parse stdin, then evaluate:
+(display (eval (read) '())) (newline)
+####################################################################
+--------------------------------------------
+(mydsl)
+loop 10 countdown
+wait 10 minutes for countdown
+--------------------------------------------
+既然不能用递归在宏里，而且又不会迭代，那就干脆用continuation来做循环吧，哇咔咔！
+(define-syntax myloop
+  (syntax-rules ()
+		((myloop n function)
+		 (let ((alist (call/cc (lambda (k) (cons k n)))))   ;;;返回一个improper list里面存储continuation和控制条件循环的变量
+		   (if (< (cdr alist) 2)
+		       function
+		     (begin function
+			    ((car alist) (cons (car alist) (- (cdr alist) 1)))))))))
+
+(define countdown (let ((a 100)) (lambda () (set! a (- a 1)) a)))
+
+(myloop 33 (countdown))
+---------------------------------
+(define-syntax run
+    (syntax-rules (you clever boy and remember)
+        ((run you clever boy and remember) (exit))))
+(define-syntax mydsl
+    (syntax-rules (loop end sleep ...)
+        ((mydsl loop n proc)
+         (loop n proc)
+         (mydsl loop n proc end 
+                sleep m end)
+           ...)))
+-------------------------------------
+define-syntax 把identifier和transformer关联 (define-syntax identifier transformer)
+而syntax-rules可以生成transformer并返回这个transformer
+scheme的卫生宏 syntax-rules是基于模板匹配的宏，而不是cl那种直接生成表达式的宏
+匹配syntax-rules第二个list里面第一个调用时的列表格式，匹配成功就执行对应的后面的列表
+syntax-rules可以写多个匹配格式
+
+define-syntax-rules 只能匹配一个模式
+(define-syntax-rules (inc a) (set! a (+ a 1)))
+
+syntax-rules的第一个参数是个list, 这个list装着一些literal identifier,就是不求值的identifier,
+就是宏调用时，这些identifier可以出现，但是不会求值
+(define-syntax return-last-parameter-value
+    (syntax-rules (this is no sense)
+        ((_ this is no sense var) var)   ;;; _替代test-macro宏名   (调用模板 执行模板)
+        ((_ var) var)
+        ((_ var var2) var2)
+        ((_ var var2 ...) (return-last-parameter-value var2 ...))))
+> (return-last-parameter-value this is no sense 3)
+3
+> (define a 6)
+> (return-last-parameter-value 2 3 4 a)
+6
+
+记住宏调用时，宏的参数不自动求值，函数的参数自动求值，但在宏的匹配模板对应的执行模板里，参数是会自动求值
+省略号... 也是个宏，在这替代剩余的参数,还可以递归
+
+(define-syntax for
+  (syntax-rules (to)
+    ;; loop in sequence
+    ;; (for i (0 to 10) do something...)
+    ((_ i in (from to end) body ...)
+     (let loop ((i from))
+       (when (< i end)
+             body ...
+             (loop (+ i 1)))))
+
+调用(for i in (10 to 20)
+       (when (even? i)
+             (display i) (display " ")))
+
+scheme的模式匹配宏，只有匹配上才求值, 而且scheme的syntax-rules里面可以用递归调用宏，而不像cl或fexpr不能递归
+调用自身
+
+读取期，编译期和运行期， 宏展开在编译期，但fexpr是在运行期
+
+scheme的宏是模式匹配宏，而且没有读取宏(宏字符)，只有编译宏, 宏定义时可以在宏展开模板里递归调用宏,
+cl的defmacro宏定义和newlisp的fexpr define-macro定义时都不可递归调用自身
+
+http://www.ituring.com.cn/article/53790
+https://docs.racket-lang.org/guide/pattern-macros.html
+http://ju.outofmemory.cn/entry/140479
+http://thzt.github.io/blog/2015/09/21/define-syntax/
+
+(define-syntax f (syntax-rules (a) ((_a x) x)))   (_a 3) _a not defined
+(define-syntax f (syntax-rules () ((_a x) x)))    (_a 3) undefined _a
+scheme don't have character macro!
+-------------------------------------------------------------
+cl的宏是defmacro, scheme的宏是syntax-rules
+而且syntax-rules的写法真的恶心。。。
+用_替代宏名
+(define-syntax when
+  (syntax-rules ()
+    ((_ pred exp exps ...)   ;此处的_替代宏名when, 宏使用时的规则
+      (if pred (begin exp exps ...)))))   ;宏展开后
+
+inc!宏，swap!宏，push!宏 对变量产生更改，名字加个!更容易理解
+(define-syntax inc!
+    (syntax-rules ()
+        ((_ var)                  ;宏调用时格式
+         (set! var (+ var 1)))))  ;宏展开后
+
+(define-syntax push!
+    (syntax-rules ()
+        ((_ atom alist)
+         (set! alist (cons atom alist)))))
+
+(define-syntax push!
+    (syntax-rules ()
+        ((_ atom alist)
+         (begin (set! alist (cons atom alist))
+                alist))))
+
+(define-syntax swap!
+    (syntax-rules ()
+      ((_ a b)
+       (let ((c a))
+     (set! a b)
+     (set! b c)))))
+
+(define-syntax nil!
+    (syntax-rules () 
+      ((nil! var)        ;此处的nil!可以用_替代
+       (set! var '()))))
+
+宏改变调用它的命名空间, 如果用函数，函数无法改变调用它的命名空间
+函数的闭包性质限制它不能影响外部变量
+(define (f-nil! x)
+  (set!x '())) 
+(define a 1)
+(f-nil! a)
+a => 1
+
+
+-----------------------------------------------------------------
+1. fexpr用于动态作用域   fexpr: call-by-text     call-by-name     call-by-value  应用序 正则序
 2. fexpr 运行在run time和函数一样，macro运行在compile time
 3. fexpr 太难编译
 4. 不论是fexpr还是macro都不要用递归，比如macro里递归调用macro自身
