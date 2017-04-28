@@ -1,4 +1,4 @@
-scheme 有卫生宏syntax-rules和非卫生宏syntax-case
+scheme 有卫生宏syntax-rules和非卫生宏syntax-case,不过syntax-case写着真恶心，不如cl的defmacro
 syntax-case可以对参数进行判断
 (define-syntax my-if
   (lambda (x)
