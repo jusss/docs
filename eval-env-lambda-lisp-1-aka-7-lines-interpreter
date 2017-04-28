@@ -1,0 +1,204 @@
+lisp-1 racket:
+> (((lambda (x) (lambda (y) (+ x y))) 3) 4)
+7
+
+lisp-2 sbcl:
+* (((lambda (x) (lambda (y) (+ x y))) 3) 4)
+; in: ((LAMBDA (X) (LAMBDA (Y) (+ X Y))) 3) 4
+;     (((LAMBDA (X) (LAMBDA (Y) (+ X Y))) 3) 4)
+; 
+; caught ERROR:
+;   illegal function call
+; 
+; compilation unit finished
+;   caught 1 ERROR condition
+
+eval something可以用((lambda (x) ...) parameter)替代,在别的语言好像不能这么用
+(eval expr env) 把eval转换成((lambda (x) ...) parameter)这种形式, expr变成lambda, env取parameter
+
+http://matt.might.net/articles/implementing-a-programming-language/
+
+Below is the 7-line, 3-minute interpreter for the lambda calculus
+
+; eval takes an expression and an environment to a value
+(define (eval e env) (cond
+  ((symbol? e)       (cadr (assq e env)))
+  ((eq? (car e) 'λ)  (cons e env))
+  (else              (apply (eval (car e) env) (eval (cadr e) env)))))
+
+; apply takes a function and an argument to a value
+(define (apply f x)
+  (eval (cddr (car f)) (cons (list (cadr (car f)) x) (cdr f))))
+
+; read and parse stdin, then evaluate:
+(display (eval (read) '())) (newline)
+
+
+(eval 'a '((a 1) (b 2))) => 1
+(eval '(lambda (x) x) '((a 2))) => ((lambda (x) x) (a 2))
+(eval '((lambda (x) x) y) '((y 2))) => error, cdr expect pair, give #f
+
+(define (apply1 f x)
+  (eval1 (car (cddr (car f))) (cons (list (car (cadr (car f))) x) (cdr f))))
+
+(eval1 '((lambda (x) x) y) '((y 3) (x 2)))
+
+(define (apply f x)
+(eval (car (cddr (car f))) (cons (list (car (cadr (car f))) x) (cdr f))))
+加2个car, (eval '((lambda (x) x) y) '((y 3) (x 2))) => 3
+如果想用(lambda (x) (+ x 1))得写+判断在eval
+但这个例子有点看不懂，为什么不把(eval ...)变形成((lambda (x) ...) parameter)这种方式求值？
+
+holy shit! 作者用的是dot-pair也就是improper list写的7行求值器，不是proper list
+
+正确的调用方式是 (eval1 '((lambda x . x) y) '((y 3)))
+----------------------------------------------------------------------------------------
+(a b c d . e) is (a . (b . (c . (d . e))))
+(lambda x . x) is (lambda . (x . x))
+
+dot-pair,或者叫cons-cells或者叫improper list
+
+(cons 'a (cons 'b (cons 'c (cons 'd (cons 'e '())))))   (a b c d e)
+
+(cons 'a (cons 'b (cons 'c (cons 'd 'e))))      (a b c d . e)
+(a b c d . e) is (a . (b . (c . (d . e))))
+
+
+((lambda . (x . x)) . y)
+
+newlisp don't use cons cell so it doesn't have car cdr stuff
+
+(lambda . (x . x)) 这样一个连一个，list就是cons cells的收集器
+----------------------------------------------------------------------------------------
+
+<notforsure> I saw someone wrote a interpreter, it just has 7 lines, there's
+	     something I don't understand
+	     https://gist.github.com/anonymous/947f11d69e7b5e684b6daf13c232e3f0
+								        [21:54]
+<notforsure> (eval '((lambda (x) x) y) '((y 2))) don't return 2
+<notforsure> or my (eval ...) style is wrong?  [21:55]
+*** dbmikus (~dbmikus@cpe-66-108-224-204.nyc.res.rr.com) has joined channel
+    #scheme  [21:56]
+*** dbmikus (~dbmikus@cpe-66-108-224-204.nyc.res.rr.com) has quit: Client Quit
+								        [21:57]
+*** dbmikus (~dbmikus@cpe-66-108-224-204.nyc.res.rr.com) has joined channel
+    #scheme  [21:58]
+<jcowan> Well, it would help if it wasn't λ in the code and 'lambda' in the
+	 example.
+<notforsure> jcowan: yes, I replace it, and still not work  [21:59]
+<ski> shouldn't `cddr' there be `caddr' ?
+*** shpx (~bv@unaffiliated/shpx) has joined channel #scheme
+<gwatt> yeh  [22:00]
+*** jcowan (~John@cpe-66-108-88-48.nyc.res.rr.com) has quit: Quit: Leaving
+<ski> oh, and `cadr' in `apply' should be `caadr'  [22:01]
+<ski> at least judging from the format `(lambda (x) x)'
+<notforsure> replace cddr (car (cddr (car f)))
+<ski> if you used `(lambda x . x)', it'd be another thing .. perhaps the
+      article did this ?
+<notforsure> and (list (car (cadr ...)))  [22:02]
+<ski> notforsure : right
+<notforsure> ski: it's from
+	     http://matt.might.net/articles/implementing-a-programming-language/
+<ski>   Anonymous functions are written with a "lambda-dot" notation, so that:
+								        [22:03]
+<notforsure> ski: it seems he uses dot pair not proper list, I'm not sure
+<ski>     (λ _v_ . _e_)
+<ski> so it seems they're using a different format for abstractions, right
+<ski> which explains the discrepancy in `apply'
+* ski finds this use of a dotted list, to look like a traditional lambda, a
+  bit amusing  [22:04]
+*** shpx (~bv@unaffiliated/shpx) has quit: Ping timeout: 252 seconds
+<ski> (also, the formatting in `eval' is weird)  [22:05]
+<notforsure> ski: so he use them like (lambda (x . body)) not normal (lambda
+	     (x) body)?  [22:06]
+<ski> no, `(lambda x . body)', rather  [22:07]
+<notforsure> aha, new to me
+<ski> rudybot: eval (car '(working))
+<rudybot> ski: e.g this isnt returning the result but rather still the lambda
+	  : (eval (plist-get (car (auth-source-search :host '("riley")))
+	  ':secret))
+<ski> ok, not working  [22:08]
+<ski> if you evaluate
+<ski>   (cons 'lambda (cons 'x 'x))
+<ski> then the result will be displayed in "dotted list" notation as  [22:09]
+<ski>   (lambda x . x)
+*** alezost (~user@unaffiliated/alezost) has joined channel #scheme  [22:10]
+<ski> (the "end tail" is not the empty list here, so this is an improper
+      list. but if the body had been an application (or an abstraction whose
+      eventual body is an application), then the "end tail" would have been
+      the empty list, and this would be a proper list)
+*** p9s (~p9s@61.145.33.82) has quit: Remote host closed the connection
+								        [22:11]
+<notforsure> the improper list is really not easy to understand for me :-(
+								        [22:14]
+<notforsure> (lambda x . x) is (lambda . (x . x)) ?
+*** p9s (~p9s@61.145.33.82) has joined channel #scheme  [22:15]
+<ski> in this case it's just a pair whose first component is the symbol
+      `lambda', and whose second component is a pair whose first component is
+      the symbol describing the formal parameter identifier, and whose second
+      component is the body expression of the abstraction
+<ski> notforsure : no, not at all
+<ski> or rather .. the printer will not print out something like the second
+								        [22:16]
+<ski> hm, right. i spoke too soon. those two indeed does describe the same
+      structure of pairs  [22:17]
+<ski> if you want to create an improper list of symbols
+<ski>   (a b c d . e)
+<ski> then you can create it by
+<ski>   (cons 'a (cons 'b (cons 'c (cons 'd 'e))))  [22:18]
+<ski> the proper list
+<ski>   (a b c d e)
+<ski> instead is made by
+<ski>   (cons 'a (cons 'b (cons 'c (cons 'd (cons 'e '())))))
+<notforsure> so (a b c d . e) is (a . (b . (c . (d . e)))) ?
+<ski> yes, but the printer abbreviates it as the former  [22:19]
+<notforsure> so (lambda x . x) is (lambda . (x . x))?
+<ski> (and i'm used to that, so i mistakenly thought the latter of those two
+      was different)  [22:20]
+<ski> yes. sorry for the confusion
+*** burtons (~textual@adsk-nat-ip4.autodesk.com) has joined channel #scheme
+<notforsure> wow, new to me  [22:21]
+<notforsure> in this case, his 7 lines interpreter, what's the eval style?
+								        [22:22]
+<ski> not sure what you mean by "eval style"
+<notforsure> like this (eval ((lambda (x) x) y) '((y 2)))
+<notforsure> (eval expr env)
+<ski> this is an environment-passing evaluator  [22:23]
+<ski> a call-by-value one
+<notforsure> yes, call-by-value, in his 7 lines interpreter, use his eval ,
+	     like?  [22:24]
+<ski> one could imagine a substitution-based evaluator
+<ski> one could imagine using call-by-name intead of call-by-value
+<ski> &c.
+<notforsure> (also I like call-by-text more)
+* ski still doesn't understand the question
+<ski> (and i don't know what "call-by-text" would mean .. FEXPRs ?)  [22:25]
+<notforsure> ski: yes, fexpr
+* ski isn't fond of it
+<notforsure> the special form
+<notforsure> fexpr just like a function but don't auto eval its parameters
+<ski> yes. imho that's bad, at least for general usage  [22:26]
+<notforsure> ski: the 7 lines interpreter, because he uses improper list, if
+	     I'd like eval ((lambda (x) x) y) in his interpreter, how I should
+	     write the lambda list? like (eval '((lambda x . x) y) '((y 3) (z
+	     4))) ?  [22:28]
+<ski> oh  [22:30]
+<ski> yes, like that
+<ski> assuming you use the definition of `apply' in the paste, without the
+      suggested modifications here
+<ski> (well, using `λ' instead of `lambda')  [22:31]
+*** badkins (~badkins@50.55.175.226) has joined channel #scheme  [22:35]
+*** badkins_ (~badkins@mobile-166-173-248-230.mycingular.net) has joined
+    channel #scheme  [22:36]
+*** badkins (~badkins@50.55.175.226) has quit: Ping timeout: 240 seconds
+								        [22:39]
+<notforsure> ski: I tried (eval '((lambda x . x) y) '((y 3))) and still got
+	     error...  [22:41]
+<notforsure> my style is not right
+<notforsure> my syntax
+
+A closure is an encoding of a function that pairs a (possibly open) lambda expression with an environment to define its free variables. In other words, a closure closes an open term.
+
+在env里用dot-pair连接函数和函数创建时的env形成closure然后存env里
+---------------------------------------
+(eval expr env) 可以试试变形成(let env expr) expr成((lambda ...) parameter)
