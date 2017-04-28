@@ -1,4 +1,48 @@
 scheme 有卫生宏syntax-rules和非卫生宏syntax-case
+syntax-case可以对参数进行判断
+(define-syntax my-if
+  (lambda (x)
+    ;;establish that "then" and "else" are keywords
+    (syntax-case x (then else)
+      (
+        ;;pattern to match
+        (my-if condition then yes-result else no-result)
+        ;;transformer
+        (syntax (if condition yes-result no-result))
+       )
+)))    syntax 表达式只是将每个部分重新安排成一个新的表达式。
+
+(define-syntax with-math-defines
+  (lambda (x)
+    (syntax-rules x ()
+      (
+        (with-math-defines expression)
+        (syntax
+          (let ( (pi 3.14) (e 2.71828) ) Scheme会对pi和e进行重命名，使它们不会与包含或嵌入宏的范围中的其他名称冲突
+               expression))
+      )
+)))
+(with-math-defines
+    (* pi e))  变量pi e未定义
+
+procedure macro: 使用syntax-rules我们不能对pattern variable做更多判断（譬如判断macro的参数是否合法等），不能对 template做更多操作。
+(define-syntax swap
+ (lambda (stx)
+  (syntax-case stx ()
+    [(swap x y)
+     (if (and (identifier? #'x)
+              (identifier? #'y))
+         #'(let ([tmp x])
+             (set! x y)
+             (set! y tmp))
+         (raise-syntax-error #f
+                             "not an identifier"
+                             stx
+                             (if (identifier? #'x)
+                                 #'y
+                                 #'x)))])))
+这里对swap参数做了检查，如果这样调用 (swap 10 b) 将会报错，因为10不是一个identifier
+http://www.cnblogs.com/youxin/p/3427323.html
 ----------------------------------------------
 非健康宏，宏调用时使用了和宏定义时同名的变量，就boom了
 http://ju.outofmemory.cn/entry/140479
