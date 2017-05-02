@@ -83,3 +83,25 @@ then use
 `search --no-floppy --fs-uuid --set=root your-uuid`
 `linux root=UUID=xxxx` in grub
 
+----------------------------------------
+make oldconfig 会从读取当前目录的.config或/boot/config
+
+debian用make-kpkg打包内核
+http://blog.chinaunix.net/uid-26826958-id-3282945.html
+普通用户需用fakeroot 
+apt install kernel-package fakeroot
+$fakeroot make-kpkg --revision john  kernel_headers  kernel_image 
+make-kpkg kernel_image kernel_headers 
+
+generate linux-headers.deb failed,
+install: cannot stat 'REPORTING-BUGS':No such file or directory
+debian/rules/targets/headers.mk:40 recipe for target 'debian/stamp/install/linux-headers-4.11.0-custom failed.
+
+so use `fakeroot make -j3 deb-pkg LOCALVERSION=-mytest KDEB_PKGVERSION=1
+it will generate linux-image.deb and linux-headers.deb 
+use dpkg -i *.deb then update-grub
+http://www.linuxquestions.org/questions/debian-26/vanilla-kernel-cannot-stat-%91reporting-bugs%92-no-such-file-or-directory-4175601088/
+
+第一种直接make ; make modules_install; make headers_install 
+第二种make-kpkg 或 make deb-pkg
+第三种download from PPA Ubuntu, use their scripts, debian/rules binary-headers binary-generic
