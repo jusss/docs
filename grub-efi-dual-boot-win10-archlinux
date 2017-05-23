@@ -18,6 +18,11 @@ menuentry "Microsoft Windows 10" {
 $hints_string的值是命令# grub-probe --target=hints_string /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi的输出.
 $fs_uuid的值是命令# grub-probe --target=fs_uuid /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi的输出.
 reference: https://blog.icehoney.me/posts/2015-10-28-UEFI-dual-boot-Archlinux
+
+安装intel-ucode之后重新生成grub.cfg,如果是amd就装linux-firmware
+ grub-mkconfig -o /boot/grub/grub.cfg
+上面这个win10启动可以写入/etc/grub.d/40_custom然后grub-mkconfig -o /boot/grub/grub.cfg生成进入
+https://wiki.archlinux.org/index.php/Microcode
 ------------------------------------------------------------------------------------
 
 制作一个可以在主板设置里boot from file的efi文件
