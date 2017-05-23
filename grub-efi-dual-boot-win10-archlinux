@@ -1,0 +1,27 @@
+0. 先在主板设置里关掉secure boot和fast boot
+1. 在主板设置里是可以选择启动先后顺序来启动不同系统，比如Win10 Archlinux，重启默认启动Win10
+2. 如果把grub2设为了第一启动顺序，可以在grub2里启动Win10 Archlinux
+
+假设/dev/sda1是ESP也就是EFI分区
+mount /dev/sda1 /boot/esp
+grub-install --efi-directory /boot/esp  --boot-directory /boot  --target x86_64-efi
+grub-mkconfig -o /boot/grub/grub.cfg
+vim /boot/grub/grub.cfg
+menuentry "Microsoft Windows 10" {
+        insmod part_gpt
+        insmod fat
+        insmod search_fs_uuid
+        insmod chain
+        search --fs-uuid --set=root $hints_string $fs_uuid
+        chainloader (hd0,gpt1)/EFI/Microsoft/Boot/bootmgfw.efi
+    }
+$hints_string的值是命令# grub-probe --target=hints_string /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi的输出.
+$fs_uuid的值是命令# grub-probe --target=fs_uuid /boot/efi/EFI/Microsoft/Boot/bootmgfw.efi的输出.
+reference: https://blog.icehoney.me/posts/2015-10-28-UEFI-dual-boot-Archlinux
+------------------------------------------------------------------------------------
+
+制作一个可以在主板设置里boot from file的efi文件
+grub-install --efi-directory /mnt/ --boot-directory /mnt--removable --target x86_64-efi
+生成/mnt/EFI/BOOT/BOOTx64.EFI 可以直接从这个文件启动就能进入grub
+再制作一个grub.cfg里面insmod part_gpt  insmod efi_gop efi_uga之类的就可以了
+
