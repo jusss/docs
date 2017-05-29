@@ -1,0 +1,3 @@
+ where I can find the system initial (boot up) message? dmesg?
+
+sudo journalctl -b ${boot_offset}
