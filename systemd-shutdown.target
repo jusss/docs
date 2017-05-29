@@ -1,0 +1,27 @@
+这个shutdown.target好像不存在。。。
+想关机时自动运行某些脚本
+
+/etc/systemd/system/my-shutdown.service
+[Unit]
+Description= run something when shutdown and reboot
+Before= shutdown.target
+
+[Service]
+ExecStart= /bin/true
+ExecStop= /home/jusss/lab/my-shutdown.sh
+RemainAfterExit= yes
+
+[Install]
+WantedBy= multi-user.target
+
+https://bbs.archlinux.org/viewtopic.php?id=188858
+
+/home/jusss/lab/my-shutdown.sh
+#!/bin/bash
+uptime >> /home/jusss/lab/last-shutdown
+
+chmod +x my-shutdown.sh
+systemctl daemon-reload
+systemctl start my-shutdown.service
+systemctl enable my-shutdown.service
+
