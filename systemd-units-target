@@ -1,0 +1,29 @@
+how to know what target running?
+$systemctl list-units --type target
+$ systemctl list-units --type target --all
+$ systemctl list-unit-files --type target
+
+查看这个target依赖什么和什么依赖这个target
+systemctl list-dependencies shutdown.target
+systemctl list-dependencies shutdown.target --reverse
+
+当用 systemctl edit shutdown.target 就会创建这个target目录？
+target should be /etc/systemd/system/shutdown.target.d/  or
+/etc/systemd/system/shutdown.target.d/
+
+man 5 systemd.unit and man 5 systemd.target
+创建foo.target
+/etc/systemd/system/foo.target    a target unit file,里面写After=已存在的target,跟随已存在target启动
+/etc/systemd/system/foo.target.wants/      存放软链接的目录  ln -s x.service /etc/systemd/system/foo.target.wants/x.service
+而这个x.service里写Wants=foo.target
+
+shutdown.target属于systemd.special, 所以man systemd.special
+find了没找到shutdown.target这个文件
+
+
+
+
+
+
+
+
