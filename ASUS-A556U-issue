@@ -1,0 +1,101 @@
+<jusss> I installed archlinux on my new laptop Asus A556U, there're NVIDIA
+	GEFORCE 930M and rtl8723be, and it pops lots spam message like "PCIe
+	Bus Error: severity=Corrected, type=Physical Layer, id=00e5(Receiver
+	ID) device [8086:9d15] error status/mask=00000001/00002000"
+<jusss> but it stop spam when I run `rmmod rtl8723be`  [11:09]
+<jusss> so it's the video card or wifi card issue?
+<jusss> I google it, and people suggest "pci=nomsi", what means nomsi?
+<sheep> no message signaled interrupts (MSI)
+<jusss> it just ignore the message?
+<sheep> no, it switches to an older form of interrupt signaling
+
+vim /etc/default/grub
+GRUB_CMDLINE_LINUX_DEFAULT="pci=nomsi"
+
+grub-mkconfig -o /boot/grub/grub.cfg
+---------------------------------------------------------------
+<jusss> where I can find the system initial (boot up) message? dmesg?
+
+<eschwartz> jusss: journalctl -b ${boot_offset}
+-----------------------------------------------
+rtl8723be(wifi card) module settings
+
+/etc/modprobe.d/rtl8723be.conf
+options rtl8723be fwlps=0 swlps=0
+-----------------------------------
+bluetooth
+bluetooth hci0: Direct firmware load for rtl_bt/rtl8723b_config.bin failed with error -2
+
+git clone https://github.com/lwfinger/rtl8723au_bt.git -b master
+sudo cp rtl8723au_bt/Linux_BT_USB_2.11.20140423_8723BE/8723B/rtl8723b_config   /usr/lib/firmware/rtl_bt/rtl8723b_config.bin
+from https://bbs.archlinux.org/viewtopic.php?pid=1698256
+
+pacman -S bluez bluez-utils
+modprob btusb
+systemctl start bluetooth.service    blueman need this service
+
+sudo gpasswd -a john lp      bluetooth deamon user group
+
+bluetoothctl     get into interactive shell
+poweron
+discoverable on
+scan on          search bluetooth
+devices  show the bluetooth device
+pair MAC Adress
+connect MAC Adress
+help
+trust dev    pair without auth
+quit
+
+or config with GUI front-end
+pacman -S blueman obexfs obexftp trayer
+trayer
+blueman-applet then you will find blueman icon on the tray
+right click the icon on the tray, send a file to device
+
+------------------------------------------
+charge but acpi show discharging
+
+clocksource
+
+noveau
+----------------------------------------------
+
+bbswitch disable nvidia video card gt930m
+
+sudo modprobe -r nouveau
+sudo modprobe bbswitch
+
+/etc/modprob.d/blacklist.conf
+blacklist nouveau
+blacklist nvidiafb
+
+sudo tee /proc/acpi/bbswitch <<< OFF 关闭N卡，lspci显示N卡rev ff
+sudo tee /proc/acpi/bbswitch <<< ON  打开N卡功能，lspci可以看到N卡rev a1，表明工作状态
+
+每次关机或重启时，最好都打开N卡，然后开机自动关闭N卡，否则重启到win或linux都会找不到设备
+
+写enable-nvidia-video-card.service，在shutdown.target前运行
+
+/etc/systemd/system/enable-nvidia-video-card.service
+[Unit]
+Description= "enable nvidia video card when shutdown and reboot"
+Before= shutdown.target
+
+[Service]
+ExecStart= /bin/true
+ExecStop= /home/jusss/lab/enable-nvidia-video-card.sh
+RemainAfterExit= yes
+
+[Install]
+WantedBy= multi-user.target
+
+vim lab/enable-nvidia-video-card.sh
+#!/bin/bash
+sudo tee /proc/acpi/bbswitch <<< ON
+
+chmod +x lab/enable-nvidia-video-card.sh
+systemctl daemon-reload
+systemctl start enable-nvidia-video-card.service
+systemctl enable enable-nvidia-video-card.service
+
