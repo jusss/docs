@@ -1,3 +1,3 @@
-cmd | curl -F c=@- http://ptpb.pw/
+cmd | curl -F c=@- https://ptpb.pw/
 
 see: http://ptpb.pw/
