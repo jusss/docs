@@ -53,6 +53,7 @@ trayer
 blueman-applet then you will find blueman icon on the tray
 right click the icon on the tray, send a file to device
 
+systemctl start bluetooth.service  when it shows bluez service init failed
 ------------------------------------------
 charge but acpi show discharging
 
@@ -63,12 +64,14 @@ noveau
 
 bbswitch disable nvidia video card gt930m
 
-sudo modprobe -r nouveau
-sudo modprobe bbswitch
+sudo modprobe -r nouveau 提示正在使用
+sudo modprobe bbswitch    
 
 /etc/modprob.d/blacklist.conf
 blacklist nouveau
 blacklist nvidiafb
+options bbswitch load_state=0
+重启
 
 sudo tee /proc/acpi/bbswitch <<< OFF 关闭N卡，lspci显示N卡rev ff
 sudo tee /proc/acpi/bbswitch <<< ON  打开N卡功能，lspci可以看到N卡rev a1，表明工作状态
@@ -99,3 +102,90 @@ systemctl daemon-reload
 systemctl start enable-nvidia-video-card.service
 systemctl enable enable-nvidia-video-card.service
 
+how to auto load kernel modules when system boot up?
+man modules-load.d
+/etc/modules-load.d/jusss.conf   启动时加载bbswitch模块
+bbswitch
+fat
+vfat
+msdos
+nls_cp437
+ntfs
+vboxnetadp
+vboxnetflt
+vboxpci
+vboxdrv
+--------------------------------------------------
+sound with pulseaudio
+I found the default archlinux have no sound even alsamix show its intel soundcard
+because it uses pulseaudio not alsa
+pacman -S pavucontrol
+then in "Output Devices" tag click the icon of mute audio, it will work
+----------------------------------------------------------
+acpi , plug in, show Discharging
+---------------------------------------------------
+touchpad tap won't work but wipe work
+
+there're synaptics and libinput two way support for touchpad
+and Xorg prefer libinput, remove synaptics and install libinput
+
+then $xinput list  find the touch's name like "Elan Touchpad"
+then vim /etc/X11/xorg.conf.d/30-touchpad.conf
+Section "InputClass"
+	Identifier "Elan Touchpad"
+	Driver "libinput"
+	MatchIsTouchpad "on"
+	Option "Tapping" "on"
+	Option "TappingButtonMap" "lmr"
+EndSection
+
+htpps://wiki.archlinux.org/index.php/Libinput#Button_re-mapping
+		  
+
+-----------------------------------------------
+fcitx,  sudo vim /etc/profile    export XMODIFIERS=@im=fcitx
+export QT_IM_MODULE=fcitx
+export GTK_IM_MODULE=fcitx
+export LC_CTYPE=zh_CN.UTF-8
+--------------------------------------------
+holy shit!
+字体发虚 屏幕亮度用xbacklight无法调节，因为显卡驱动默认用的modesetting!而不是intel驱动
+archlinux默认用modesetting! 在/etc/X11/xorg.conf里 driver modesetting
+
+pacman -Ss xf86-video 看是否装了intel显卡驱动! xf86-video-intel
+
+而且modesetting还可以用vaapi或者vdpau解码， 不需要xf86-video-intel，只需要libva-intel-driver
+libva-vdpau-driver
+
+https://wiki.archlinux.org/index.php/Xorg
+
+没有找到指定的驱动，先搜索xf86-video-fbdev然后xf86-video-vesa然后fall back to modesetting并使用glamor加速
+
+pacman -S xf86-video-vesa
+
+/etc/X11/xorg.conf.d/20-intel.conf
+Section "Device"
+ Identifier "Intel Graphics"
+ Driver     "intel"
+ Option	    "DRI" "2"  #DRI3 is now default
+ #Option    "AccelMethod" "sna" #default
+ #Option    "AccelMethod" "uxa" #fallback
+
+安装xf86-video-intel并设置上面这个xorg.conf之后，xbacklight就能调节屏幕亮度了
+2017.06.02 xf86-video-intel 1:2.99.917+772+gc72bb27a-1 使用vaapi硬解电影还是会屏幕撕裂 tear screen
+开启 Option "TearFree" "true"就好了
+------------------------------------------------
+pacman -S deepin
+vim /etc/lightdm/lightdm.conf
+greeter-session=lightdm-deepin-greeter
+
+vim ~/.xinirc
+startdde
+
+然后用startx发现deepin桌面环境是启动起来了，可是竟然莫名奇妙卡在某个画面不动，发现lightdm.service没启动。。。
+
+直接用systemctl start lightdm.service启动deepin桌面环境，不要用startdde or startx
+
+lightdm好像不读取~/.xinitrc和~/.Xdfaults  also不读取~/.xprofile
+
+DDE右键配置壁纸 不能用了，点图片没反应,重启系统，以john运行systemctl start lightdm发现可以了
