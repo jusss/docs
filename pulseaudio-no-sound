@@ -1,0 +1,8 @@
+sound with pulseaudio
+I found the default archlinux have no sound even alsamix show its intel soundcard
+because it uses pulseaudio not alsa
+pacman -S pavucontrol
+then in "Output Devices" tag click the icon of mute audio, it will work
+
+also make your use is belong audio group
+or gpasswd -a john audio
