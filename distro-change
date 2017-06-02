@@ -1,0 +1,10 @@
+modesetting取代i915
+systemd取代 system v   udev chroot network-manager
+pulseaudio取代 alsa
+wayland 取代 xorg
+libinput 取代 synaptics
+ubuntu的upstart Mir Unity总被抛弃
+
+modesetting 使用glamor作为2D加速 opengl为3D加速
+而且modesetting还可以用vaapi或者vdpau解码， 不需要xf86-video-intel，只需要libva-intel-driver
+libva-vdpau-driver
