@@ -1,3 +1,5 @@
+pkg1.chinafreebsd.cn  new repo at China but not official
+---------------------------
 pkg, pkg_add, ports
 
 ports是一堆Makefile, 从源码编译安装
