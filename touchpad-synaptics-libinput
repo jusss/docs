@@ -1,0 +1,18 @@
+touchpad tap won't work but wipe work
+
+there're synaptics and libinput two way support for touchpad
+and Xorg prefer libinput, remove synaptics and install libinput
+
+then $xinput list  find the touch's name like "Elan Touchpad"
+then vim /etc/X11/xorg.conf.d/30-touchpad.conf
+Section "InputClass"
+	Identifier "Elan Touchpad"
+	Driver "libinput"
+	MatchIsTouchpad "on"
+	Option "Tapping" "on"
+	Option "TappingButtonMap" "lmr"
+EndSection
+
+htpps://wiki.archlinux.org/index.php/Libinput#Button_re-mapping
+		  
+
