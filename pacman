@@ -1,3 +1,9 @@
+pacman -Sg base-devel 查看base-devel组都有什么包
+pacman -S base-devel 安装base-devel组
+
+pacman -S gnome 安装gnome组
+pacman -Sg gnome 查看gnome组的包
+--------------------------------------------------------------------------------------
 pacman 5.0.0-1
 
 大选项 -Database -Query -Remove -Sync -T(deptest) -Upgrade -Files -Version -help
