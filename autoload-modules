@@ -1,0 +1,14 @@
+how to auto load kernel modules when system boot up?
+man modules-load.d
+
+/etc/modules-load.d/jusss.conf
+bbswitch
+fat
+vfat
+msdos
+nls_cp437
+ntfs
+vboxnetadp
+vboxnetflt
+vboxpci
+vboxdrvw
