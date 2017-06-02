@@ -1,0 +1,7 @@
+holy shit!
+字体发虚 屏幕亮度用xbacklight无法调节，因为显卡驱动默认用的modesetting!而不是intel驱动
+archlinux默认用modesetting!
+
+pacman -Ss xf86-video 看是否装了intel显卡驱动!
+而且modesetting还可以用vaapi或者vdpau解码， 不需要xf86-video-intel，只需要libva-intel-driver
+libva-vdpau-driver
