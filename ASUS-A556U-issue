@@ -213,4 +213,53 @@ mpv全屏切换，在DDE里会卡顿，但是在fvwm里不会卡顿
 mpv still don't read the fucking config file ~/.config/mpv/mpv.config! because it read the
 fucking file ~/.config/mpv/mpv.conf!
 ----------------------------------------------------------------------------
-acpi 一开始无法识别充电，现在莫名其妙识别了。。。
+acpi 一开始无法识别充电，现在莫名其妙识别了。。。原来并不是不充电，只是是描述变了
+
+<jusss> [    0.486013] ACPI Error: [_SB_.PCI0.RP01.PXSX] Namespace lookup
+	failure, AE_NOT_FOUND (20170119/psargs-363)
+<jusss> [    0.486022] ACPI Error: Method parse/execution failed [\] (Node
+	ffffffff81d25c60), AE_NOT_FOUND (20170119/psparse-543)
+<jusss> anyone know why this happen?
+<Hello71> !give jusss xy
+<phrik> jusss: What exactly are you trying to do?
+	http://www.perlmonks.org/index.pl?node_id=542341
+<Khorne> jusss, https://bugzilla.redhat.com/show_bug.cgi?id=1413342
+
+<phrik> Title: Bug 1413342 – Linux 4.9.3: ACPI Error: [_OSI] Namespace lookup
+	failure, AE_NOT_FOUND (20160831/psargs-359) (at bugzilla.redhat.com)
+<Khorne> Or if you want something a little bit more general:
+	 https://bugzilla.kernel.org/show_bug.cgi?id=193531#c28
+<phrik> Title: 193531 – ACPI Namespace lookup failure (at bugzilla.kernel.org)
+
+<jusss> Khorne: now I plug power line into my laptop, but acpi show Battery 0:
+	Discharging, 100%, discharging at zero rate - will never fully
+	discharge.  [22:59]
+<Khorne> And?
+
+<jusss> and it should show charging I think
+
+<Khorne> Charging to what? 101%?
+
+<Khorne> Is it charging at zero rate? Discharging at zero rate? is that
+	 actually the same thing?
+
+<jusss> Khorne: I don't know, is it same?  [23:02]
+
+<Khorne> If you are moving at 0km/h, are you moving forwards or backwards?
+<Khorne> Or both?
+
+<jusss> Khorne: so it's not important about acpi error ? 
+
+<jusss> I can ignore that?
+<Khorne> jusss, I dont think its related, acpi just interprets the
+	 trickle-charge I think  [23:05]
+<Khorne> And the ACPI errors are pretty common, I have them too, they are just
+	 annoying, dont affect my charging or discharging
+
+<jusss> Khorne: oh I see, it's a new way to descript about charing when it's
+	100%
+
+<Khorne> jusss, fairly certain, yea, its gonna discharge a tiny bit and then
+	 gets topped off again, and discharges a tiny bit:
+	 https://en.wikipedia.org/wiki/Trickle_charging  [23:07]
+<phrik> Title: Trickle charging - Wikipedia (at en.wikipedia.org)
