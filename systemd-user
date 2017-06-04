@@ -1,0 +1,26 @@
+store battery.notify.service into ~/.config/systemd/user/
+systemctl --user daemon-reload
+systemctl --user start battery.notify.service
+systemctl --user enable battery.notify.service
+
+---------------------------------------------------------------------------
+systemd service files store 
+/usr/lib/systemd/user/    where units provided by installed packages belong
+~/.config/systemd/user/   where the user puts its own units
+/etc/systemd/user/        where system-wide user units are placed by the system admin
+/lib/systemd/system/
+/etc/systemd/system/
+~/.local/share/systemd/user/  where units of packages that have been installed in the home directory belong
+
+systemctl --user enable x.service
+set user's environment ~/.config/systemd/user.conf with DefaultEnvironment
+
+https://wiki.archlinux.org/index.php/Systemd/User
+
+systemctl --user link ./home-john-mnt.mount doesn't work!
+because it needs to be absolutely path!
+systemctl link /home/john/home-john-mnt.mount works!
+systemctl start home-john-mnt.mount
+systemctl enable home-john-mnt.mount
+
+
