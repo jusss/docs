@@ -189,3 +189,28 @@ startdde
 lightdm好像不读取~/.xinitrc和~/.Xdfaults  also不读取~/.xprofile
 
 DDE右键配置壁纸 不能用了，点图片没反应,重启系统，以john运行systemctl start lightdm发现可以了
+
+屏幕闪烁 切换tty和Xorg延迟，于是决定使用modesetting
+
+mpv提示[ao/pulse] the stream is suspended bailing out
+安装pulseaudio-alsa之后发现播放video直接卡在第一个画面不动，卸载后播放正常
+但是还是提示上面这个，killall pulseaudio之后就正常了，pulseaudio会自动重启
+
+modesetting还可以用vaapi或者vdpau解码， 不需要xf86-video-intel，只需要libva-intel-driver 或libva-vdpau-driver
+pacman -S libva-intel-driver libva-vdpau-driver
+mpv -vo vaapi x.mp4
+
+export VDPAU_DRIVER=va_gl
+mpv -vo vdpau x.mp4
+但是这是在用vaapi模拟vdpau, intel不支持vdpau,只支持vaapi,除非有nvidia显卡并安装nvidia官方驱动
+
+硬件解码 mpv --hwdec=vaapi --vo=vaapi x.mp4
+
+ligthdm会读取~/.xprofile而不读取~/.xinitrc
+
+mpv全屏切换，在DDE里会卡顿，但是在fvwm里不会卡顿
+
+mpv still don't read the fucking config file ~/.config/mpv/mpv.config! because it read the
+fucking file ~/.config/mpv/mpv.conf!
+----------------------------------------------------------------------------
+acpi 一开始无法识别充电，现在莫名其妙识别了。。。
