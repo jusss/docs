@@ -1,3 +1,7 @@
+发现服务并没有启动，因为WantedBy=multi-user.target,而journal --user显示并没有
+multi-user.target这个target,所以就没启动，用WantedBy=default.target就可以启动了
+因为journalctl --user显示存在default.target
+------------------------------
 store battery.notify.service into ~/.config/systemd/user/
 systemctl --user daemon-reload
 systemctl --user start battery.notify.service
