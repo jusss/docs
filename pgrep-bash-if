@@ -1,0 +1,2 @@
+pgrep process-name && echo running
+pgrep process-name || echo not running
