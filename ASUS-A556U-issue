@@ -263,3 +263,6 @@ acpi 一开始无法识别充电，现在莫名其妙识别了。。。原来并
 	 gets topped off again, and discharges a tiny bit:
 	 https://en.wikipedia.org/wiki/Trickle_charging  [23:07]
 <phrik> Title: Trickle charging - Wikipedia (at en.wikipedia.org)
+-------------------------------------------------------------------------------
+xterm 按tab自动补全出现屏幕闪烁，用xterm +vb可以避免,  visualbell
+.Xdefaults   XTerm*visualBell:false
