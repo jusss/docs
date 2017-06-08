@@ -9,3 +9,7 @@ mpv -vo vdpau x.mp4
 硬件解码 mpv --hwdec=vaapi --vo=vaapi x.mp4
 
 配置文件 ~/.config/mpv/mpv.conf  not mpv.config
+
+sub-font-size=30 设置字体大小
+
+sub-font=SimSun   设置字体  fc-list|grep Sim知道, SimSun在大号字体情况下显示并不好，只有在小号字体时显示很好
