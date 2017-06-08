@@ -1,0 +1,5 @@
+because there's ~/.config/systemd/user/battery.notifier.service
+ExeStartPre=/usr/bin/sleep "10"
+
+user systemd-analyze blame and systemctl --failed
+systemd-analyze critical-chain xxx.service
