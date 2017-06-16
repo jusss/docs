@@ -1,0 +1,17 @@
+in service
+
+Restart= always   it will restart no matter whatever, if you don't set RestartSec, it will be 100ms
+it means the service restart per 100ms
+
+restart= no always on-sucess on-failure on-abnormal on-abort on-watchdog
+no as default
+on-abnormal   if it's terminated by signal
+on-watchdog watchdog timeout will cause restart
+
+WatchdogSec=
+RestartSec=
+
+---------------------------------------
+
+Restart= on-failure
+RestartSec= "5min 20s"
