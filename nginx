@@ -1,8 +1,23 @@
+强制走https
+#server {
+#    listen 80;
+#    server_name rycbar.win;
+#    # http to https
+#    location / {
+#          #rewrite ^/(.*)$ https://rycbar.win/$1 permanent;
+#          return 301 https://rycbar.win/$request_uri;
+#    }
+#}
+
+---------------------------
 vim /etc/nginx/sites-enabled/default
 server {
         root /usr/share/nginx/www;
         }
 debian jessie 上 #root /var/www/html;
+确保/etc/nginx/nginx.conf里面
+没有root html; 否则这个root html;会覆盖site-enable/default里面的root /usr/share/nginx/www;
+
 设置nginx的根目录,如果不设置这个根目录，nginx就不知道去哪找文件
 
 http://stackoverflow.com/questions/10674867/nginx-default-public-www-location
