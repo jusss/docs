@@ -26,6 +26,27 @@ II. native code
     打包运行时库和可执行文件到指定目录以便可以在其它机器上运行
     raco distribute destination-direcotry x.exe
 
+    这样这个destination-directory就包含了bin和lib
+    复制这个文件夹到/tmp
+    ldd /tmp/bin/x.exe可知依赖的文件
+    然后mkdir /tmp/对应依赖文件的路径
+    如 ldd /tmp/bin/x.exe显示
+    linux-vdso.so.1
+    /usr/lib/libpthread.so.0
+    /usr/lib/libc.so.6
+    /lib64/ld-linux-x86-64.so.2
+    
+    然后mkdir -p /tmp/usr/lib /lib64
+    cp /usr/lib/libpthread.so.0 /tmp/usr/lib
+    cp /usr/lib/libc.so.6 /tmp/usr/lib
+    cp /lib64/libc.so.6 /tmp/lib64
+    
+    sudo chroot . /bin/x.exe
+    创建完整的依赖文件后，可以用cpio打包方便移植
+    find /tmp | cpio -o > ~/x.cpio
+    cpio -i < x.cpio
+    
+
 III. 创建library和调用
 
      x.rkt

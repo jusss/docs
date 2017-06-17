@@ -1,0 +1,30 @@
+ldd what-you-want-to-run.bin  查看这个bin的依赖库
+cd /tmp
+mkdir lib usr lib64
+然后把那些依赖库文件复制到/tmp/lib 对应
+sudo chroot /tmp /bin/what-you-want-to-run.bin
+
+不需要创建bash等其它文件或环境，只要把要执行的文件的依赖文件复制就可以
+
+raco exe -o x.exe x.rk
+raco distribute destination-direcotry x.exe
+这样这个destination-directory就包含了bin和lib
+复制这个文件夹到/tmp
+ldd /tmp/bin/x.exe可知依赖的文件
+然后mkdir /tmp/对应依赖文件的路径
+如 ldd /tmp/bin/x.exe显示
+linux-vdso.so.1
+/usr/lib/libpthread.so.0
+/usr/lib/libc.so.6
+/lib64/ld-linux-x86-64.so.2
+
+然后mkdir -p /tmp/usr/lib /lib64
+cp /usr/lib/libpthread.so.0 /tmp/usr/lib
+cp /usr/lib/libc.so.6 /tmp/usr/lib
+cp /lib64/libc.so.6 /tmp/lib64
+
+sudo chroot . /bin/x.exe  
+
+创建完整的依赖文件后，可以用cpio打包方便移植
+find /tmp | cpio -o > ~/x.cpio
+cpio -i < x.cpio
