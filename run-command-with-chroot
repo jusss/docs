@@ -28,3 +28,5 @@ sudo chroot . /bin/x.exe
 创建完整的依赖文件后，可以用cpio打包方便移植
 find /tmp | cpio -o > ~/x.cpio
 cpio -i < x.cpio
+
+reference: https://wiki.archlinux.org/index.php/Tor#Running_Tor_in_a_Chroot
