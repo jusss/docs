@@ -45,6 +45,13 @@ II. native code
     创建完整的依赖文件后，可以用cpio打包方便移植
     find /tmp | cpio -o > ~/x.cpio
     cpio -i < x.cpio
+
+    或者直接mkdir -p /tmp/usr/lib /tmp/lib64
+    sudo mount -o rbind,ro /usr/lib /tmp/usr/lib  把/usr/lib以只读挂载到/tmp/usr/lib, /usr/lib可读写，/tmp/usr/lib只读
+    sudo mount --make-rslave /tmp/usr/lib 再挂载到/tmp/usr/lib下面的目录，不会映射到/usr/lib, 但/usr/lib的会映射到/tmp/usr/lib
+    sudo mount -o rbind,ro /lib64 /tmp/lib64
+    sudo mount --make-rslave /tmp/lib64
+    sudo chroot /tmp /bin/x.exe
     
 
 III. 创建library和调用
