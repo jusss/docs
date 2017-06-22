@@ -6,14 +6,14 @@ ro read-only
 
 mount -o rbind,ro /lib64 ~/lib64  此时~/lib64是只读的，但/lib64是可写的
 -----------------------------------------------------
-共享挂载点
+共享挂载点, 用于bind之后再挂载设备的子目录是否映射
 https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/5/html/Deployment_Guide/sect-Using_the_mount_Command-Mounting-Bind.html
 mount -rbind old-dir new-dir
 
 mount --bind /media /media
 mount --make-shared /media
 mount --bind /media /mnt
-运行这些命令之后，以后挂载到/media的会映射挂载到/mnt，如/media/cdrom/也会出现在/mnt/cdrom,
+运行这些命令之后，以后挂载到/media的会映射挂载到/mnt，比如挂载设备/dev/cdrom到/media/cdrom,也会映射挂载到/mnt/cdrom,
 以后挂载设备到/mnt下,/mnt下的挂载点也会出现在/media下, 
 /mnt和/media共享原有/media的目录信息，而没有原有/mnt的目录信息
 
