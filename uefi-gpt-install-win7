@@ -1,3 +1,7 @@
+用ultroiso把win7的iso写u盘，用intel的usb3.0 creator把驱动写u盘，把win10的bootmgfw.efi放
+u盘，bios设置从这个文件启动项，装完自动识别win10, 开机esc可选windows启动或archlinux启动，
+如果选windows启动进去后又可选win7 或 win10非常好，连grub都不用再设
+-------------------------------
 或许不需要enable CSM, 反正要uefi启动加gpt分区，直接把bootmgfw.efi复制到u盘
 然后BIOS创建启动路径指向u盘的bootmgfw.efi就能以efi启动gpt分区安装win7
 
