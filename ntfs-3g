@@ -1,0 +1,2 @@
+pacman -S ntfs-3g
+sudo mount -t ntfs-3g /dev/sda5 ~/tmp
