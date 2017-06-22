@@ -1,3 +1,36 @@
+mount -o remount,bind,ro  old-dir new-dir   此时old-dir可写，new-dir只读
+remount 重新加载文件系统，更改文件系统时使用
+ro read-only
+
+递归的话用 -o rbind,ro
+
+mount -o rbind,ro /lib64 ~/lib64  此时~/lib64是只读的，但/lib64是可写的
+-----------------------------------------------------
+共享挂载点
+https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/5/html/Deployment_Guide/sect-Using_the_mount_Command-Mounting-Bind.html
+mount -rbind old-dir new-dir
+
+mount --bind /media /media
+mount --make-shared /media
+mount --bind /media /mnt
+运行这些命令之后，以后挂载到/media的会映射挂载到/mnt，如/media/cdrom/也会出现在/mnt/cdrom,
+以后挂载设备到/mnt下,/mnt下的挂载点也会出现在/media下, 
+/mnt和/media共享原有/media的目录信息，而没有原有/mnt的目录信息
+
+mount --bind /media /media 
+mount --make-shared /media
+mount --bind /media /mnt
+mount --make-slave /mnt  运行这些命令之后，以后挂载到/media的设备，会映射挂载到/mnt，以后挂载到/mnt的却不会映射挂载到/media
+
+mount --bind /media /media
+mount --make-shared /media
+mount --bind /media /mnt
+mount --make-private /mnt
+此时之后，再挂载到/meida的设备挂载点不会映射到/mnt,再挂载到/mnt的也不会映射到/media
+
+mount --bind /media /media
+mount --make-unbindable /media 禁止挂载/media至其它位置,运行mount --bind /media /mnt会提示错误
+-----------------------------------------------
 挂载点标记 shared, private, slave, unbindable
 shared共享挂载，从共享挂载克隆的挂载对象也是共享的挂载；它们相互传播挂载事件。
 如果两个挂载对象具有共享关系，那么一个挂载对象中的挂载事件会传播到另一个挂载对象，反之亦然。
