@@ -13,3 +13,11 @@ bmon, slurm, bwm-ng, nload, cbm, speedometer, netload 显示当前的速度，�
 vnstat 记录显示每天每月总流量
 
 ifstat, dstat, collectl 记录每分钟的流量
+
+-----------------------------------------------------
+
+wifi-menu 能显示附近的ssid和信号
+查看当前连接的ssid信号强度 iw wlp3s0 info 或者 iwconfig wlp3s0 或 cat /proc/net/wireless
+pacman -S wireless_tools
+
+查看连接信息 wavemon
