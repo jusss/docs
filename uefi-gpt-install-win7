@@ -6,6 +6,8 @@ u盘，bios设置从这个文件启动项，装完自动识别win10, 开机esc�
 然后BIOS创建启动路径指向u盘的bootmgfw.efi就能以efi启动gpt分区安装win7
 
 但或许仍需要intel的usb3.0 creator把u盘的win7映像修改下，否则识别不了u盘驱动
+https://downloadcenter.intel.com/zh-cn/download/25476/NUCs-Windows7-USB3-0Creator-?wapkw=usb+3+creator&_ga=2.149170357.226390669.1498237222-1302447239.1498237206
+search 'usb 3 creator' on intel.com
 
 安装系统之后，用驱动精灵把驱动装下，然后发现有个未知设备没装上驱动，去华硕官网搜型号
 把intel serial IO I2C装上，在其它驱动选项里，还有Elan触摸板驱动 和splendid
@@ -18,23 +20,23 @@ BIOS enable CSM, 关闭CSM会以纯efi启动， 开启CSM会以efi或非efi启�
 
 从intel下载usb3.0 把usb3.0驱动写入u盘
 
-<onlylove> jusss: 我倒是记得win7的uefi文件不完整，需要加工下，其他的倒好说，
+<x> j: 我倒是记得win7的uefi文件不完整，需要加工下，其他的倒好说，
 	   xhci和usb3好像是一回事，因为之前是ehci
-<jusss> onlylove: ahci又是什么
-<onlylove> jusss: ahci应该没问题，就是sata盘驱动
+<j> x: ahci又是什么
+<x> j: ahci应该没问题，就是sata盘驱动
 
-<onlylove> jusss: 我记得win7官方的iso对uefi支持不完整的，你要修改文件结构的
-<onlylove> jusss: 你别用ultraiso了，我真的没办法用官方iso在uefi机器上装
+<x> j: 我记得win7官方的iso对uefi支持不完整的，你要修改文件结构的
+<x> j: 你别用ultraiso了，我真的没办法用官方iso在uefi机器上装
 								        [18:41]
-<jusss> onlylove: 问题不是在ultroiso上，我在bios里enablele CSM就能从u盘启动
+<j> x: 问题不是在ultroiso上，我在bios里enablele CSM就能从u盘启动
 	win7 了  [18:42]
-<onlylove> jusss: 对，问题不在ultraiso上，在win7的镜像上，所以你别折腾了
+<x> j: 对，问题不在ultraiso上，在win7的镜像上，所以你别折腾了
 								        [18:43]
-<jusss> disable CSM是纯EFI启动，enable CSM支持非EFI启动
-<onlylove> jusss: 我再说一遍，win7官方镜像对uefi支持不完整，启动不了机器
-<onlylove> jusss: 你要搞，就把镜像修改下再用ultraiso写  [18:44]
-<onlylove> jusss: 但是你那样就不如直接在u盘上改了
-<onlylove> jusss: 我今天不想和你说第三次，你自己去搜资料去
+<j> disable CSM是纯EFI启动，enable CSM支持非EFI启动
+<x> j: 我再说一遍，win7官方镜像对uefi支持不完整，启动不了机器
+<x> j: 你要搞，就把镜像修改下再用ultraiso写  [18:44]
+<x> j: 但是你那样就不如直接在u盘上改了
+<x> j: 我今天不想和你说第三次，你自己去搜资料去
 
 
 从win10里面复制bootmgr.efi和 bootmgfw.efi  C:\Windows\Boot\EFI\ 复制到u盘 EFI\Microsoft\Boot
