@@ -42,3 +42,4 @@ linux (hd1,9)/ 按tab自动补全显示目录来找/boot/确定/的名字，因�
 (hd1,gpt1)是EFI分区，windows和Linux的启动文件都在这里  (hd1,1)/EFI/arch/grubx64.efi
 (hd1,1)/EFI/Microsoft/Boot/bootmgfw.efi
 
+或者直接用 root=UUID=xxx取代 root=/dev/sda9
