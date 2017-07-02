@@ -1,3 +1,23 @@
+gvim " + y 这3个字符能把visual mode选中的行或者块复制到clipboard
+gvim默认开启+clipboard, 而大多数发行版默认的vim都是-clipboard
+vim --version|grep clip就可看到
+使用gvim或者编译vim enable clipboard或者xclip stuff
+
+1. 即使编译vim带clipboard,也会和gvim一样需要"+y 这3个字符复制到clipboard
+2. vim里:h 'clip
+3. "+和"*和X clipboard有关  vim自己的叫寄存器  而X的叫clipboard, 当然也可以
+   用xclip把寄存器的复制到clipboard, emacs的好像也是把寄存器ring的复制到clipboard
+4. 转述   y默认yank到"寄存器，还可以选别的寄存器来yank,比如"jy。 +寄存器是特殊的
+   对应clipboard。可以把默认的寄存器"换成+
+5. 之所以默认vim没带+clipboard,是因为clipboard依赖libX11, gvim提供clipboard,gvim里也
+   包括vim, 但gvim和vim两个包冲突
+6. 安装gvim然后.vimrc  set clipboard^=unnamed,unnamedplus 就可以把yank的复制到clipboard
+   y复制到clipboard,  p从clipboard复制到vim, 在emacs里C-y从clipboard复制到emacs,
+   在terminal里Shift-Insert复制从clipboard到当前位置
+7. mac下的vim "+y不能复制到clipboard,macvim直接使用command-c和command-v
+8. 另一种是xclip或xsel, 在visual mode选中lines之后，按:然后输入w !xclip就把选中的发送到clipboard
+    或:w !xsel -ib  读取就是:r !xsel -ob 但是这样选择的好像直接是一行，而不是一行中的一段
+-----------------------------------
 vim 按q进入recording宏录制
 1.按q进入recording模式
 2.输入a-z或0-9做缓冲器名字并进行录制
