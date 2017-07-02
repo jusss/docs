@@ -42,4 +42,8 @@ linux (hd1,9)/ 按tab自动补全显示目录来找/boot/确定/的名字，因�
 (hd1,gpt1)是EFI分区，windows和Linux的启动文件都在这里  (hd1,1)/EFI/arch/grubx64.efi
 (hd1,1)/EFI/Microsoft/Boot/bootmgfw.efi
 
-或者直接用 root=UUID=xxx取代 root=/dev/sda9
+或者直接用 root=UUID=xxx取代 root=/dev/sda9 所有内核参数设置都应该写入/etc/default/grub然后grub-mkconfig -o /boot/grub/grub.cfg生成新的grub.cfg
+直接在/boot/grub/grub.cfg改，更新内核后会恢复原装，所以在/etc/default/grub里改，然后grub-mkconfig -o /boot/grub/grub.cfg
+lsblk -f可以显示各个分区的UUID
+或者sudo blkid显示，blkid需要root权限
+
