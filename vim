@@ -1,4 +1,5 @@
 gvim " + y 这3个字符能把visual mode选中的行或者块复制到clipboard
+"+p 这3个字符把clipboard复制到vim
 gvim默认开启+clipboard, 而大多数发行版默认的vim都是-clipboard
 vim --version|grep clip就可看到
 使用gvim或者编译vim enable clipboard或者xclip stuff
@@ -17,6 +18,8 @@ vim --version|grep clip就可看到
 7. mac下的vim "+y不能复制到clipboard,macvim直接使用command-c和command-v
 8. 另一种是xclip或xsel, 在visual mode选中lines之后，按:然后输入w !xclip就把选中的发送到clipboard
     或:w !xsel -ib  读取就是:r !xsel -ob 但是这样选择的好像直接是一行，而不是一行中的一段
+
+http://vim.wikia.com/wiki/Accessing_the_system_clipboard
 -----------------------------------
 vim 按q进入recording宏录制
 1.按q进入recording模式
