@@ -1,0 +1,75 @@
+https://community.openvpn.net/openvpn/wiki/TrafficObfuscation
+server: obfsproxy --log-file=obfsproxy.log --log-min-serverity=info obfs2 --dest=127.0.0.1:1194 --shared-secret=<some-random-key> server 0.0.0.:21194
+       假设openvpn的为tcp 1194端口, obfsproxy监听tcp 21194, some-random-key是至少32个随机字符
+        /etc/openvpn/server.conf添加port 1194以防没开
+client: obfsproxy --log-file=obfsproxy.log --log-min-serverity=info obfs2 --shared-secret=<some-random-key> socks 127.0.0.1:10194
+        openvpn.client.conf里添加
+        socks-proxy-retry
+        socks-proxy 127.0.0.1 10194
+        remote <your-server> 21194
+
+openvpn虽然支持tcp和udp两种方式，但是udp速度更快，所以我用的是udp模式，but obfsproxy只支持tcp，需要udp over tcp tunnel
+
+google下发现有个 https://github.com/sagan/udp-proxy
+server: udp-server.py -s server-ip -p openvpn-port -l listen-port -k "password"
+vim /etc/openvpn/server.conf
+注释掉redirect-gateway def1
+添加mssfix 1422
+route server-ip 255.255.255.255 net_gateway
+route 0.0.0.0 128.0.0.0
+route 128.0.0.0 128.0.0.0
+client: udp_client.py -s server-ip -p server-listen-port -l local-listen-port -k "password"
+vim client.openvpn.config  remote server-ip port change to remote 127.0.0.1 local-listen-port
+然后openvpn --config ./client.ovpn 
+BOOM! vps网络配置搞坏了，ping都没反应 ssh也是
+
+用网页登录，重置root密码，进入网页版console
+ifdown eth0
+ifup eth0
+iptables -F
+iptables -L
+重置了vps的eth0网络，然后网络正常工作了
+
+------------------------------------------------------------
+server: obfsproxy obfs3 --dest 127.0.0.1:22  server 0.0.0.0:22222
+client: obfsproxy obfs3 --dest 111.111.111.111:22222  client 127.0.0.1:12222
+        ssh -p 12222 root@127.0.0.1
+---------------------------------------------------------------------------
+https://www.atgfw.org/2015/09/obfsproxy.html?m=1
+obfsproxy是tor的流量混淆插件，这个插件不仅可以用在tor网桥上，还可以用在openvpn ssh等其它应用上
+推荐用pip安装，从debian源安装的缺少scramblesuit特性
+    pip install obfsproxy service_identity
+直接运行obfsproxy查看支持的混淆方式，而archlinux源装的支持scramblesuit
+一般使用obfs3或scramblesuit, scramblesuit是obfs3的加强版，使用密码加密，使gfw无法模拟obfs客户端来探测被混淆的是什么
+
+scramblesuit的密码必须为base32字符 ABCDEFGHIJKLMNOPQRSTUVWXYZ234567 且必须为32位
+
+server: obfsproxy  --data-dir ~/.obfs  scramblesuit --dest 127.0.0.1:22 --password ABCDEFGHIJKLMNOPQRSTUVWXYZ234567 server 0.0.0.0:12222
+client: obfsproxy scramblesuit --dest 111.111.111.111:12222 --password ABCDEFGHIJKLMNOPQRSTUVWXYZ234567 client 127.0.0.1:22222
+        ssh -p 22222 root@127.0.0.1
+
+server上ssh端口是22,然后obfsproxy监听端口12222,  client上obfsproxy连接服务器的12222端口，并监听本地22222端口,然后ssh连接本地的22222端口
+
+如果是用于翻墙的ssh, 就在client运行 ssh -N -D 7070 user@127.0.0.1 -p 22222
+windows版本的obfsproxy.exe可以从Tor里面提取,如果无法运行就安装python
+
+--------------------------------------------------------------------------------
+1. obfsproxy from tor
+2. obfuscated-openssh
+
+握手时的static signatures会被识别为ssh or vpn
+
+
+openvpn, ssh tunnel, tor, 使用deep packet inspection检查openvpn和tor连线handshake时包，然后中断连线
+
+pptp无加密 l2tp/ipsec固定端口 openvpn握手封包被检测 ssh同
+
+
+normal:  A用本地随机端口连接B的22端口 ssh
+obfsproxy: A用本地随机端口连接本地obfsproxy监听端口，然后这个端口连B的obfsproxy监听端口，再由这个端口连接B的22端口  ssh
+
+server: sudo obfsproxy --log-min-serverity=info --log-file=/tmp/ofs-log obfs3 --dest=127.0.0.1:22 server x.x.x.x:443
+client: obfsproxy --log-min-serverity=info obfs3 socks 127.0.0.1:4321
+        ssh -v -o "ProxyCommand /bin/nc.openbsd -x 127.0.0.1:4321 %h %p" -p 443 user@server.net
+
+https://bbs.archlinux.org/viewtopic.php?id=209945
