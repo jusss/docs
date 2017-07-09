@@ -1,3 +1,5 @@
+openvpn连接后，需要设置/etc/resolv.conf的dns服务器为内网地址10.8.0.1
+----------------------------
 bandwagonhost用的是OpenVZ, 换不了内核！！！
 root@localhost:/lib/modules# modprobe tun
 modprobe: ERROR: ../libkmod/libkmod.c:514 lookup_builtin_file() could not open builtin file '/lib/modules/2.6.32-042stab116.1/modules.builtin.bin'
