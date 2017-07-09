@@ -1,3 +1,5 @@
+openvpn连接后，需要设置/etc/resolv.conf的dns服务器为内网地址10.8.0.1
+---------------------
 https://community.openvpn.net/openvpn/wiki/TrafficObfuscation
 server: obfsproxy --log-file=obfsproxy.log --log-min-serverity=info obfs2 --dest=127.0.0.1:1194 --shared-secret=<some-random-key> server 0.0.0.:21194
        假设openvpn的为tcp 1194端口, obfsproxy监听tcp 21194, some-random-key是至少32个随机字符
