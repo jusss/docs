@@ -1,9 +1,112 @@
+<j> I'm using tls-crypt now, and I found there's only one client can
+    connect to the server at the same time, why?
+<o> j: tls-crypt does not prevent multiple client from connecting,
+    therefore the issue is unrelated to tls-crypt  
+<o> are you using client/server mode?
+<j> o: yes
+<o> with different certs per client?
+<j> o: same certs
+<o> j: this is not really recommandable...but if you really want that
+<o> you must allow CN duplicates
+<o> otherwise the server won't allow more than one client with the same CN
+<o> j: check --duplicate-cn in the manpage
+<j> o: ok
+<j> o: I add "duplicate-cn" in server.conf and now I can use two
+    clients at the same time, :)  
+<o> j: however, unless you have a real reason, it is better to use
+    multiple certificates  
+<o> so you can block each single client in case of troubles
+<j> o: yes, I'm kind of lazy
+<o> :P
+
+------------------------------------------------------
+#################  tls-crypt 取代 tls-auth #######################
+#grep -v '#' /etc/openvpn/server.conf |grep -v ';'
+/etc/openvpn/server.conf
+port your-server-port
+proto udp
+dev tun
+ca /etc/openvpn/easy-rsa/keys/ca.crt
+cert /etc/openvpn/easy-rsa/keys/server.crt
+dh /etc/openvpn/dh2048.pem
+server 10.8.0.0 255.255.255.0
+ifconfig-pool-persist ipp.txt
+push "redirect-gateway def1 bypass-dhcp"
+push "dhcp-option DNS 10.8.0.1"
+keepalive 10 120
+tls-crypt static.key
+cipher AES-256-CBC
+auth SHA512
+comp-lzo
+user openvpn_server
+group nogroup
+persist-key
+persist-tun
+status openvpn-status.log
+verb 3
+duplicate-cn   #允许多个clients用同一个证书，默认一个client只能用一个证书，第二个client用相同的证书会中断第一个client的连接
+-----------------------------------------------------
+############### tls-crypt 取代 tls-auth #######################
+grep -v '#' client.ovpn |grep -v ';'
+~/openvpn/client.ovpn
+client
+dev tun
+proto udp
+remote your-server-ip your-server-port
+resolv-retry infinite
+nobind
+user nobody
+group nogroup
+persist-key
+persist-tun
+ca ca.crt
+cert client1.crt
+key client1.key
+remote-cert-tls server
+tls-crypt static.key
+cipher AES-256-CBC
+auth SHA512
+comp-lzo
+verb 3
+auth-nocache
+-----------------------------------------------------------------------
+使用tls-crypt取代tls-auth, openvpn v2.4之后才有, 
+openvpn --genkey --secret static.key    生成key file时使用--secret参数把密钥写入文件
+在server.conf和client.ovpn里"tls-crypt static.key" 取代tls-auth
+https://github.com/jimmielin/ovpn-ipv6-setup
+tls-crypt是针对xor混淆补丁创建出来的, 但仍可能被流量检测侦查到特征码
+The tls-crypt option isn't safe from traffic analysis as it doesn't hide all elements of the control channel, notably the opcodes, session/packet IDs and timestamp.
+http://svn.dd-wrt.com/ticket/3450
+"tls-crypt can still be blocked because it is not obfuscation. just a different way of doing th handshake (encrypting the payload)"
+
+debian jessie上还是v2.3。。。用jessie-backports更新v2.4
+https://backports.debian.org/Instructions/
+vim /etc/apt/sources.list
+deb http://httpredir.debian.org/debian jessie-backports main contrib non-free
+
+aptitude update
+aptitude -t jessie-backports install "package"
+或者apt-get install -t jessie-backports openvpn
+
+2.4.0 首选使用ip v6,移除了tls-remote使用verify-x509-name取代
+把tls-auth注释掉, tls-cipher是用于TLS-session可以和tls-crypt一起使用，也可以不使用
+添加tls-crypt static.key
+------------------------------------------------------------------------
+使用static keys只能支持一对一，如果想要多个连续，需要创建多个openvpn 实例，
+用不同的server.conf 里面tun和port需要不一样，比如"dev tun0" "dev tun1"  "port 23822" "port 21232"
+然后用openvpn --config server1.conf 和server2.conf这种分别指定不同server.conf来启动多个openvpn instances
+-----------------------------------------------------------------------------------
 shadowsocks 全局代理需要用iptables重定向到tunnel 或者在openwrt路由器上， shadowsocks支持混淆obfuscation,shadowsocks的server和client都支持混淆
 openvpn 全局代理，tls握手特征包以被检测到，
 1. 使用static key取代tls握手,但是这种static key只能用于一对一，即同一时刻只能有一台机器使用openvpn连服务器
 2. 使用tls,可同时多个机器使用Openvpn,tcp使用obfsproxy混淆tls握手包, 但是udp无法使用obfsproxy,或许可以尝试github上的udp-proxy
 openvpn本身不支持混淆，只能用第三方工具实现，包括server和client都不支持，但可以给源码打补丁编译来支持，
+openvpn tls握手包被识别，obfsproxy混淆又不支持udp（只支持tcp），static keys又只能一对一（可以开多个实例）。。。
 android上并没有支持obfsproxy的openvpn客户端，所以在android上最好还是使用static key的openvpn，但此时别的设备无法使用openvpn
+android上有支持static keys的openvpn for android 0.6.65, https://github.com/schwabe/ics-openvpn, 不要手动创建profile总提示ip v4 error
+点+ 然后点import选中client.static.ovpn，这样导入创建static keys的profile,实际上只有TLS Auth File设为static.key,并且Type设为Static Keys但
+Type下面的Certifcate Revoke List(optional)不选择任何数据
+3. 使用tls-crypt取代tls-auth, v2.4版本以后才支持
 
 https://openvpn.net/index.php/open-source/documentation/security-overview.html
 openvpn有2种验证模式 static key使用预先分享的静态密钥  tls使用ssl/tls加证书验证和密钥交换
@@ -32,6 +135,7 @@ ii. server config: /etc/openvpn/server.conf 注释掉 ca cert key server tls-cip
     push "redirect-gateway def1 bypass-dhcp"      
     ###user nogroup和group nogroup选项用了就无法连接，不知道是因为nogroup不存在还是因为nogroup权限太低无法添加路由,不用这选项就可以连接成功
 ----------------------------------------------------------
+########################### static keys ##################################
 dev tun
 port your-server-port
 proto udp
@@ -42,6 +146,8 @@ keepalive 10 60
 ping-timer-rem
 persist-tun
 persist-key
+cipher AES-256-CBC
+auth SHA512
 status /etc/openvpn/openvpn.status.log
 log /etc/openvpn/openvpn.log
 verb 4
@@ -70,6 +176,7 @@ iii. client config: client.ovpn  注释掉 client ca cert key ns-cert-type tls-c
     dhcp-option DNS 10.8.0.1
 
 -----------------------------------------------------
+#######################   static keys #############################
 remote your-server-ip your-server-port
 proto udp
 dev tun
@@ -79,6 +186,8 @@ comp-lzo
 keepalive 10 60
 persist-tun
 persist-key
+cipher AES-256-CBC
+auth SHA512
 redirect-gateway def1
 dhcp-option DNS 10.8.0.1
 # success   然后把/etc/resolv.conf改为nameserver 10.8.0.1
@@ -87,7 +196,7 @@ dhcp-option DNS 10.8.0.1
 
 如果openvpn server在子网192.168.4.0/24里，而想让client访问这个子网的其它机器
 就在client config里添加 route 192.168.4.0 255.255.255.0，在server上添加10.8.0.2到server的路由到server's LAN gateway，并在server上开启ip forwarding
-
+https://community.openvpn.net/openvpn/wiki/GettingStartedwithOVPN
 google 'openvpn tls static key' 'openvpn tls 握手 特征' 
 ---------------------------------------------------------
 openvpn连接后，需要设置/etc/resolv.conf的dns服务器为内网地址10.8.0.1
