@@ -1,3 +1,95 @@
+shadowsocks 全局代理需要用iptables重定向到tunnel 或者在openwrt路由器上， shadowsocks支持混淆obfuscation,shadowsocks的server和client都支持混淆
+openvpn 全局代理，tls握手特征包以被检测到，
+1. 使用static key取代tls握手,但是这种static key只能用于一对一，即同一时刻只能有一台机器使用openvpn连服务器
+2. 使用tls,可同时多个机器使用Openvpn,tcp使用obfsproxy混淆tls握手包, 但是udp无法使用obfsproxy,或许可以尝试github上的udp-proxy
+openvpn本身不支持混淆，只能用第三方工具实现，包括server和client都不支持，但可以给源码打补丁编译来支持，
+android上并没有支持obfsproxy的openvpn客户端，所以在android上最好还是使用static key的openvpn，但此时别的设备无法使用openvpn
+
+https://openvpn.net/index.php/open-source/documentation/security-overview.html
+openvpn有2种验证模式 static key使用预先分享的静态密钥  tls使用ssl/tls加证书验证和密钥交换
+static keys这种应该经常更换，比如一周一换或一月一换
+https://openvpn.net/index.php/open-source/documentation/miscellaneous/78-static-key-mini-howto.html
+server 10.8.0.1    client 10.8.0.2  udp port 1194
+i.generate a static key:  openvpn --genkey --secret static.key
+    copy the key to server and client
+ii. server config: /etc/openvpn/server.conf 注释掉 ca cert key server tls-cipher push redirect and dhcp
+    dev tun
+    port your-server-port
+    proto udp
+    ifconfig 10.8.0.1 10.8.0.2
+    secret static.key
+    comp-lzo
+    keepalive 10 60
+    ping-timer-rem
+    persist-tun
+    persist-key
+    user nogroup #grep 'nogroup' /etc/group archlinux上有nogroup, debian上有nobody,它们同时是user和group, nobody和nogroup和其它non-root账户一样的权限
+    group nogroup #或直接创建opengroup  useradd -r -s /bin/nologin opengroup  然后发现连接不上，这nogroup还是不能用，这user和group选项还是不能用!
+    daemon
+    status /etc/openvpn/openvpn.status.log
+    log /etc/openvpn/openvpn.log
+    verb 4
+    push "redirect-gateway def1 bypass-dhcp"      
+    ###user nogroup和group nogroup选项用了就无法连接，不知道是因为nogroup不存在还是因为nogroup权限太低无法添加路由,不用这选项就可以连接成功
+----------------------------------------------------------
+dev tun
+port your-server-port
+proto udp
+ifconfig 10.8.0.1 10.8.0.2
+secret static.key
+comp-lzo
+keepalive 10 60
+ping-timer-rem
+persist-tun
+persist-key
+status /etc/openvpn/openvpn.status.log
+log /etc/openvpn/openvpn.log
+verb 4
+push "redirect-gateway def1 bypass-dhcp"
+# success    from: https://www.zhukun.net/archives/7625
+然后systemctl start openvpn 或者openvpn --config /etc/openvpn/server.conf
+再运行包含规则的iptables.openvpn.sh
+-----------------------------------------------------------
+
+iii. client config: client.ovpn  注释掉 client ca cert key ns-cert-type tls-cipher
+    remote server-domain-or-ip your-port
+    dev tun
+    proto udp
+    port your-server-port
+    ifconfig 10.8.0.2 10.8.0.1
+    secret static.key
+    comp-lzo
+    keepalive 10 60
+    ping-timer-rem
+    persist-tun
+    persist-key
+    user nogroup
+    group nogroup
+    daemon
+    redirect-gateway def1
+    dhcp-option DNS 10.8.0.1
+
+-----------------------------------------------------
+remote your-server-ip your-server-port
+proto udp
+dev tun
+ifconfig 10.8.0.2 10.8.0.1
+secret static.key
+comp-lzo
+keepalive 10 60
+persist-tun
+persist-key
+redirect-gateway def1
+dhcp-option DNS 10.8.0.1
+# success   然后把/etc/resolv.conf改为nameserver 10.8.0.1
+运行sudo openvpn --config ./client.ovpn
+--------------------------------------------------------
+
+如果openvpn server在子网192.168.4.0/24里，而想让client访问这个子网的其它机器
+就在client config里添加 route 192.168.4.0 255.255.255.0，在server上添加10.8.0.2到server的路由到server's LAN gateway，并在server上开启ip forwarding
+
+google 'openvpn tls static key' 'openvpn tls 握手 特征' 
+---------------------------------------------------------
 openvpn连接后，需要设置/etc/resolv.conf的dns服务器为内网地址10.8.0.1
 ---------------------
 https://community.openvpn.net/openvpn/wiki/TrafficObfuscation
@@ -14,7 +106,7 @@ openvpn虽然支持tcp和udp两种方式，但是udp速度更快，所以我用�
 
 google下发现有个 https://github.com/sagan/udp-proxy
 server: udp-server.py -s server-ip -p openvpn-port -l listen-port -k "password"
-vim /etc/openvpn/server.conf
+vim /etc/openvpn/server.conf(错了，应该是客户端的client.ovpn)
 注释掉redirect-gateway def1
 添加mssfix 1422
 route server-ip 255.255.255.255 net_gateway
@@ -32,6 +124,7 @@ iptables -F
 iptables -L
 重置了vps的eth0网络，然后网络正常工作了
 
+mssfix 1422 route ...应该是在client.ovpn里设置而不是server的server.conf！
 ------------------------------------------------------------
 server: obfsproxy obfs3 --dest 127.0.0.1:22  server 0.0.0.0:22222
 client: obfsproxy obfs3 --dest 111.111.111.111:22222  client 127.0.0.1:12222
