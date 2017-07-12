@@ -1,3 +1,16 @@
+archlinux上有nobody  debian上有nogroup  
+nobody同时是user和group   nogroup也一样
+nobody和nogroup和non-root用户有一样的权限
+
+useradd -M -G nogroup -s /bin/nologin john  用户john不能登录shell,属于nogroup组，没有home directory
+or -s /bin/false
+
+useradd -r -s /bin/nologin john  创建一个system account而且不能登录shell, system account没有密码,没有home directory,但仍会创建同名组
+那些daemon服务的一般都是system account,如ftp nginx dovecot postfix
+
+Interesting question. The passwd (/etc/passwd) file is the file with a list of users. If you look at the passwd file, you will see that users have uid and gid after the username. For example root is uid 0 and gid 0. If UID_MIN is set to 500 in /etc/login.defs that means that any user that is created with useradd will now have a uid greater than 500. But if you specify the -r option, that means that you create a uid which is less than 500. So, what's the significance? The password , home directory and other settings from login.defs will not apply to this user. You have to manually create a home directory with -m parameter (man useradd).
+
+-----------------------------------------
 user group suid sgid
 
 添加用户 useradd -m creat user home -g属于一个已存在的组 -G同时也属于另一个组 -s指定登录shell从/etc/shells中选择
