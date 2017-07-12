@@ -1,3 +1,7 @@
+openvpn tls握手包已被识别，用tls-crypt取代tls-auth，或用static keys（只能一对一，可开启多个实例）或obfsproxy混淆（只支持tcp）
+openvpn v2.4之后有tls-crypt可以取代tls-auth
+openvpn tls握手包被识别，obfsproxy混淆又不支持udp（只支持tcp），static keys又只能一对一（可以开多个实例）。。。
+----------------------------------
 <j> I'm using tls-crypt now, and I found there's only one client can
     connect to the server at the same time, why?
 <o> j: tls-crypt does not prevent multiple client from connecting,
