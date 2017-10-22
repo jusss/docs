@@ -1,0 +1,52 @@
+download archlinuxarm-armv7h-latest.tar.gz from archlinuxarm.org
+dd if=/dev/zero of=arch.img bs=512K count=8000
+mount -o loop arch.img /tmp/myloop
+decompress archlinuxarm-armv7h-latest.tar.gz into /tmp/myloop
+you can use `jmtpfs ~/empty-mount` to mount android storage device on linux
+on Android, install busybox, connectbot, flash android with supersu in recovery mode for root, 
+open connectbot, run `su`, and copy arch.img to sdcard, in android 4.4.4 it should in /storage/sdcard1
+cd /storage/sdcard1
+/system/xbin/mount -o loop /storage/sdcard1/arch.img /storage/sdcard1/ar
+cd ar
+mount -o bind /dev ./dev
+mount -t proc /proc ./proc
+mount -t sysfs /sys ./sys
+mount -t devpts /dev/pts ./dev/pts
+chroot . /bin/bash
+su
+cd
+vi /etc/group
+inet:x:3003:root
+net_raw:x:3004:root
+
+touch /etc/resolv.conf add nameserver 223.5.5.5
+touch resolv.conf and failed, ls -lh /etc/resolv.conf and you will know it's softlink
+it point /run/systemd/resolve/resolv.conf
+then creat that file or just delete this link and recreate a really file
+
+creat the file will work
+
+vim /etc/pacman.d/mirrorlist  add ustc source
+pacman -Sy
+pacman -S aria2
+pacman -S xterm
+install xrdb on android and open it, it remind :0
+then xterm -display :0 will show xterm in xrdb
+
+pacman -S lxde
+env DISPLAY=:0 startlxde
+
+
+share file or msg
+mkdir share directory at the same level with ar
+mkdir /storage/sdcard1/share
+/system/xbin/mount -o bind share ar/mnt
+then in chroot environment, you can get outside file just pass it to share directory
+
+on Android, install gedit for edit file, browse rarbg.com for magnet link
+copy magnet link from rarbg.com to /storage/sdcard1/share/magnet, 
+aria2c -i /mnt/magnet
+just download file in /mnt of chroot env, you can get file directly from outside of chroot env
+even aria2 download file not store in the share directory /mnt, just mv them into /mnt will be ok, you still can get those files from outside of chroot env
+if you mount android into linux with jmtpfs and there's nothing on /storage/sdcard1/share, you should copy it into another non-share directory on android, then mount
+it on linux will show those files
