@@ -1,3 +1,16 @@
+su
+cd /storage/sdcard1
+/system/xbin/mount -o loop ./arch.img ./ar
+/system/xbin/mount -o bind ./share ./ar/mnt
+/system/xbin/mount --rbind /sys ./ar/sys
+/system/xbin/mount --rbind /dev ./ar/dev
+because it doesn't need Xorg so no /dev/pts, and no need host process info so no /proc
+chroot ./ar /bin/bash
+PATH=/usr/bin
+su
+cd
+
+-----------------------------------------------------------------------------------------------
 download archlinuxarm-armv7h-latest.tar.gz from archlinuxarm.org
 dd if=/dev/zero of=arch.img bs=512K count=8000
 mount -o loop arch.img /tmp/myloop
