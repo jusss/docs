@@ -90,3 +90,8 @@ xsdl就不会卡了, fcitx记得用fcitx-configtool把Trigger Input Method由Ctr
 安装aicp nightly 2017.02.20包，用音量-+电源键 三个键一起按进入recovery mode,把gapps 7.1.1和supersu一起装了在recovery mode
 这个包在设置里一点开发者模式就死机
 包和gapps从xda下载
+android 6.0版本需要supersu 2.49以上版本在recovery模式卡刷root
+https://www.muzisoft.com/root/171588.html
+https://forum.xda-developers.com/apps/supersu
+http://tieba.baidu.com/p/4224614417
+https://forum.xda-developers.com/apps/supersu/stable-2016-09-01supersu-v2-78-release-t3452703
