@@ -1,0 +1,20 @@
+android 4.4.4可以在recovery模式下卡刷supersu包来root, 但是6.0好像不行
+刷的6.0rom提供adb root权限在开发者模式中打开，点击7次内核编译版本号在设置中打开开发者模式
+用adb方式把supersu的包里的文件放置到android里
+#adb shell
+#adb help
+#adb push ./su /system/bin/
+#adb shell 
+#chmod 4755 /system/bin/su
+
+解压update-supersu.zip，查看目录结构，用adb push复制到android对应目录
+adb push arm/su /system/bin/  提示文件系统只读
+adb remount
+再允许adb push arm/su /system/bin即可
+
+
+android 6.0版本需要supersu 2.49以上版本在recovery模式卡刷root
+https://www.muzisoft.com/root/171588.html
+https://forum.xda-developers.com/apps/supersu
+http://tieba.baidu.com/p/4224614417
+https://forum.xda-developers.com/apps/supersu/stable-2016-09-01supersu-v2-78-release-t3452703
