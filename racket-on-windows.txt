@@ -1,0 +1,6 @@
+﻿从官网下载racket,安装之后，找到目录文件，如"C:\Program Files\Racket"
+然后把这个目录加入环境变量PATH, 打开cmd直接运行racket就可以打开racket
+从github下载rkt文件,在cmd下直接racket irchat3.rkt就可以运行,
+在win10下使用rime输入法是可以在irchat3的输入框里直接输入多个汉字的，
+但是在archlinux下用fcitx却只能一个个汉字输入，不知道为什么
+更新fcitx并安装fcitx-googlepinyin,然后用fcitx-config-gtk3把pinyin去掉，换成googlepinyin,发现可以在输入框里打多个汉字了
