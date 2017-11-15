@@ -1,0 +1,118 @@
+*scratch* (run-scheme "/usr/bin/racket") C-j
+
+
+racket的contract可以确定函数的参数和返回值的类型，违反类型的参数会被报错，同时函数不会被执行
+
+http://docs.racket-lang.org/guide/contract-boundaries.html
+
+#lang racket
+(provide (contract-out [amount positive?]))
+(define amount ...)
+amount为正数
+
+(provide (contract-out [amount (and/c number? positive?)]))
+amount为正整数
+函数有作用域domain和范围range, 指定domain值(参数)的类型和range(返回值)的类型
+-> 不是contract,是contract combinator,把多个contract组合成一改contract
+模块导出函数，建立2个通信，server和client
+If the client module calls the function, it sends a value into the server module. Conversely, if such a function call ends and the function returns a value, the server module sends a value back to the client module. This client–server distinction is important, because when something goes wrong, one or the other of the parties is to blame.
+
+(provide (contract-out
+          [deposit (-> number? any)]
+          [balance (-> number?)]))
+ 
+If a client module were to apply deposit to 'millions, it would violate the contract. The contract-monitoring system would catch this violation and blame the client for breaking the contract with the above module. In contrast, if the balance function were to return 'broke, the contract-monitoring system would blame the server module.
+
+any 是任意值 任意多值
+any/c 是任意一个值
+(-> number? any) 这个contract是任意多个数字
+
+define/contract可以定义带contract的函数，即使是在模块内部，contract一般是定义在一个模块((server模块)内，另一个模块调用时算client模块
+
+> (define/contract (a b) (-> number? any) (+ b 10))
+> (a 3)
+13
+> (a 'a)
+; a: contract violation
+;   expected: number?
+;   given: 'a
+;   in: the 1st argument of
+;       (-> number? any)
+;   contract from: (function a)
+;   blaming: top-level
+;    (assuming the contract is correct)
+;   at: readline-input:1.18
+; [,bt for context]
+
+尽管这个函数是在模块内定义的，但没次调用时都会检查contract,会影响执行，尤其是递归循环
+any匹配任意返回值,而且只能用于返回值range, void?指返回void值
+contract监视器会检查函数的返回值, 设为any则不检查函数返回值类型
+any/c 任意单一值，可用于参数，也可用于返回值，用于返回值，会强迫检查返回值是否单一
+
+(-> integer? any) 函数接受一个正数做参数，返回任意数量的值
+
+(-> integer? any/c) 函数接受一个正数，产生一个单一的结果
+
+(define (f x) (values (+ x 1) (- x 1))) 匹配(-> integer? any)，不匹配(-> integer? any/c)
+
+any/c用于结果时，特指只产生一个值
+
+(-> 参数类型 返回值类型)
+
+一个模块调用另一个模块的函数,client调用server的函数，client发送参数，server返回结果
+函数a定义在x模块里，在y模块里调用a，x的a是server, y里的a是client
+函数也能当contract来限制类型
+(define (amount? a)
+  (and (number? a) (integer? a) (exact? a) (>= a 0)))
+(provide (contract-out
+          ; an amount is a natural number of cents
+          ; is the given number an amount?
+          [deposit (-> amount? any)]
+          [amount? (-> any/c boolean?)]
+          [balance (-> amount?)]))
+(define amount 0)
+(define (deposit a) (set! amount (+ amount a)))
+(define (balance) amount)
+amount?函数被用于contract在-> contracts里，如果deposit的参数不是正整数，amount?作用在参数上会返回#f,contract监视器会blame client
+the server module must provide an exact, nonnegative integer as the result of balance to remain blameless.
+(-> amount?) 返回结果需要是正整数, balance的返回值需要是正整数
+http://docs.racket-lang.org/guide/contract-func.html
+
+(-> 参数类型 返回值类型)
+(-> 返回值类型)
+
+(-> integer? (-> integer? integer?)) 参数是整数，返回值是一个函数，而这个函数参数是整数返回值是整数
+
+(-> (-> integer? integer?) integer?) 参数是一个函数
+
+wrote your mode with contracts
+
+(module bank-server racket
+	(provide
+		(contract-out
+			(deposit (-> (lambda (x) (and (number? x (integer? x))))
+				 any))))
+
+	(define total 0)
+	(define (deposit a) (set! total (+ a  total))))
+
+flat named contracts,收集的数据是内建原子类数据的子集
+(deposit (-> (flat-named-contract 'amount (lambda ...))))
+
+> (define/contract (a b c) (-> number? number? number?) (+ b c))
+> (a 3 5)
+多个参数就用多个参数类型一一指定
+
+
+[john@moon ~]$ racket
+Welcome to Racket v6.11.
+> #lang racket
+; readline-input:1:0: read: #lang not enabled in the current context [,bt for
+;   context]
+; racket: undefined;
+;  cannot reference undefined identifier
+; [,bt for context]
+> 
+
+在repl下不能用#lang racket之类的，需要在终端打开racket时用参数-I指定
+racket -I racket/base， #lang racket是在脚本里用的
