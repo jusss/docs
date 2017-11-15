@@ -1,0 +1,6 @@
+unzip *.zip show caution: filename not matched 
+so unzip only decompress one file one time
+
+find . -maxdepth 1 -name "*.zip" -exec unzip {} \;
+
+or  for f in *.zip; unzip "$f"; done 
