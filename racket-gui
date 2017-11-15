@@ -1,3 +1,52 @@
+使用canvas%替代text%显示信息在irchat里
+(require racket/gui)
+(define frame (new frame%
+                   [label "Example"]
+                   [width 300]
+                   [height 300]))
+(define canvas (new canvas% [parent frame] [style '(hscroll vscroll)]
+             [paint-callback
+              (lambda (canvas dc)
+                (send dc set-scale 3 3)
+                (send dc set-text-foreground "blue")
+                (send dc draw-text "Don't Panic!" 0 0) (send dc draw-text "he" 0 22))]))
+
+(send canvas init-auto-scrollbars 3 3 1.0 1.0)
+(send frame show #t)
+
+canvas%和editor-canvas%, 后者是管文本显示的, racket网址上的文档里，参数里面[ [...]] 表明里面的参数是可有可无的，使用时只使用一个[]即可，不要使用[[]]
+如http://docs.racket-lang.org/gui/editor-canvas_.html里描述(new editor-canvas% [parent parent] [[editor editor] [style style]...])表明里面的参数
+[editor editor]和[style ...]都是可有可无的，使用时还是一个括号(new editor-canvas% [parent parent] [editor editor]...)
+
+(require racket/gui)
+(define frame (new frame%
+                   [label "Example"]
+                   [width 300]
+                   [height 300]))
+ (define text (new text% [auto-wrap #t]))   ;;;use auto-wrap for one very long string, it will auto display as multiple-lines 
+ (new editor-canvas% [parent frame]
+     		      [editor text]
+		      [style '(auto-vscroll no-hscroll no-focus)]) ;;; no-focus mean no keyboard input, because of auto-wrap, so auto-hscroll is useless, no-hscroll
+ (send frame show #t)
+ (send text insert "hi")
+ (send text insert "good")
+ (send text insert "\n haha")
+ (send text insert "\n what are you wondering, do you wonder how it works? ???????????????????????????????")
+ (send text lock #t)  ;;;lock or unlock, write msg on canvas
+ (send text lock #f)
+
+canvas%里是有paint-callback参数的
+canvas<%>有2个类canvas%和editor-canvas%,  on-event on-char 鼠标 键盘事件
+text%和pasteboard%实现了editor<%>
+
+用emacs打开racket文件后可以用M-x scheme-mode打开这个mode用于代码缩进
+
+;;;用editor-canvas%来显示接受的信息，用text-field%来接受键盘输入的信息
+;;;editor-canvas%的style选项里有no-focus拒绝接受键盘输入，不要使用(send print-receive-msg lock #t)这种形式阻止在显示区域的键盘输入
+;;;而text-field%里是没有no-focus这种拒绝接受键盘输入的选项，所以用editor-canvas%取代text-field%显示信息
+
+
+--------------------------------------------------------------------------
 (require racket/gui)
 ;;;创造一个窗口
 (define frame (new frame% (label "Example")
