@@ -10,3 +10,8 @@ check for update
 if it doesn't work, chrome://plugins  re-enable adobe flash
 
 http://techdows.com/2015/07/fix-chrome-adobe-flash-player-was-blocked-because-it-is-out-of-date-error.html
+
+now, pepper-flash is available on archlinux official repo,
+and chromium remove chrome://plugins option,
+you need enable it on chrome://settings/content/flash
+when website notice you need to install flash, just click install and a window pop up ask you if allow to run flash on this website or not, just click yes, the flash will work.
