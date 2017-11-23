@@ -9,3 +9,8 @@ dns-proxy-client再把数据发给dnsmasq, dnsmasq建立缓存，并发给各个
 
 有些网络为了禁止bt,直接把udp连接都禁了，只留目的地址是53端口的udp包，
 所以设vps上的端口为53,但是又会被gfw检测，所以重新排列或加密下数据内容
+
+vps上设置dns-proxy-server.py监听127.0.0.1 53 udp端口
+client上设置dns-proxy-client.py监听127.0.0.1 5353 udp端口，发送vps的53 udp端口
+dnsmasq设置上游服务器为127.0.0.1 5353 udp端口,/etc/dnsmasq.conf server=127.0.0.1#5353
+/etc/resolv.conf设为nameserver 127.0.0.1
