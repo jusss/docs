@@ -1,0 +1,17 @@
+[john@moon ~]$ python
+Python 3.6.3 (default, Oct 24 2017, 14:48:20) 
+[GCC 7.2.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import base64
+>>> 'abcd'.encode()
+b'abcd'
+>>> base64.b64encode('abcd'.encode())
+b'YWJjZA=='
+>>> base64.b64encode('abcd'.encode()).decode()
+'YWJjZA=='
+>>> base64.b64decode('YWJjZA==')
+b'abcd'
+>>> base64.b64decode('YWJjZA==').decode()
+'abcd'
+>>> 
+
