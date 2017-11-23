@@ -1,3 +1,26 @@
+ (require racket/gui)
+> (define text-enter 0)
+> (define frame (new frame%
+                   [label "Example"]
+                   [width 300]
+                   [height 300]))
+> (define canvas (new canvas% [parent frame] [style '(hscroll vscroll)]
+             [paint-callback
+              (lambda (canvas dc)
+                (set! text-enter dc))]))
+
+> (send frame show #t)
+> (send text-enter set-scala 3 3)
+> (send text-enter set-background "blue")
+> (send text-enter set-text-background "red")
+> (send text-enter draw-text "hi" 0 0)
+> (send text-enter draw-text "hi" 1 0)
+> (send text-enter draw-text "hi" 0 3)
+> (send text-enter draw-text "hi" 0 10)
+
+用canvas%和dc%取代editor-canvas%和text%
+
+-------------------------------------------------------------------------------------
 使用canvas%替代text%显示信息在irchat里
 (require racket/gui)
 (define frame (new frame%
