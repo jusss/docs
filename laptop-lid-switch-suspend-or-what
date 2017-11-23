@@ -1,0 +1,45 @@
+如果想合上盖子就锁屏，
+/etc/systemd/logind.conf
+HandleLidSwitch=lock
+
+pacman -S xlockmore
+用xlock就能锁屏
+但是需要合上盖子自动运行xlock锁屏还需要xss-lock
+
+从aur下载xss-lock并编译安装
+然后把 xss-lock -- xlock& 写入~/.xinitrc
+
+当合上盖子后，就会自动执行xlock
+
+----------------------------------------------------
+合上笔记本盖子，默认进入suspend
+由/etc/systemd/logind.conf控制
+#HandleLidSwitch=suspend  合上盖子，执行suspend
+#HandleLidSwitchDocked=ignore 连接外接显示器时，合上盖子，什么也不执行
+https://wiki.archlinux.org/index.php/Power_management#ACPI_events
+HandlePowerKey	Triggered when the power key/button is pressed.	poweroff
+HandleSuspendKey	Triggered when the suspend key/button is pressed.	suspend
+HandleHibernateKey	Triggered when the hibernate key/button is pressed.	hibernate
+HandleLidSwitch	Triggered when the lid is closed, except in the cases below.	suspend
+HandleLidSwitchDocked	Triggered when the lid is closed if the system is inserted in a docking station, or more than one display is connected.	ignore
+
+如果合上盖子，就执行某个脚本，需要安装acpid, 并修改/etc/acpi/handler.sh
+如果只是想要合上盖子就关闭屏幕不suspend,
+直接设置HandleLidSwitch=ignore即可，关上盖子会自动关闭显示器，这是由firmware控制的
+vim /etc/systemd/logind.conf
+HandleLidSwitch=ignore
+systemctl dameon-reload
+systemctl restart systemd-logind.service
+
+The specified action for each event can be one of ignore, poweroff, reboot, halt, suspend, hibernate, hybrid-sleep, lock or kexec.
+In case of hibernation and suspension, they must be properly set up. If an event is not configured, systemd will use a default action.
+
+------------------------------------------------------------------------------------
+
+
+https://wiki.archlinux.org/index.php/Acpid
+合上盖子执行某个脚本，安装acpid并修改/etc/acpi/handler.sh
+或者
+<d0048> thenwhat:  我的做法是加到/etc/acpi/events里面  [14:45]
+<d0048> thenwhat: 在/etc/acpi/里面加个监听器
+<d0048> thenwhat: 暴力的话直接把pm-hibernate这个玩意在path下面干掉
