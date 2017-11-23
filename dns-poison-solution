@@ -1,0 +1,11 @@
+/etc/hosts
+dnsmasq监听本地127.0.0.1 udp 53端口
+设置dnsmasq上游服务器为127.0.0.1 udp 5353端口
+dns-proxy-client监听本地5353端口，把数据发往vps的53 udp端口
+vps把53 udp端口接收的数据发往国外的dns服务器并把收到的数据发回dns-proxy-client
+dns-proxy-client再把数据发给dnsmasq, dnsmasq建立缓存，并发给各个询问的socket
+
+如果dns-proxy-client用tcp连接，则可以再套层obfsproxy
+
+有些网络为了禁止bt,直接把udp连接都禁了，只留目的地址是53端口的udp包，
+所以设vps上的端口为53,但是又会被gfw检测，所以重新排列或加密下数据内容
