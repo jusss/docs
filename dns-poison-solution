@@ -14,3 +14,5 @@ vps上设置dns-proxy-server.py监听127.0.0.1 53 udp端口
 client上设置dns-proxy-client.py监听127.0.0.1 5353 udp端口，发送vps的53 udp端口
 dnsmasq设置上游服务器为127.0.0.1 5353 udp端口,/etc/dnsmasq.conf server=127.0.0.1#5353
 /etc/resolv.conf设为nameserver 127.0.0.1
+
+使用dnsmasq是为了dns缓存，更快的速度
