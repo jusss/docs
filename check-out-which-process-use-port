@@ -1,0 +1,4 @@
+sudo netstat -tulpn
+
+if it shows 1/init
+then systemctl list-sockets
