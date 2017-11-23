@@ -1,0 +1,22 @@
+import codecs
+s   = "hello"
+enc = codecs.getencoder("rot-13")
+os  = enc(s)[0]
+
+
+[john@moon ~]$ python
+Python 3.6.3 (default, Oct 24 2017, 14:48:20) 
+[GCC 7.2.0] on linux
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import codecs
+>>> s="sssjjj"
+>>> enc=codecs.getencoder("rot-13")
+>>> os=enc(s)[0]
+>>> os
+'fffwww'
+>>> jj=enc(os)[0]
+>>> jj
+'sssjjj'
+>>> 
+
+
