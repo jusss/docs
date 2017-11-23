@@ -18,6 +18,17 @@ systemctl start v2ray
 启动客户端/usr/bin/v2ray/v2ray --config v2ray-client.json, 然后浏览器设置socks5代理127.0.0.1:1080即可
 v2ray的server和client都是一样的程序，和openvpn类似
 
+
+v2ray还可以做中转服务器，把本服务器的流量中转到另一个服务器, outboundDetour里设置目的服务器的地址 方法 密码
+outbound段里streamSettings里network格式可以设tcp kcp websocket
+在 Inbound 和 Outbound 配置中添加 streamSettings 并设置 network 为 "kcp"。
+
+streamSettings要在settings外面，服务器端只有inbound和inboundDetour需要设置kcp，客户端只有outbound需要设置，其它的删除了。
+   "streamSettings": {
+      "network": "kcp"
+    }
+
+
 //注释都去掉
 v2ray-server.json
 
