@@ -1,3 +1,19 @@
+gnome-system-monitor
+ksysguard
+conky
+iftop
+jnettop
+iptraf-ng
+kgamma5  monitor gamma setting
+xorg-xgamma
+xorg-xconsole
+netwatch
+netcount
+netdata
+knemo
+munin
+gkrellm
+-------------------------------------------------------------
 http://www.binarytides.com/linux-commands-monitor-network/
 
 nethogs wlp3s0 能显示程序 下载速度 上传速度
