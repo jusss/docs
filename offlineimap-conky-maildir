@@ -13,3 +13,9 @@ https://kennyballou.com/blog/2017/10/conky-maildirs-config/
 $MAIL can set in /etc/profile
 also $MAILCHECK is default 60
 
+use `mutt -f $MAIL/INBOX` to check mailbox
+or `mail -f $MAIL/INBOX`  or just `MAIL=$MAIL/INBOX`
+
+set $MAIL to .../INBOX
+
+also use msmtp for sending mail
