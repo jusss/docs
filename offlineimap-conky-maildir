@@ -1,0 +1,15 @@
+offlineimap doesn't support mbox, only support maildir
+conky support maildir, but the directory must be expanse to INBOX,
+it means like ${mails $MAIL/INBOX}  
+there's /var/spool/mail/john/INBOX/new tmp cur
+
+${new_mails $MAIL/INBOX} will only check INBOX/new, that's only unseen mails
+but ${mails $MAIL/INBOX} will check INBOX/cur, that's all mails
+there're also seen_mails and trashed_mail, man conky you'll see more details
+and also mail_spool is no longer a valid configuration setting
+
+https://kennyballou.com/blog/2017/10/conky-maildirs-config/
+
+$MAIL can set in /etc/profile
+also $MAILCHECK is default 60
+
