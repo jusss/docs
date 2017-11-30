@@ -1,0 +1,12 @@
+fvwm直接用conky发现无法透明，安装xcompmgr
+把xcompmgr -c -C -t-5 -l-5 -r4.2 -o.55 &
+写入.xinitrc
+发现conky可以透明了，但当背景是png图片时，
+有背景，是jpg时就一片灰白
+
+fvwm, xterm如果没配置icon后的图标，会默认显示xterm的缩略图
+但此时使用xcompmgr,这个缩略图就再也打不开,而且缩略图也不按
+fvwm的iconbox排列,但是此时conky是透明的, fvwm使用fvwm-root以png做背景图片
+不是一片灰白
+Style "xterm"   Icon   filled-xterm_48x48.xpm, IconOverride
+
