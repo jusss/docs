@@ -9,7 +9,7 @@ inbox默认是系统环境变量$MAIL,除非你设置inbox在你的$HOME,一般�
 shortcut  "!" 指 "inbox"   "~"指$HOME  "+"or"="指"folder"也就是mutt的folder
 ">"之"mbox"     "<"指"sent" $record
 
-set folder=$MAIL   设置folder为$MAIL, 里面有INBOX Sent ...等mailboxes
+set folder=/var/spool/mail/john   设置folder为$MAIL, 里面有INBOX Sent ...等mailboxes
 set spoolfile="+INBOX" 收件箱$MAIL/INBOX
 set record="+Sent Messages" 发送的邮件保存到$MAIL/Sent\ Messages
 set mbox="~/Mail/Seen"  按d删除的邮件或已阅读的邮件，移动到~/Mail/Seen,需要set move=yes, 如果set move=no,这个选项无用, Seen目录下需要有cur tmp new这3个目录，会移动删除的邮件到cur目录, 把阅读的也移动或删除并不好，因为offlineimap会同步到服务器，所以最好还是设置set move=no
@@ -17,7 +17,7 @@ set postponed="+Drafts" 延期的邮件保持到$MAIL/Drafts
 
 remote folders可以设置为set folder="imaps://user@example.com"
 --------------------------------------------------------------------
-set folder=$MAIL
+set folder=/var/spool/mail/john
 ### deleted mails by press d key in mutt and which have been read, move them to ~/Mail/QQ-Deleted
 ### this directory must have three directory tmp cur and new, it will store
 ### in cur directory. and set move=yes, it it's no then this option won't work
@@ -30,7 +30,7 @@ ver, and sync delete
 ### so just leave it in INBOX
 set mbox="+INBOX"
 
-### inbox will be $MAIL/INBOX
+### inbox will be /var/spool/mail/john/INBOX
 set spoolfile="+INBOX"
 
 ### sent box will be $MAIL/Sent\ Messages
