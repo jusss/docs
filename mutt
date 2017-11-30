@@ -1,0 +1,62 @@
+https://dev.mutt.org/trac/wiki/MuttGuide/Folders
+
+inbox  $spoolfile
+mbox or received, $mbox, $move 如果想保存或移动邮件离开inbox取代删除他们
+sent  $record, $copy 发送的
+postponed $postponed  start new email but ehn pause to continue later
+
+inbox默认是系统环境变量$MAIL,除非你设置inbox在你的$HOME,一般指向/var/spool/mail/USER
+shortcut  "!" 指 "inbox"   "~"指$HOME  "+"or"="指"folder"也就是mutt的folder
+">"之"mbox"     "<"指"sent" $record
+
+set folder=$MAIL   设置folder为$MAIL, 里面有INBOX Sent ...等mailboxes
+set spoolfile="+INBOX" 收件箱$MAIL/INBOX
+set record="+Sent Messages" 发送的邮件保存到$MAIL/Sent\ Messages
+set mbox="~/Mail/Seen"  按d删除的邮件或已阅读的邮件，移动到~/Mail/Seen,需要set move=yes, 如果set move=no,这个选项无用, Seen目录下需要有cur tmp new这3个目录，会移动删除的邮件到cur目录, 把阅读的也移动或删除并不好，因为offlineimap会同步到服务器，所以最好还是设置set move=no
+set postponed="+Drafts" 延期的邮件保持到$MAIL/Drafts
+
+remote folders可以设置为set folder="imaps://user@example.com"
+--------------------------------------------------------------------
+set folder=$MAIL
+### deleted mails by press d key in mutt and which have been read, move them to ~/Mail/QQ-Deleted
+### this directory must have three directory tmp cur and new, it will store
+### in cur directory. and set move=yes, it it's no then this option won't work
+###set mbox="~/Mail/QQ-Deleted"
+
+### if you set delete flag on mail in mutt, then wait offlineimap sync it to ser
+ver, and sync delete
+### move the deleted mails to where mbox point, if it's not INBOX, and move=yes,
+### it will be deleted from INBOX and it's not good when it sync to server
+### so just leave it in INBOX
+set mbox="+INBOX"
+
+### inbox will be $MAIL/INBOX
+set spoolfile="+INBOX"
+
+### sent box will be $MAIL/Sent\ Messages
+set record="+Sent Messages"
+
+### Drafts
+set postponed="+Drafts"
+set move=no
+-----------------------------------------------------------
+c 切换邮箱，比如从INBOX切换到sent, tab或者首字母索引会自动补全
+以qq邮箱为例，offlineimap同步下来的有"INBOX" "Junk" "Sent Messages" "Drafts"
+"Deleted Messages"
+
+mailboxes "INBOX" "Sent Messages" "Drafts" "Deleted Messages" "Junk"
+
+处理html需要~/.mailcap  text/html; lynx --dump %s; nametemplate=%s.html; copiousoutput
+
+~/.muttrc  auto_view text/html
+
+
+prevent asking like "~/Mail does not exist create it ?"
+set folder=""
+
+prevent asking like "move read message to ~/mbox? no/yes"
+set move=no
+
+dont wait for sendmail to finish
+set sendmail_wait=-1
+
