@@ -1,0 +1,5 @@
+ibus ibus-googlepinyin ibus-rime
+安装后修改/etc/profile设置export XMODIFIER 等等, LC_CTYPE，.Xdefault设xterm
+ibus-setup设置语言
+然后ibus-daemon -rdx& 启动,比fcitx多了个-x选项
+fcitx -rd& 
