@@ -1,0 +1,54 @@
+offlineimap容易务删服务器邮件，如果本地邮箱删除，而~/.offlineimap目录又没删除，同步之后，服务器邮件全删
+just delete ~/.offlineimap directory and the local mailboxes, then offlineimap sync 
+在.muttrc里不要设置set record= and set postponed= 
+mutt会把它们保存本地，然后同步到服务器上，但是当smtp时服务器上已经有了
+所以会同步失败,等服务器同步到本地
+getmail好像只能下载到一个文件夹，以为只能同步INBOX文件钾
+
+所以多写几个配置在getmail里,需要首先搞清服务器上的文件钾名字，然后创建本地
+同名文件钾，记得里面创建tmp cur new, 创建文件前，先删~/.getmail目录，然后创建~/.getmail目录和getmailrc并设置600,先删再建是为了清缓存记录
+~/.getmail/getmailrc
+
+[retriever]
+type = SimpleIMAPSSLRetriever
+server = imap.qq.com
+port = 993
+username = x
+password = x
+mailboxes = ("INBOX",)
+
+[destination]
+type = Maildir
+path = /var/spool/john/INBOX/
+
+[retriever]
+type = SimpleIMAPSSLRetriever
+server = imap.qq.com
+port = 993
+username = x
+password = x
+mailboxes = ("Sent Messages",)
+
+[destination]
+type = Maildir
+path = /var/spool/john/Sent Messages/
+
+[retriever]
+type = SimpleIMAPSSLRetriever
+server = imap.qq.com
+port = 993
+username = x
+password = x
+mailboxes = ("Drafts",)
+
+[destination]
+type = Maildir
+path = /var/spool/john/Drafts/
+
+[options]
+read_all = false
+delete = false
+received = false
+delivered_to = false
+message_log = ~/.getmail/mvmail.log
+

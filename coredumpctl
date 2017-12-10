@@ -1,0 +1,6 @@
+sudo extundelete /dev/sda10 --restore-inode 22324
+总是segmentation fault,即使umount /dev/sda10
+
+用coredumpctl可查看到pid
+然后coredumpctl dump this-pid > my.coredump
+then  gdb extundelete my.coredump   bt  
