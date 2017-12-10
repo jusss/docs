@@ -1,3 +1,13 @@
+pacman -Si package get info about package
+pacman -Ql package see what it installed
+-----------------------
+不能用pacman得到source code从仓库，用asp可得到PKGBUILD编译
+pacman -S asp
+asp checkout pkgname 
+like  asp checkout extundelete
+会创建~/extundelete目录里面有它的PKGBUILD,然后makepkg -s
+pacman -U x安装即可
+------------------------------------
 pacman -Sg base-devel 查看base-devel组都有什么包
 pacman -S base-devel 安装base-devel组
 

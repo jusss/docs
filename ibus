@@ -1,5 +1,19 @@
-ibus ibus-googlepinyin ibus-rime
+weird,因为我没装DE,只有一个fvwm,而且没panel,没tray,
+但是当ibus-setup里开启"Show icon on system tray"时，新开窗口才会默认不启用ibus
+即需要control-space才能使用中文输入法，使用shift不能使用中午输入法，和fcitx一样
+如果没启用这个选项，会在所有新窗口都自动开启ibus的中文输入法，weird!
+
+ibus-setup 修改后
+ibus-daemon -rxd& 重新启动ibus
+
+发现好像即使这样，还是会随机设中文为首选输入法，我还是换fcitx吧
+fcitx-rime 默认使用繁体，按F4选中/全/汉然后选繁体汉字－>简体汉字
+就能在fcitx-rime里使用简体汉字了，希望这个不会再次出现断字行为
+即刚按z直接就把'正'打印出来了，根本没法全输入完zhe显示再选择打印
+-----------------------------------------------
+ibus ibus-googlepinyin ibus-rime ibus-libpinyin
 安装后修改/etc/profile设置export XMODIFIER 等等, LC_CTYPE，.Xdefault设xterm
 ibus-setup设置语言
 然后ibus-daemon -rdx& 启动,比fcitx多了个-x选项
 fcitx -rd& 
+
