@@ -1,0 +1,50 @@
+sudo testdisk /dev/sda10 也可以恢复数据，但是还是有些数据不显示也无法恢复
+因为是对一个硬盘的某个分区恢复，所以检测不到任何分区表是正常的，选NONE
+Advanced -> List 选中红色的文件恢复, c复制当前文件，然后C选中目的地址
+
+-----------------------------
+!!! ext4magic only recovery files deleted in 24 hours if you don't set -a and -b!!!
+
+/home is /dev/sda10, recovery /home/john/Downloads/ deleted files to /tmp
+
+sudo ext4magic /dev/sda10 -r -f john/Downloads/ -a $(date -d "-10 day" +%s) -b $(date  +%s) -d /tmp
+
+ls -i get the inode of your-direcoty
+sudo extundelete /dev/sda10 --inode 262252
+https://wiki.archlinux.org/index.php/File_recovery#Usage
+
+extundelete need umount first, echo "u" >/proc/sysrq-trigger or remount with ro
+or fuser -k /home 
+注意，如果你删除文件后重启了系统，那么，相关的文件 journal 会丢失，我们也就无法恢复文件了。所以，恢复文件的前提是，Journal不能丢失，即，系统不能重启。
+extundelete always got journal descriptor segmentation fault
+-----------------------------------------------------------------------------------------------
+
+photorec
+pacman -Ss photorec and you'll see it's in testdisk package. then install testdisk
+and run 
+
+extundelete
+ext4magic
+
+sudo ext4magic /dev/sda10 -r -f john/Market/ -b $(date +%s) -d /bla2/
+
+/dev/sda10 is /home/john/Market  so -f john/Market
+-r recovery, -f filename, -b before unix time, -d restore dir
+
+
+ sudo extundelete /dev/sda10 --inode the-inode-of-your-deleted-files-directory
+
+
+if you delete /home/john/Market/zz and /home is /dev/sda10
+sudo ext4magic /dev/sda10 -f john/Market/zz -T -x
+get the zz's logic address
+sudo dd if=/dev/sda10 of=/tmp/rec.zz skip=logic-address bs=4096 count=zz-size
+
+or just   sudo ext4magic /dev/sda10 -r -f john/Market/ -d /tmp/
+
+
+date -d "-2 day" +%s    -d transform to string,  +%s transform to unix time
+
+!!! ext4magic only recovery files deleted in 24 hours if you don't set -a and -b!!!
+
+sudo ext4magic /dev/sda10 -r -f john/Downloads/ -a $(date -d "-10 day" +%s) -b $(date  +%s) -d /tmp
