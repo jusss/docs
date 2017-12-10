@@ -1,3 +1,25 @@
+
+在.muttrc里不要设置set record= and set postponed= 
+### disable this, mutt will make ~/sent/ mailbox directory for sent mails
+mutt会把它们保存本地，然后同步到服务器上，但是当smtp时服务器上已经有了
+所以会同步失败,等服务器同步到本地
+----------------------------------
+N unread mails
+O old and unread
+R read
+搜索未读邮件 l ~N     l is short for limit
+如果想打开mutt后只显示未读邮件，添加以下在.muttrc
+folder-hook . 'push <limit>~N<enter>'
+上面这个是所有邮箱都只显示未读邮件，如果是指定邮箱只显示未读邮件比如INBOX
+folder-hook INBOX 'push <limit>~N<enter>'
+如果set folder=var/spool/mail/john
+也可以用 folder-hook "+INBOX" 'push <limit>~N<enter>'
+但是foler-hook需要设置在set folder下面
+
+mutt默认会打开spoolfile指定的邮箱
+set spoolfile="+INBOX"
++也就是set folder=xxx/xxx/xxx指定的目录，"+INBOX"就是xxx/xxx/xxx/INBOX
+----------------------------------------------------------
 https://dev.mutt.org/trac/wiki/MuttGuide/Folders
 
 inbox  $spoolfile
