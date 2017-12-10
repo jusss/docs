@@ -1,3 +1,94 @@
+1. generate a key
+gpg --full-gen-key
+~/.gnupg/private-keys-v1.d/
+
+2. delete a key
+gpg --delete-secret-keys your-keys-name
+gpg --delete-keys your-keys-name
+
+3. export key
+导出公钥
+gpg --export --output key-id.pub --armor key-id
+顺序很重要，因为--output和--armor属于--export
+without --armor it will export a binary code, --armor will turn it to ASCII
+
+导出私钥
+gpg --export-secret-keys --output key-id.private --armor key-id
+不同于openssl那一套，私钥是不包含公钥的, openssh也不包含
+
+3.5 import key
+导入公钥和私钥是一样的
+gpg --import file.name.pub or file.name.private
+
+3.6 upload you key to server
+gpg --keyserver keyserverAddress --send mykeyID
+注： --keyserver 可以不加，默认为 keys.gnupg.net
+
+3.7 download a key from server
+gpg --keyserver keyserverAddress --search-keys keyid/name/Email
+gpg --keyserver keyserverAddress --recv-keys pubkeyID
+
+3.8 encrypt file and decrypt file (openssl的私钥不能用文件加密，gpg的私钥可以用于文件加密)
+gpg -e -r key-uid filename   多个文件用--encrypt-files  
+it will generate filename.gpg, -r is --recipient 接受人, 接受人的公钥需要先在本地找到, -e encrypt
+gpg -o filename -d filename.gpg
+it decrypt to filename, -o is --output, -d is --decrypt
+
+对~/sent/cur/里所有文件用公钥jusss加密,加密自动去寻找公钥，解密去自动寻找私钥在本地保存密钥的文件里,不用特别指出,
+一般保存~/.gnupg/
+gpg --encrypt-files -r jusss ~/sent/cur/*  会生成同名.gpg文件在同一目录
+解密一堆文件　 gpg --decrypt-files ~/sent/cur/*.gpg 同一目录生成同名文件
+
+3.9 文件签名
+
+数字签名
+gpg -o doc.sig -s doc
+其中doc是原文件，doc.sig包含了原文件和签名，是二进制的。这个命令会要求你输入你的私钥的密码句。
+gpg -o doc.sig -ser key-id doc 既签名又加密
+
+文本签名
+gpg -o doc.sig --clearsign doc
+这样产生的doc.sig同样包含原文件和签名，其中签名是文本的，而原文件不变。
+
+分离式签名 (use this!)  (openssl那一套是生成文件摘要然后用私钥对文件摘要签名，私钥不能对文件加密)
+gpg -o doc.sig -ab doc
+doc.sig仅包括签名，分离式签名的意思是原文件和签名是分开的。
+b 表示分离式签名detach-sign
+a 表示ASCII格式，默认是binary
+
+验证签名
+gpg --verify doc.sig [doc]
+验证之前必须导入文件作者的公钥，对于分离式签名，最后还要加上原文件，即后面的doc。
+
+4. revoke your key
+生成吊销证书gpg --output revoke.asc --gen-revoke mykeyID
+导入吊销证书gpg --import revoke.asc
+再同步服务器gpg --keyserver keyserverAddress --send mykeyID
+
+ gpg --list-keys    gpg -k列出所有公钥　　gpg -K列出所有私钥
+可以显示所有现有的钥匙。 要想同时显示签名，用
+
+  gpg --list-sigs 
+（更多的信息见 钥匙签名）。 要想见到钥匙的指纹，敲入：
+
+ gpg --fingerprint 
+用户需要见到”指纹”来确认某人的确是其自称是的人（就象在电话中一样）。 这个命令将会产生一列相对较小的数字。
+要列出私密钥匙，你可以敲
+
+ gpg --list-secret-keys
+注意：列出私密钥匙的指纹和签名根本就没用。
+
+要删除一把公钥，你可以敲
+ gpg --delete-key UID 
+
+要删除一把密钥，你可以敲
+  gpg --delete-secret-key 
+
+用此命令你可以修改钥匙的失效日期，加进一个指纹，对钥匙签名等等。 尽管显得太清楚而不用提，这里还是要说，要做以上事情你得用你的通行句。 敲入通行句后，你会见到命令行。
+ gpg --edit-key UID
+要对一把钥匙签名，用 gpg --edit-key UID ，然后用 sign命令。
+
+--------------------------------------------------
 emacs undo and redo:
  C-/ or C-x u will undo, and do any operate like C-f or C-g then C-/ or C-x u
  it will redo. not like vim
