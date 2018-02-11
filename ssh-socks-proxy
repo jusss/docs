@@ -1,0 +1,43 @@
+stunnel /etc/stunnel/stunnel.conf
+ssh -p 1990 -D 7070 -C -q -N john@moon -i ./.ssh/john@vps
+chromium --proxy-server="socks5://127.0.0.1:7070"
+
+moon is localhost, and I already run stunnel on localhost as client mode
+via `stunnel /etc/stunnel/stunnel.conf`
+[john@moon ~]$ cat /etc/stunnel/stunnel.conf
+pid = /tmp/stunnel.pid
+sslVersion = TLSv1
+client = yes
+[ssh]
+accept=1990
+connect=your-vps-ip:1991
+
+ON SERVER:
+stunnel /etc/stunnel/stunnel.conf
+
+root@x:~# cat /etc/stunnel/stunnel.conf 
+cert = /etc/stunnel/server.pem
+sslVersion = TLSv1
+chroot = /var/run/stunnel4
+setuid = john
+setgid = john
+pid = /stunnel.pid
+socket = l:TCP_NODELAY=1
+socket = r:TCP_NODELAY=1
+
+[sshd]
+accept = 1991
+connect = 1990
+TIMEOUTclose = 0
+
+--------------------------------------------------------------
+ssh -D 8123 -f -C -q -N sammy@example.com
+Explanation of arguments
+
+-D: Tells SSH that we want a SOCKS tunnel on the specified port number (you can choose a number between 1025-65536)
+-f: Forks the process to the background
+-C: Compresses the data before sending it
+-q: Uses quiet mode
+-N: Tells SSH that no command will be sent once the tunnel is up
+
+ssh -p 1990 -D 7070 -C -q -N john@moon -i ./.ssh/john@vps

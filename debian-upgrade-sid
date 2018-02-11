@@ -1,0 +1,14 @@
+sid aka unstable, anothers are test and stable
+vim /etc/apt/sources.list
+find like this
+deb http://ftp.us.debian.org/debian squeeze main
+deb http://security.debian.org/ squeeze/updates main
+and change squeeze to sid or just copy them and change them, don't change the old one
+
+apt-get update
+
+# those are optional
+apt-get dist-upgrade
+apt-get -f install
+reboot
+

@@ -1,0 +1,17 @@
+1. chroot run aria2 for downloading
+2. chroot run brook provide socks5 proxy for other devices in the same LAN
+我突然想起直接在使用brook时用192.168.2.210替代127.0.0.1不就是可以直接让其它设备使用代理了吗！
+当然chrome使用代理时也要使用192.168.2.210而不是127.0.0.1
+但是发现直接用brook的这个tunnel, 不支持http, 只支持socks5
+也就是说其它设备只能用socks5代理直接连接这个tunnel, 或者用privoxy用socks5 forward转发到这个tunnel,而其它设备用http连接privoxy
+
+
+firefox for android 支持socks5和http代理
+用about:config配置，　http代理无法解决dns问题，　socks5可以让dns走代理
+about:config　搜　network.proxy  
+socks5修改4项　　　network.proxy.socks是地址　　network.proxy.socks_port是端口　network.proxy.socks_remote_dns改成true　
+network.proxy.socks_version默认是5  network.proxy.type改成1, 0是不启用, 5是使用系统的
+
+android手机上chroot跑个brook开个socks5的tunnel,然后firefox浏览器通过about:config配置就可以了
+用about:config也可以配置http代理，但是需要解决http代理的dns问题，也就是自己搭建个dns转发服务器
+

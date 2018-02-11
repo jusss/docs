@@ -1,0 +1,70 @@
+kali制作的u盘有个perisistence mode可以保存修改，
+鉴于我笔记本的efi主板会自动记住上次启动的项，所以插了一次u盘
+笔记本上的启动项没了，需要手动进bios里添加启动项文件grubx64.efi, fuck!
+---------------------------------
+install archlinux on usb stick with archlinux-bootstrap.tar.gz,
+just decompress and copy them to usb-stick, and change the grub
+config on usb-stick, or use pacstrap script
+sudo pacman -S arch-install-scripts
+
+### 因为机器是efi启动，所以u盘需要是gpt+efi,需要3个分区 / /boot/efi swap
+### 用fdisk创建gpt分区  需要一个efi分区，fat32，挂在/boot/efi里,而且efi必须gpt
+Device       Start      End Sectors  Size Type
+/dev/sdb1     2048  4196351 4194304    2G Linux filesystem
+/dev/sdb2  4196352  6293503 2097152    1G Linux filesystem
+/dev/sdb3  6293504 15204318 8910815  4.3G Linux filesystem
+sdb1 for /boot/efi, sdb2 for swap, sdb3 for /
+sudo mkfs.vfat /dev/sdb1
+
+ sudo mkswap /dev/sdb2
+
+sudo mkfs.ext4 /dev/sdb3
+
+sudo mount /dev/sdb3 /mnt/
+ sudo mkdir /mnt/boot
+ sudo mkdir /mnt/boot/efi
+ sudo mount /dev/sdb1 /mnt/boot/efi/
+ sudo swapon /dev/sdb2
+sudo pacman -Sy  
+sudo pacstrap /mnt base grub-efi-x86_64 efibootmgr dialog wpa_supplicant
+genfstab -U /mnt | sudo tee /mnt/etc/fstab
+vim /mnt/etc/fstab 去掉不是u盘的分区
+
+sudo arch-chroot /mnt/ /bin/bash
+ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime 
+ hwclock --systohc
+pacman -S vim
+vim /etc/locale.gen   uncomment what ever you want
+ locale-gen
+ echo venus > /etc/hostname
+ passwd
+#  useradd -m -G wheel -s /bin/bash john
+# passwd john
+mkinitcpio -p linux  　
+ ### 千万注意一定要指定设备，否则默认安装到/dev/sda
+ grub-install --target=x86_64-efi --efi-directory=/boot/efi  /dev/sdb3
+ grub-mkconfig -o /boot/grub/grub.cfg
+ exit
+ sudo umount -R /mnt
+reboot, boot with usb-stick 
+
+https://wiki.archlinux.org/index.php/Bootstrap
+https://github.com/tokland/arch-bootstrap
+https://github.com/tokland/arch-bootstrap/blob/master/arch-bootstrap.sh
+http://mirrors.aliyun.com/archlinux/iso/2016.02.01/
+http://archlinuxarm.org/developers/downloads
+http://mirrors.ustc.edu.cn/archlinuxarm/os/
+
+
+
+or use a  archlinux live cd usb-stick, install archlinux on another usb-stick
+treat usb stick like another harddisk, which means you need two usb-sticks
+and boot PC from the usb stick
+use a live cd usb-stick install archlinux on another usb-stick,
+
+
+because dd a archlinux into a usb stick, you can't change and save
+it on that usb-stick
+
+<effulgence> My installation guide lives here:
+	     https://gist.github.com/HardenedArray/31915e3d73a4ae45adc0efa9ba458b07

@@ -1,0 +1,7 @@
+$last                ;show when and who login
+$less /var/log/messages     ; log, or less /var/log/secure
+$who /var/log/wtmp    ;show who login
+$history    ;show who input what command
+$su - username   ;change to user
+$w      ;show who is login
+$who

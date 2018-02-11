@@ -1,0 +1,147 @@
+WW_Phone-13.8.26.60 玩mobile legendary: bangbang很卡，当使用手机流量时
+刷回UL-ASUS_Z010-WW-12.8.10.56-user.zip试试
+
+四个官方包:
+6.0: UL-ASUS_Z010-WW-13.8.26.92-user.zip
+     UL-ASUS_Z010-WW-13.8.26.60-user.zip  玩游戏卡,可能ROM和CPU有关，这个型号有2个CPU
+5.0: UL-ASUS_Z010-WW-12.8.10.56-user.zip
+     UL-ASUS_Z010-CN-12.8.10.114-user.zip 中国包
+---------------------------------------------------
+突然发现可以进入recovery mode了，音量-和电源键一起按，震动一下就松开
+能进recovery mode,然后卡刷WW包，尼玛提示这是个CN设备无法刷WW包，草尼玛
+当前版本是CN_Phone-12.8.0.52-20150827(5.0的包)　刷的是UL-ASUS_Z010-WW-13.8.26.60-user.zip(6.0的包)
+从　http://dlsvr04.asus.com/pub/ASUS/ZenFone/ZC550KL/UL-ASUS_Z010-WW-12.8.10.56-user.zip(5.0的包)
+下WW版本，解压这个包里面得到boot.img和system.new.dat
+./sdat2img.py system.transfer.list system.new.dat system.img 从system.new.dat生成system.img, 最好vim下那个sdat2img.py因为里面是#!/usr/bin/env python,把python改成python2, 因为archinux上默认的python是python3 fuck!
+手机音量+和电源键一起按进入CSM模式也就是bootloader,连上电脑
+fastboot devices 看到数字就是正常连接了
+fastboot flash boot boot.img      不用使用fastboot flash erase boot or system
+fastboot flash system system.img
+不用刷其它的了，因为刷了也是远端权限拒绝
+这时拔了数据线，关机，不要fastboot reboot重启,
+关机后,音量-和电源键一起按，震动一下就都松开，等个5秒进入recovery mode
+双清下 wipe data/cache, 然后重启，系统就是WW版的5.0系统了
+上次只刷了6.0的WW包，可能是版本太高，或者是忘了双清，导致开机卡在logo界面
+然后下了解bootloader的APK还是安装不上，包解析错误，难道非得升到6.0才能解bootloader?
+recovery卡刷6.0试试或者再用这种方法刷6.0
+现在进recovery已经是WW版本了,双清wipe data/cache,卡刷WW 6.0包，重启等个5分钟就进入6.0.1系统了
+安装解锁工具，还是失败..
+尼玛，官网给的解锁工具是　ZC550KL_8939_SIGNED_Android_M_UnlockTool_2016_0706.apk
+而这个手机的CPU是8916能解的就见鬼了　
+从https://forum.xda-developers.com/zenfone2/general/official-unlock-bootloader-app-8916-cpu-t3481413
+下https://dl.xda-developers.com/3/9/0/5/1/1/2/8916_SIGNED_Android_M_UnlockTool_2016_0715.apk?key=OTSbE_lShwGfuNYWpsJfSA&ts=1514035950
+这个才是8916的bootloader解锁工具,尼玛解锁bootloader得联网。。。
+已解锁bootloader, "you're free to go!"
+原来这个ZC550KL有2个版本的CPU 8916和8939,
+https://forum.xda-developers.com/asus-zenfone-max/how-to/guide-how-to-install-twrp-recovery-t3702278
+or http://appfreedown4u.blogspot.jp/2017/05/asus-zenfone-max-zc550kl-msm8916.html
+下载8916版的recovery
+音量+　电源键进CSC Mode
+以root用户操作fastboot,
+fastboot devices
+fastboot flash recovery TWRP-3.2.0-Z010D-20171205-by-Audahadi.img
+拔掉数据线，关机，音量- 电源键一起按，震动下松开，进入新recovery了,以后可以刷第三方ROM了,也可以卡刷SuperSU获得root
+---------------------------------------------
+adb shell
+su
+reboot bootloader
+reboot recovery
+我用下面这种方法试了下，貌似不行，刷倒是很顺利，但是刷完启动就卡在logo
+可能是包的问题,用的是UL-ASUS_Z010-WW-13.8.26.60-user.zip, 用的不是下面这个包
+然后又重新刷了CN的包，系统能启动了，但是google play打不开了
+在设置里重置恢复出厂设置，重启后重新安装所有软件
+--------------------------
+http://zentalk.asus.com.cn/archiver/?tid-16071.html&page=3
+本帖最后由 glupdaily 于 2016-3-4 12:08 编辑 
+
+很高兴向你汇报：
+你判断准确，确实是工具问题。使用你的工具成功了！！
+
+已经开机，查看版本，Z010-WW-12.8.10.56
+
+我是这样操作的：
+1，在官网下载最新国际版：http://dlsvr04.asus.com/pub/ASUS/ZenFone/ZC550KL/UL-ASUS_Z010-WW-12.8.10.56-user.zip
+2，下载Converter_system_Lollipop.zip，http://pan.baidu.com/s/1pJ3QXuj
+3，用WinRAR解压UL-ASUS_Z010-WW-12.8.10.56-user.zip，得到system.new.dat和system.transfer.list，boot.img
+4，解压Converter_system_Lollipop.zip，把system.new.dat和system.transfer.list复制到其中in文件夹，然后执行System-conVERTER.cmd，运行几分钟，完毕。system.img就创建在out文件夹
+5，把superfighter的工具和system.img，boot.img复制到c盘根目录
+6，打开命令窗口，cd\，到根目录。
+7，依次执行
+fastboot devices（在这一步要看到一串字符，表示已经连接手机）
+fastboot erase system（这一步很快）
+fastboot flash boot boot.img（这一步很快）
+fastboot flash system system.img （这一步比较漫长，尤其是开始出现的一段文字，程序会停滞，让人以为又不行，）
+这段文字如下
+
+C:\>fastboot flash system system.img
+target reported max download size of 268435456 bytes
+Invalid sparse file format at header magi      注意：这要等待3-4分钟时间，尤其是Invalid这个单词，让人误以为又失败了，下面的文字就是开始写入了。
+erasing 'system'...
+OKAY 
+sending sparse 'system' (262141 KB)...
+                                  
+请superfighter大神看看，以上刷机还有什么问题吗？还是否需要adb sideload UL-ASUS_Z010-WW-12.8.10.56-user.zip
+非常感谢你的指导！
+晚安！
+----------------------------------------------------------------------
+我好奇如果只刷boot.img和system.img是否可以升级系统？(可以)
+是否需要fastboot erase再刷(可有可无最好还是erase system boot)
+从哪提取recovery.img?
+
+如果能进recovery mode,可以开install from adb,然后用adb sideload rom.zip来刷机
+和卡刷差不多
+
+-------------------------------------
+刷完boot.img能进系统了，然后发现wifi打不开了，擦擦擦
+从官网下载那个1G左右的CN版的zip包，解压发现没有system.img　recovery.img
+只有system.new.dat和firmware-update下一堆mbn文件
+手机音量+和电源键一起按进入CSM模式也就是bootloader
+linux上用root登录,连上手机,
+#fastboot flash modem NON-HLOS.bin 基带
+#fastboot flash asusfw asusfw.img发现远端权限拒绝，其它也是权限拒绝
+从https://github.com/xpirt/sdat2img 下载sdat2img.py
+然后
+./sdat2img.py system.transfer.list system.new.dat system.img 从system.new.dat生成system.img, 最好vim下那个sdat2img.py因为里面是#!/usr/bin/env python,把python改成python2, 因为archinux上默认的python是python3 fuck!
+fastboot flash system system.img 
+fastboot reboot
+重启后发现有wifi了,然后用go谷歌安装器安装了谷歌全家桶，别问我为啥用这个应用
+因为tmd这个手机进不去recovery mode,音量-加电源键进不去，卡在logo界面
+只能用这个应用，或手工复制gapps的文件安装全家桶,用go谷歌安装器装完全家桶
+记得再在go谷歌安装器里面更新下全家桶
+-------------------------------------------------------------
+真尼玛逗，手机安装更新无法进入系统，卡在Logo界面，也无法进入recovery也是卡Logo
+进bootloader,然后从官网下载CN的zip包，也就算线刷包，解压得到boot.img
+然后fastboot flash boot boot.img　　  fastboot reboot启动进入系统了
+
+无法开机，进入bootloader,连windows 10下怎么都安装不了这个手机的usb驱动，
+现在进系统了，再试试，装上驱动，就可以用asus flash tool线刷WW国际包,
+然后用官网的apk解锁bootloader,刷第三方recovery，刷gapps
+开机时win10能识别这个手机的usb驱动，但是一进入bootloader就识别不了，无法
+用asus flash tool刷机，fuck!
+
+fastboot -w clear cache
+fastboot :x
+
+adb shell
+su
+reboot recovery   or reboot bootloader
+
+asus z010da aka zc550kl aka 电神5000
+音量- power recovery
+音量+ power bootloader
+官方锁了bootloader,自带的版本CN_Phone-12.8.0.52-20150827，安装不了官方提供的解锁apk
+需要先刷到WW的ROM再用解锁apk解锁,然后进bootloader用fastboot刷recovery,然后卡刷gapps
+
+http://zentalk.asus.com.cn/forum.php?mod=viewthread&tid=30586&extra=page%3D3
+https://dlsvr04.asus.com/pub/ASUS/ZenFone/ZC550KL/UL-ASUS_Z010-WW-13.8.26.60-user.zip 
+  刷的方法有两种，一种是把固件复制到手机根目录下检测更新，另一种是把固件复制到手机或者SD卡任意位置，然后关机，
+再同时按住音量-和关机键进recovery模式来刷，刷前最好双清，第一次刷时间可能会长一点，耐心等进度条滚完然后开机吧，
+第一次开机如果卡在开机画面上可以关机然后再重启一次应该就能进系统了。
+ 解锁 要刷CM这类第三方固件当然要刷入twrp这类第三方recovery工具，但没解锁可是做不到的，解锁有两种方法，一种是刷无锁的beta版官方固件，
+另一种是刷到新版系统然后用华硕官方给的解锁工具解锁，有大大给过方法了请参考解锁工具，安装完解锁工具运行一下按照提示操作就行了，解锁时会重启下重开后就无锁了，可以刷twrp了。
+
+补充：
+推荐用无锁的beta版固件，如果用bootloader解锁工具估计 奸若磐石硕 会后台记录，找借口终身停止保修；
+audahadi大神的所有rom固件： https://www.androidfilehost.com/?w=files&flid=132105  
+
+

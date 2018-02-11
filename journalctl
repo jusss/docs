@@ -1,0 +1,4 @@
+journalctl --vacuum-size=10M
+journalctl --vacuum-time=2d
+ clear journalctl log
+

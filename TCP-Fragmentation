@@ -1,0 +1,24 @@
+把一个TCP包分割成两个发送，躲避GFW对DNS over TCP的干扰
+A point of clarification: It's called a TCP segment and a UDP datagram. They are not packets. TCP = Segment, UDP = Datagram, IP = Packet, Ethernet = Frame, At all other layers (AFAIK) they're just called PDU's (Protocol Data Units). – joeqwerty Aug 28 '13 at 4:27
+
+TCP fragmentation, 
+can TCP packets arrive to receiver by pieces?
+
+Yes. IP supports fragmentation, though TCP generally tries to determine the path MTU and keep its packets smaller than that for performance reasons. Fragmentation increases the datagram loss rate catastrophically. If a path has a 10% packet loss rate, fragmenting a datagram into two packets makes the datagram loss rate almost 20%. (If either packet is lost, the datagram is lost.)
+
+You don't have to worry about this though, and neither does the TCP layer. The IP layer reassembles packets into whole datagrams.
+
+but what about 1 packet? If it arrives, can I be sure that it is a complete packet, not a piece?
+
+No, but that's not your problem. The UDP protocol handles datagram reassembly. That's part of its job. (In actuality, the IP protocol does this for the UDP protocol, so UDP does it merely by being layered on top of IP.) If a datagram gets split over two packets, the IP protocol will reassemble it for the UDP protocol, so you will see the complete data.
+https://serverfault.com/questions/534063/can-tcp-and-udp-packets-be-split-into-pieces/534190
+UDP也可以分割包发送，但是不会验证包的完整性，而TCP是会验证的
+
+https://docs.python.org/3/library/asyncio-protocol.html?highlight=socket%20tcp_nodelay
+Changed in version 3.6: The socket option TCP_NODELAY is now set by default.
+
+self.socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+  
+
+MTU :x
+

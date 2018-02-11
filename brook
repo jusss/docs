@@ -1,0 +1,48 @@
+https://github.com/txthinking/brook#brook-server
+
+shadowsocks and openvpn have been compromised,
+so try v2ray and brook
+
+it seems brook has only one file, download from github and run it on vps
+
+on vps:
+wget 'https://github.com/txthinking/brook/releases/download/v20171113/brookvps'
+chmod +x brook
+./brook server -l :9999 -p password
+
+on client:
+wget 'https://github.com/txthinking/brook/releases/download/v20171113/brookvps'
+chmod +x brook
+./brook client -l 127.0.0.1:1080 -i 127.0.0.1 -s your-vps-addr:9999 -p password
+
+then run your firefox and set network socks5 proxy 127.0.0.1:1080
+and remember enable remote dns proxy, otherwise you will solve dns issue by yourself
+
+multi-server:
+# Run as multiple brook servers
+$ brook servers \
+        -l ":9999 password" \
+        -l ":8888 password"
+
+or just run multiple instances
+
+
+on server:
+./brook streamservers -l ":port password" -l ":port password"
+./brook server -l :port -p password
+
+on client:
+./brook streamclient -l 127.0.0.1:1080 -i 127.0.0.1 -s vps-ip:port -p password
+./brook client -l 127.0.0.1:1080 -i 127.0.0.1 -s vps-ip:port -p password
+
+
+
+我突然想起直接在使用brook时用192.168.2.210替代127.0.0.1不就是可以直接让其它设备使用代理了吗！
+当然chrome使用代理时也要使用192.168.2.210而不是127.0.0.1
+但是发现直接用brook的这个tunnel, 不支持http, 只支持socks5
+也就是说其它设备只能用socks5代理直接连接这个tunnel, 或者用privoxy用socks5 forward转发到这个tunnel,而其它设备用http连接privoxy
+
+使用netstat -tnul -p brook 显示brook正在使用的端口
+tcp number udp listen 
+发现brook在使用本地的TCP 7070和UDP 7070,也就是dns over socks5 proxy
+

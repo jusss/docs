@@ -1,0 +1,31 @@
+误删了ESP里面的win10启动文件，
+ESP分区上/dev/sda1 
+用u盘制作启动盘，从网上下载win10_PE.iso或者win10.iso
+在linux上用woeusb --device win10.iso /dev/sdb  假设u盘是/dev/sdb
+然后开机esc选u盘启动，点高级修复，点命令提示符
+diskpart
+sel disk 0
+list vol　查看到fat32分区，那个是ESP即EFI分区,比如Vol是3
+sel vol 3
+assign letter=Z: 给这个分区添加一个不存在的卷标为Z:
+exit 退出diskpart
+
+因为ESP里面都删光了，
+Z:  进入z盘
+mkdir EFI
+mkdir EFI\Microsoft
+mkdir EFI\Microsoft\Boot
+cd /d Z:\EFI\Microsoft\Boot
+bootrec /fixboot 提示拒绝访问。。。不知道为啥,接着运行下面指令
+bootrec /fixmbr 这个倒是可以运行
+bootrec /rebuildbcd
+bcdboot c:\windows /s z: /f UEFI (注意此时EFI\Microsoft\Boot里面是没有bootmgfw.efi的，所以开机能启动，很奇怪,因为grub需要bootmgfw.efi才能启动windows)
+虽然bootrec /fixboot拒绝访问，但是bootrec /rebuildbcd却可以，而且也
+在Z盘创建了呀，不明白为什么拒绝访问，或者说访问的不是Z盘被拒绝了
+
+重启，开机esc直接选择windows的启动项(这个启动项应该是自动生成的),而不是grub,然后就能进入win10了
+开机按esc是因为这个EFI会自动选择上次启动的启动项，比如你上次启动的是grub,那这次默认还是grub
+而不是win10
+
+https://neosmart.net/wiki/fix-uefi-boot/amp/
+google 'repair efi partition windows 10'

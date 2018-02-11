@@ -1,0 +1,84 @@
+share files between linux guest and linux host os
+host os is 10.0.2.2, use ssh scp
+---------------------------------------
+cp file from guest os xp to host os archlinux is too slowly, 
+maybe it's the '-net nic,model=ne2k_pci' issue, change another network driver
+or mount xp.img on host os archlinux,
+ sudo mount -o loop,offset=32256 xp.img /mnt/
+ xp.img is the virtual machine file, raw format,
+and remember do not mount xp.img when the virtual machine is runing
+-----------------------------------------------------------
+qemu-system-x86_64 -net nic,model=help
+qemu: Supported NIC models: ne2k_pci,i82551,i82557b,i82559er,rtl8139,e1000,pcnet,virtio
+xp need to set network driver, add option '-net nic,model=ne2k_pci'
+ne2k_pci is slow, use rtl8139
+qemu-system-x86_64 -m 2G -smp 4,sockets=2,threads=2 -enable-kvm -machine q35,accel=kvm -device intel-iommu -cpu host,hv_relaxed,hv_spinlocks=0x1fff,hv_vapic,hv_time -drive file=./xp.img,format=raw,cache=none -net nic,model=rtl8139 -net user,smb=/home/john/emp -soundhw all
+
+baiduyun client by other somebody is conflict with wucult*.exe in xp,
+kill wucult*.exe
+
+you really should choose chinese when you install xp,otherwise
+xp need cpl.exe to install chinese,and it is in your xp.iso
+sudo mount -o loop xp.iso /mnt
+/mnt/I386/LANG is where you want, just cp I386 to your share directory eg ~/emp
+find I386 on \\10.0.2.4\qemu in your file browser in guest xp,cp it to local
+then open "control" "Regional and Language Options" "Languages" "Install files
+for East Asisan languages" clck Ok, browse your I386 directory to install
+
+--------------------------------------------
+C-A-g get pointer out of the virtual machine
+C-A-f full screen
+qemu default as qemu-i386, if you want 64bit, use qemu-system-x86_64
+but no manual for qemu-system-x86_64, just man qemu, its parameters for qemu-system-x86_64
+
+-smp 2,sockets=1 模拟了一个具有 1 个物理 CPU, 两个逻辑 CPU 的系统
+-smp 4,sockets=2,threads=2 模拟一个具有 2 个物理 CPU, 四个逻辑 CPU 的系统, 启用超线程技术, 每个核心两个 线程.
+-vga specify video card     and use what for sound card?
+qemu-system-x86_64 -soundhw help  this will show all available sound card,
+-soundhw all will enable all of the above, all hda is a bad choice
+gus sb16 pcspk ac97 not work,  es1370 adlib  cs4231a hda
+-vga std or vmware virtio cirrus   std as default, virtio vmware is a bad choice
+
+create disk
+qemu-img create -f raw win10.img 30G
+
+install system
+qemu-system-x86_64 -m 2G -smp 4,sockets=2,threads=2 -enable-kvm -machine q35,accel=kvm -device intel-iommu -cdrom ~/Downloads/Win10_1709_China_GGK_Chinese\(Simplified\)_x64.iso -boot order=d -drive file=./win10.img,format=raw
+
+boot system
+qemu-system-x86_64 -m 2G -smp 4,sockets=2,threads=2 -enable-kvm -machine q35,accel=kvm -device intel-iommu -cpu host,hv_relaxed,hv_spinlocks=0x1fff,hv_vapic,hv_time -drive file=./win10.img,format=raw,cache=none -net nic -net user,smb=/home/john/emp -soundhw all -vga vmware
+-device intel-iommu 和-machine type=pc 冲突
+if=virto会让win10启动失败
+sound is cracky, awful, and if set QEMU_AUDIO_DRV=alsa QEMU_PA_SAMPLES=128 will random free the guest os win10
+screen is ok
+qemu-system-x86_64 -m 2G -smp 4,sockets=2,threads=2 -enable-kvm -machine q35,accel=kvm  -cpu host,hv_relaxed,hv_spinlocks=0x1fff,hv_vapic,hv_time -drive file=./win10.img,format=raw -net nic -net user,smb=/home/john/emp/
+
+share files between host and guest with smb, put these parameters to qemu-system-x86_64 
+-net nic -net user,smb=/home/john/emp  
+on windows, \\10.0.2.4\qemu  is /home/john/emp
+
+cpu help : qemu-system-x86_64 -cpu help
+
+pacman -S virt-manager qemu
+sudo modprob kvm virtio
+virt-manager　need libvirtd.service running, so systemctl start libvirtd
+sudo vim /etc/modules-load.d/john.conf  add virtio for auto-loaded
+
+create a hard disk image
+$qemu-img create -f raw image_file 30G
+
+installing the operating system
+$qemu-system-x86_64 -m 1G,slots=3,maxmem=2G -cdrom iso_image -boot order=d -drive file=disk_image,format=raw
+
+-m 1G,slots=3,maxmem=2G 内存1G到2G,3个槽点,默认128M
+-mem-path path还可以用临时文件作内存
+-boot order=d 从CD-ROM启动，如果是c就从硬盘启动，默认从硬盘启动
+
+running virtualized system with kvm
+$qemu-system-x86_64 -enable-kvm disk_image
+
+if you want enable Intel VT-d/AMD-Vi support, set kernel parameter 
+intel_iommu=on or intel_iommu=pt   amd_iommu=on
+
+$ qemu-system-x86_64 -enable-kvm -machine q35,accel=kvm -device intel-iommu -cpu host,hv_relaxed,hv_spinlocks=0x1fff,hv_vapic,hv_time ..
+

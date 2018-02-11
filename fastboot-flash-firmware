@@ -1,0 +1,72 @@
+firmware-update/
+
+fastboot flash dsp adspso.bin
+fastboot flash bluetooth BTFM.bin
+fastboot flash cmnlib64 cmnlib64.mbn
+fastboot flash cmnlib64bak cmnlib64.mbn
+fastboot flash cmnlib cmnlib.mbn
+fastboot flash cmnlibbak cmnlib.mbn
+fastboot flash devcfg devcfg.mbn
+fastboot flash aboot emmc_appsboot.mbn
+fastboot flash abootbak emmc_appsboot.mbn
+fastboot flash hyp hyp.mbn
+fastboot flash hypbak hyp.mbn
+fastboot flash keymaster keymaster.mbn
+fastboot flash keymasterbak keymaster.mbn
+fastboot flash logo logo.img
+fastboot flash modem NON-HLOS.bin
+fastboot flash pmic pmic.elf
+fastboot flash pmicbak pmic.elf
+fastboot flash rpm rpm.mbn
+fastboot flash rpmbak rpm.mbn
+fastboot flash splash splash.img
+fastboot flash tz tz.mbn
+fastboot flash tzbak tz.mbn
+fastboot flash xbl xbl.elf
+
+
+
+fastboot flash boot boot.img
+fastboot flash userdata userdata.img
+fastboot flash system system.img
+
+实际上，刷到这里就可以开机了，但是下面的应该是一些cm优化过的分区、基带什么的，刷了下面的会导致fastboot 无法解锁。尝试直接用官方recovery刷 http://bbs.anzhi.com/thread-9010642-1-1.html 官方包即可重新解锁。
+
+fastboot flash recovery recovery.img
+fastboot flash cache cache.img
+fastboot flash modem NON-HLOS.bin
+fastboot flash sbl1 sbl1.mbn
+fastboot flash dbi sdi.mbn
+fastboot flash aboot emmc_appsboot.mbn
+fastboot flash rpm rpm.mbn
+fastboot flash tz tz.mbn
+fastboot flash LOGO logo.bin
+fastboot reboot
+
+http://bbs.zhiyoo.com/thread-9007757-1-2.html
+https://forum.xda-developers.com/showpost.php?p=74886129&postcount=883
+
+fastboot flash dsp adspso.bin
+fastboot flash bluetooth BTFM.bin
+fastboot flash cmnlib64 cmnlib64.mbn
+fastboot flash cmnlib64bak cmnlib64.mbn
+fastboot flash cmnlib cmnlib.mbn
+fastboot flash cmnlibbak cmnlib.mbn
+fastboot flash devcfg devcfg.mbn
+fastboot flash aboot emmc_appsboot.mbn
+fastboot flash abootbak emmc_appsboot.mbn
+fastboot flash hyp hyp.mbn
+fastboot flash hypbak hyp.mbn
+fastboot flash keymaster keymaster.mbn
+fastboot flash keymasterbak keymaster.mbn
+fastboot flash logo logo.img
+fastboot flash modem NON-HLOS.bin
+fastboot flash pmic pmic.elf
+fastboot flash pmicbak pmic.elf
+fastboot flash rpm rpm.mbn
+fastboot flash rpmbak rpm.mbn
+fastboot flash splash splash.img
+fastboot flash tz tz.mbn
+fastboot flash tzbak tz.mbn
+fastboot flash xbl xbl.elf
+

@@ -1,0 +1,7 @@
+apt apt-get aptitude dpkg 
+apt-cache, aptitude search, apt-file,
+
+pacman pactree pkgfile bacman pacsort pacsearch paccache pacdiff paclist pacfart
+
+
+apt-file is like pacman -Fs

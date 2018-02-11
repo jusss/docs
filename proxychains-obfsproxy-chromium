@@ -1,0 +1,28 @@
+obfsproxy for ssh openvpn shadowsocks , there's also tsocks like obfsproxy
+proxychains for global proxy
+
+ssh openvpn shadowsocks v2ray brook
+
+chromium cann't run with proxychains, because of sand box
+also chromium don't relay dns over socks5,
+but there's 'proxy dns when using socks5' in firefox, 
+
+https://github.com/FelisCatus/SwitchyOmega/wiki/DNS-and-SOCKS-proxy
+there's dns prefetching in chromium, that use local dns resolv
+When using SOCKS proxy with Chromium, some DNS requests may go NOT through the proxy. This is caused by DNS prefetching. 
+
+--host-resolver-rules="MAP * ~NOTFOUND , EXCLUDE 127.0.0.1"
+
+To prevent DNS leaking, you may use the command line flag as described above, with 127.0.0.1 replaced with the IP address of your proxy host. Or you can disable DNS prefetching completely by unchecking the following option in your Chromium settings (under "Show advanced settings..."):
+
+[ ] Predict network actions to improve page load performance
+
+
+
+or call 'use a prediction service to load pages mor quickly'? to disable dns prefetch
+there's also a chromium plug in called 'proxyswitch omega' in apps store
+
+chromium没提供像firefox那样的'proxy dns when using socks5'选项，但好像可以通过禁止dns prefetch来阻止本地dns解析，通过禁用'use a prediction service to load pages more quickly'，这样dns就走代理了？
+
+chromium --proxy-server="socks5://127.0.0.1:1080"  
+

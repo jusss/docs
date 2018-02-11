@@ -1,0 +1,64 @@
+http://www.cs.utexas.edu/~cannata/cs345/Class%20Notes/27%20Lambda%20Calculus%20and%20the%20Y%20Combinator.html
+
+https://www.jianshu.com/p/64786c4396a7
+
+(lambda (f x) (f f x))
+
+假如　(Y f) => f'    f'就是f的不动点, Y是不动点操作者,
+高阶函数f的不动点是一个函数f', f'映射到自己被f求值, 即(f f') => f'
+(Y f) = f' = (f f') = (f (Y f)) = (f (f (Y f)))
+
+(let ((f (lambda (f a) ... (f f a))))
+    (f f a-value-wahtever-you-want))
+
+turn it to lambda form
+((lambda (f) (f f a-value))
+ (lambda (f a)
+    ...
+    (f f a)))
+make argument a variable
+((lambda (f x) (f f x))
+ (lambda (f a)
+    ...
+    (f f a))
+ a-value)
+
+就是CPS变换，给函数f添加个参数，这个参数指向自身，然后把这个函数本体作参数传给
+函数，这个参数再操作需要操作的
+
+比如从1加到10
+
+(define add-to 
+    (lambda (x y z)
+        (if (eq? x y)
+            (+ x z)
+            (add-to (+ 1 x) y (+ z x)))))
+(add-to 1 10 0)
+
+变换
+(letrec ((f (lambda (x y z)
+                (if (eq? x y)
+                    (+ x z)
+                    (f (+ 1 x) y (+ z x))))))
+        (f 1 10 0))
+
+再变换
+(let ((f (lambda (f x y z))
+            (if (eq? x y)
+                (+ x z)
+                (f f (+ 1 x) y (+ z x)))))
+    (f f 1 10 0))
+
+再变换
+((lambda (f) (f f 1 10 0))
+ (lambda (f x y z)
+    (if (eq? x y)
+        (+ x z)
+        (f f (+ 1 x) y (+ z x)))))
+
+也就是(F x) 变成((lambda (F) (F F x)) (lambda (F x) ... (F F x)))
+
+Y = λf. (λx. f(x x)) (λx. f(x x))
+
+(lambda (x) (+ x 1))    on math   \x.x+1  
+

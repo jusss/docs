@@ -1,0 +1,28 @@
+Xorg, not tty
+man xset
+ dpms flags...
+               The  dpms option allows the DPMS (Energy Star) parameters to be
+               set.  The option can take up to three numerical values, or  the
+               `force'  flag  followed  by  a  DPMS  state.  The `force' flags
+               forces the server to immediately switch to the DPMS state spec‐
+               ified.   The  DPMS  state  can  be one of `standby', `suspend',
+               `off', or `on'.  When numerical values are given, they set  the
+               inactivity  period (in units of seconds) before the three modes
+               are activated.  The first value  given  is  for  the  `standby'
+               mode,  the  second  is for the `suspend' mode, and the third is
+               for the `off' mode.  Setting these  values  implicitly  enables
+               the DPMS features.  A value of zero disables a particular mode.
+
+xset dpms force standby/suspend/off/on
+xset dpms 20 30 40 
+20 is for standby mode
+30 is for suspend
+40 is for off
+
+xset dpms 5 5 5    the screen will blank after 5 seconds
+xset dpms 5   it works too
+xset dpms 1800 1800 1800    blank after half-hour I think
+
+on moder screens, standby suspend or off are not much different
+they all blank the screen, on crts there was a diffrence in if it 
+turned off the gun or not, etc

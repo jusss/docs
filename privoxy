@@ -1,0 +1,82 @@
+brook or shadowsocks open a tunnel which listen on 1080
+install privoxy
+vim /etc/privoxy/config
+forward-socks5 / localhost:1080 .
+listen-address localhost:8118
+#listen-address 192.168.0.210:8118 other devices in the same LAN can use this for http proxy
+# when you use 192.168.0.210:8118, you MUST use 192.1680.210 for chromium --proxy-server, # 127.0.0.1 will not work
+
+systemctl restart privoxy
+
+then 
+chromium --proxy-server=http://127.0.0.1:8118
+
+it's not 
+chromium --proxy-server="socks5://127.0.0.1:8118"
+
+I don't know why dns will be over this proxy, but it is over this proxy, weird, even it is http proxy
+
+
+http or socks5 proxy, dns will over those proxy, think proxy server as dns server(that tunnel)
+
+
+twitter for android, it has proxy built-in
+firefox for android, use add-ons like foxyproxy standard for http proxy, dns wont work over proxy
+or Settings-Wi-Fi- long press your network and choose 'Modify network' 'Advanced options' 'Proxy' set it, this way dns will not over proxy
+
+http or socks5, dns over proxy or not depend the client, 
+chromium on archinux via privoxy visit internet, dns will over the http proxy tunnel
+because chromium choose dns over http proxy
+
+chromium on archlinux or chrome on android both can use http proxy and dns over it, but only when dns error, it will over it , it means they have to refresh connection after got connection failed because of dns stuff
+
+由浏览器决定dns是否走代理，而不是由privoxy或其它代理工具决定
+当浏览器开启http或socks5代理时，浏览器如果还是去本地/etc/resolv.conf找dns那就不走代理
+
+浏览器走代理时，dns走不走代理完全是浏览器决定的，但是浏览器又tmd不给出个明确的选项控制是否dns走代理，firefox只有个socks5时走代理，http没这个选项，chromium根本就没这个选项，有什么插件或其它浏览器可以控制dns问题吗?　dns设计时根本没考虑代理，是时候重新设计了
+
+firefox for android是有插件的，但是http可以走代理，但是dns还是本地，还是useless
+
+privoxy也就本地局域网用用，因为本地局域网没GFW,如果在外网使用privoxy挂http代理，直接被GFW干掉了
+
+on Archlinux:
+systemctl start privoxy
+chromium --proxy-server="http://192.168.2.210:8118"
+chromium去掉Use a prediction service to load pages more quickly那个预测加载服务，就会让dns走http或socks代理
+dns走不走代理是由浏览器决定的，而不是privoxy,是由使用网络的软件决定的
+
+on Android:
+Settings-Wi-Fi- long press your network and choose 'Modify network' 'Advanced options' 'Proxy' set it, this way dns will not over proxy 这种代理只对浏览器有效，对其它app无效
+然后使用chrome for android就可以访问网络了，但是会出现代理失败自动刷新可以连接上，因为dns问题, chrome应该是在发现本地dns解析失败后，使用http代理的解析
+twitter for android,有自己内建的http代理设置,可以使用
+
+
+fuck fuck fuck
+
+用自己写的dns-proxy-client.py监听192.168.2.210:53而不是127.0.0.1:53来给其它设备提供dns代理功能
+来做dns server, 然后android 上设置这个192.168.2.210地址做dns server并开启http代理
+这样android上就解决了http代理和dns问题
+
+PC上，开着dns-proxy-client.py来中转dns,当然还可以开个dnsmasq来缓存,解决dns问题
+brook开个tunnel, 然后privoxy监听192.168.2.210:8118重转发到那个tunnel来给其它设备提供http代理服务
+
+或者尝试把dns-proxy-client.py改成转发到tunnel,让tunnel的另一方解析
+
+sudo python lab2/dns-proxy-client.py mars 33333 192.168.2.210 53
+
+我突然想起直接在使用brook时用192.168.2.210替代127.0.0.1不就是可以直接让其它设备使用代理了吗！
+当然chrome使用代理时也要使用192.168.2.210而不是127.0.0.1
+chromium --proxy-server="socks5://192.168.2.210:7070"
+但是发现直接用brook的这个tunnel, 不支持http, 只支持socks5
+也就是说其它设备只能用socks5代理直接连接这个tunnel, 或者用privoxy用socks5 forward转发到这个tunnel,而其它设备用http连接privoxy
+
+firefox for android 支持socks5和http代理
+用about:config配置，　http代理无法解决dns问题，　socks5可以让dns走代理
+about:config　搜　network.proxy  
+socks5修改4项　　　network.proxy.socks是地址　　network.proxy.socks_port是端口　network.proxy.socks_remote_dns改成true　
+network.proxy.socks_version默认是5  network.proxy.type改成1, 0是不启用, 5是使用系统的
+
+android手机上chroot跑个brook开个socks5的tunnel,然后firefox浏览器通过about:config配置就可以了
+用about:config也可以配置http代理，但是需要解决http代理的dns问题，也就是自己搭建个dns转发服务器
+
+

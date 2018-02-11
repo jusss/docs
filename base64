@@ -1,0 +1,3 @@
+echo 'encode-messages'|base64 -d -
+
+also see base64 --help

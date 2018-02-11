@@ -1,0 +1,33 @@
+google drive不知道用了什么黑科技，浏览器从google drive下载文件时无法得到文件
+大小，也无法预测文件下载结束时间，在鹏博士网络这种流量每10M左右就断一次的网络
+上能不中断下载
+----------------------------------------------
+pacman -S rclone
+rclone config   # for generate config
+配置最后一步会用链接打开浏览器登录谷歌获取验证码
+填写验证码
+
+可以在本地配置rclone 开代理获取那个谷歌登录的token然后生成配置文件
+再把配置文件传到vps上直接使用
+
+获得token后会链接谷歌确认，而本地rclone并没走代理，所以无法确认
+
+还是再vps上           配置rclone 
+vps:  
+$rclone config
+...
+Say N if you are working on remote or a headless machine
+choose N
+复制出来的链接，然后本地开代理打开那个链接得到token
+把token复制到vps上的rclone config接着验证成功
+
+因为vps上开Xorg用浏览器打开那个链接会非常卡　ssh -XY 很卡
+所以本地开代理打开那个验证链接
+
+rclone config生成配置时，google drive选的名字是google-drive,所以下文用的就是
+rclone copy UL-ASUS_Z010-WW-13.8.26.60-user.zip google-drive:/
+rclone ls google-drive:/
+1531601201 UL-ASUS_Z010-WW-13.8.26.60-user.zip
+和scp一样，需要addr:/path, google-drive:/指的是google drive的根目录
+
+rclone help 查看rclone的参数

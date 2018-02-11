@@ -1,0 +1,8 @@
+网页UI里面配置完总是卡在正在配置界面，
+于是直接ssh过去openvpn --config a.ovpn运行起来，
+发现kill `pidof openvpn`之后网络无法恢复，原来是网络UI里面openvpn还开着，需要disable
+现在发现只要ssh过去运行一次之后，以后可以直接在网页UI里面开关了
+
+直接在网页UI里面也能配置了，用configure client manually, 先把config复制进字框
+不要在config字框里配置ca cert key,在下面对应的字框里复制ca cert key的内容进去
+然后保存即可，卡在配置界面，直接关掉页面就好，已经运行起来了

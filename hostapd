@@ -1,0 +1,48 @@
+rtl8723be mt7601u 总是提示nl80211无法配置驱动模式
+用create_ap试试发现bl-link的mt7601u根本不支持AP模式
+而rtl8723be这个网卡虽然支持AP(master)和Station两种模式，但是同一时间只能有一种模式工作
+使用rtl873be创建AP sudo create_ap -n wlp3s0 mypoint fuckyour --no-virt
+此时用外置bl-link网卡连网，用内置的rtl8723be创建AP
+netcore的nw360 300M r8712u也不支持全AP模式
+这样尝试用mt7601u联网，然后用rtl8723be提供AP,但是它同时只能有一种模式，以为着rtl8723be
+提供AP时不能和mt7601u连接去联网 meaningless
+-------------------------------
+使用外置的usb无线网卡创建无线AP
+因为usb网卡接口的名字太难记了，用udev更改下
+sudo vim /etc/udev/rules.d/10-network.rules
+SUBSYSTEM=="net",ACTION=="add",
+ATTR{address}=="ee:bb:dd:aa:dd:cc",
+NAME="wlan0"
+
+systemctl daemon-reload
+重新插拔usb网卡就行了
+
+ip link就会显示是wlan0
+
+pacman -S hostapd
+
+启用转发　
+echo 1|sudo tee /proc/sys/net/ipv4/ip_forward
+sudo iptables -t nat -A POSTROUTING -o wlp3s0 -j MASQUERADE  启用wlp3s0端口的NAT
+
+配置hostapd 
+vim /etc/hostapd/hostapd.conf
+interface=wlan0
+hw_mode=g
+channel=10
+ieee80211d=1
+country_code=CN
+ieee80211n=1
+wmm_enabled=1
+
+ssid=usbwifi
+auth_algs=1
+wpa=2
+wpa_key_mgmt=WPA-PSK
+rsn_pairwise=CCMP
+wpa_passphrase=helloworld
+
+
+
+systemctl start hostapd
+

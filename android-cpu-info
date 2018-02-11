@@ -1,0 +1,4 @@
+adb shell
+uname -m
+or cat /proc/cpuinfo
+ armv7l is not arm64, it is arm

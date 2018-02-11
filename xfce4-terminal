@@ -1,0 +1,68 @@
+有个MiscDefaultWorkingDir= 留空就是默认上一个tab的目录为新tab的目录
+或者设置为~
+xfce4-terminal的配置文件竟然是scheme, 而且在archlinux上装xfce4-terminal只
+需要安装4个依赖的库文件，而不是xfce4全家桶，不像debian
+
+xfce4-terminal选项里有复制选中的内容到剪切板，就算用鼠标选中就自动复制到了剪切板
+而且还有tab页面, 鼠标选中后，Shift-Insert粘贴
+
+配置文件在~/.config/xfce4/terminal/ 
+一个是accels.scm 一个是terminalrc
+
+修改accels.scm重映射键盘绑定，C-t new tab
+C-w close tab
+M-n next tab
+M-p previous tab
+M-1 tab-1
+M-2 tab-2
+-------------------------------------------------------
+[john@moon ~]$ cat .config/xfce4/terminal/accels.scm |grep -v ';'
+(gtk_accel_path "<Actions>/terminal-window/goto-tab-4" "<Alt>4")
+(gtk_accel_path "<Actions>/terminal-window/goto-tab-3" "<Alt>3")
+(gtk_accel_path "<Actions>/terminal-window/next-tab" "<Alt>n")
+(gtk_accel_path "<Actions>/terminal-window/goto-tab-1" "<Alt>1")
+(gtk_accel_path "<Actions>/terminal-window/close-tab" "<Primary>w")
+(gtk_accel_path "<Actions>/terminal-window/new-tab" "<Primary>t")
+(gtk_accel_path "<Actions>/terminal-window/goto-tab-8" "<Alt>8")
+(gtk_accel_path "<Actions>/terminal-window/goto-tab-2" "<Alt>2")
+(gtk_accel_path "<Actions>/terminal-window/prev-tab" "<Alt>p")
+(gtk_accel_path "<Actions>/terminal-window/toggle-menubar" "F10")
+(gtk_accel_path "<Actions>/terminal-window/goto-tab-7" "<Alt>7")
+(gtk_accel_path "<Actions>/terminal-window/goto-tab-9" "<Alt>9")
+(gtk_accel_path "<Actions>/terminal-window/goto-tab-6" "<Alt>6")
+(gtk_accel_path "<Actions>/terminal-window/goto-tab-5" "<Alt>5")
+[john@moon ~]$ 
+--------------------------------------------------------
+MiscCopyOnSelect=TRUE 这个选项应该是复制鼠标选中的到剪切板
+
+[john@moon ~]$ cat .config/xfce4/terminal/terminalrc 
+[Configuration]
+ColorForeground=#000000
+ColorBackground=#ffffff
+MiscAlwaysShowTabs=FALSE
+MiscBell=FALSE
+MiscBellUrgent=FALSE
+MiscBordersDefault=TRUE
+MiscCursorBlinks=FALSE
+MiscCursorShape=TERMINAL_CURSOR_SHAPE_BLOCK
+MiscDefaultGeometry=80x24
+MiscInheritGeometry=FALSE
+MiscMenubarDefault=TRUE
+MiscMouseAutohide=FALSE
+MiscMouseWheelZoom=TRUE
+MiscToolbarDefault=TRUE
+MiscConfirmClose=TRUE
+MiscCycleTabs=TRUE
+MiscTabCloseButtons=TRUE
+MiscTabCloseMiddleClick=TRUE
+MiscTabPosition=GTK_POS_TOP
+MiscHighlightUrls=TRUE
+MiscMiddleClickOpensUri=FALSE
+MiscCopyOnSelect=TRUE
+MiscDefaultWorkingDir=
+MiscRewrapOnResize=TRUE
+MiscUseShiftArrowsToScroll=FALSE
+MiscSlimTabs=FALSE
+FontName=Monospace 14
+
+

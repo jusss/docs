@@ -1,0 +1,11 @@
+if there's no configure, only configure.ac then use autoconf to generate configure
+compile fvwm2 need xorg-server-devel pkg-config xorg-server-devel libtool automake
+installed that packages, and run `autoconf` will generate configure script
+
+if autoconf get error about m4_patter_allow  then run
+autoreconf -i -I /home/john/AUR/fvwm/fvwm-version-2_6_5/
+./configure
+make 
+sudo make install
+
+2.6.5 from github, compile successed!
