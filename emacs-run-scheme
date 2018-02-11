@@ -2,3 +2,7 @@ M-x run-scheme can run scheme on emacs
 C-h f run-scheme  know you need set variable of 'scheme-program-name'
 (setq scheme-program-name "racket") in *scratch* buffer
 then M-x run-scheme
+
+(+ 0.1 0.2) 返回0.30000000000000004, racket guile python ruby全部返回这个数，只有common lisp返回的是0.3
+"大部分语言用的是 IEEE 754 浮点数标准，算出来都会这样。
+ Common Lisp 用了自己的能表示虚数的浮点数标准。"

@@ -1,3 +1,123 @@
+https://serverfault.com/questions/675553/stunnel-vpn-traffic-and-ensure-it-looks-like-ssl-traffic-on-port-443
+https://gist.github.com/bwann/82ed679e94972666808d97587d276677
+https://www.raspberrypi.org/forums/viewtopic.php?t=40389
+
+ON SERVER:
+# install stunnel
+sudo apt-get install stunnel4 openssl -y
+
+# Generate your own Private Key (server.pem)
+cd /etc/stunnel/
+sudo openssl genrsa -out server.key 4096
+sudo openssl req -new -key server.key -out server.csr
+sudo openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
+sudo bash
+cat server.key > server.pem && cat server.crt >> server.pem
+chmod 400 /etc/stunnel/server.pem
+exit
+用密钥自身给依据自身生成的证书签名，自签名，由此可见server.pem同时具有私钥和证书
+
+# write those into /etc/stunnel/stunnel.conf
+     sslVersion = all
+     options = NO_SSLv2
+     cert = /etc/stunnel/server.pem
+     pid = /var/run/stunnel.pid
+     output = /var/log/stunnel
+
+     [openvpn]
+     client = no
+     accept=20183
+     connect=20182
+
+# run stunnel
+stunnel /etc/stunnel/stunnel.conf
+
+# run openvpn, make sure your openvpn listen on 20182, and enable iptable rules for openvpn
+openvpn --config /etc/openvpn/server.conf
+
+ON CLIENT:
+# install stunnel
+pacman -S stunnel
+
+# write those into /etc/stunnel/stunnel.conf
+[openvpn]
+client = yes
+accept = 127.0.0.1:20182
+connect = your-vps-ip:20183
+
+# in your openvpn.conf
+client
+proto tcp
+remote localhost 20182
+...
+
+# run openvpn
+sudo openvpn --config openvpn.conf
+
+---------------------------------
+obfs4可能也被gfw识别了，openvpn obfs3 scramblesuit obfs4(obfs4proxy+ptproxy) 还是连接重置，为什么你们设计TLS握手时一定要明文交换信息？？？
+https://www.schneier.com/blog/archives/2012/12/china_now_block.html
+ptproxy https://github.com/gumblex/ptproxy    
+on server ptproxy.py -s example.conf
+on client ptproxy.py -c example.conf 把on server上面运行的之后显示的cert写入client的example里面
+obfsproxy不提供obfs4, 要想使用obfs4需要用obfs4proxy + ptproxy
+https://jm33.me/using-obfs4proxy-to-obfuscate-your-non-tor-proxy-wei-shadowsockslu-you-qi-zeng-jia-obfs4hun-yao.html
+https://jm33.me/shi-yong-obfsproxy-scramblesuit-hun-yao-sh4d0ws0cksliu-liang.html
+https://dcamero.azurewebsites.net/openvpn-obfsproxy.html
+
+--------------------------------------
+即使设置tun-mtu也还是被墙，"但是聪明的GFW还是找到了OpenVPN TLS验证时的特征并墙之。"
+http://markzhang.cn/blog/2014/09/01/ros-openvpn/
+原因是网络通讯动态加密协议都存在一个特征，就是通讯协议初期握手时，IP包特定位置会发送一段明文
+static key, tun-mtu, 都还是被识别
+http://blog.csdn.net/chengzhezhijian/article/details/49275869
+-----------------------------
+The --mssfix option only makes sense when you are using the UDP protocol for OpenVPN peer-to-peer communication, i.e. --proto udp.
+The --fragment option only makes sense when you are using the UDP protocol ( --proto udp ).
+https://openvpn.net/index.php/open-source/documentation/manuals/65-openvpn-20x-manpage.html
+----------------------------------------------
+OpenVPN requires a value called the MSS to be set. The MSS is the value for the MTU minus 40).
+Eg. If your MTU is 1460, your MSS is 1420
+mssfix 1420 in .ovpn to set that
+
+tun-mtu 1400 
+mssfix 1360
+In the most common case, MTU on the physical interface is 1500, so it is better to set OpenVPN TUN MTU to a value lower than the real MTU, and MSSFIX to MTU-40, as in the example above.
+
+如果证书是4096位的，那mss设为512?
+
+原来TCP的Maximum Segment Size是可以在应用层设置的，只要将MSS设置为一个比证书还要小的值，服务器返回的证书就会分段，从而不会被检测到，只是MSS太小了通信效率有点低带宽进一步缩水。。。
+IPv6又复活拉！
+前几天开始GFW对6in4实现了根据服务器返回包的证书进行阻断，一旦触发整个隧道都阻断大概2分钟，即使使用TCPFastOpen也不行，由于是回包无法对其分片处理估计除非把mtu改成非常小的值是没有什么好办法了，隧道穿墙基本无望
+from https://twitter.com/bluebit_cg/status/945124892676182016
+------------------------------
+发现openvpn默认读取/etc/openvpn/server.tls.conf而不是server.conf奇怪了
+而且只能用systemctl start openvpn启动，用openvpn --config server.conf启动不运行在debian
+android上的确有一款openvpn客户端支持obfs3，不过需要捐款才能使用
+AUR上有openvpn的obfs补丁，直接打在源码上编译 https://aur.archlinux.org/packages/?O=0&K=openvpn
+------------
+openvpn with obfsproxy   https://community.openvpn.net/openvpn/wiki/TrafficObfuscation
+on server:
+/etc/openvpn/server.tls.conf
+proto tcp
+port 21222
+
+obfsproxy obfs3 --dest=127.0.0.1:21222 server 0.0.0.0:21111
+systemctl start openvpn
+
+on client:
+in client.conf 
+proto tcp
+socks-proxy-retry
+socks-proxy 127.0.0.1 21000
+remote your-server-ip 21111
+
+obfsproxy obfs3 socks 127.0.0.1:21000
+sudo openvpn --config client.tls.conf
+
+vim /etc/resolv.conf
+nameserver 8.8.8.8
+--------------------------------------
 2017.07.17 发现tls-crypt也握手失败。。。还是用static keys吧。。。
 openvpn tls握手包已被识别，用tls-crypt取代tls-auth，或用static keys（只能一对一，可开启多个实例）或obfsproxy混淆（只支持tcp）
 openvpn v2.4之后有tls-crypt可以取代tls-auth

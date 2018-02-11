@@ -1,3 +1,102 @@
+cd /etc/openvpn/easy-rsa/
+source ./vars
+./build-key client2   ;;;generate client2.crt and client2.key
+
+copy client2.crt client2.key ca.cert to another user, make another user can use openvpn
+
+openvpn怎么都启动不了，报错信息只说主进程退出不说别的 journalctl -xe显示的
+重新配置文件　
+gunzip -c /usr/share/doc/openvpn/examples/sample-config-files/server.conf.gz > /etc/openvpn/server.conf
+vim /etc/openvpn/server.conf修改下
+ca /etc/openvpn/easy-rsa/ca.crt 指定位置
+不想用tls-auth就直接把tls-auth用#注释掉,避免tls握手失败
+4096位的证书，要想把证书分包传输
+
+#tun-mtu 1500  如果想分包好像只能设1500
+#fragment 500  UDP分包最大值  但是archlinux的openvpn二进制包竟然没编译fragment test功能导致无法分包
+#mssfix 472    TCP分包最大值
+https://blog.hambier.lu/post/solving-openvpn-mtu-issues
+
+----------------------------------------------
+I. disable tls-auth to avoid handshake fail
+II. set certificate as 4096 bit, and mtu less than 512 to avoid certificate detect
+
+cd /etc/openvpn/easy-rsa
+source ./vars
+./clean-all
+
+openssl dhparam 4096 > /etc/openvpn/easy-rsa/keys/dh4096.pem            ;dh4096.pem
+### you can use openvpn without tls-auth, so don't generate ta.key
+####openvpn --genkey --secret /etc/openvpn/easy-rsa/keys/ta.key             ;ta.key
+vim ./vars       ### change to KEY_SIZE=4096 and CA_EXPIRE=36500
+source ./vars
+./build-ca                 ;generate ca.crt and ca.key in ./keys/            ;ca.key
+./build-key-server server                                          ;server.key
+source ./vars
+./build-key client1                                                ;client1.key and client1.cert
+
+
+now there're ca.crt ca.key client1.crt client1.csr client1.key dh4096.pem server.csr server.key server.crt ...
+
+you only need ca.crt client1.crt client1.key those three files to your client,
+ta.key is optional, and config your openvpn.ovpn
+
+on server, put those files to where you point them in /etc/openvpn/server.conf
+comment tls-auth with ; 
+dh /etc/openvpn/easy-rsa/keys/dh2048.pem
+ca .../ca.crt
+cert .../serer.crt
+key .../server.key
+### tls-auth ta.key 0   
+### tls-crypt /etc/openvpn/easy-rsa/keys/static.key
+### tls-cipher
+
+if you wanna static key auth, then just need tls-crypt will be ok, don't need others keys
+
+this is a static key config file on server
+dev tun
+port 19124
+proto tcp
+ifconfig 10.8.0.1 10.8.0.2
+secret static.key
+comp-lzo
+keepalive 10 60
+ping-timer-rem
+persist-tun
+persist-key
+cipher AES-128-CBC
+auth SHA512
+status /etc/openvpn/openvpn.status.log
+log /etc/openvpn/openvpn.log
+verb 4
+push "redirect-gateway def1 bypass-dhcp"
+
+this is a normal config file on server
+port 21222
+proto tcp
+;dev tap
+dev tun
+ca /etc/openvpn/easy-rsa/keys/ca.crt
+cert /etc/openvpn/easy-rsa/keys/server.crt
+key /etc/openvpn/easy-rsa/keys/server.key
+dh /etc/openvpn/easy-rsa/keys/dh2048.pem
+server 10.8.0.0 255.255.255.0
+ifconfig-pool-persist ipp.txt
+push "redirect-gateway def1 bypass-dhcp"
+push "dhcp-option DNS 10.8.0.1"
+keepalive 10 120
+cipher AES-256-CBC
+auth SHA512
+comp-lzo
+max-clients 100
+persist-key
+persist-tun
+status openvpn-status.log
+log         openvpn.log
+verb 3
+
+
+------------------------------------------------
 openvpn连接后，需要设置/etc/resolv.conf的dns服务器为内网地址10.8.0.1
 ----------------------------
 bandwagonhost用的是OpenVZ, 换不了内核！！！
