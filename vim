@@ -1,3 +1,9 @@
+pacman -S vim-jellybeans vim-seti
+vim color scheme
+:colorscheme jellybeans
+or download colorscheme file from internet, those files end with .vim
+move them to ~/.vim/colors/ then put 'colorscheme the-name-of-them' into ~/.vimrc
+------------------------------------------
 gvim " + y 这3个字符能把visual mode选中的行或者块复制到clipboard
 "+p 这3个字符把clipboard复制到vim
 gvim默认开启+clipboard, 而大多数发行版默认的vim都是-clipboard

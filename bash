@@ -1,3 +1,96 @@
+impv(){ 
+P_LIST=( "$@" )
+#echo "the number of parameter is $#"
+for ((i=0; i<$#; i+=2))
+do
+    if [[ $# -gt 1 ]]
+    then
+        #echo "this is the first parameter: ${P_LIST[0]}"
+        if [[ "${P_LIST[$i+1]}" == *.srt || "${P_LIST[$i+1]}" == *.ass ]]
+        then
+            mpv "${P_LIST[$i]}" --sub-file "${P_LIST[$i+1]}"
+        else impv_music "$@"; break
+        fi
+    else mpv "$@"
+    fi
+done
+}
+
+impv_music(){
+mpv "$@"
+}
+
+----------------------------------------------------------------------
+bash的函数定义不能使用函数参数，impv(parameter)是错误的,但是可以调用时传参
+如impv_music $@, 然后在impv_music的函数里使用$@, 使用break跳出for循环
+impv(){
+P_LIST=( "$@" )
+#echo "the number of parameter is $#"
+for ((i=0; i<$#; i+=2))
+do
+    if [[ $# -gt 1 ]]
+    then
+        #echo "this is the first parameter: ${P_LIST[0]}"
+        if [[ "${P_LIST[$i+1]}" == *.srt || "${P_LIST[$i+1]}" == *.ass ]]
+        then
+            mpv "${P_LIST[$i]}" --sub-file "${P_LIST[$i+1]}"
+        else mpv "$@"
+        fi
+    else mpv "$@"
+    fi
+done
+-----------------------------------------------
+用for ((a=1;a<5;a++)) 取代 for i in `seq 1 1 5`这种形式
+用$()取代``
+数组取值，用${array[i]} 而不是$(array[i])
+在每个字符串变量外面多加个""  "${arry[i]}"  "$@"
+turn parameters to a list
+PLIST=( "$@" )  there shouldn't be any space between '='
+注意这个数组的第0项是第一个参数，而不是程序本身
+------------------------------------------------------
+;用于分割同一行有多个语句
+$((i + 1))  是当前参数的下一项　
+for i in *; do ... done, $i的下一项是$((i+1))
+当前项算数加1是(($i+1))
+shift(1)每执行一次，参数列表就会减去第一个
+shift 2,执行一次参数列表减去前2个
+--------------------------------------
+$0 永远指向程序本身
+比如　bash a.sh   $0指向a.sh
+./a.sh  $0指向a.sh
+第一个参数是$1, 依次类推, $*是把所有参数当作是一个整体，　$@是所有参数当中的一个
+$# 是参数个数, 没有参数就是0
+impv(){
+if [ $# -gt 1 ]
+then
+    if [[ $2 == *.srt || $2 == *.ass ]]
+    then
+        mpv $1 --sub-file $2
+    fi
+fi
+} 
+
+()分割语句 (())可以使用c的for形式　for((i=0;i<5;i++)) 替代for i in `seq 0 4`
+也可用于算数运算比较if (($i<5)) 等同　if [ $i -lt 5 ]
+((exp))返回0或1
+[]和test命令是等同的，用于判断条件
+[[]]和[]很像，能使用逻辑判断复 && || !
+if [[ $a != 1 && $a != 2 ]], 如果不适用双括号, 则为if [ $a -ne 1] && [ $a != 2 ]或者if [ $a -ne 1 -a $a != 2 ]
+
+字符串包含判断
+result=$(echo 'name.srt' | grep '.srt')
+if [[ "$result" != "" ]]
+或 if [[ "name.srt" =~ ".srt" ]] 　=~判断前面的是否包含后面的
+或 if [[ "name.srt" == *.srt ]] 
+或　if [[ "name.srt"/".srt" ]]
+
+http://blog.csdn.net/taiyang1987912/article/details/39551385
+https://www.cnblogs.com/AndyStudy/p/6064834.html
+---------------------------------------------
+split -b 1M her.mp3 her.  最后这个参数'her.'是分割后的文件前缀
+可以分割成her.aa her.ab her.ac等1M大小的文件
+cat her.a* > b.mp3 重新合并成b.mp3
+
 http://mywiki.wooledge.org/BashGuide
 http://mywiki.wooledge.org/ParsingLs
 
@@ -16,6 +109,17 @@ put ; before }  and put one space after {
 
 then put that in .bashrc and you can use it anywhere
 
+
+!在find里面可以表示非，相反, -not就是!, 用-and -or -not来串条件
+
+1.把./del里所有非目录的文件用key-name为jusss的加密 (文件加密)
+ gpg --encrypt-files -r jusss `find ./del/ ! -type d`
+
+2.把./del下所有非目录的文件并且不以.gpg结尾的都删除 (删源文件)
+rm `find ./del/ ! -type d -and ! -iname "*.gpg"`
+
+3.把./del下所有非目录的文件并以.gpg结尾的都删除  (删加密文件)
+rm `find ./del/ ! -type d -and -iname "*.gpg"`
 
 
 

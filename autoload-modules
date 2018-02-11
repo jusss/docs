@@ -12,3 +12,8 @@ vboxnetadp
 vboxnetflt
 vboxpci
 vboxdrvw
+
+and set modules parameters /etc/modprobe.d/jusss.conf
+options module parameter
+
+also you can black it on that file too

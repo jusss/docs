@@ -1,3 +1,14 @@
+使用netstat -tnul -p brook 显示brook正在使用的端口
+tcp number udp listen 
+发现brook在使用本地的TCP 7070和UDP 7070,也就是dns over socks5 proxy
+
+lsof -i 显示进程和它使用的端口
+netstat -tulpn 也是显示进程和它使用的端口
+lsof -i :22 看哪个进程在使用22端口
+ls -l /proc/PID/exe 会显示那个PID对应的程序名字
+whatis program-name 显示这个程序是做什么的
+
+-------------------------
 gnome-system-monitor
 ksysguard
 conky

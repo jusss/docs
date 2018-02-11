@@ -1,6 +1,9 @@
+linux 添加参数　fastboot可以跳过fsck　磁盘检查
+----------------------
 
 制作一个可以在主板设置里boot from file的efi文件, 比如u盘fat32系统，挂载/mnt
-grub-install --efi-directory /mnt/ --boot-directory /mnt --removable --target x86_64-efi
+grub-install --efi-directory /mnt/ --boot-directory /mnt --removable --target x86_64-efi /dev/sdb
+注意一定要指定设备，否则默认安装到/dev/sda, no 还是自动把/dev/sda给突突了，但是可以从bios指定grubx64.efi启动
 生成/mnt/EFI/BOOT/BOOTx64.EFI 可以直接从这个文件启动就能进入grub
 也可以开机esc选择u盘uefi启动，会自动进入grub
 insmod part_gpt

@@ -1,1 +1,4 @@
 chromium's cookie password stuff store on ~/.config/chromium/
+chromium --proxy-server="socks5://127.0.0.1:1080"
+chromium --proxy-server="socks5://192.168.2.210:7070"
+

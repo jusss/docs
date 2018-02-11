@@ -1,10 +1,19 @@
+woeusb 和 winusb两款工具可在linux上使用windows的iso制作windows的启动盘
+-----------------------------
+old version of grub bug , wipe out /boot/esp and cann't install efi
+said` cant open /boot/esp/EFI/"arch/bootx86.efi'
+upgrade grub, and try it again,
+but where's bootmgfw.efi for win10?
+you can cop it from C:\Windows\Boot\EFI  to /boot/esp/EFI/Microsoft/Boot/
+--------------------------------------
 0. 先在主板设置里关掉secure boot和fast boot
 1. 在主板设置里是可以选择启动先后顺序来启动不同系统，比如Win10 Archlinux，重启默认启动Win10
 2. 如果把grub2设为了第一启动顺序，可以在grub2里启动Win10 Archlinux
 
-假设/dev/sda1是ESP也就是EFI分区
-mount /dev/sda1 /boot/esp
-grub-install --efi-directory /boot/esp  --boot-directory /boot  --target x86_64-efi
+假设/dev/sda1是ESP也就是EFI分区, 挂载在哪里不重要，关键是要写入这个分区，挂载在
+/boot/efi或/mnt也可以，主要是写入这个分区,grub里调用使用的是(hd0,gpt1)而不是分区
+mount /dev/sda1 /boot/esp  一定要指定设备，否则不知道装到哪去 no 还是自动把/dev/sda给突突了，但是>可以从bios指定grubx64.efi启动
+grub-install --efi-directory /boot/esp  --boot-directory /boot  --target x86_64-efi /dev/sda
 grub-mkconfig -o /boot/grub/grub.cfg
 vim /boot/grub/grub.cfg
 menuentry "Microsoft Windows 10" {

@@ -15,3 +15,16 @@ xargs
     find . -name "*.txt" print0 |xargs -0 rm {} 
 find -print0  与 xargs -0 的结合避免文件名有特殊字符如空格，引号等无法处理：
  find . -name "*.txt" print0 |xargs -0 rm {} 
+
+用!表示非，相反
+用-and -or -not来串条件, -not就是!
+1.把./del里所有非目录的文件用key-name为jusss的加密 (文件加密)
+ gpg --encrypt-files -r jusss `find ./del/ ! -type d`
+
+2.把./del下所有非目录的文件并且不以.gpg结尾的都删除 (删源文件)
+rm `find ./del/ ! -type d -and ! -iname "*.gpg"`
+
+3.把./del下所有非目录的文件并以.gpg结尾的都删除  (删加密文件)
+rm `find ./del/ ! -type d -and -iname "*.gpg"`
+
+

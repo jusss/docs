@@ -1,192 +1,257 @@
-1. generate a key
-gpg --full-gen-key
-~/.gnupg/private-keys-v1.d/
+gpg -e -a -r jusss testme 加密testme这个文件，-e加密, -a输出ASCII, -r收件人公钥
+生成testme.asc，可以把里面的信息复制以邮件的正文形式发送,不使用-a会输出binary
+把binary转变成ASCII，这个真的很好
 
-2. delete a key
-gpg --delete-secret-keys your-keys-name
-gpg --delete-keys your-keys-name
+gpg -o testme -d testme.asc 解密testme.asc, -d解密，-o输出文件
+如果是多个文件就--decrypt-files,会自动生成对应的文件名，不用再使用-o选项
+---------------------------------------------------------
+    key-id就是那一串数字，gpg --list-keys显示的16进制数字
+    如果导出之前，私钥有passphrase保护，那么导出私钥之后，
+    这个导出的私钥文件也有passphrase保护，当再在其它机器上导入这个
+    私钥文件时，会提示输入passphrase, 可以不指定--armor
+    不以ASCII形式存储，但是file 这个私钥还是会显示这是个私钥文件,可以对
+    这个文件再进行字节操作,对私钥文件进行passphrase和字节操作双重保护
 
-3. export key
-导出公钥
-gpg --export --output key-id.pub --armor key-id
-顺序很重要，因为--output和--armor属于--export
-without --armor it will export a binary code, --armor will turn it to ASCII
+    导入一个私钥，同时也意味着导入了这个私钥的公钥,而且这个私钥和公钥都是
+    同一个key-id，也就是一串16进制数字
+    也就是说，只需要导出私钥即可,和openssl一样，私钥文件包含公钥
 
-导出私钥
-gpg --export-secret-keys --output key-id.private --armor key-id
-不同于openssl那一套，私钥是不包含公钥的, openssh也不包含
+   递归加密，如果是多个文件夹，打包成一个tar包然后加密这个包
+    或者gpg --encrypt-files -r jusss `find tmp/`
+      gpg --encrypt-files -r jusss `find openvpn/  -type f`
+    rm `find openvpn/ -iname "*.gpg" -type f`
 
-3.5 import key
-导入公钥和私钥是一样的
-gpg --import file.name.pub or file.name.private
+gpg --encrypt-files -r 69D1049662BF2FB843A262B63588658D0ED6EA43 `find tmp/ ! -type d`  把所有不是目录的文件用密钥69-43加密
 
-3.6 upload you key to server
-gpg --keyserver keyserverAddress --send mykeyID
-注： --keyserver 可以不加，默认为 keys.gnupg.net
+!在find里面可以表示非，相反, -not就是!, 用-and -or -not来串条件, 操作时先确认是否有mp4文件，
+0. 先把mp4文件移出到/tmp/media/
+ mv `find ./del/ -iname "*.mp4" -or -iname "*.mkv" -or -iname "*.mp3" -or -iname "*.avi"`   /tmp/media/
 
-3.7 download a key from server
-gpg --keyserver keyserverAddress --search-keys keyid/name/Email
-gpg --keyserver keyserverAddress --recv-keys pubkeyID
+1.把./del里所有非目录的文件且非多媒体的文件用key-name为jusss的加密或者用接收人的公钥 (文件加密)
+ gpg --encrypt-files -r jusss `find ./del/ ! -type d -and ! -iname "*.mp4" -and ! -iname "*.mkv" -and ! -iname "*.mp3" -and ! -iname "*.avi"`
+加密文件可以加上--armor选项，把加密后的binary文件转换成ASCII文件
+2.0 rm删除并不安全，因为可以用testdisk ext4magic恢复，重写数据到文件，更安全
+ echo "" | tee `find ./del/ ! -type d -and ! -iname "*.gpg" -and ! -iname "*.mp4" -and ! -iname "*.mkv" -and ! -iname "*.mp3" -and ! -iname "*.avi"`
 
-3.8 encrypt file and decrypt file (openssl的私钥不能用文件加密，gpg的私钥可以用于文件加密)
-gpg -e -r key-uid filename   多个文件用--encrypt-files  
-it will generate filename.gpg, -r is --recipient 接受人, 接受人的公钥需要先在本地找到, -e encrypt
-gpg -o filename -d filename.gpg
-it decrypt to filename, -o is --output, -d is --decrypt
+2.1 把./del下所有非目录的文件并且不以.gpg结尾的都删除 (删源文件)
+rm `find ./del/ ! -type d -and ! -iname "*.gpg"`
 
-对~/sent/cur/里所有文件用公钥jusss加密,加密自动去寻找公钥，解密去自动寻找私钥在本地保存密钥的文件里,不用特别指出,
-一般保存~/.gnupg/
-gpg --encrypt-files -r jusss ~/sent/cur/*  会生成同名.gpg文件在同一目录
-解密一堆文件　 gpg --decrypt-files ~/sent/cur/*.gpg 同一目录生成同名文件
+3.把./del下所有非目录的文件并以.gpg结尾的都删除  (删加密文件)
+rm `find ./del/ ! -type d -and -iname "*.gpg"`
 
-3.9 文件签名
+4.把./del下所有非目录的文件并以.gpg结尾的都解密　(解密文件)
+gpg --decrypt-files `find ./del ! -type d -and -iname "*.gpg"`
 
-数字签名
-gpg -o doc.sig -s doc
-其中doc是原文件，doc.sig包含了原文件和签名，是二进制的。这个命令会要求你输入你的私钥的密码句。
-gpg -o doc.sig -ser key-id doc 既签名又加密
+    ecryptfs https://launchpad.net/ecryptfs
 
-文本签名
-gpg -o doc.sig --clearsign doc
-这样产生的doc.sig同样包含原文件和签名，其中签名是文本的，而原文件不变。
+    https://wiki.archlinux.org/index.php/GnuPG
+    https://lists.gnupg.org/pipermail/gnupg-users/2014-January/048907.html
+    I'm not sure I understand what you're trying to do.  --export-secret-keys doesn't add or remove a passphrase.  If the key has a passphrase, the exported one still does.  If the key has no passphrase, neither does the exported one.
+    If your secret key has a passphrase, then "--armor --export-secret-keys xxxxx" generates an armored key file with a passphrase.
 
-分离式签名 (use this!)  (openssl那一套是生成文件摘要然后用私钥对文件摘要签名，私钥不能对文件加密)
-gpg -o doc.sig -ab doc
-doc.sig仅包括签名，分离式签名的意思是原文件和签名是分开的。
-b 表示分离式签名detach-sign
-a 表示ASCII格式，默认是binary
+    1. generate a key   1024,2048,4096,都不安全,可以使用RSA-3076,这个数字可以任意设置
+    gpg --full-gen-key
+    ~/.gnupg/private-keys-v1.d/
 
-验证签名
-gpg --verify doc.sig [doc]
-验证之前必须导入文件作者的公钥，对于分离式签名，最后还要加上原文件，即后面的doc。
+    2. delete a key
+    gpg --delete-secret-keys your-keys-id
+    gpg --delete-keys your-keys-id
 
-4. revoke your key
-生成吊销证书gpg --output revoke.asc --gen-revoke mykeyID
-导入吊销证书gpg --import revoke.asc
-再同步服务器gpg --keyserver keyserverAddress --send mykeyID
+    3. export key
+    导出公钥
+    gpg --export --output key-id.pub --armor key-id
+    顺序很重要，因为--output和--armor属于--export
+    without --armor it will export a binary code, --armor will turn it to ASCII
 
- gpg --list-keys    gpg -k列出所有公钥　　gpg -K列出所有私钥
-可以显示所有现有的钥匙。 要想同时显示签名，用
+    导出私钥
+    gpg --export-secret-keys --output key-id.private --armor key-id
 
-  gpg --list-sigs 
-（更多的信息见 钥匙签名）。 要想见到钥匙的指纹，敲入：
+    3.5 import key
+    导入公钥和私钥是一样的
+    gpg --import file.name.pub or file.name.private
 
- gpg --fingerprint 
-用户需要见到”指纹”来确认某人的确是其自称是的人（就象在电话中一样）。 这个命令将会产生一列相对较小的数字。
-要列出私密钥匙，你可以敲
+    3.6 upload you key to server
+    gpg --keyserver keyserverAddress --send mykeyID
+    注： --keyserver 可以不加，默认为 keys.gnupg.net
 
- gpg --list-secret-keys
-注意：列出私密钥匙的指纹和签名根本就没用。
+    3.7 download a key from server
+    gpg --keyserver keyserverAddress --search-keys keyid/name/Email
+    gpg --keyserver keyserverAddress --recv-keys pubkeyID
 
-要删除一把公钥，你可以敲
- gpg --delete-key UID 
+    3.8 encrypt file and decrypt file (openssl的私钥不能用文件加密，gpg的私钥可以用于文件加密)
+    gpg -e -r key-uid filename   多个文件用--encrypt-files  
+    it will generate filename.gpg, -r is --recipient 接受人, 接受人的公钥需要先在本地找到, -e encrypt
+    gpg -o filename -d filename.gpg
+    it decrypt to filename, -o is --output, -d is --decrypt
 
-要删除一把密钥，你可以敲
-  gpg --delete-secret-key 
+    对~/sent/cur/里所有文件用公钥jusss加密,加密自动去寻找公钥，解密去自动寻找私钥在本地保存密钥的文件里,不用特别指出,
+    一般保存~/.gnupg/
+    gpg --encrypt-files -r jusss ~/sent/cur/*  会生成同名.gpg文件在同一目录
+    解密一堆文件　 gpg --decrypt-files ~/sent/cur/*.gpg 同一目录生成同名文件
 
-用此命令你可以修改钥匙的失效日期，加进一个指纹，对钥匙签名等等。 尽管显得太清楚而不用提，这里还是要说，要做以上事情你得用你的通行句。 敲入通行句后，你会见到命令行。
- gpg --edit-key UID
-要对一把钥匙签名，用 gpg --edit-key UID ，然后用 sign命令。
+    3.9 文件签名
 
---------------------------------------------------
-emacs undo and redo:
- C-/ or C-x u will undo, and do any operate like C-f or C-g then C-/ or C-x u
- it will redo. not like vim
- vim undo and redo:
-  u or U will undo, C-r will redo, and there're :undolist then :undo 178 can undo
+    数字签名
+    gpg -o doc.sig -s doc
+    其中doc是原文件，doc.sig包含了原文件和签名，是二进制的。这个命令会要求你输入你的私钥的密码句。
+    gpg -o doc.sig -ser key-id doc 既签名又加密
 
+    文本签名
+    gpg -o doc.sig --clearsign doc
+    这样产生的doc.sig同样包含原文件和签名，其中签名是文本的，而原文件不变。
 
-veryfy:
- download the file and xxx.sign, then `gpg --verify xxx.sign file`
+    分离式签名 (use this!)  (openssl那一套是生成文件摘要然后用私钥对文件摘要签名，私钥不能对文件加密)
+    gpg -o doc.sig -ab doc
+    doc.sig仅包括签名，分离式签名的意思是原文件和签名是分开的。
+    b 表示分离式签名detach-sign
+    a 表示ASCII格式，默认是binary
 
-$ gpg --verify linux-4.7.3.tar.sign linux-4.7.3.tar.gz 
-gpg: Signature made Wednesday, September 07, 2016 PM02:35:30 HKT using RSA key ID 6092693E
-gpg: Can't check signature: public key not found
+    验证签名
+    gpg --verify doc.sig [doc]
+    验证之前必须导入文件作者的公钥，对于分离式签名，最后还要加上原文件，即后面的doc。
 
-it's should be gpg --verify linux-4.7.3.tar.sign linux-4.7.3.tar, not linux-4.7.3.tar.gz
-!!!the sign is for tar, not gz file
+    4. revoke your key
+    生成吊销证书gpg --output revoke.asc --gen-revoke mykeyID
+    导入吊销证书gpg --import revoke.asc
+    再同步服务器gpg --keyserver keyserverAddress --send mykeyID
 
-$ gpg --keyserver hkp://keys.gnupg.net --recv-keys 6092693E
+     gpg --list-keys    gpg -k列出所有公钥　　gpg -K列出所有私钥
+    可以显示所有现有的钥匙。 要想同时显示签名，用
 
-add keys to database of system:
+      gpg --list-sigs 
+    （更多的信息见 钥匙签名）。 要想见到钥匙的指纹，敲入：
 
-$gpg --export --armor 6092693E|sudo apt-key add -
+     gpg --fingerprint 
+    用户需要见到”指纹”来确认某人的确是其自称是的人（就象在电话中一样）。 这个命令将会产生一列相对较小的数字。
+    要列出私密钥匙，你可以敲
 
-use public key to verify signature, and use private key to make signature of file
+     gpg --list-secret-keys
+    注意：列出私密钥匙的指纹和签名根本就没用。
 
-so if you want to verify files, you need "public key" "signature file" and "files"
+    要删除一把公钥，你可以敲
+     gpg --delete-key UID 
 
-1. generate a gpg key
-$apt-get install gnupg
-$gpg --gen-key
+    要删除一把密钥，你可以敲
+      gpg --delete-secret-key 
 
-it will take some minutes, all you need to do is type somethings or move your mouse stuff and wait it, it need lots of random data generated by your action.
-see flash through browser is a wonderful idea :)
+    用此命令你可以修改钥匙的失效日期，加进一个指纹，对钥匙签名等等。 尽管显得太清楚而不用提，这里还是要说，要做以上事情你得用你的通行句。 敲入通行句后，你会见到命令行。
+     gpg --edit-key UID
+    要对一把钥匙签名，用 gpg --edit-key UID ，然后用 sign命令。
 
-when it's done, the key will save in ~/.gnupg
-
-2. import others keys
-get others keys, then
-$ gpg --import others.public.key
-when it's done, you will see a key ID like "EBA34B1C"
-
-3. get fingerprint
-$gpg --fingerprint EBA34B1C
-or get all of them on your system
-$gpg --fingerprint
-
-4. make keys as trusted
-$gpg --edit-key EBA34B1C
-then input "trust" to gpg prompt like 'gpg> '
-then give it a number and "sign" "save"
-
-5. get the key list
-$gpg --list-keys
-
-6. verify the key and file
-$gpg --verify xxx.asc xxx.tar
-
-xxx.asc is signature file of xxx.tar, if it says "Good signature", that's true, otherwise it will says" Bad signature", that's fake.
-
-7. give your public key to others
-$gpg -a --output my.public.key --export your.name.or.email.address
-
-8. set your public key to servers
-$gpg --keyserver keys.gnupg.net --send-key ID
-ID is your public key's ID
-
-9. get keys from servers
-$gpg --keyserver keys.gnupg.net --search-key others.name.or.email.address
-or
-$gpg --keyserver keys.gnupg.net --recv-key ID
-ID like EBA34B1C, it's public ID
-
-10. sign the key
-$gpg --sign-key others.name.or.email.address
-
-11. delete the key
-$gpg --delete-keys others.name.or.email.address
-
-12. encrypt file
-$gpg --output file.after.encrypt -r your.name.or.email.address -e file
-or others' public key I think
-
-13. decrypt file
-$gpg --output file.after.decrypt -d encrypt.file
-gnupg will auto use my private key to decrypt the file
-
-14. sign file
-detached signatures:
-gpg --output mytest.sig --detach-sig mytest
-or
-gpg -b file     it will auto generate file.asc
-
-clearsigned documents:
- gpg --clearsign file
-
-15. verify
-$gpg --verify file.sign
-or gpg --verify file.sign file
-because you have got the public keys through gpg --keyserver so the second parameter is not necessary
+    --------------------------------------------------
+    emacs undo and redo:
+     C-/ or C-x u will undo, and do any operate like C-f or C-g then C-/ or C-x u
+     it will redo. not like vim
+     vim undo and redo:
+      u or U will undo, C-r will redo, and there're :undolist then :undo 178 can undo
 
 
+    veryfy:
+     download the file and xxx.sign, then `gpg --verify xxx.sign file`
+
+    $ gpg --verify linux-4.7.3.tar.sign linux-4.7.3.tar.gz 
+    gpg: Signature made Wednesday, September 07, 2016 PM02:35:30 HKT using RSA key ID 6092693E
+    gpg: Can't check signature: public key not found
+
+    it's should be gpg --verify linux-4.7.3.tar.sign linux-4.7.3.tar, not linux-4.7.3.tar.gz
+    !!!the sign is for tar, not gz file
+
+    $ gpg --keyserver hkp://keys.gnupg.net --recv-keys 6092693E
+
+    add keys to database of system:
+
+    $gpg --export --armor 6092693E|sudo apt-key add -
+
+    use public key to verify signature, and use private key to make signature of file
+
+    so if you want to verify files, you need "public key" "signature file" and "files"
+
+    1. generate a gpg key
+    $apt-get install gnupg
+    $gpg --gen-key
+
+    it will take some minutes, all you need to do is type somethings or move your mouse stuff and wait it, it need lots of random data generated by your action.
+    see flash through browser is a wonderful idea :)
+
+    when it's done, the key will save in ~/.gnupg
+
+    2. import others keys
+    get others keys, then
+    $ gpg --import others.public.key
+    when it's done, you will see a key ID like "EBA34B1C"
+
+    3. get fingerprint
+    $gpg --fingerprint EBA34B1C
+    or get all of them on your system
+    $gpg --fingerprint
+
+    4. make keys as trusted
+    $gpg --edit-key EBA34B1C
+    then input "trust" to gpg prompt like 'gpg> '
+    then give it a number and "sign" "save"
+
+    5. get the key list
+    $gpg --list-keys
+
+    6. verify the key and file
+    $gpg --verify xxx.asc xxx.tar
+
+    xxx.asc is signature file of xxx.tar, if it says "Good signature", that's true, otherwise it will says" Bad signature", that's fake.
+
+    7. give your public key to others
+    $gpg -a --output my.public.key --export your.name.or.email.address
+
+    8. set your public key to servers
+    $gpg --keyserver keys.gnupg.net --send-key ID
+    ID is your public key's ID
+
+    9. get keys from servers
+    $gpg --keyserver keys.gnupg.net --search-key others.name.or.email.address
+    or
+    $gpg --keyserver keys.gnupg.net --recv-key ID
+    ID like EBA34B1C, it's public ID
+
+    10. sign the key
+    $gpg --sign-key others.name.or.email.address
+
+    11. delete the key
+    $gpg --delete-keys others.name.or.email.address
+
+    12. encrypt file
+    $gpg --output file.after.encrypt -r your.name.or.email.address -e file
+    or others' public key I think
+
+    13. decrypt file
+    $gpg --output file.after.decrypt -d encrypt.file
+    gnupg will auto use my private key to decrypt the file
+
+    14. sign file
+    detached signatures:
+    gpg --output mytest.sig --detach-sig mytest
+    or
+    gpg -b file     it will auto generate file.asc
+
+    clearsigned documents:
+     gpg --clearsign file
+
+    15. verify
+    $gpg --verify file.sign
+    or gpg --verify file.sign file
+    because you have got the public keys through gpg --keyserver so the second parameter is not necessary
+
+
+    ----------------------------------------------------
+    archlinux上只用不到1秒就生成了3076位的RSA密钥
+    debian上用好几分钟生成2048位的RSA密钥
+    <igemnace> seeding the entropy pool depends on the machine and the
+           circumstances, not the distro  [11:31]
+    <igemnace> you could very well have two debian machines that vary in the same
+           way
+    <d0048> jusss:  墒是累计的
+    <d0048> 之前用完了就没了就得重新赞
+    <d0048> jusss:  从/dev/random出来的话速度取决于你还剩多少墒...
+    <jusss> d0048: 这个字是啥东西  [11:38]
+    <d0048> 你就当随机事件数量好了..
+    <jusss> 好吧
+    <d0048> 随机程度
+    i或许和开着brook代理有关,产生了大量随机数据，不可预测
