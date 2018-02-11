@@ -1,0 +1,151 @@
+redsocks或者brook的 tunnel udp都需要指定目的地址，这有点难用，要使用udp需要先知道它跟where连接
+不知道openvpn基于udp的部分是怎么实现的，它不需要先知道具体地址
+-------------------------------------
+redsocks, work with iptables REDIRECT rules, it need destination ip and port
+unless it is TPROXY, it doesn't need the destination ip and port, you need use a hack-free
+way to get the original destination ip, so fuck it
+-------------------------
+最新版的brook在github上20180112 release的版本
+如果在vps开启了brook server
+就可以在本地用sudo ./brook tunnel -l 127.0.0.1:53 -t 8.8.8.8:53 -s vps-ip:port -p password做dns转发
+vim /etc/resolv把nameserver 127.0.0.1
+但是只有brook server可以提供给brook tunnel解析dns, brook streamserver是不可以的
+
+这样的vps上开brook streamserver和brook server两个，前者是tcp代理，后者是dns解析
+本地开brook streamclient和brook tunnel 同上
+
+bash brook/brook.sh
+cd /etc;sudo redsocks
+bash brook/redsocks.iptables.sh
+vim /etc/resolv  nameserver 127.0.0.1
+
+------------------------------------------
+brook redsocks iptables解决全局TCP走代理问题
+自己写的dns-proxy-client解决dns问题
+代理效果貌似提升了点，如果用浏览器的远端解析，brook服务器上总是提示有些域名解析不了，不知道为啥，最后会报错open too many files然后就挂了，现在自己解决dns解析问题，貌似还没报错
+-------------------------------------------------
+使用下面方法后发现tcp能用，dns还是不行，原来brook还不支持这个dns功能，现在最新版
+有个方法　https://github.com/txthinking/brook/issues/102#issuecomment-357451079
+$ brook tunnel -l 127.0.0.1:53 -t 8.8.8.8:53 -s your_server:port -p password
+从github的brook页面从release下载最新版本的brook
+
+brook开个socks5的端口监听，使用redsocks监听一个端口并把数据进行socks5代理重定向到brook的端口，
+iptables把tcp数据重定向到redsocks监听的端口
+iptables把udp 53数据重定向到dns-client-proxy.py监听的5353
+
+bash brook/brook.sh
+python lab2/dns-proxy-client.py server-ip server-port local-ip local-port
+cd /etc;sudo redsocks
+bash redsocks.iptables.sh
+
+dns问题可以用自己写的dns-proxy-client/server临时解决
+但是brook新出个tunnel功能好像可以解决dns,好像tunnel还能用于透明代理transparent proxy
+这样就不用redsocks了
+
+iptables并不能把udp端口的数据重定向到tcp端口，那是跨协议的
+---------------------------------
+redsock2也是bug满满，根本不能用
+从AUR下载编译了redsocks发现竟然可以使用，直接修改配置文件/etc/redsocks.conf
+然后在/etc目录下运行sudo redsocks就可以了
+base {
+	log_debug = on;
+	log_info = on;
+	log = "syslog:daemon";
+	daemon = off;
+	user = redsocks;
+	group = redsocks;
+	redirector = iptables;
+}
+redsocks {
+	local_ip = 127.0.0.1;
+	local_port = 55555;
+	ip = 127.0.0.1;
+	port = 7070;
+	type = socks5;
+}
+redudp {
+	local_ip = 127.0.0.1;
+	local_port = 10053;
+	ip = 127.0.0.1;
+	port = 7070;
+	dest_ip = 8.8.8.8;
+	dest_port = 53;
+	udp_timeout = 30;
+	udp_timeout_stream = 180;
+}
+dnstc {
+	local_ip = 127.0.0.1;
+	local_port = 5300;
+}
+
+#!/bin/bash
+sudo iptables -t nat -A OUTPUT -d your-vps-ip -j RETURN
+sudo iptables -t nat -A OUTPUT -d 192.168.2.1 -j RETURN
+sudo iptables -t nat -A OUTPUT -d 127.0.0.1 -j RETURN
+sudo iptables -t nat -A OUTPUT -p tcp -j REDIRECT --to-port 55555
+#sudo iptables -t nat -A OUTPUT -p udp --dport 53 -j REDIRECT --to-port 10053
+#sudo iptables -t nat -A OUTPUT -p udp -j REDIRECT --to-port 10053
+#sudo iptables -t nat -L
+sudo iptables -t nat -A OUTPUT -p udp --dport 53 -j REDIRECT --to-port 5353
+然后开dns-proxy-client.py监听本地udp 5353端口转发dns
+_____________________________________________________________________________
+whereis redsocks2 可知redsocks2的配置文件/etc/redsocks2.conf
+用git clone从AUR下载redsocks2的git然后makepkg -s, 不要直接用PKGBUILD, 会提示缺少文件
+redsocks.install
+
+To launch redsocks2:
+
+1. Start an ssh tunnel on port 4711
+2. Start the redsocks2 and iptables daemons:
+
+    rc.d start redsocks2 iptables
+
+3. Load the redsocks2 iptables rules:
+
+    iptables-restore /etc/iptables/redsocks2.rules
+
+-----------------------------------
+git clone https://github.com/darkk/redsocks.git
+直接make就能编译出redsocks可执行文件
+cp debian/redsocks.conf ./
+vim redsocks.conf
+redsocks {
+local_ip = 192.168.2.210; 监听的地址
+local_port = 12345; 这个地址和端口是为了iptables重定向,也就是接收数据然后发往socks
+
+ip = 192.168.2.210; brook监听的地址和端口,也就是socks5服务器的地址
+port = 7070;   
+type = socks5;
+}
+
+redudp {
+local_ip = 192.168.2.210; 监听的地址
+local_ip = 10053;
+
+ip = 192.168.2.210; socks5服务器地址，但是brook应该只监听tcp吧，不清楚
+local_ip = 7070;
+
+dest_ip = 8.8.8.8;
+dest_port = 53;
+}
+
+dnstc {
+local_ip = 192.168.2.210;
+local_port = 5300;
+}
+
+然后是iptables把tcp数据和udp数据重定向到redsocks监听的地址
+
+echo 1|sudo tee /proc/sys/net/ipv4/ip_forward　开启转发
+或者/etc/sysctl.conf  net.ipv4.ip_forward = 1
+
+sudo iptables -t nat -A OUTPUT -d your-server-ip -j RETURN
+sudo iptables -t nat -A OUTPUT -d 192.168.2.0/16 -j RETURN
+sudo iptables -t nat -A OUTPUT -d 127.0.0.0/8 -j RETURN
+sudo iptables -t nat -A OUTPUT -p tcp -j REDIRECT --to-port 12345
+sudo iptables -t nat -A OUTPUT -p udp --dport 53 -j REDIRECT --to-port 10053
+
+brook会监听TCP 7070和UDP 7070
+
+
+http://wonderkun.cc/index.html/?p=394

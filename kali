@@ -1,0 +1,27 @@
+download from kali.org
+kali light version
+dd if=kali.iso of=/dev/sdb
+reboot, esc then choose usb-stick, kali live presistence
+user:root pass:toor
+
+root@kali:~# cat /etc/modprobe.d/rtl8723be.conf 
+options rtl8723be fwlps=0 swlps=0
+
+rmmod rtl8723be
+modprobe rtl8723be
+
+root@kali:~# cat /etc/X11/xorg.conf.d/30-touchpad.conf 
+#vim /etc/X11/xorg.conf.d/30-touchpad.conf
+#libinput instead of synaptics for touchpad
+Section "InputClass"
+	Identifier "Elan Touchpad"
+	Driver "libinput"
+	MatchIsTouchpad "on"
+	Option "Tapping" "on"
+	Option "TappingButtonMap" "lmr"
+EndSection
+
+#htpps://wiki.archlinux.org/index.php/Libinput#Button_re-mapping
+root@kali:~# 
+
+kill `pidof Xorg`

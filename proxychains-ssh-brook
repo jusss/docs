@@ -1,0 +1,32 @@
+shadowsocks-libev有ss-redir可以透明代理，就是把一个建立好的tunnel监听
+本地端口，任何想走代理的，直接用iptables把连接重定向到这个端口，
+另一个是proxychains
+配置文件　./proxychains.conf   ~/.proxychains/proxychains.conf  /etc/proxychains.conf
+
+archlinux的repo里是proxychains-ng, 默认配置文件是/etc/proxychains.conf
+vim /etc/proxychains.conf
+
+strict_chain
+proxy_dns 
+remote_dns_subnet 224
+tcp_read_time_out 15000
+tcp_connect_time_out 8000
+[ProxyList]
+socks5 127.0.0.1 1080    这个1080就是本地tunnel监听的端口
+
+brook创建tunnel监听本地1080端口
+./brook client -l 127.0.0.1:1080 -i 127.0.0.1 -s your-server:port -p password
+
+使用proxychains代理ssh连接
+sudo proxychains ssh -p port user@host -i .ssh/users-key
+
+开启ssh的Xorg回传
+ssh -XY -p port user@host -i .ssh/user-key
+
+
+
+
+
+
+
+http://www.360doc.com/content/10/1007/12/296547_59036038.shtml

@@ -1,0 +1,33 @@
+Jan 15 00:40:34 moon systemd[365]: Stopped target Timers.
+Jan 15 00:40:34 moon systemd[365]: Stopped target Paths.
+Jan 15 00:40:34 moon systemd[365]: Reached target Shutdown.
+Jan 15 00:40:34 moon systemd[365]: Starting Exit the Session...
+Jan 15 00:40:34 moon systemd[365]: Received SIGRTMIN+24 from PID 3386 (kill).
+Jan 15 00:40:34 moon systemd[366]: pam_unix(systemd-user:session): session closed for user john
+Jan 15 00:40:34 moon systemd[1]: Stopped User Manager for UID 1000.
+Jan 15 00:40:35 moon login[351]: pam_unix(login:session): session closed for user john
+Jan 15 00:40:35 moon login[351]: pam_systemd(login:session): Failed to release session: Connection reset by peer
+Jan 15 00:40:35 moon systemd-logind[347]: Failed to abandon session scope, ignoring: Transport endpoint is not connected
+Jan 15 00:40:35 moon systemd[1]: Stopped Getty on tty1.
+Jan 15 00:40:35 moon systemd[1]: Removed slice system-getty.slice.
+Jan 15 00:40:35 moon mkinitcpio[3280]: ==> Build complete.
+Jan 15 00:40:35 moon systemd[1]: Started Generate shutdown-ramfs.
+Jan 15 00:40:35 moon systemd-coredump[3445]: Failed to connect to coredump service: Connection refused
+Jan 15 00:41:03 moon systemd-logind[347]: Lid closed.
+Jan 15 00:42:04 moon systemd[1]: session-c1.scope: Stopping timed out. Killing.
+Jan 15 00:42:04 moon systemd[1]: session-c1.scope: Killing process 563 (dhcpcd) with signal SIGKILL.
+Jan 15 00:42:04 moon systemd[1]: session-c1.scope: Failed with result 'timeout'.
+Jan 15 00:42:04 moon systemd[1]: Stopped Session c1 of user john.
+Jan 15 00:42:04 moon systemd[1]: Removed slice User Slice of john.
+Jan 15 00:42:04 moon systemd[1]: Stopping Permit User Sessions...
+Jan 15 00:42:04 moon systemd[1]: Stopping Login Service...
+Jan 15 00:42:04 moon systemd[1]: Stopped Permit User Sessions.
+Jan 15 00:42:04 moon systemd[1]: Stopped target Remote File Systems.
+Jan 15 00:42:04 moon systemd[1]: Stopped Login Service.
+Jan 15 00:42:04 moon systemd[1]: Stopped target Basic System.
+Jan 15 00:42:04 moon systemd[1]: Stopped target Slices.
+Jan 15 00:42:04 moon systemd[1]: Removed slice User and Session Slice.
+Jan 15 00:42:04 moon systemd[1]: Stopped target Paths.
+Jan 15 00:42:04 moon systemd[1]: Stopped target Sockets.
+
+每次关机都需要等1分30秒，需要等a c1 session of user john结束才能关机，用journalctl看好像是dhcpcd的锅

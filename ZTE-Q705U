@@ -1,0 +1,8 @@
+先安装win7的usb driver关于android,就是几个dll文件，在win10上发现安装失败
+下载线刷包，打开flashtool.exe,Scatter-loading File选择线刷包的MT6582_Android_scatter.txt
+点“全部格式化和下载”　点Download,然后把关机的手机用数据线连接电脑
+
+这个是MTK的，线刷用odin然后手机关机连接电脑
+高通的，用fastboot刷，手机要进bootloader模式
+
+手动格式化用odin，从0x0000000开始(好像是bootloader)，把calibration data给erase了，手机game over

@@ -1,0 +1,35 @@
+另一个github作品可以直接上传下载
+https://github.com/jusss/baiduyun-sdk
+先把资源下到vps,然后在vps上用百度云的cli脚本把资源上传到百度云，本地再从百度云秒下资源，哈哈，当然也可以ssh Xorg转发,在vps上打开浏览器然后把资源从vps传到百度云，但是ssh -XY vps实在太卡了，没试过vnc估计也不会快多少,从github找的cli工具
+---------------------------------------------------------
+打开baidu.com登录，chromium点地址栏里地址的开头那个标记显示出网站证书等信息
+点cookie点baidu.com下找到BDUSS 右键那个content选择全部复制
+
+git clone https://github.com/meoow/baiduyun-upload-script.git
+vim bdupload.sh
+把里面的BDUSS的值改为你的BDUSS的值
+
+登录你的pan.baidu.com创建upload文件夹
+./bdupload your-files 就把这个文件上传到了upload文件夹里
+
+# files are all uploaded to /upload folder
+# 所有文件都上传到 /upload 下
+
+# upload single file
+# 上传单文件
+./bdupload.sh filename
+
+# compressing the file while uploading (saved with .gz suffix on server)
+./bdupload.sh -z filename
+
+# upload multiple files (pathes are not reserved)
+# 上传多文件, 路径不保留，都传到/upload下
+./bdupload.sh filename1 /path/to/filename2 filename3
+
+# upload all files recursively in given direcotory
+# 上传整个文件夹
+./bdupload.sh folder
+
+# compression is also supported (compress every single file, not the entire folder)
+# 同样可以压缩（压缩每个文件，不是压缩整个文件夹。需要后者的可以先自行压缩）
+./bdupload.sh -z folder

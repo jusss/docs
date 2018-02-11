@@ -1,0 +1,57 @@
+sudo iptables -t nat -D OUTPUT 10 删除第10条规则，规则从1开始,
+iptables -t nat -L查看规则
+iptables -h查看用法
+---------------------------------------------------------
+ 当一个数据包进入网卡时，它首先进入PREROUTING链，内核根据数据包目的IP判断是否需要转送出去。 
+ 如果数据包就是进入本机的，它就会到达INPUT链。数据包到了INPUT链后，任何进程都会收到它。本机上运行的程序可以发送数据包，这些数据包会经过OUTPUT链，然后到达POSTROUTING链输出。 
+ 如果数据包是要转发出去的，且内核允许转发，数据包就会经过FORWARD链，然后到达POSTROUTING链输出。
+
+表（tables）提供特定的功能，iptables内置了4个表，即filter表、nat表、mangle表和raw表，分别用于实现包过滤，网络地址转换、包重构(修改)和数据跟踪处理。
+
+Network -> nat表的PREROUTING -> filter表的INPUT -> Local Process -> nat表的OUTPUT -> filter表的OUTPUT -> nat表的POSTROUTING -> Network
+
+1.filter表——三个链：INPUT、FORWARD、OUTPUT
+作用：过滤数据包  内核模块：iptables_filter.
+2.Nat表——三个链：PREROUTING、POSTROUTING、OUTPUT
+作用：用于网络地址转换（IP、端口） 内核模块：iptable_nat
+3.Mangle表——五个链：PREROUTING、POSTROUTING、INPUT、OUTPUT、FORWARD
+作用：修改数据包的服务类型、TTL、并且可以配置路由实现QOS内核模块：iptable_mangle(别看这个表这么麻烦，咱们设置策略时几乎都不会用到它)
+4.Raw表——两个链：OUTPUT、PREROUTING
+作用：决定数据包是否被状态跟踪机制处理  内核模块：iptable_raw
+
+PREROUTING链就是进来的包怎么操作
+POSTROUTING链就是出去的包怎么操作
+
+表之间优先顺序　Raw mangle nat filter　默认好像是显示设置filter表
+
+iptables的匹配顺序从上到下，一旦匹配就执行规则,后面也匹配的规则不会被执行
+所以这个表的链上的规则顺序很重要
+两种方式，自己建立个规则链然后插入预设链上，或者直接在预设链上插入规则
+插入又分插入头-I和插入尾-A
+
+iptables -t nat -I OUTPUT -p tcp -j REDIRECT --to-port 12345　把tcp重定向到12345
+可以用iptables -t nat -F OUTPUT清空这个链　-L查看
+或iptables -t nat -N ss
+iptables -t nat -A ss -p tcp -j REDIRECT --to-port 12345
+iptables -t nat -A OUTPUT -j ss
+
+-A -I -D -R -L -P  -A追加append -I insert -D delete 
+-p -s -d -i -o --dport --sport
+-j ACCEPT DROP REJECT REDIRECT RETURN   RETURN就是不操作　
+-p tcp udp icmp all
+-s -d ip-addr
+-i interface-name
+-o interface-name
+--sport --dport ip's port
+
+https://wiki.archlinux.org/index.php/Iptables_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)
+http://www.cnblogs.com/ggjucheng/archive/2012/08/19/2646466.html
+
+
+iptables -t nat -A OUTPUT -p tcp -d your-server-ip -j RETURN
+iptables -t nat -A OUTPUT -p tcp -d 192.168.2.0/16 -j RETURN
+iptables -t nat -A OUTPUT -p udp --dport 53 -j REDIRECT --to-port 10053
+iptables -t nat -A OUTPUT -p tcp -j REDIRECT --to-port 12345
+
+
+iptables -t nat -F OUTPUT 清空

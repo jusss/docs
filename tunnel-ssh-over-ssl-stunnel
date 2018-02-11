@@ -1,0 +1,54 @@
+https://gist.github.com/jusss/5f9fa1c6c09f13622b4ae1225e9d2d5d
+https://gist.github.com/bwann/82ed679e94972666808d97587d276677
+
+on server: 
+# install stunnel
+aptitude install stunnel
+
+# generate certificate
+cd /etc/stunnel/
+sudo openssl genrsa -out server.key 4096
+sudo openssl req -new -key server.key -out server.csr
+sudo openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
+sudo bash
+cat server.key > server.pem && cat server.crt >> server.pem
+chmod 400 /etc/stunnel/server.pem
+exit
+
+# create chroot directory
+mkdir /var/run/stunnel4 ; chown john:john /var/run/stunnel4
+
+# write those into /etc/stunnel/stunnel.conf
+cert = /etc/stunnel/server.pem
+sslVersion = TLSv1
+chroot = /var/run/stunnel4
+setuid = john
+setgid = john
+pid = /stunnel.pid
+socket = l:TCP_NODELAY=1
+socket = r:TCP_NODELAY=1
+
+[sshd]
+accept = 1991
+connect = 1990
+TIMEOUTclose = 0
+
+# run stunnel
+stunnel /etc/stunnel/stunnel.conf
+
+on client:
+# install stunnel
+pacman -S stunnel
+
+# write those into /etc/stunnel/stunnel.conf
+pid = /tmp/stunnel.pid
+client = yes
+[ssh]
+accept=1990
+connect=your-vps-ip:1991
+
+# run stunnel
+stunnel /etc/stunnel/stunnel.conf
+
+# run ssh
+ssh -p 1990 user@127.0.0.1
