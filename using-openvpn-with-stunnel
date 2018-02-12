@@ -1,0 +1,136 @@
+https://www.raspberrypi.org/forums/viewtopic.php?t=40389
+# Some countries like China, Syria, North Korea etc, are using deep packet inspection
+# to detect and block openvpn connections.
+# To get around this, VPN connections can be hidden inside another SSL envelope
+# using a program called stunnel making the VPN look like something else
+
+# This post is based upon these
+# http://kyl191.net/2012/12/tunneling-ope ... h-stunnel/
+# https://syria.hacktivist.me/?p=161
+# http://pve.proxmox.com/wiki/Stunnel_in_DAB_appliances
+# http://www.jeffyestrumskas.com/index.ph ... ntication/
+#
+# mirror post at http://tryapi.wordpress.com/
+#
+# Using Raspberry PI as Openvpn server located outside China or Syria 
+# we wrap the openvpn signalling inside another SSL envelope using stunnel
+
+# On Raspberry PI, after you have installed openvpn
+# (for openvpn see http://www.raspberrypi.org/phpBB3/viewt ... 36&t=21566)
+# Install stunnel and openssl
+Code: Select all
+
+sudo apt-get install stunnel4 openssl -y
+# Generate your own Private Key (server.pem)
+Code: Select all
+
+cd /etc/stunnel/
+sudo openssl genrsa -out server.key 4096
+sudo openssl req -new -key server.key -out server.csr
+sudo openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
+sudo bash
+cat server.key > server.pem && cat server.crt >> server.pem
+chmod 400 /etc/stunnel/server.pem
+exit
+# enable stunnel
+Code: Select all
+
+sudo nano /etc/default/stunnel4
+  
+     ENABLED=1
+#=========================================
+# Server stunnel.conf on Raspberry PI
+#=========================================
+Code: Select all
+
+sudo nano /etc/stunnel/stunnel.conf
+
+     sslVersion = all
+     options = NO_SSLv2
+     cert = /etc/stunnel/server.pem
+     pid = /var/run/stunnel.pid
+     output = /var/log/stunnel
+
+     [openvpn]
+     client = no
+     accept=993
+     connect=34567
+#=========================================
+# Add Firewall setting on Raspberry PI
+#=========================================
+# Edit the same firewall file we used for openvpn
+# and add a new line
+Code: Select all
+
+sudo nano /usr/local/bin/firewall.sh
+
+     iptables -A INPUT -p tcp –dport 993 -j ACCEPT
+#================================================
+# Restart stunnel or reboot Raspberry PI and we are done
+#================================================
+Code: Select all
+
+sudo /etc/init.d/stunnel4 restart
+# check status
+Code: Select all
+
+ps aux | grep ‘stunnel*’
+#================================================
+# Installing & configuring stunnel on windows client:
+#================================================
+
+# You can download stunnel installer from the official website
+# http://mirrors.go-part.com/stunnel/stun ... taller.exe
+# or check here http://www.stunnel.org/downloads.html
+# Installation shouldn’t be a problem… it’s a few clicks
+
+# On windows, you should see an stunnel icon on your desktop, run it as administrator. 
+# Now you should see the stunnel icon also on the taskbar.
+# Do a right click on it, and choose “Edit stunnel.conf”
+
+# Notepad will opened automatically, to edit the stunnel.conf file…
+
+# add the following lines:
+Code: Select all
+
+[openvpn]
+client = yes
+accept = 127.0.0.1:1194
+connect = change_this_to_your_to_raspberry_PI_server_address_from_no-ip.com:993
+# Save & exit
+# right click on stunnel icon, and click reload stunnel.conf
+
+# in Windows, create a new text file called
+# C:\Program Files (x86)\OpenVPN\config\raspberry_via_stunnel.ovpn
+# this is the OpenVPN client configuration
+Code: Select all
+
+client
+dev tun
+proto tcp
+remote  localhost 1194
+resolv-retry infinite
+nobind
+persist-key
+persist-tun
+ca capi.crt
+cert clientpi.crt
+key clientpi.key
+# tls-auth tapi.key 1
+ns-cert-type server
+cipher AES-256-CBC
+comp-lzo
+verb 3
+route your-vps-ip 255.255.255.255 net_gateway
+
+Re: [How to] using stunnel + openvpn from China or Syria
+Quote
+Thu Jul 30, 2015 10:35 am
+
+I have found this for Android, it works.
+
+https://forums.openvpn.net/topic18110.html
+
+The important part is routing for the ip address of the openvpn server:
+
+"The key item here is the Custom Option above which tells OpenVPN not to route SSLDroid's SSL tunnel through the VPN. Without this option, the SSL tunnel will be broken when OpenVPN connects because SSLDroid can no longer reach the server"

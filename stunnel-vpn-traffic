@@ -1,0 +1,132 @@
+https://serverfault.com/questions/675553/stunnel-vpn-traffic-and-ensure-it-looks-like-ssl-traffic-on-port-443
+
+10
+down vote
+favorite
+9
+I am trying to make my outgoing and incoming traffic look as legitimate as close to SSL traffic as possible. Is there a way to DPI my own traffic to ensure it looks like SSL traffic and not OpenVPN traffic? And based on my config setup does all traffic use port 443 which is the SSL port?
+
+My configuration is as follows:
+
+STUNNEL on laptop:
+
+[openvpn]
+# Set sTunnel to be in client mode (defaults to server)
+client = yes  
+# Port to locally connect to
+accept = 127.0.0.1:1194  
+# Remote server for sTunnel to connect to
+connect = REMOTE_SERVER_IP:443
+OPENVPN CONFIG ON laptop:
+
+client
+dev tun
+proto tcp
+remote 127.0.0.1 1194
+resolv-retry infinite
+nobind
+tun-mtu 1500
+tun-mtu-extra 32
+mssfix 1450
+persist-key
+persist-tun
+STUNNEL CONFIG ON SERVER:
+
+sslVersion = all
+options = NO_SSLv2
+;chroot = /var/lib/stunnel4/
+; PID is created inside the chroot jail
+pid = /stunnel4.pid
+; Debugging stuff (may useful for troubleshooting)
+ debug = 7
+ output = /var/log/stunnel4/stunnel4.log
+setuid = root
+setgid = root
+socket = l:TCP_NODELAY=1
+socket = r:TCP_NODELAY=1
+compression = zlib
+[openvpn]
+accept = REMOTE_SERVER_IP:443
+connect = REMOTE_SERVER_IP:11440
+cert=/etc/stunnel/server.pem
+key=/etc/stunnel/server.key
+OPENVPN CONFIG on server:
+
+local REMOTE_SERVER_IP
+port 11440
+proto tcp
+
+------------------------------------------------------
+
+OpenVPN over TLS
+Your VPN is using TCP as a transport protocol. The stunnel instance is used to encapsulate the content of the TCP stream in TLS/TCP. You get this protocol stack:
+
+[IP     ]<------------------------>[IP     ]
+[OpenVPN]<------------------------>[OpenVPN]
+            [TLS   ]<~~~~~>[TLS]
+[TCP    ]<->[TCP   ]<----->[TCP]<->[TCP    ]
+[IP     ]<->[IP    ]<----->[IP ]<->[IP     ]
+[       ]   [      ]       [   ]   [       ]
+ Server      stunnel      stunnel  Client
+Between the stunnel instances you have this protocol stack on the wire:
+
+[IP      ]
+[OpenVPN ]
+[TLS     ]
+[TCP(443)]
+[IP      ]
+[...     ]
+As the TLS encrypts its payload, an attacker can only see:
+
+[???     ]
+[TLS     ]
+[TCP(443)]
+[IP      ]
+[...     ]
+So yes, it is plain TLS traffic (it could be HTTP/TLS, SMTP/TLS, POP/TLS or anything else for someone looking at the traffic but it looks a lot like HTTP/TLS as the TCP port 443 is used). You can check this by using wireshark: record the traffic between the stunnel instances. In the wireshark UI (right button on a packet of the stream), you can ask wireshark to interpret the traffic as TLS: it will recognise it as TLS traffic (you will see the different TLS messages but not the payload of the TLS session). You might want to use SNI in the client in order to look like what a modern browser would do.
+
+OpenVPN with builtin TLS
+In comparison, if you are using OpenVPN, you will have something like this:
+
+[IP      ]
+[OpenVPN ]
+[TCP     ]
+[IP      ]
+[...     ]
+Which looks like this:
+
+[???     ]
+[OpenVPN ]
+[TCP     ]
+[IP      ]
+[...     ]
+The builtin TLS layer does not encpsulate the (IP, Ethernet) packets but only for setting up the session and authenticating:
+
+[TLS     ]
+[OpenVPN ]
+[TCP     ]
+[IP      ]
+[...     ]
+In this case, your traffic does not look like a plain TLS traffic but is obviously OpenVPN. If you interpret this traffic as OpenVPN in wireshark, you will recognise the OpenVPN messages and inside of them the TLS messages (but not the payload).
+
+Warning
+You should be aware that if a passive attacker will not be able to tell that your remote server is in fact an OpenVPN server, an active attacker will be able to find this out: simply by connecting to your server over TLS, he will be able to confirm that it is not a HTTP/TLS server. By trying to speak the OpenVPN protocol, he will be able to detect that your server is a OpenVPN/TLS server.
+
+OpenVPN over TLS with client authentication
+It you are worried about this you could enable TLS client authentication: an attacker will not be able to initiate a working TLS session and will not be able to guess which payload is encapsulated over TLS.
+
+Multiplexed OpenVPN/TLS and HTTP/TLS
+Another solution is to serve both HTTP and OpenVPN over the TLS session. sslh can be used to automatically detect the payload of the protocol and dispatch either to a plain HTTP/TCP server or you OpenVPN/TCP server. The server will look like standard HTTP/TLS server but someone trying to speak OpenVPN/TLS with this server will be able to detect that it is in fact a OpenVPN/TLS server as well.
+
+        either OpenVPN/TCP
+          or HTTP/TCP       
+[1].---------.     .------.HTTP/TCP.-------------.
+-->| stunnel |---->| sslh |------->| HTTP server |
+   '---------'     '------'|       '-------------'
+                           |       .----------------.
+                           '------>| OpenVPN server |
+                        OpenVPN/TCP'----------------'
+
+[1]= Either OpenVPN/TLS/TCP or HTTP/TLS/TCP
+OpenVPN over HTTP CONNECT over TLS
+Another solution is to use a standard HTTP/TLS server and use HTTP CONNECT/TLS to connect to the OpenVPN server: it will look like a standard HTTP server. You can even require authentication of client in order to authorise the HTTP CONNECT request (squid should be able to do this).
