@@ -1,3 +1,6 @@
+-D socks代理，如果不用socks代理，则需要指定具体地址，socks代理应该是在数据里加了个目的地址
+proxychains可以配置用于socks代理，还有redsocks
+----------------------------------------
 stunnel /etc/stunnel/stunnel.conf
 ssh -p 1990 -D 7070 -C -q -N john@moon -i ./.ssh/john@vps
 chromium --proxy-server="socks5://127.0.0.1:7070"
