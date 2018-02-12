@@ -1,0 +1,52 @@
+ON SERVER:
+root@rycbar:~# cat /etc/stunnel/stunnel.conf 
+cert = /etc/stunnel/server.pem
+sslVersion = TLSv1
+pid = /stunnel.pid
+socket = l:TCP_NODELAY=1
+socket = r:TCP_NODELAY=1
+
+[sshd]
+accept = 1991
+connect = 1990
+TIMEOUTclose = 0
+
+[openvpn]
+accept = 20183
+connect = 20182
+
+
+root@rycbar:~# cat /etc/systemd/system/john-stunnel.service 
+[Unit]
+Description=SSL tunnel for network daemons
+After=network.target
+After=syslog.target
+ 
+[Install]
+WantedBy=multi-user.target
+Alias=stunnel.target
+ 
+[Service]
+Type=forking
+ExecStart=/usr/bin/stunnel /etc/stunnel/stunnel.conf
+ExecStop=/usr/bin/killall -9 stunnel
+ 
+# Give up if ping don't get an answer
+TimeoutSec=600
+ 
+Restart=always
+PrivateTmp=false
+
+
+ON CLIENT
+[john@moon ~]$ cat /etc/stunnel/stunnel.conf
+pid = /tmp/stunnel.pid
+sslVersion = TLSv1
+client = yes
+[ssh]
+accept=1990
+connect=your-vps-ip:1991
+[openvpn]
+accept=20182
+connect=your-vps-ip:20183
+
