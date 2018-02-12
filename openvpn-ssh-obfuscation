@@ -1,3 +1,14 @@
+there're other tools like QuickTun KcpTun
+-------------------------------------------------------------
+OPENVPN OVER SSH TUNNEL WITH STUNNEL
+https://redfern.me/tunneling-openvpn-through-ssh/
+ssh -p 1990 -L 20182:localhost:20182 -N john@moon -i ../.ssh/john@vps
+if you want to use -D in ssh, then you must use socks-proxy in openvpn
+client.conf
+remote localhost 20182
+route your-vps-ip 255.255.255.255 net_gateway
+-----------------------------
+OPENVPN WITH STUNNEL
 https://serverfault.com/questions/675553/stunnel-vpn-traffic-and-ensure-it-looks-like-ssl-traffic-on-port-443
 https://gist.github.com/bwann/82ed679e94972666808d97587d276677
 https://www.raspberrypi.org/forums/viewtopic.php?t=40389
@@ -49,6 +60,7 @@ connect = your-vps-ip:20183
 client
 proto tcp
 remote localhost 20182
+route your-vps-ip 255.255.255.255 net_gateway 必须添加这一行，否则能连上openvpn但不转发
 ...
 
 # run openvpn
