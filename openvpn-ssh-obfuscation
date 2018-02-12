@@ -1,5 +1,6 @@
 there're other tools like QuickTun KcpTun
 on Android, there's a stunnel-like tool SSLDroid, remember to exclude SSLDroid on allowed apps page in OpenVPN for Android
+another app is TLS/SSL Tunnel, it is better than SSLDroid, remember Root-Certificate choose Gullible(Trust All)
 -------------------------------------------------------------
 OPENVPN OVER SSH TUNNEL WITH STUNNEL
 https://redfern.me/tunneling-openvpn-through-ssh/

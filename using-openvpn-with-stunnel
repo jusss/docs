@@ -136,3 +136,5 @@ The important part is routing for the ip address of the openvpn server:
 "The key item here is the Custom Option above which tells OpenVPN not to route SSLDroid's SSL tunnel through the VPN. Without this option, the SSL tunnel will be broken when OpenVPN connects because SSLDroid can no longer reach the server"
 
 on Android, there's a stunnel-like tool SSLDroid, remember to exclude SSLDroid on allowed apps page in OpenVPN for Android
+
+another app is TLS/SSL Tunnel, it is better than SSLDroid, remember Root-Certificate choose Gullible(Trust All)
