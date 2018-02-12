@@ -1,5 +1,5 @@
 ssh, ok with stunnel, not ok with obfsproxy
-openvpn, no, tls handshake plain is detected
+openvpn, no, tls handshake plain is detected, ok with stunnel
 brook, ok, work in 鹏博士宽带
 v2ray, unknown, not work in 鹏博士宽带
 shadowsocks, no
