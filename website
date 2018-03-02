@@ -155,3 +155,6 @@ http://space.bilibili.com/11805472/#!/index
 ubuntu 17.04
 deb http://mirrors.aliyun.com/ubuntu zesty main universe restricted non-free multiverse
 
+
+CIDR IP Range
+http://www.subnet-calculator.com/cidr.php

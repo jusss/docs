@@ -4,3 +4,26 @@ brook, ok, work in 鹏博士宽带
 v2ray, unknown, not work in 鹏博士宽带
 shadowsocks, no
 
+google 'gfw DPI China'
+https://twitter.com/bluebit_cg/status/945124892676182016
+有人说设置MTU比证书小，把证书包分割成2个可翻墙
+google的dns TCP服务器，把dns包分成2个发送可避免投毒,开启TCP_NODELAY
+openvpn之所以被识别是因为TLS Handshake时的TLS的信息是plain,所以被识别为openvpn traffic
+
+socks就是把目的地址写数据里，这样接收了数据的地方通过对数据操作得到目的地址然后发过去
+redsocks+iptables或者proxychains给没socks的程序提供socks
+stunnel client就是把监听端口的数据加上ssl发到目的地址
+stunnel server就是把监听端口的数据去掉ssl发到目的地址
+
+chrome关掉预测就能让dns over socks,而firefox需要在socks页面指定remote dns resolv
+socks5支持udp, 
+
+openvpn还能over ssh with stunnel,用ssh的-L参数指定具体地址，而不是-D socks
+udp socks资料太少，redsocks的udp功能几乎不能用，udp的转发需要获得目的地址，用TPROXY可以实现
+udp的分包发送比tcp更复杂　fragmentation,openvpn里面可以设置MTU 
+因为openvpn使用tun这种虚拟接口，像网卡接口一样，所以udp和tcp一样简单
+但其它ssh brook shadowsocks v2ray 等只支持TCP
+aria2　magnet这种都是用udp的
+游戏一般都是udp
+udp tunnel
+socket 三种　tcp udp raw, 包握手需要用raw操作,

@@ -1,3 +1,5 @@
+TIMEOUTidle = 30
+---------------------------------------
 ON SERVER:
 root@rycbar:~# cat /etc/stunnel/stunnel.conf 
 cert = /etc/stunnel/server.pem

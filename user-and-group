@@ -1,3 +1,85 @@
+# create system account sarah, sarah is like nobody, no password, no home, no shell
+useradd -r -s /usr/sbin/nologin sarah
+chown sarah:sarah /var/brook/*
+# set uid
+chmod +s /var/brook/*
+/var/brook/brook.sh    以sarah运行brook
+-------------------------------------
+/etc/passwd 查看所有用户
+/etc/group 查看所有组
+[john@moon ~]$ cat /etc/passwd|grep nobody
+nobody:x:99:99:nobody:/:/usr/bin/nologin
+nobody是个不能登录的用户
+https://stackoverflow.com/questions/66870/how-do-i-run-a-program-as-nobody
+
+Another option is that she will do `chown nobody` and `chmod +s ` on your binary executable
+and you'll be able to execute it directly. This task must be repeated each time your executable changes.
+
+As far as I know, you can't unless you're root or have sudo set up to allow you to switch users.
+Or, you can have your executable have the suid bit set up on it, and have it owned by nobody. But that requires root access too.
+
+<x> how to make a user that can login with ssh but unable to run any
+	command? I'd like to provide a ssh user for tunnel to my friends, but
+	I don't want them to ruin my shell  [23:19]
+
+<y> x: use /bin/nologin as their shell
+<C> x: using chsh to /usr/bin/nologin
+<p> x: i think you can still set the shell to /usr/bin/nologin,
+	      and pass -N to the ssh
+
+<x> if I use /usr/bin/nologin, ssh login with certificate is possible?
+<p> x: maybe, you should?
+<x> p: if I want use certificate, do I need create home
+	directory for that?
+
+<p> x: well, you have to store the public keys somewhere, eh?
+<p> x: there's always some home for every user  [23:26]
+<x> p: system account don't have home directory I think
+<p> x: i think they have it set to /
+<x> p: but they are unable to login
+<S> every account has a home dir
+<p> x: they are unable to login, because 1) they are unable to
+	      spawn shell; 2) they have no password set
+<C> x: when you add the user, you can specify where the home
+	      will be. Then, put the key there like normal
+
+<j> p: wait a second, if I creat a user with nologin, how I can
+	make a ssh certificate for it?
+
+<j> because I cann't su them
+<p> j: you mean, ssh-keygen?
+<S> j: why would you have to generate them as the user?
+<j> p: yeah
+<p> j: you can generate it under any onther user on any other
+	      machine and just copy afterwards
+<p> *other
+<jc> j: If my memory does not lie to me, you can do that, but than
+	  you can not use an interactive shell with that user  [23:49]
+<jc> Only stuff like SFTP
+<j> S: I'd like to provide ssh tunnel, is there a way I don't need
+	generate user can do that?
+<S> j: most of the time, the user generates the key pair on their
+	  machine and just gives you the pub key
+
+创建一个用户，home为/var/user/ 创建时指定/usr/bin/nologin,因为无法su进去，所以随便用个user生成key pair,然后复制到home的.ssh里面即可
+这样就可以让这个用户以ssh certificate连接但无法登录shell,但可使用ssh tunnel
+ON SERVER:
+mkdir -p /var/ssh-user/joe
+useradd -m -d /var/ssh-user/joe  -s /usr/sbin/nologin joe
+passwd joe 必须给joe设置密码，否则用密钥连接时提示public key denied
+
+# generate ssh key pair
+ssh-keygen -t rsa -b 3077 -f ./.ssh/joe
+# there will be ./.ssh/joe and joe.pub
+# put joe.pub into /var/ssh-user/joe/.ssh/authorized_keys on server
+chown -R joe:joe /var/ssh-user/joe
+chmod 600 /var/ssh-user/joe/.ssh/authorized_keys
+systemctl restart sshd
+# and past ./.ssh/joe to local, done!
+
+ON LOCAL:
+ssh -p 1990 -D 7070 -C -q -N joe@moon -i .ssh/joe
+---------------------------------
 archlinux上有nobody  debian上有nogroup  
 nobody同时是user和group   nogroup也一样
 nobody和nogroup和non-root用户有一样的权限
@@ -36,6 +118,6 @@ user group suid sgid
 wheel组     su和sudo用户需在此组
 vboxsf组    vbox共享目录
 
-把jusss添加进vboxusers组后,登出再登入,然后groups jusss看是否已属于vboxusers组,打开vbox, Devices-USB Devices即可看到
+把x添加进vboxusers组后,登出再登入,然后groups jusss看是否已属于vboxusers组,打开vbox, Devices-USB Devices即可看到
 usb设备,如招行的usb key是Tendyron Token [0001],建行的是Watchdata USB Key [0001],点击即可安装驱动使用,然后再从银行官网
 下载网银盾登录软件即可使用网银盾登录
