@@ -1,0 +1,8 @@
+十进制10转换成二进制
+echo "obase=2;ibase=10;100" | bc
+
+10进制转16进制：
+$ echo "obase=16;ibase=10;100" | bc
+
+http://blog.51cto.com/297020555/591988
+
