@@ -1,0 +1,7 @@
+aur上有tor-browser-en, 
+打开tor-browser-en时可以选择代理连接，比如挂在ssh开启的socks后面，或者用openvpn
+tor-browser-en打开并连接tor网络后，会在本地开启个9150的socks5代理端口
+可以给其它程序使用tor网络
+
+deepweblinks.org
+http://xmh57jrzrnw6insl.onion/
