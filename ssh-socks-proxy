@@ -1,3 +1,132 @@
+关于ProxyJump的用法
+~/.ssh/config
+Host server3
+        HostName 192.168.5.38
+        ProxyJump user1@jumphost1.example.org:22,user2@jumphost2.example.org:2222
+        User fred
+
+or $ ssh -J user1@jumphost1.example.org:22,user2@jumphost2.example.org:2222 fred@192.168.5.38
+or $ ssh -o ProxyCommand="ssh -W %h:%p jumphost.example.org" server.example.org
+ 
+more details https://en.wikibooks.org/wiki/OpenSSH/Cookbook/Proxies_and_Jump_Hosts
+free ssh tunnel https://www.globalssh.net/
+-------------------------------
+没有登录shell权限的user在ssh里依然可以端口转发
+ssh -L 20222:jp1.globalssh.xyz:22 -p 1990 -i .ssh/joe joe@moon -N
+ssh -D 8080 -NCT alexagrace-globalssh@moon -p 20222 
+但不能用-t选项来端口转发，因为-t会分配终端，而这个user没有权限
+------------------------------------------------
+oopenvpn over ssh with stunnel, openvpn listen 20182 on server
+ssh -L 20183:localhost:20182 -i .ssh/john@vps john@moon -p 1990 -NCT
+----------------------------------
+ssh -L 9090:jp1.globalssh.xyz:22 -NT john@moon -p 1990 -i .ssh/john@vps
+ssh -D 8080 alexagrace-globalssh@moon -p 9090 -NT
+
+-L 9090:jp1.globalssh.xyz:22 监听本地9090端口的数据并通过moon转发到jp1.globalssh.xyz的22端口
+此时这个moon是localhost,并且localhost:1990已用stunnel连接到mars的1991,所以实际连的是mars
+-D 8080 在本地建立socks代理，端口8080,然后用jp1.globalssh.xyz的user登录moon的9090就能连接到jp1.globalssh.xyz的22端口
+
+-L 9090:mars:9091 user@MiddleMan, 监听本地的9090并通过MiddleMan发送到mars:9091,连接本地9090就能连接到mars:9091
+-R 9090:mars:9091 user@MiddleMan, 让MiddleMan监听自己的9090端口并把接收的数据发送到mars:9091 然后连接MiddleMan:9090就能连接到mars:9091
+
+-L 8001:localhost:8002 user@MiddleMan,监听本地的8001并发到MiddleMan上的8002,这个localhost
+会在MiddleMan上解析成127.0.0.1,所以还是MiddleMan的地址，而不是本地
+ssh -L 8080:localhost:8081 -i .ssh/john@vps -p 1990 john@moon -t ssh -D 8081 -NCT alexagrace-globalssh@jp1.globalssh.xyz
+
+-N 不执行远程指令
+-T 禁止虚拟终端分配
+-C 压缩数据
+-t 强制虚拟终端分配，-t后面跟的命令会在登录的机器上运行
+-J user@host:port 和~/.ssh/config里的ProxyJump一样，先登录到第一个主机然后再通过第一个主机登录到第二个主机，
+
+http://www.ruanyifeng.com/blog/2011/12/ssh_port_forwarding.html
+--------------------------------------------
+android google play, kpn tunnel revolution, direct proxy is for ssh tunnel 
+you can get ssh tunnel account from globalssh.net
+ssh to B via A
+ssh -L 127.0.0.1:9999:B:22 userA@A
+then in another terminal run `ssh userB@127.0.0.1:9999`
+----------------------------------------------------
+
+知道怎么用ssh to machine A via B, 知道怎么用ssh with ssl 
+不知道怎么用ss to machine A with ssl via B with ssl
+用ssh with ssl登录到A再用ssh with ssl登录到B
+用-J参数不知道怎么写，如果用-t参数的话，可以在A上配置stunnel,然后用-t参数就可以了
+或者直接用ssh with ssl登录A，然后用ssh登录B,而不是ssh with ssl
+
+本地用stunnel连到mars,然后用mars以ssh连到globalssh, socks5是localhost:8001
+ssh -L 8001:localhost:8002 john@moon -p 1990 -i .ssh/john@vps -t ssh -D 8002 -N -q -C alexagrace-globalssh@jp1.globalssh.xyz
+https://en.wikibooks.org/wiki/OpenSSH/Cookbook/Proxies_and_Jump_Hosts
+
+ssh -i ~/.ssh/mykey.id_rsa -Ao ProxyCommand="ssh -i ~/.ssh/mykey.id_rsa -W %h:%p -p 1234 foo@1.0.0.1" -p 5678 bar@1.0.1.1
+https://superuser.com/questions/1168309/using-ssh-forwardagent-and-proxyjump-with-identityfile-in-command-line
+----------------------------------
+google 'free ssh tunnel' 
+there're lots of ssh with tls tunnel on internet
+www.globalssh.net
+create one account, then 
+make a stunnel config 
+[john@moon ~]$ cat astunnel.conf 
+pid = /tmp/stunnel2.pid
+sslVersion = TLSv1
+client = yes
+[ssh]
+accept=19900
+connect=ssl-jp1.globalssh.xyz:444
+then
+ssh -p 19900 -D 8080 -C -q -N jonsnow-globalssh@moon
+now, local 8080 is socks5 proxy port
+-----------------------------------------------
+ssh to machine A via B
+or use ProxyCommand in ~/.ssh/config
+
+ssh -J root@192.168.2.1:22 john@1.1.3.1 -p 19 -i .ssh/john@vps
+1. -p参数不能跟在-J后面，用user@hos:port形式
+2. 第二个ssh的地址不要用当前的hosts里的别名，要用ip地址
+3. -i指定密钥，这个密钥存在当前local，而不是192.168.2.1里面
+
+ssh -t root@192.168.2.1 ssh -p 1990 joe@106.187.34.187 -i .ssh/joe
+1. 这个.ssh/joe存在于192.168.2.1上面，而不是Local
+
+https://askubuntu.com/questions/311447/how-do-i-ssh-to-machine-a-via-b-in-one-command
+
+-------------------------------------
+prevent ssh timeout
+ON SERVER: 
+/etc/ssh/sshd_config
+ClientAliveInterval 120
+ClientAliveCountMax 720
+
+or ON CLIENT:
+~/.ssh/config
+ServerAliveInterval 120
+
+you just need one of them to prevent ssh timeout, 120 means send 'null packet' every 120s
+https://bjornjohansen.no/ssh-timeout
+
+prevent stunnel timeout
+/etc/stunnel/stunnel.conf
+TIMEOUTidle = 30
+-------------------------------
+创建一个用户joe，home为/var/user/ 创建时指定/usr/bin/nologin,因为无法su进去，所以随便用个user生成key pair,然后复制到home的.ssh里面即可
+这样就可以让这个用户以ssh certificate连接但无法登录shell,但可使用ssh tunnel
+ON SERVER:
+mkdir -p /var/ssh-user/joe
+useradd -m -d /var/ssh-user/joe  -s /usr/sbin/nologin joe
+passwd joe 必须给joe设置密码，否则用密钥连接时提示public key denied
+
+# generate ssh key pair
+ssh-keygen -t rsa -b 3077 -f ./.ssh/joe
+# there will be ./.ssh/joe and joe.pub
+# put joe.pub into /var/ssh-user/joe/.ssh/authorized_keys on server
+chown -R joe:joe /var/ssh-user/joe
+chmod 600 /var/ssh-user/joe/.ssh/authorized_keys
+systemctl restart sshd
+# and past ./.ssh/joe to local, done!
+
+ON LOCAL:
+ssh -p 1990 -D 7070 -C -q -N joe@moon -i .ssh/joe
+---------------------------------------------------------------------------------------
 -D socks代理，如果不用socks代理，则需要指定具体地址，socks代理应该是在数据里加了个目的地址
 proxychains可以配置用于socks代理，还有redsocks
 ----------------------------------------

@@ -1,2 +1,5 @@
 pacman -S ntfs-3g
 sudo mount -t ntfs-3g /dev/sda5 ~/tmp
+sudo ntfs-3g /dev/sda8 /mnt/
+cd /mnt
+mv what-ever-you-want to-what-withot-sudo

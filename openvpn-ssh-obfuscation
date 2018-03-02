@@ -1,3 +1,12 @@
+openvpn via ssh with stunnel
+eg, your server.conf is listen on 20182
+ssh -L 20183:localhost:20182 -i .ssh/john@vps john@moon -p 1990 -NCT
+in your client.conf
+remote 127.0.0.1 20183
+route your-vps-ip 255.255.255.255 net_gateway
+ssh tunnel只能用于TCP代理,aria2这种udp下载软件无法使用，让openvpn用TCP连接走ssh tunnel with stunnel,这样openvpn可以给aria2提供udp代理
+或者直接用openvpn over stunnel
+-----------------------------------------
 there're other tools like QuickTun KcpTun
 on Android, there's a stunnel-like tool SSLDroid, remember to exclude SSLDroid on allowed apps page in OpenVPN for Android
 another app is TLS/SSL Tunnel, it is better than SSLDroid, remember Root-Certificate choose Gullible(Trust All)
