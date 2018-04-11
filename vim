@@ -1,3 +1,6 @@
+zz zt zb on vim, just C-l on emacs, C-l make the current line display on the middle of the screen,
+and if you press it again it can make it at the top of the screen or the bottom of the screen
+-------------------------------------
 pacman -S vim-jellybeans vim-seti
 vim color scheme
 :colorscheme jellybeans
