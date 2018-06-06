@@ -1,3 +1,23 @@
+class Employee:
+    def __init__(self,first,last):
+        self.first=first
+        self.last=last
+        self.email=first + '.' + last + '@company.com'
+
+    def fullname(self,p):
+        self.p=p
+        return 'first' + self.p
+
+    def fullname2(self):
+        return self.p
+
+emp_1 = Employee('Corey','Joss')
+print(emp_1.fullname('3'))            # first3
+print(emp_1.fullname2())                # 3
+        
+# all that parameters from outside, they need turn to self.variable to call
+
+---------------------------------------
 1. 定义类 class bla(base-class)
 2. 实例化 bla3=bla() 实例化就是 class() 也就是class后面加个()
 3. 给类分配属性 bla.var='xx'
