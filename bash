@@ -1,3 +1,8 @@
+
+for i in *.mp4; do ffmpeg -i "$i" -acodec libmp3lame "$i.mp3"; done;
+
+count=0;for i in *.srt; do mv "$i" "$count"; count=$((count+1)); done; 
+-------------------------------------------------------------
 impv(){ 
 P_LIST=( "$@" )
 #echo "the number of parameter is $#"

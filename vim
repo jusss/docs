@@ -1,3 +1,9 @@
+vim doesn't support high lights on python code
+~/.vimrc
+filetype plugin on
+syntax on
+https://stackoverflow.com/questions/19754849/vim-syntax-highlighting-does-not-work
+--------------------------
 zz zt zb on vim, just C-l on emacs, C-l make the current line display on the middle of the screen,
 and if you press it again it can make it at the top of the screen or the bottom of the screen
 -------------------------------------
