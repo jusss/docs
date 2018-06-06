@@ -155,6 +155,9 @@ http://space.bilibili.com/11805472/#!/index
 
 ubuntu 17.04
 deb http://mirrors.aliyun.com/ubuntu zesty main universe restricted non-free multiverse
+http://releases.ubuntu.com/18.04/
+http://cdimage.ubuntu.com/daily-live/current/
+http://cdimage.ubuntu.com/ubuntukylin/daily-live/current/
 
 
 CIDR IP Range
