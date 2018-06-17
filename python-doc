@@ -1,3 +1,24 @@
+
+https://www.emacswiki.org/emacs/PythonProgrammingInEmacs
+自带的python-mode,再安装auto-complet就可以自动补全Python代码
+还有个就是jedi插件 jedi.el
+https://stackoverflow.com/questions/7138039/vim-autocomplete-for-python
+
+https://stackoverflow.com/questions/25669809/how-do-you-run-python-code-using-emacs
+自带的python-mode.el, 在python buffer里面
+C-c C-z 打开个python shell
+C-c C-c 运行这个buffer里的代码在已经打开的python shell里
+C-c C-r 运行选中的代码 用mark标记的块
+
+emacs自带的python-mode再安装auto-complete就能自动补全python代码，不一定非得用jedi,在python-mode里C-c C-z打开个python shell,然后C-c C-c就能直接运行buffer里的代码
+----------------------------------------------------------------
+python 使用()来用作函数调用
+f=lambda x: x+1
+f(3)
+(lambda x: x+1)(3)
+
+exit不能退出repl, 但是exit()可以退出repl
+------------------------------------------------
 检查object是否为str isinstance(object,str)
 得到某object的所属的类 type("a") -> <class 'str'>
 
