@@ -1,3 +1,8 @@
+sudo adb reboot bootloader
+sudo adb reboot recovery
+sudo fastboot reboot
+sudo fastboot boot recovery.img
+-------------------------------
 用adb push来解压supersu.zip的文件到指定位置来root
 查看supersu.zip解压后的META-INF/com/google/android/update-binary.sh
 
