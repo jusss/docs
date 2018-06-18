@@ -1,3 +1,10 @@
+M-! 和 M-& 可以运行系统指令, M-!会阻塞emacs, M-&是异步执行指令，不阻塞emacs
+可以用C-h k M-!来查看该组合键的使用
+C-h f function-name 查看函数
+
+M-x ielm 进入elisp
+--------------------------------------------------------
+
 install auto-complete on emacs for coding auto completion
 
 emacs自带的python-mode再安装auto-complete就能自动补全python代码，不一定非得用jedi,在python-mode里C-c C-z打开个python shell,然后C-c C-c就能直接运行buffer里的代码
