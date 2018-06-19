@@ -1,3 +1,12 @@
+>>> f= lambda x: lambda y: x+y
+>>> f
+<function <lambda> at 0x7fca971f5f28>
+>>> f(3)(4)
+7
+>>> f(3)
+<function <lambda>.<locals>.<lambda> at 0x7fca97583048>
+>>> 
+-----------------------------------------
 
 https://www.emacswiki.org/emacs/PythonProgrammingInEmacs
 自带的python-mode,再安装auto-complet就可以自动补全Python代码
