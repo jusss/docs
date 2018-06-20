@@ -1,0 +1,71 @@
+python lambda closure
+
+https://stackoverflow.com/questions/2295290/what-do-lambda-function-closures-capture
+
+尝试批量生成函数
+
+adders=[0,1,2,3]
+
+for i in [0,1,2,3]:
+    adders[i]=lambda a: i+a
+
+print(adders[1](3))
+结果是6而不是4
+I expected it to store a pinter to the integer object currently pointed to by i.
+That means what when i assigned a new integer object it shouldn't effect the previously created closures.
+Sadly, inspecting the adders array within a debugger shows that it does, All lambda functions refer
+to the last value of i, 3, which results in adders[1](3) returning 6.
+
+Scoping in Python is lexical. A closure will always remeber the name and scope of the variable,
+not the object it's pointing to. Since all the functions in your example are created in the same
+scope and use the same variable name, they always refer to the same variable.
+
+adders=[0,1,2,3]
+
+for i in [0,1,2,3]:
+    adders[i]=(lambda a: lambda b: b+a)(i)
+
+print(adders[1](3))
+
+用()来函数调用，exit不行，exit()可以函数调用, f不行,f()函数调用
+lambda里调用了外部变量形成closure, closure会和这个lambda一起绑定在namespace里
+
+-----------------------------------------------
+
+
+>>> f=lambda x: x+1
+>>> f(3)
+4
+
+>>> (lambda x: x+1)(3)
+4
+
+(lambda x, y: x + y)(5, 3)  => 8
+
+>>> def make_adder(n):
+...     return lambda x: x + n
+
+(lambda x: print(x))(3)
+
+(lambda: 3)()
+
+lambda: 3 and (lambda: 3) are both functions, you want (lambda: 3)()
+
+>>> list(map(lambda x: x * 2, item))
+[2, 4, 6]
+>>> item
+[1, 2, 3]
+>>> [items * 2 for items in item]
+[2, 4, 6]
+
+python3 map(func,list)返回的是个可迭代的对象, 但是python里面又没有指定的iterator类
+所以还是用anything you like. A for loop. list(). ''.join(). Lots of
+	things iterate.
+
+>>> for i in d:
+...  print(i)
+... 
+2
+4
+6
+
