@@ -1,3 +1,33 @@
+2018.06.23 system boot failure after upgrade,
+one, disk uuid changed
+two, xhci and acpi usb  error
+three, keyboard don't work
+four, bbswitch conflict, after upgrade, bbswitch  depends 4.17.2, and you need to remove it
+
+use grub /dev/sda9 boot it , 
+boot press c into grub 
+set root=/dev/sda9
+linux (hd0,gpt9)/boot/vmlinuz root=/dev/sda9
+initrd (hd0,gpt9)/boot/initramfs.img
+
+pacman -U /var/cache/pacman/pkg/linux-xxx.xz linux-headers-xxx.xz virtualbox-xxx.xz  acpid-xxx.xz
+
+reboot!
+
+now it works!
+
+the failure kernel is 4.17.2-1-ARCH
+4.16.6-1-ARCH is normal
+
+you need re-install bbswitch after degrading packages,
+sudo pacman -S bbswitch-dkms, not bbswitch
+sudo modprobe bbswitch
+sudo tee /proc/acpi/bbswitch <<< OFF
+lspci |grep NV   see if it's rev ff
+
+https://wiki.archlinux.org/index.php/downgrading_packages
+
+-----------------------------
 it's been two years that archlinux on my eeepc don't upgrade, and I'd like to upgrade to now
 #pacman-key --refresh-keys 
 if it takes so long time, then use
