@@ -1,3 +1,5 @@
+M-x desktop-save  can save the buffers when you leave, or write (desktop-save-mode 1) into .emacs, then use M-x desktop-read to re-open them
+-----------------------------------------------------
 M-! 和 M-& 可以运行系统指令, M-!会阻塞emacs, M-&是异步执行指令，不阻塞emacs
 可以用C-h k M-!来查看该组合键的使用
 C-h f function-name 查看函数
