@@ -1,2 +1,9 @@
+systemctl start bluetooth.service
+blueberry
+choice the bluetooth device and connect, run pavucontrol ,Output Devices tag choose Headphones(unplugged) in Port section
+
+or blueman-manager
+https://wiki.archlinux.org/index.php/bluetooth#Graphical
+-----------------------
 apt install blueman
 blueman-manager open bluetooth manager
