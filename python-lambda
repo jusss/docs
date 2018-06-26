@@ -1,3 +1,72 @@
+python lambda closure lisp
+
+
+(let ((n 0)) ...) equal ((lambda (n) ..) 0) equal def a(n) then f=a(0) f is a function
+
+python's function call with (), 
+ 
+def a(n):
+ def b():
+  n=n+1
+  return n
+ return b
+f=a(0)
+f()     this won't work because you can't change that outer n's value in function b
+
+nonlocal can change the variable's value that is in one upper level and only one upper level, for example
+
+n=0
+def b():
+    nonlocal n
+    n=1
+    
+then you can change the n's value inside function b and affect that n's value which is at the same namespace with function b
+
+global is not a same thing with nonlocal, nonlocal only change that one upper level,
+but global change that top level's variable
+https://stackoverflow.com/questions/1261875/python-nonlocal-statement
+
+
+def f(n):
+    def b():
+        nonlocal n
+        n += 1
+        return n
+    return b
+
+inc = f(0)
+print(inc())
+print(inc())
+
+>>> def a():
+...   n=0
+...   def b():
+...     nonlocal n
+...     n=n+1
+...     return n
+...   return b
+... 
+>>> f=a()
+>>> f()
+1
+>>> f()
+2
+
+<W> j: in py3, you can use the nonlocal keyword. in py2... ugly
+	 hacks.
+<j> it seems a bit likely, class and closure
+<W> j: it's usually cleaner to encapsulate data in a class instead of
+	 having mutable nonlocal state.
+
+
+
+         
+lambda x,y: [x](y)
+
+
+
+
+-----------------------------------------------------------------------------
 python lambda closure
 
 https://stackoverflow.com/questions/2295290/what-do-lambda-function-closures-capture
@@ -31,6 +100,15 @@ print(adders[1](3))
 lambda里调用了外部变量形成closure, closure会和这个lambda一起绑定在namespace里
 
 -----------------------------------------------
+>>> f= lambda x: lambda y: x+y
+>>> f
+<function <lambda> at 0x7fca971f5f28>
+>>> f(3)(4)
+7
+>>> f(3)
+<function <lambda>.<locals>.<lambda> at 0x7fca97583048>
+>>> 
+-----------------------------------------
 
 
 >>> f=lambda x: x+1
