@@ -1,0 +1,32 @@
+rtl_pci, rtl8723be, spam message costs lots of CPU
+[ 3351.902333] pcieport 0000:00:1c.5: AER: Corrected error received: id=00e5
+[ 3351.902552] pcieport 0000:00:1c.5: PCIe Bus Error: severity=Corrected, type=Physical Layer, id=00e5(Receiver ID)
+[ 3351.902587] pcieport 0000:00:1c.5:   device [8086:9d15] error status/mask=00000001/00002000
+[ 3351.902619] pcieport 0000:00:1c.5:    [ 0] Receiver Error         (First)
+[ 3351.902822] pcieport 0000:00:1c.5: AER: Corrected error received: id=00e5
+[ 3351.902919] pcieport 0000:00:1c.5: PCIe Bus Error: severity=Corrected, type=Physical Layer, id=00e5(Receiver ID)
+[ 3351.902954] pcieport 0000:00:1c.5:   device [8086:9d15] error status/mask=00000001/00002000
+[ 3351.903080] pcieport 0000:00:1c.5:    [ 0] Receiver Error         (First)
+[ 3351.903345] pcieport 0000:00:1c.5: AER: Corrected error received: id=00e5
+[ 3351.903359] pcieport 0000:00:1c.5: can't find device of ID00e5
+[ 3351.903361] pcieport 0000:00:1c.5: AER: Corrected error received: id=00e5
+[ 3351.903372] pcieport 0000:00:1c.5: PCIe Bus Error: severity=Corrected, type=Physical Layer, id=00e5(Receiver ID)
+[ 3351.903379] pcieport 0000:00:1c.5:   device [8086:9d15] error status/mask=00000001/00002000
+[ 3351.903382] pcieport 0000:00:1c.5:    [ 0] Receiver Error         (First)
+
+downgrading linux-firmware
+
+put 'pci=noaer' into kernel parameter when system boot, it can avoid this.
+
+sudo vim /etc/default/grub   put 'pci=noaer' 
+
+Updated dmesg with pci=noaer
+
+It booted no problem after replacing pci=nommconf with pci=noaer as suggested.  See updated dmesg.txt as requested.
+
+Thanks!
+
+https://bugzilla.kernel.org/show_bug.cgi?id=109691
+
+may vbox pci driver cause this!
+
