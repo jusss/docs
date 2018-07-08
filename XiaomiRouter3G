@@ -1,0 +1,9 @@
+Xiaomi Router 3G AKA R3G
+https://www.vvzero.com/2018/02/24/mi-router-3g-ssh/
+https://jingyan.baidu.com/article/a24b33cd1080f719fe002b8e.html
+
+1. download R3G developer version from http://www1.miwifi.com/miwifi_download.html
+2. login your R3G router and upload that bin file
+3. login R3G and login your Xiaomi account by MiWiFi App on your android phone
+4. login http://www1.miwifi.com/miwifi_open.html and choose enable ssh tool download bin file
+5. upload what your got from that website and do what it says
