@@ -1,3 +1,17 @@
+https://www.youtube.com/watch?v=ja6yK6QWuiA
+https://drive.google.com/file/d/0B0ixxJIu61aDajNqTTZ4MVZBaDQ/view
+download the TWRP Max.zip for root
+in bootloader
+sudo fastboot flash recovery TWRP\ Max/recovery.img
+拔掉数据线，长按关机键，按个几秒后，松开，屏幕变黑重启，此时按住音量减和电影键，
+震动下，进入TWRP的recovery模式，卡刷第三方ROM或supersu来获取权限
+或者尝试sudo fastboot boot recovery.img进入recovery
+重启之后如果卡在bootloop界面就是一个开机转圈的界面，就再刷次recovery然后直接卡刷supersu
+复制SuperSu.zip进SD卡，然后进入recovery卡刷，开机之后
+adb install rootexplorer.apk安装root explorer,然后打开root explorer第一次会提示失败
+此时打开SuperSU看到root explorer申请root权限，点grant同意，root explorer就有root权限了
+
+--------------------------------------------------
 WW_Phone-13.8.26.60 玩mobile legendary: bangbang很卡，当使用手机流量时
 刷回UL-ASUS_Z010-WW-12.8.10.56-user.zip试试
 
