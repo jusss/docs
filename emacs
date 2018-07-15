@@ -7,6 +7,15 @@ C-h f function-name 查看函数
 M-x ielm 进入elisp
 --------------------------------------------------------
 
+M-x package-list or M-x package-list-packages   ;update the packages log
+(require 'package)
+(package-initialize)
+(add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
+M-x pacakge-install RET auto-complete
+(ac-config-default)    ; write this into .emacs
+~
+
+--------------------------------------------------------
 install auto-complete on emacs for coding auto completion
 
 emacs自带的python-mode再安装auto-complete就能自动补全python代码，不一定非得用jedi,在python-mode里C-c C-z打开个python shell,然后C-c C-c就能直接运行buffer里的代码
