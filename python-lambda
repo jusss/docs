@@ -1,3 +1,51 @@
+python 3.0 aka python 3k or python 3000, more details see PEP 3000, GvR steps down BDFL because of the argument about PEP 572. at 2018.07.13
+reduce() is removed from python 3k, but you can also find it in functools module.
+lambda, filter, and map, filter and map will return iterators instead of lists.
+
+"Lambda functions are mainly used in combination with the functions filter(), map() and reduce(). The lambda feature was added to Python due to the demand from Lisp programmers."
+
+lambda argument,argument: expression
+map(function, sequence_like_a_list)
+filter(function, sequence)
+reduce(function, sequence)
+
+import functools
+functools.reduce(lambda x,y: x+y, [47,11,42,13])   => 113
+这个lambda先作用在前2个元素上，然后再作用在返回的结果和第三个元素上，依次递推
+
+检测一个列表里最大的值
+reduce(lambda a,b: a if (a>b) else b, [47,11,42,102,13])  => 102
+
+计算1到100的和
+reduce(lambda x,y: x+y, range(1,101))  => 5050
+
+计算前100项Fibonacci数列之和
+reduce(lambda x,y: x+y, fs)
+
+Fibonacci数列
+fs=map(f, range(0,101))   只要加了()就相当于函数调用，所以此处是f而不是f()
+
+Fibonacci数
+f=lambda c,x=0,y=1: x if c==0 else f(c-1,y,x+y)
+
+filer()把function作用在sequence的每个元素上，返回值是true的元素返回, sequence可以是list or tuple, dictionary啥的
+
+map() applies the function to all the elements of the sequence and return a list in python2 and an iterator in python3
+a=[1,2,3,5]
+b=[17,12,11,10]
+list(map(lambda x,y: x+y, a, b)) => [18,14,14,15]
+
+---------------------------------------------------
+https://stackoverflow.com/questions/890128/why-are-python-lambdas-useful
+mult3 = filter(lambda x: x%3 == 0, [1, 2, 3, 4, 5, 6, 7, 8, 9])
+mult3 is [3,6,9]
+or mult3 = [x for x in [1,2...9] if x%3 ==0]
+','.join(str(x) for x in [1,2,3,4,5,6])
+
+map, filter, reduce, 
+
+lambda is useful in GUI for callback
+---------------------------------------------
 python lambda closure lisp
 
 
