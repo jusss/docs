@@ -34,6 +34,14 @@ x=list(x)
 >>> 
 
 
+>>> a=["red","blue","deep blue"]
+>>> b=["horse","cat","dog"]
+>>> {a[i]:b[i] for i in range(0,3)}
+{'red': 'horse', 'blue': 'cat', 'deep blue': 'dog'}
+>>> c={a[i]:b[i] for i in range(0,3)}
+>>> c["red"]
+'horse'
+
 -------------------------
 python 3.0 aka python 3k or python 3000, more details see PEP 3000, GvR steps down BDFL because of the argument about PEP 572. at 2018.07.13
 reduce() is removed from python 3k, but you can also find it in functools module.
