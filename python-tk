@@ -1,3 +1,14 @@
+-----------------------
+tkinter.Entry用来做输入框　input field
+entry_field.bind("<Return>",send)回车发生
+用tkinter.Listbox()来做显示框
+https://medium.com/swlh/lets-write-a-chat-app-in-python-f6783a9ac170
+或者用Message()做显示框，但是无法获得焦点 https://www.python-course.eu/tkinter_message_widget.php
+或者用Text()来做　但是需要设置只读 text.config(state=DISABLED)　after text.insert()
+https://stackoverflow.com/questions/3842155/is-there-a-way-to-make-the-tkinter-text-widget-read-only
+
+
+-------------------------------------------------
 #!/usr/bin/env python3
 import tkinter
 

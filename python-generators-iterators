@@ -1,0 +1,11 @@
+iterator is a more general concept: any object whose class has a next method (__next__ in Python 3) and an __iter__ method that does return self.
+
+Every generator is an iterator, but not vice versa. A generator is built by calling a function that has one or more yield expressions (yield statements, in Python 2.5 and earlier), and is an object that meets the previous paragraph's definition of an iterator.
+
+iterator包含generator,有__next__和__iter__方法的是iterator
+但并不是所有iterator都是generator,通过调用一个有 yiled表达式的函数的返回构建的是generator
+
+所有generator都是iterator,但iterator并不都是gnerator
+yield返回的是generator object, 
+iterator都有next或__next__方法 and __iter__
+https://stackoverflow.com/questions/2776829/difference-between-pythons-generators-and-iterators

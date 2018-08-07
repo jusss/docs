@@ -1,3 +1,10 @@
+M-x package-refresh-contents
+M-x package-install RET racket-mode RET C-x C-z will open racket
+和python-mode一样，C-c C-z调出repl, F5直接求值并显示结果在repl C-c C-c 运行
+C-x C-e 求值光标之前的表达式
+C-x C-r 求值选择的区域(region也就是C-S-n或M-; M-w)的表达式
+或者直接M-x eshell RET racket
+---------------------------------
 M-x desktop-save  can save the buffers when you leave, or write (desktop-save-mode 1) into .emacs, then use M-x desktop-read to re-open them
 -----------------------------------------------------
 M-! 和 M-& 可以运行系统指令, M-!会阻塞emacs, M-&是异步执行指令，不阻塞emacs
