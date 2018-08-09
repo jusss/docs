@@ -1,0 +1,13 @@
+docs.racket-lang.org
+reduce provided from event
+
+if you want wrote a library for racket in a.rkt, and there's function print-a in it,
+you want use print-a in other racket file, just (provide print-a) in a.rkt
+and (require "a.rkt") in others file then you can use print-a in others file
+
+(require event) package:event-lang
+
+search 'reduce' and show items that who provide, and click that items, and show what lang contain that module
+
+raco pkg show
+raco pkg install event-lang

@@ -1,4 +1,17 @@
+
+;;; auto-complete for coding
+(require 'auto-complete)
+(add-to-list 'ac-modes 'javascript-mode)
+(add-to-list 'ac-modes 'html-mode)
+(add-to-list 'ac-modes 'css-mode)
+(add-to-list 'ac-modes 'python-mode)
+(add-to-list 'ac-modes 'racket-mode)
+(add-to-list 'ac-modes 'scheme-mode)
+(ac-config-default)
+
+--------------------------------------------------------
 M-x package-refresh-contents
+M-x package-list-packages
 M-x package-install RET racket-mode RET C-x C-z will open racket
 和python-mode一样，C-c C-z调出repl, F5直接求值并显示结果在repl C-c C-c 运行
 C-x C-e 求值光标之前的表达式

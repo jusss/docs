@@ -42,6 +42,8 @@ x=list(x)
 >>> c["red"]
 'horse'
 
+map(lambda x,y: {}.append(x:y), list1, list2)
+
 -------------------------
 python 3.0 aka python 3k or python 3000, more details see PEP 3000, GvR steps down BDFL because of the argument about PEP 572. at 2018.07.13
 reduce() is removed from python 3k, but you can also find it in functools module.
