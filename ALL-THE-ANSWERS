@@ -10,3 +10,76 @@
 	      1) '() x))
      alist)
 '(1 2 () () 4 () 7 () () ())
+
+
+(define (map f alist)
+	(if (eq? alist '())
+	    '()
+	    (cons (f (car alist)) (map f (cdr alist)))))
+
+
+(define remove-empty-list
+  (lambda (alist)
+    (if (eq? alist '())
+    '()
+    (if (eq? (car alist) '())
+        (remove-empty-list (cdr alist))
+        (cons (car alist) (remove-empty-list (cdr alist)))))))
+ 
+(define remove-same-element
+  (lambda (alist)
+        (remove-empty-list
+        (map (lambda (x)
+               (if (> (apply + (map (lambda (y)
+                                             (if (eq? x y) 1 0))
+                         alist))
+                        1) '() x))
+                 alist))))
+ 
+(define get-max-value
+  (lambda (alist max)
+    ;max is (car alist) at the first time
+    (if (eq? alist '())
+    max
+    (if (> (car alist) max)
+        (get-max-value (cdr alist) (car alist))
+        (get-max-value (cdr alist) max)))))
+ 
+(define alist '(1 2 3 3 5 9 7 7))
+> (get-max-value (remove-same-element alist) (car alist))
+9
+
+> (require srfi/1)
+> (reduce (lambda (x y) (if (> x y) x y)) 0 '(1 2 3))
+
+-------------------------------------------------------------------------------------
+#lang racket
+(require srfi/1)
+
+(define alist (list 1 2 3 3 4 5 7 9 5 9))
+
+
+;(define (f alist)
+;(cond ((eq? '() (car alist)) (f (cdr alist)))
+;      ((eq? (cdr alist)) '())
+;      (else (cons (car alist) (f (cdr alist))))))
+;
+
+;(f (map (lambda (x)
+;       (if (> (apply + (map (lambda (y)
+;			       (if (eq? x y) 1 0))
+;			     alist))
+;	      1) '() x))
+;     alist))
+;
+(reduce (lambda (a b) (if (> a b) a b)) (car alist)
+ (filter (lambda (x) (not (eq? x '())))
+      (map (lambda (x)
+       (if (> (apply + (map (lambda (y)
+			       (if (eq? x y) 1 0))
+			     alist))
+	      1) '() x))
+     alist)))
+
+
+------------------------------------------------------------------------------
