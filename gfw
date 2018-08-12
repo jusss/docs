@@ -1,3 +1,8 @@
+Android: brook, openvpn with stunnel, v2ray
+iPhone: brook, outline
+Windows: openvpn with stunnel
+Linux: ssh with stunnel, brook, openvpn with stunnel or with ssh  over stunnel, v2ray
+-------------------------------------------------------------------
 ssh, ok with stunnel, not ok with obfsproxy
 openvpn, no, tls handshake plain is detected, ok with stunnel
 brook, ok, work in 鹏博士宽带

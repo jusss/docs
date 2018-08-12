@@ -1,0 +1,79 @@
+Now, what are decorators really? They “decorate” or “wrap” another function and let you execute code before and after the wrapped function runs.
+
+def null_decorator(func):
+    return func
+
+def greet():
+    return 'Hello!'
+
+greet = null_decorator(greet)
+
+>>> greet()
+'Hello!'
+
+Putting an @null_decorator line in front of the function definition is the same as defining the function first and then running through the decorator. Using the @ syntax is just syntactic sugar, and a shortcut for this commonly used pattern.
+
+@null_decorator
+def greet():
+    return 'Hello!'
+
+>>> greet()
+'Hello!'
+
+def uppercase(func):
+    def wrapper():
+        original_result = func()
+        modified_result = original_result.upper()
+        return modified_result
+    return wrapper
+
+@uppercase
+def greet():
+    return 'Hello!'
+
+>>> greet()
+'HELLO!'
+equal def greet()... ;greet=uppercase(greet)
+Note that using the @ syntax decorates the function immediately at definition time.
+--------------------------------
+python's f-string is like $var expanse in bash or in ruby, expanse variable in string
+*args, turn all parameters into one list
+**kwargs, keyword args turn all like func(a=12, b="abc") into one dict {'a':12, 'b':"abc"}
+
+def f(*args, **kwargs):
+    print("args:",args)
+    print("keyword args:",kwargs)
+
+f('one','two','tree',b='four')
+args: ('one', 'two', 'tree')
+kw: {'b': 'four'}
+
+
+------------------------------------------
+def trace(func):
+    def wrapper(*args, **kwargs):
+        print(f'TRACE: calling {func.__name__}() '
+              f'with {args}, {kwargs}')
+
+        original_result = func(*args, **kwargs)
+
+        print(f'TRACE: {func.__name__}() '
+              f'returned {original_result!r}')
+
+        return original_result
+    return wrapper
+
+@trace
+def say(name, line):
+    return f'{name}: {line}'
+
+>>> say('Jane', 'Hello, World')
+'TRACE: calling say() with ("Jane", "Hello, World"), {}'
+'TRACE: say() returned "Jane: Hello, World"'
+'Jane: Hello, World'
+
+It uses the * and ** operators in the wrapper closure definition to collect all positional and keyword arguments and stores them in variables (args and  kwargs).
+
+The wrapper closure then forwards the collected arguments to the original input function using the * and ** “argument unpacking” operators.
+
+
