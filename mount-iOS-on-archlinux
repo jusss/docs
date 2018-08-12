@@ -1,0 +1,5 @@
+pacman -S ifuse
+modprobe fuse
+connect your iPhone to archlinux, then click trust this computer
+ifuse ./emp/
+umount ./emp/
