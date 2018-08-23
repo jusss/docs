@@ -1,4 +1,16 @@
+python.el bug, If it's the only thingthen it prints the output but with anything else
+it doesn't, Bug #29592 
+in python code buffer with python-mode (python.el)
+def aha()
+  return 9
+aha()
+press C-c C-c won't show 9 in *Python* repl
 
+but just input 3 and press C-c C-c will show 3 in *Python* repl
+
+and yet I try the same in racket-mode with racket language, and yet the repl
+shows whatever it got return,
+-----------------------------
 ;;; auto-complete for coding
 (require 'auto-complete)
 (add-to-list 'ac-modes 'javascript-mode)
