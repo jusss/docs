@@ -1,0 +1,36 @@
+https://www.programiz.com/python-programming/closure
+
+nonlocal in python 3
+dict in python 2
+
+1. We must have a nested function(function inside a function)
+2. The nested function must refer to a value defined in the enclosing function
+3. The enclosing function must return the nested function
+
+def bll(x):
+    def a():
+        print('h')
+    def b():
+        print('w')
+        print(c['show'])
+    def setq(x,y):
+        c[x]=y
+        return lambda x: c[x]
+    def get_closure():
+        return c
+    def add(method):
+        c[method.__name__]=method
+        return lambda x: c[x]
+    c={a.__name__:a, b.__name__:b, setq.__name__:setq, get_closure.__name__:get_closure, add.__name__:add}
+    
+    return c[x]
+
+dd=bll("setq")
+ee=dd("show",3)
+ee["b"]()
+bll("b")()
+
+
+cll=bll("setq")("show", 3)
+cll("b")()
+
