@@ -1,0 +1,28 @@
+pacman -S ifuse libimobiledevice
+modprobe fuse
+connect your iPhone to archlinux, then click trust this computer
+ifuse ./emp/
+umount ./emp/
+
+
+
+ifuse --documents <appid> <mountpoint>
+ifuse --documents org.videolan.vlc-ios ./emp/
+
+
+if you want to know all the appid on iPhone, you should install ideviceinstaller from AUR
+download the PKGBUILD from AUR, and install ideviceinstaller
+
+ideviceinstaller -l   # this will get all the installed appid on the iPhone
+
+now you can get the bundles
+
+and it is also possible to mount the sandboxed root folder of an application using
+the --container parameter:
+
+ifuse --container <appi> <mountpoint>
+
+https://github.com/libimobiledevice/ifuse/blob/master/README
+
+
+
