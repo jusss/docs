@@ -1,0 +1,7 @@
+1. 密钥登录并禁止密码登录
+2. 端口更改为非22
+3. fail2ban
+4. stunnel重定向并加上iptables禁止直连端口，只允许stunnel重定向的
+
+iptables -A INPUT -p tcp -s localhost --dport 22 -j ACCEPT
+iptables -A INPUT -p tcp --dport 22 -j DROP
