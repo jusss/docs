@@ -1,3 +1,36 @@
+python 3.6+ 有f-string 类似于ruby　bash的变量在字符串中展开
+python 2.7可以用''.format来玩
+
+-----------------------------------------------
+python 的threading.Thread并没有能结束线程的方法，
+自己实现
+    def recv_from_server():
+        while True:
+            if name['exit_signal']:
+                return "end"
+
+
+    def recv_from_keyboard(event=None):
+        msg=my_msg.get()
+        my_msg.set("")
+        if msg.startswith("/quit"):
+            name['exit_signal'] = True
+            name['sock'].send(('QUIT' + "\r\n").encode('utf-8'))
+
+    rt=Thread(target=whatever['recv_from_server'])
+这样在两个线程绑定的两个函数里，用一个线程发出个信号让另一个线程结束
+-----------------------------------
+l=[0,1,2]
+for i in range(0,3):
+  l[i] = lambda a: a+i
+结果l[0] = l[1] = l[2] = lambda a: a+2
+词法闭包，调用时去函数定义时的那个环境里去取值，i在那个环境里最终会变为2
+这个lambda a: a+i 没有立即求值i,　l[0]得到也是labda a a: a+i,
+当l[0](5)时才会求值这个lambda,而此时这个lambda所在的那个环境里i的值为2
+解决方法: l[i] = lambda a,b=i: a+b
+或　l[i] = (lambda b: lambda a: a+b)(i)
+  
+------------------------------------------
 python 实现 socket.readline
 recv_msg=sock.recv(102400)
 if recv_msg.endswith('\r\n'):
