@@ -1,3 +1,74 @@
+
+enclosing 围起来的
+enclosing function, 指的是函数中的函数
+
+python 3的list有.clear() 清除所有元素
+
+如果一个变量和列表定义在一个函数外面,你可以在这个函数里修改列表的值，但是如果你重新给这个变量的名字赋值，python会默认这个变量是local的
+除非你用global指定它是函数外面的那个
+
+变量第一次赋值叫　assign
+再次赋值叫　re-assign
+列表修改叫　mutate
+你在一个函数里re-assign一个定义在函数外面的变量名字，但是函数默认会assign一个local变量，除非你用global指定
+但你可以在函数里面mutate定义在函数外面的列表，但是你不能re-assign这个列表的名字在函数里，函数会把它当local来assign的，
+所以在一个函数里用 alist=[]这种re-assign不会修改函数外面alist的值,而是会assign一个local的alist,
+要用 alist[:]=[] 这样mutate来修改定义在函数外面的变量
+
+在函数里修改外边变量
+1.用global指出或者在python3里用nonlocal，否则assign一个同名的local变量，而不会re-assign外部的变量
+2.用列表来mutate外部的列表 但不能re-assign外部列表，同变量
+
+I think you're confusing "enclosing" with "enclosed": an enclosing function need not be nested in anything,
+although something must be nested in it (else there is no enclosing going on.)
+
+enclosing function就是最外面的那个没有被其它函数包围的函数
+enclosing scope 就是函数外面的那个作用域
+
+closure就是一个function带着它的enclosing scope而形成的name space?
+
+<jusss> what's the proper way to clean a list? I mean remove all the elements of a list
+<Wooble> jusss: there's a .clear() method, but why bother?  [20:20]
+<Wooble> jusss: (err, apparently not in py2, if you're using py2.  [20:21]
+<liste> jusss: if you can't remove your dirty shared references, you can do
+	mylist[:] = []
+<liste> jusss: you can't re-assign globals without the "global" keyword
+<fredrikhl> jusss: a[1]=3 mutates a, which is defined in the enclosing scope,
+	    a=[] assigns something to a in the local scope
+
+<liste> jusss: f3 isn't re-assigning a global  [20:26]
+<liste> jusss: it's just mutating a list
+<jusss> liste: everytime you give a value to a variable, it is re-assigning?
+<bjs> jusss: there's a difference between changing what a variable refers to
+      (assignment) and mutating that value
+
+<bjs> jusss: i.e. `x  = [1,2,3]` makes x refer to a completely different, new,
+      object.  Whereas x[0] = 5  doesn't change what x means, it just changes
+      a component of the list
+
+<liste> jusss: every time but the first
+<bjs> jusss: and that difference (between assigning inside functions and
+      outside functions) is called "scope", and which "scope" a variable
+      belongs to is important  [20:41]
+
+<jusss> bjs: liste if variables and lists are defined out of a fucntion, you
+	can change that lists in that function, but variables are not same as
+	lists,
+<Yhg1s> jusss: they are the same.
+<Yhg1s> jusss: assigning to a name is different from modifying a list. Have
+	you read or watched bit.ly/pynames1?
+<liste> jusss: a[0] = b is VERY different from a = b
+
+<jusss> bjs: you can't re-assign a variable in a inside function ,but you can
+	mutate a list in a inside functiton
+
+<bjs> jusss: well you can re-assign names, but you need to tell python which
+      name you want to assign to  (and by default it assumes you want the
+      "local" name)  [21:27]
+
+<jusss> bjs: aha, I see
+-------------------------------------------------------------------------------------
+
 https://www.programiz.com/python-programming/closure
 
 nonlocal in python 3
