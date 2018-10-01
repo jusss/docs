@@ -1,0 +1,56 @@
+def p10():
+    i=0
+    def p():
+        nonlocal i
+        i=i+1
+        yield i
+        p()
+    p()
+f=p10()
+while next(f) < 10:
+    print('hello')
+
+
+
+
+
+def p10():
+    i=0
+    def p():
+        nonlocal i
+        while True:
+            i=i+1
+            yield i
+    return p()
+
+f=p10()
+while next(f) < 10:
+    print('hello')
+
+
+
+
+
+    
+#for i in range(0,10):
+#    yield i
+
+#def f1():
+#...  for i in range(0,10):
+#...   yield i
+#... 
+#>>> f2=f1()
+#>>> while next(f2) <10:
+#...  print('hello')
+#... 
+#hello
+#hello
+#hello
+#hello
+#hello
+#hello
+#hello
+#hello
+#hello
+#hello
+

@@ -1,3 +1,94 @@
+a=3 if 'a' in 'abc' else 4
+<squirrel> i'd have ? : over = if else any day
+-----------------------------------------
+<jusss> None, False, [], (), they are same or different? bool() them will be
+	same False
+<ChrisWarrick> jusss: different
+<jusss> ok
+<ChrisWarrick> jusss: by this logic, 1 is the same as 2 is the same as 3…
+<jusss> in other languages, like C if it's not 0, it will be true,in lisp, if
+	it's not nil or () it will be true
+<jusss> but in python, eval None, False, [], () , they all are False
+<jusss> it's kind of weird
+<nedbat> jusss: languages are different. that's why we have more than one
+	 language
+<nedbat> jusss: also, "", {} are false  [01:01]
+<ChrisWarrick> and 0
+<ChrisWarrick> although I prefer the word “falsey”
+<nedbat> jusss: right, and 0 and 0.0
+<jarthur> Yea, I usually say something like falsey as well.
+--------------------------------------
+python的函数默认返回None,或者除非用return来指定返回的值
+-----------------------------------------------------------
+beware use lambda in for statement
+
+improper:  i will always be 2, like this lambda in for statement
+c=[lambda x: x+i for i in [0,1,2]]
+d=[(lambda : lambda x: x+i)() for i in [0,1,2]]
+e=[lambda: lambda x: x+i for i in [0,1,2]]
+
+proper:  i will be 0, 1, 2
+f=[(lambda y: lambda x: x+y)(i) for i in [0,1,2]]
+<nedbat> jusss: you can also get 0,1,2  with f=[(lambda x,y=i: x+y) for i in
+	 [0,1,2]]  [01:07]
+<ChrisWarrick> or define a function and use functools.partial
+<jusss> nedbat: what made 'for' do this differnt?
+<nedbat> jusss: it's not the for that's different, it's the lambda
+<jusss> use if-else instead of lambda in that position, and if-else will
+	generate result every time
+<jusss> but it is lambda, why lambda only get the last same value  [01:12]
+<ChrisWarrick> jusss: an if-else or a call is evaluated at iteration time
+<jusss> ChrisWarrick: and the lambda won't eval?
+<ChrisWarrick> jusss: the lambda does not save values at that time
+
+<ChrisWarrick> jusss: it just knows to use the `i` from somewhere, and the `i`
+	       ends up being 2 after the loop
+
+<jusss> ChrisWarrick: so all I do is just make lambda be evaluated, that will
+	make lambda save it values?
+<ChrisWarrick> 19:04:35 <jusss> but f=[(lambda y: lambda x: x+y)(i) for i in
+	       [0,1,2]] this will be 0,1,2  [01:15]
+<ChrisWarrick> this is evaluating
+
+<ChrisWarrick> 19:07:20 <nedbat> jusss: you can also get 0,1,2  with
+	       f=[(lambda x,y=i: x+y) for i in [0,1,2]]
+<ChrisWarrick> this is one possible solution
+
+<jusss> yeah, I did make it evaluted
+
+<jusss> lambda in python is like a girl, you can only kiss her but never make
+	out
+----------------------------------------------------------------
+closure in python ,如果不想使用nonlocal,就用字典来替代变量
+
+proper:
+def f(x):
+    def y():
+    	nonlocal x
+	x = x+1
+	return x
+    return y
+    
+
+proper:
+def f():
+    x=1
+    def y():
+       nonlocal x
+       x = x+1
+       return x
+    return y
+
+improper:   don't forget return n
+def f(n):
+    def b():
+        nonlocal n
+        n=n+1
+        
+    return b
+c=f(0)
+print(c())
+-----------------------------------------------------------------
 list comprehension
 generator and iterator的属性？generator可以用for x in gen或list(gen)来操作
 function object的属性？传递class? 把class做参数传递？
@@ -242,3 +333,4 @@ python3 map(func,list)返回的是个可迭代的对象, 但是python里面又�
 4
 6
 
+---------------------------------------------
