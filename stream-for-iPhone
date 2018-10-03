@@ -1,0 +1,25 @@
+debian jessie doesn't have ifuse package,
+so I have to use vlc to stream videos on 
+debian for my iPhone,
+
+https://www.arthurtoday.com/2012/09/vlc-player-streaming-video-server.html
+
+在PC上用vlc stream给iPhone,无线局域网太卡，
+在刷了石像鬼的路由器上插入u盘，然后用vsftpd
+提供ftp服务，发现总是提示no shares defined,
+但明明配置了anon_root和vsftpd_root在/etc/vsftpd.conf里
+这个配置文件还总被/etc/init.d/vsftpd start启动时所忽略
+最终还是选择了uhttpd, 
+假设路由器地址是192.168.2.1
+u盘挂载在路由器的路径是/tmp/usb_mount/F9F5-B7A3
+假设视频文件为108.mkv
+在root@Gargoyle:/tmp/usb_mount/F9F5-B7A3# cat /etc/config/uhttpd 
+最后追加这段
+config uhttpd 'mnt'
+        list 'listen_http' '81'
+        option 'home' '/tmp/usb_mount/F9F5-B7A3'
+
+然后/etc/init.d/uhttpd restart
+
+打开iPhone上的vlc,选择 Network Stream, input 'http://192.168.2.1:81/108.mkv'
+then Tap 'Open Network Stream' you will watch this video over local lan
