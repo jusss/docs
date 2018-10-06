@@ -1,0 +1,28 @@
+https://my.oschina.net/tjt/blog/906200
+
+并发，一个CPU依次在多个函数里穿插执行，
+并行，多个CPU执行多个函数
+
+co-routine, 单线程里依次执行多个函数里的片段，避免I/O阻塞
+最大的作用感觉就是避免阻塞当前线程，比如像bash里面的&符号,把将要执行的函数放到后台执行，不阻塞后面的函数
+
+在算法中如果一个线程的挂起没有导致其它的线程挂起，我们就说这个算法是非阻塞的。所以不能单纯的说线程是不是阻塞的概念
+一个coroutine如果处于block状态，可以交出执行权，让其他的coroutine继续执行(这个是由其实现调度的,对用户透明的)。
+
+非阻塞I/O模型协程(Coroutines)使得开发者可以采用阻塞式的开发风格,却能够实现非阻塞I/O的效果隐式事件调度
+操作系统中最核心的概念是进程，分布式系统中最重要的问题是进程间通信。
+
+线程是进程的一个执行流，独立执行它自己的程序代码。是操作系统能够进行运算调度的最小单位。
+协程是一种用户态的轻量级线程，协程的调度完全由用户控制。
+协程和线程的区别是：协程避免了无意义的调度，由此可以提高性能，但也因此，程序员必须自己承担调度的责任，同时，协程也失去了标准线程使用多CPU的能力
+
+说了这么多，无非是说明，coroutine 是从另一个方向演化而来，它是对 continuation 概念的简化。Lua 设计者反复提到，coroutine is one-shot semi-continuation。
+
+在python的asyncio里面用async def定义个函数，这个函数会返回一个coroutin,然后用asyncio.get_event_loop()获取事件循环控制，作用在这个coroutin上获得future对象
+再loop.run_until_complete(coroutine)执行这个future
+
+在js里，ES6,const promise = new Promise(function(resolve, reject) {...}用new创建一个Promise对象，然后这个对象里的函数的参数是两个callback函数
+这个Promise对象有then方法，返回的也是个Promise对象
+
+http://es6.ruanyifeng.com/#docs/promise
+
