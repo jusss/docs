@@ -1,3 +1,12 @@
+最近被co-routine, generator, promise/future这堆概念所困扰，
+据说还和 continuation, monad, lazy eval这堆概念有关
+call-by-name, call-by-value, 应用序求值，正则序求值，
+lambda expression, thunk function, callback, closure,
+lexical scope, dynamic scope, f-expression,
+delay-deferred-eval, asyncio, yield, decorator,
+Continuation-Passing-Style, Y-combinator,
+curring, 柯里化，
+-------------------------------------------
 python 3.6+ 有f-string 类似于ruby　bash的变量在字符串中展开
 python 2.7可以用''.format来玩
 
