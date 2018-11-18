@@ -1,3 +1,81 @@
+lf = (lambda x: lambda: [x.append(x[-1]+1),x][-1][-1])([0])
+纯函数式语言是没有赋值语句的，他们会用不停的返回一个新值来取代重新赋值
+用一个一直在增长的列表来替代闭包里的变量重赋值(返回最后一个列表的值)
+用generator可以写fibonacci sequence,但是可以用闭包来代替(返回个函数f)
+把这个f传到一个递归函数或while循环里，是不是有点意思
+如果传到递归函数里，递归函数还要返回一个thunk后的函数，再外加个while
+蹦床求值，还是放到迭代的while里省事
+-------------------------------------
+def mysum(n,m):
+    if n<0:
+        return m
+    else:
+        return lambda: mysum(n-1,m+n)
+def t(f):
+    while callable(f):
+        f=f()
+    return f
+
+t(mysum(1000,0))
+
+def count(x):
+    def f():
+        x.append(x[-1]+1)
+        return x[-1]
+    return f
+c=count([0])
+c()
+
+lc = lambda x: lambda: [x.append(x[-1]+1),x][-1][-1]
+ld = lc([0])
+ld()
+
+def fib():
+    m=0
+    n=1
+    def f():
+        nonlocal m
+        nonlocal n
+        m,n=n,m+n
+        return n
+    return f
+
+t=fib()
+
+while ld() < 100:
+    t()
+
+t()
+
+----------------------------------------
+python __future__ library,
+Django，Django REST framework的接口都是返回unicode类型的字符串。
+为了统一，我个人建议使用from __future__ import unicode_literals，
+将模块中显式出现的所有字符串转为unicode类型
+-------------------------------------------------
+展开let在js python
+f = (x => y => y+x)(1)
+f = (let ((x 1)) (lambda (y) (+ y x)))
+这样写能避免显式的赋值，而且还能限制变量x的作用域，可以在不支持let的语言里这样玩
+比如ES6之前的js没有let,只有var,或者默认global variable,就可以这样玩
+----------------------------------------------
+用yield和trampoline也可以避免递归时stack overflow
+<Yhg1s> jusss: not somethign worth using. The usual thing is to raise an
+	exception and catch it in the first call. It's more efficient in all
+	possible measurements to just not use deep recursion, and instead
+	write iteratively.
+<ikanobori> jusss: No.
+<ikanobori> Weird exception flow left out you can write most things it...
+-------------------------
+人为构造一个“蹦床”机制就可以对python的尾递归进行优化，这个写法是老黄历了。
+Guido 还写了一篇博客解释，大意就 TCO 破坏了 stack traces：  最后还说道 Python 的简单让他很自豪[笑cry]。
+
+尾递归的时候用异常跳出来执行，顺便通过异常把参数带出来。
+https://weibo.com/2009248211/GuKlxkcM3?type=comment
+
+--------------------------------------
+python gevent asyncio twisted tonator future 
+--------------------------------------------------------
 最近被co-routine, generator, promise/future这堆概念所困扰，
 据说还和 continuation, monad, lazy eval这堆概念有关
 call-by-name, call-by-value, 应用序求值，正则序求值，
@@ -5,7 +83,11 @@ lambda expression, thunk function, callback, closure,
 lexical scope, dynamic scope, f-expression,
 delay-deferred-eval, asyncio, yield, decorator,
 Continuation-Passing-Style, Y-combinator,
-curring, 柯里化，
+curring, 柯里化，trampoline,
+high-order function, list comprehension
+
+<jusss> onlylove: co-routine, promise/future, generator, yield之类的感觉都来自
+	于continuation, 而decorator什么的来自于macro?  [21:36]
 -------------------------------------------
 python 3.6+ 有f-string 类似于ruby　bash的变量在字符串中展开
 python 2.7可以用''.format来玩
