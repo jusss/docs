@@ -1,0 +1,136 @@
+it seems wireguard and openvpn they both need public ip v6 address for ip v6 vpn
+because there's no NAT on ip v6 yet
+so you need to require the ip v6 block from your ISP
+by the way, China Unicom LTE Network will give you ip v6 address now, and it's public, 
+and set that ipv6 phone as a host spot, those devices connected the host spot will get ipv6 too , and they're public too!
+
+------------------------
+root@rycbar:~# cat /etc/wireguard/wg0.conf 
+[Interface]
+Address = 10.0.0.2/24
+ListenPort = server-port
+PostUp = iptables -A FORWARD -i %i -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+PostDown = iptables -D FORWARD -i %i -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+PrivateKey = server-private-key
+
+[Peer]
+PublicKey = client-public-key
+AllowedIPs = 10.0.0.1/24
+
+[Peer]
+PublicKey = client2-public-key
+AllowedIPs = 10.0.0.3/24
+
+#wg-quick up wg0
+
+[john@moon ~]$ sudo cat /etc/wireguard/wg0.conf
+[Interface]
+Address = 10.0.0.1/24
+PrivateKey = client-private-key
+DNS = 114.114.114.114
+
+[Peer]
+PublicKey = server-public-key
+AllowedIPs = 0.0.0.0/0
+Endpoint = server-ip:server-port
+
+$sudo wg-quick up wg0
+--------------------------------------------
+Local:
+[john@moon ~]$ sudo ip link add wg0 type wireguard
+[john@moon ~]$ sudo ip addr add 10.0.0.1/24 dev wg0
+[john@moon ~]$ sudo wg set wg0 private-key wireguard/privatekey 
+[john@moon ~]$ sudo ip link set wg0 up
+[john@moon ~]$ sudo wg       #get the publickey
+[john@moon ~]$ sudo wg set wg0 peer server-publick-key allowed-ips 10.0.0.2/32 endpoint server-ip:port
+[john@moon ~]$ ping 10.0.0.2
+
+Server:
+root@rycbar:~# ip link add wg0 type wireguard
+root@rycbar:~# ip addr add 10.0.0.2/24 dev wg0
+root@rycbar:~# wg set wg0 private-key wireguard/privatekey 
+root@rycbar:~# ip link set wg0 up
+root@rycbar:~# sudo wg       #get the listen port and publickey
+root@rycbar:~# wg set wg0 peer client-public-key allowed-ips 10.0.0.1/32
+root@rycbar:~# ping 10.0.0.1
+
+reference: https://www.youtube.com/watch?v=eDpjBB6mr20
+https://blog.minirplus.com/12235/
+
+but this won't redirect all your client traffic to the server, change on client 
+[john@moon ~]$ sudo wg set wg0 peer server-public-key allowed-ips 0.0.0.0/0 endpoint server-ip:port
+
+and on Server
+root@rycbar:~# iptables -A FORWARD -i %i -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+
+if you have openvpn running on it, stop it and iptables -F && iptables -t nat -F to clear
+the openvpn iptables rules at first, then wireguard.
+
+https://www.stavros.io/posts/how-to-configure-wireguard/
+
+https://wiki.archlinux.org/index.php/WireGuard
+
+The configuration can be saved by utilizing showconf:
+# wg showconf wg0 > /etc/wireguard/wg0.conf
+# wg setconf wg0 /etc/wireguard/wg0.conf
+generate qr code for config 
+$ qrencode -t ansiutf8 < client1.conf
+----------------------------------------------------
+iOS, install Test Flight first, then Wire Guard and Tun Safe
+linux server, https://wiki.archlinux.org/index.php/WireGuard
+if you want install wireguard on linode, upgrade your linode kernel first,
+login you linode manager website, and change kernel to grub2 at boot settings
+note DO NOT REBOOT NOW, 
+
+ON UBUNTU:
+aptitude update && aptitude upgrade
+aptitude install linux-image-virtual grub2
+reboot at the manager website
+aptitude install linux-headers-$(uname -r)
+
+ON DEBIAN:
+vim /etc/apt/source.list
+deb http://ftp.debian.org/debian jessie-backports main
+apt-get install -t jessie-backports linux-image-amd64
+apt-get install -t jessie-backports linux-headers-amd64
+update-grub
+apt-get clean
+
+Change your boot settings to grub2 on manager.linode.com, then reboot
+
+then I found that it stucks on grub2... 
+https://www.linode.com/docs/platform/manager/how-to-change-your-linodes-kernel/
+you need a grub2 config to run non-official kernel
+
+vim /etc/default/grub
+GRUB_CMDLINE_LINUX="console=ttyS0,19200n8 net.ifnames=0"
+GRUBE_TERMINAL=serial
+GRUBE_DISABLE_OS_PROBER=true
+GRUEB_SERIAL_COMMAND="serial --speed=19200 --unit=0 --word=8 --parity=no --stop"
+GRUBE_DISABLE_LINUX_UUID=true
+GRUB_GFXPAYLOAD_LINUX=text
+
+grub-mkconfig -o /boot/grub/grub.cfg
+
+NOW, set your boot setting to grub2 and reboot, it will be ok
+
+if it's an old kernel, you need install a new one > 4.13
+
+apt-get update
+apt-get install linux-image-amd64
+grub-mkconfig -o /boot/grub/grub.cfg
+it should auto replace the old one in grub.conf and make the new one as default boot kernel
+
+https://wiki.archlinux.org/index.php/WireGuard
+wg genkey | tee privatekey | wg pubkey > publickey
+
+# ip link add dev wg0 type wireguard
+# ip addr add 10.0.0.1/24 dev wg0
+# wg set wg0 listen-port 48574 private-key ./privatekey
+# wg set wg0 peer [Peer B public key] persistent-keepalive 25 allowed-ips 10.0.0.2/32 endpoint 10.10.10.2:39814
+# ip link set wg0 up
+
+https://www.linode.com/docs/networking/vpn/set-up-wireguard-vpn-on-ubuntu/
+
+
+lsmod|grep wireguard     see if it's loaded 
