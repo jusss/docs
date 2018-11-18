@@ -1,0 +1,187 @@
+#counter
+counter = (lambda x: lambda: [x.append(x[-1]+1),x][-1][-1])([0])
+"""
+counter()
+counter()
+"""
+
+
+#ture-false outputer
+#consider to add timestamp for control the output times in one minute
+f = (lambda x: lambda: [x.append(False) if x[-1] else x.append(True), x[-1]][-1])([False])
+f2 = (lambda x: lambda: [x.append(False) if x[-1] else x.append(True), x][-1][-1])([False])
+f3 = (lambda x: lambda: [x[-1], x.append(False) if x[-1] else x.append(True)][0])([True])
+f4 = (lambda x: lambda y: (lambda z: lambda: [z[-1], z.append(False) if z[-1] else z.append(True)][0])([x<y]))(3)(4)
+"""
+f4()
+f4()
+"""
+
+
+#timer-for-while
+lf = (lambda x: lambda: [x.append(x[-1]+1),x][-1][-1])([0])
+lf1 = lambda x: (lambda y: lambda: [y.append(False) if y[-1]<0 else y.append(y[-1]-1), y][-1][-1])([x])
+lf2 = lambda x: (lambda y: lambda z=[True]: [z.append(False) if y[-1]<1 else y.append(y[-1]-1), z][-1][-1])([x])
+
+"""
+ three_times=lf2(3)
+  while three_times():
+     print(1)
+"""
+#False-1 will get -1 in python3, False<0 will get False
+
+#util-er
+
+#return-er like promise in js, list.append() will return a new list, class.method() will return new class
+
+
+------------------------------------------------
+f = (lambda x: lambda: [x.append(False) if x[-1] else x.append(True), x[-1]][-1])([False])
+f = (lambda x: lambda: [x.append(False) if x[-1] else x.append(True), x][-1][-1])([False])
+----------------------------------
+lf = (lambda x: lambda: [x.append(x[-1]+1),x][-1][-1])([0])
+纯函数式语言是没有赋值语句的，他们会用不停的返回一个新值来取代重新赋值
+用一个一直在增长的列表来替代闭包里的变量重赋值(返回最后一个列表的值)
+用generator可以写fibonacci sequence,但是可以用闭包来代替(返回个函数f)
+把这个f传到一个递归函数或while循环里，是不是有点意思
+如果传到递归函数里，递归函数还要返回一个thunk后的函数，再外加个while
+蹦床求值，还是放到迭代的while里省事
+计数器还可以用于while循环
+ while counter()<100:
+   do_whatever
+counter和timer的区别是?
+还可以写个timer  timer55=timer(55)    while timer55: do whatever
+-----------------------------
+def mysum(n,m):
+    if n<0:
+        return m
+    else:
+        return lambda: mysum(n-1,m+n)
+def t(f):
+    while callable(f):
+        f=f()
+    return f
+
+t(mysum(1000,0))
+
+def count(x):
+    def f():
+        x.append(x[-1]+1)
+        return x[-1]
+    return f
+c=count([0])
+c()
+
+lc = lambda x: lambda: [x.append(x[-1]+1),x][-1][-1]
+ld = lc([0])
+ld()
+
+def fib():
+    m=0
+    n=1
+    def f():
+        nonlocal m
+        nonlocal n
+        m,n=n,m+n
+        return n
+    return f
+
+t=fib()
+
+while ld() < 100:
+    t()
+
+t()
+
+-----------------------------
+def mysum(n,m):
+    if n<0:
+        return m
+    else:
+        return lambda: mysum(n-1,m+n)
+def t(f):
+    while callable(f):
+        f=f()
+    return f
+
+t(mysum(1000,0))
+---------------------------------
+def mysum(n):
+    if n < 0:
+        return 0
+    else:
+        return n + mysum(n-1)
+
+def mysum(n,m):
+    if n < 0:
+        return m
+    else:
+        return thunk(mysum,n-1,m+n)
+        #what if 
+        #return lambda: mysum(n-1,m+n)
+        #yeah, it works!
+
+thunk = lambda name, *args: lambda: name(*args)
+
+def trampoline(f):
+    while callable(f):
+        f=f()
+    return f
+
+trampoline(mysum(1000,0))
+
+-----------------------------------------
+
+trampoline = lambda f: trampoline(f()) if callable(f) else f
+------------------------------------------------------------------
+mysum = lambda x,y: (lambda name,*args: lambda: name(*args))(mysum,x-1,y+x) if x>0 else y
+
+-----------------------------------------------------------------
+<bjs> jusss: no, *args isn't an expression on its own.  If args is an iterable
+      you can do function(*args)  to call the functions, but instead of
+      passing just 1 argument it unpacks the iterable and passes each value as
+      a separate argument
+<KirkMcDonald> jusss: args, without the asterisk, is a tuple.            [15:53]
+<bjs> jusss: no, *args isn't an expression, *args doesn't have a "value", it's
+      just syntax
+<bjs> jusss: if args=(3,5)  then f(*args) means f(3, 5)
+<jusss> bjs: and what is f(args)?
+<bjs> jusss: f((3,5))                                [15:57]
+<bjs> jusss: f(*[1,2,3,4]) == f(1,2,3,4)
+<bjs> jusss: you can't think *args equals anything, it's not an expression
+<bjs> jusss: it's just how you tell python "please interpret the next argument
+      as a list/tuple/sequence of arguments rather than 1"
+<jusss> bjs: f(*[1,2,3,4]) == f(1,2,3,4) so f(*(1,2,3,4)) == f(1,2,3,4) ?
+<bjs> jusss: yes
+-----------------------------------------------------
+def mysum(n):
+    if n < 0:
+        return 0
+    else:
+        return n + mysum(n-1)
+
+
+def mysum(n,m):
+    if n < 0:
+        return m
+    else:
+        return thunk(mysum,n-1,m+n)
+
+thunk = lambda name, *args: lambda: name(*args)
+
+def trampoline(f):
+    while callable(f):
+        f=f()
+    return f
+
+trampoline(mysum(1000,0))
+
+http://jtauber.com/blog/2008/03/30/thunks,_trampolines_and_continuation_passing/
+
+----------------------------------------
+循环:
+python 直接用爆栈时异常捕捉参数来搞循环更有效率
+TCO 尾递归优化的
+迭代iteration
+trampoline function,
+-------------------------------------------------
