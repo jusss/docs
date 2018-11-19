@@ -1,7 +1,7 @@
-Android: brook, openvpn with stunnel, v2ray, wireguard
-iPhone: brook, outline, wireguard
-Windows: openvpn with stunnel
-Linux: ssh with stunnel, brook, openvpn with stunnel or with ssh  over stunnel, v2ray, wireguard
+Android: brook, openvpn with stunnel, v2ray(v2rayNG), wireguard(tunsafe)
+iPhone: brook, outline, wireguard(tunsafe)
+Windows: openvpn with stunnel, brook
+Linux: ssh with stunnel, brook, openvpn with stunnel or with ssh  over stunnel, v2ray, wireguard, outline
 -------------------------------------------------------------------
 ssh, ok with stunnel, not ok with obfsproxy
 openvpn, no, tls handshake plain is detected, ok with stunnel
