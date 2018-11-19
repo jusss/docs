@@ -1,3 +1,10 @@
+wireguard创建的网段不能和现有的私有网段冲突，比如在192.168.3.1上创建wg0 10.0.0.1 然后在192.168.3.2上创建wg0 10.0.0.2 endpoint连到192.168.3.1 而192.168.3.1有公网ip
+然后在外网上创建wg0 10.0.0.3 endpoint 192.168.3.1的公网ip 
+这样就能在外网访问内网的192.168.3.2用10.0.0.2访问
+
+假如一个内网服务器A有公网ip，然后内网服务器B用wireguard连接A，这样就可以在外网用wireguard连A再连B
+
+--------------------------------------------
 it seems wireguard and openvpn they both need public ip v6 address for ip v6 vpn
 because there's no NAT on ip v6 yet
 so you need to require the ip v6 block from your ISP
