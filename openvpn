@@ -1,3 +1,42 @@
+openvpn with ipv6
+root@li1893-232:~# cat openvpn.iptables.sh 
+ip6tables -A INPUT -p udp --dport 20182 -j ACCEPT
+ip6tables -A FORWARD -m state --state NEW -i tun0 -o eth0 -s ipv6-public-block -j ACCEPT
+ip6tables -A FORWARD -m state --state NEW -i eth0 -o tun0 -d ipv6-public-block -j ACCEPT
+ip6tables -A FORWARD -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+
+root@li1893-232:~# cat /etc/openvpn/ipv6.conf 
+port 20182
+proto tcp6
+tun-ipv6
+dev tun
+ca /etc/openvpn/ca.crt
+cert /etc/openvpn/server.crt
+key /etc/openvpn/server.key
+dh /etc/openvpn/dh4096.pem
+server-ipv6 ipv6-block
+server 10.8.0.0 255.255.255.0
+push tun-ipv6
+ifconfig-ipv6 2400:8902:e001:b2::1 2400:8902:e001:b2::2
+push "route-ipv6 2000::/3"
+push "dhcp-option DNS 2400:8902::5"
+keepalive 10 120
+cipher AES-256-CBC
+comp-lzo
+max-clients 100
+user nobody
+group nogroup
+persist-key
+persist-tun
+status openvpn-status.log
+verb 3
+
+root@li1893-232:~# cat /etc/sysctl.conf |grep -v '#'
+net.ipv4.ip_forward=1
+net.ipv6.conf.all.forwarding=1
+
+--------------------------------------------
 cd /etc/openvpn/easy-rsa/
 source ./vars
 ./build-key client2   ;;;generate client2.crt and client2.key
