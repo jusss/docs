@@ -1,3 +1,116 @@
+
+fold from https://repl.it/repls/LowPracticalAbstractions
+<jusss> eiGHttt: 你的fold里的f从来没变过。。。
+const foldl = (f, acc, xs) => {
+  if (!xs.length) {
+    return acc;
+  }
+
+  const [y, ...ys] = xs;
+
+  return foldl(f, f(acc, y), ys);
+};
+
+const add = (x, y) => x + y;
+console.log(foldl(add, 0, [1, 2, 3]));
+
+fold from https://paste.ubuntu.com/p/XTzzDZ95N3/
+<jusss> LdBeth: 你的fold不是尾递归。。。
+function foldr (f,z,l) {
+    if (l.length == 0) {
+        return z;
+    }
+    else {
+        var a,b;
+        [a,...b] = l;
+        return f(a,foldr(f,z,b));
+    }
+}
+
+<eiGHttt> jusss: https://repl.it/repls/LowPracticalAbstractions	        [15:58]
+<LdBeth> jusss: https://paste.ubuntu.com/p/XTzzDZ95N3/
+<jusss> eiGHttt: LdBeth 你们竟然同时写出，好默契		        [16:29]
+<jusss> 还都是js
+
+<jusss> LdBeth: eiGHttt 我的f(g,alist)里g一直在变，g=g(i)每次执行一次,就把g(i)
+	的值重赋值给了g
+
+<jusss> eiGHttt: 无所谓，就是你们这个fold并没有改变函数，我的那个f却是一直在改
+	变函数							        [17:00]
+
+<jusss> LdBeth: 你上午推荐的是 haskell programming from first principles?
+###########################################################
+
+def z(x):
+    def t(y):
+        if y=="end":
+            return x[-1]
+        else:
+            x.append(x[-1]+y)
+            return t
+
+    return t
+
+ee=z([0])
+
+
+def f(g,alist):
+    if not alist:
+        return ee("end")
+    else:
+        return f(g(alist[0]), alist[1:])
+        
+    
+f(ee,[1,2,3])
+
+#############################################
+def f(g,alst):
+    for i in alst:
+        g=g(i)
+
+    return g
+
+def f(g,alst):
+    if not alst:
+        return sum
+    else:
+        return f(g(alst[0]), alst[1:])
+
+sum=0
+    
+def add(y):
+    def add1(x):
+        global sum
+        if x=="end":
+            return sum
+        else:
+            sum=sum+x
+            return add1
+    return add1(y)
+
+f(add,[1,2,3,5,6,7,"end"])
+### <jusss> LdBeth: 简单点就是 for i in alst: g=g(i)		        [10:48]        
+
+##########################################################################
+if you don't want use *args in python, or ... in javascript, &rest in lisp
+then just pass a list to do that, that would be great!
+
+f = lambda x: lambda y: x(y)      x is a function, y is a list
+add1 = lambda x: x[0] + 1
+add = lambda x: x[0] + x[1]
+addn = lambda x: reduce(lambda x,y: x+y, x)
+reduce? not map, a common function get all the elements out of the list
+
+X = f(add1)    X([3])
+Y = f(add)     Y([3,4])
+Z = f(addn)    Z([3,4,5,6])
+
+Don't use a variable as parameter, always use a list as parameter!
+And always use a curry function
+
+
+###############################################################
+
 #counter
 counter = (lambda x: lambda: [x.append(x[-1]+1),x][-1][-1])([0])
 """
