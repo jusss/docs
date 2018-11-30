@@ -1,0 +1,20 @@
+use xrandr modify brightness
+xrandr --output eDP-1 --brightness 0.8 --rotate right
+
+##############################################
+
+use `xrandr` to get all the messages about available screens
+but I found that HDMI2 screen perfer 1920x1080 and it shows no signal,
+then I set the second optional 1920x1080i as the mode, and it works
+
+xrandr --output HDMI2 --mode 1920x1080i
+
+xrandr --output HDMI2 --same-as eDP1
+
+xrandr --output HDMI2 --mode 1920x1080i --right-of eDP1
+
+xrandr --output eDP1 --off --output HDMI2 --mode 1920x1080i
+
+you have to try --mode for low dpi screen, don't use --auto
+
+audio setup, use pavucontrol choose Configuration, then choose HDMI/DisplayPort 2
