@@ -1,0 +1,2984 @@
+
+python's function object and javascript's dict object can do something wonderful!
+
+f.on=3
+dict.on=3
+
+#########################################################
+
+#confuse #question #closure
+
+js primitive data type is immutable, https://developer.mozilla.org/en-US/docs/Glossary/Primitive
+
+let foo=5
+at = (num) => {num+=2}
+at(foo)
+
+foo is 5
+
+---------------------------------------------------------------
+
+var liList = ul.getElementsByTagName('li')
+for(var i=0; i<6; i++){
+  liList[i].onclick = function(){
+    alert(i) // 为什么 alert 出来的总是 6，而不是 0、1、2、3、4、5
+  }
+}
+
+https://zhuanlan.zhihu.com/p/22465092
+
+#########################################################
+
+<jusss> bokuno: LdBeth Sasasu ""在js里不是对象, 		        [11:23]
+<jusss> 而[]和{}是object					        [11:24]
+<jusss> 而在python里""是str对象
+<jusss> 在js里""和String("")返回的都不是object,而new String("")返回的是object
+<jusss> 而python的built-in的class是不允许修改的，比如c=[]  c.on=3是不可以的，
+	但是在js里可以						        [11:28]
+<jusss> 但是python的function object却能f.on=3,感觉很神奇
+
+<evulish> https://developer.mozilla.org/en-US/docs/Glossary/Primitive   [10:58]
+<altendky> jusss: https://docs.python.org/3/reference/datamodel.html
+
+A primitive (primitive value, primitive data type) is data that is not an object and has no methods. In JavaScript, there are 6 primitive data types: string, number, boolean, null, undefined, symbol (new in ECMAScript 2015).
+
+<jusss> jwhisnant: deniska function and list are both built-in object, I can
+	do function_a.on=3 but I can't do list_a.on=3, why?
+<altendky> jusss: because of how they are implemented.
+<altendky> jusss: luckily, you shouldn't be assigning to random attributes in
+	   python anyways so we don't really care
+<energizer> jusss: i dont think this is a 'deep truth' about python, no
+	    particular reason you can't add attributes to lists
+<deniska> jusss: if you put __slots__ on a python class, you won't be able to
+	  dynamically assign new attributes to it
+<deniska> jusss: something similar, but not exactly that, is happening with
+	  lists
+<deniska> and yes, typically you shouldn't assign new attributes to objects
+	  anyway :)
+<SnoopJeDi> Although you can do quite a lot of cool stuff by doing exactly
+	    that, like @functools.lru_cache			        [11:46]
+<jusss> deniska: that's a more OOP way I think					  
+
+####################################################################
+c={}; c.on=3; it works
+ but c=""; c.on=3; it doesn't
+ why?
+
+<evulish> jusss: because "" is a string not an object
+<evulish> n> const n = new String(""); n.on = "hi"; n.on	        [10:36]
+
+s=new String("")
+String { "" }
+s.on=3
+3
+s
+String { "" }
+s.on
+3
+
+<jusss> evulish: you're right, but in python "" is a string object, why it's
+	not in js?
+<jusss> evulish: 3 is an object?
+<evulish> jusss: 3 is a number
+<evulish> {} is an object
+<jusss> evulish: 3 should be a int object?			        [10:56]
+<jusss> or is there int object?
+<evulish> not everything in js is an object, it is a primitive
+<evulish> n> typeof 3
+<jellobot> (okay) 'number'
+<evulish> n> typeof ""
+<jellobot> (okay) 'string'
+<evulish> n> typeof Number(3)
+<jellobot> (okay) 'number'
+<evulish> n> typeof String("")					        [10:57]
+<jellobot> (okay) 'string'
+<evulish> n> typeof new String("")
+<jellobot> (okay) 'object'
+<evulish> n> typeof new Number(3)
+<jellobot> (okay) 'object'
+<jusss> n> typeof '{}'
+<jellobot> (okay) 'string'
+<evulish> well yes that's a string
+<evulish> n> typeof {}
+<jellobot> (okay) 'object'
+<jusss> n> typeof []
+<jellobot> (okay) 'object'
+<evulish> https://developer.mozilla.org/en-US/docs/Glossary/Primitive   [10:58]
+
+
+<jusss> altendky: nedbat hey, I found that def f(): pass, f.n=3 works   [09:54]
+<altendky> jusss: yup, mostly not a good thing to do though
+<jusss> altendky: function object is not built-in?
+<altendky> jusss: it's hard to work with attributes that may or may not exist.
+	   I can make a class that you can't add attributes to either.  It
+	   depends
+<jusss> altendky: how ?
+class C:
+    __slots__ = ['a']
+    
+c = C()
+c.b = 37
+<altendky> jusss: or you can have attrs do it for you with @attr.s(slots=True)
+<altendky> There's also @attr.s(frozen=True) for immutability
+<jusss> altendky: where I can find all the __method__ options?	        [10:01]
+<altendky> jusss: https://docs.python.org/3/reference/datamodel.html
+
+###################################################
+<jusss> the class I defined can use class.var=3 to add attribute, but I can't
+	do [].var=3 , why?
+<jusss> or {}.var=3
+<nedbat> jusss: built-in types don't allow arbitrary attribute creation
+<jusss> nedbat: this is only in python? or other OOP do this too?
+<nedbat> jusss: nothing is true of all OOP systems :)
+<jusss> nedbat: how to define a shortest class?			        [09:28]
+<nedbat> jusss: lots of OOP don't allow anything to make arbitrary attributes
+<nedbat> jusss: class Foo: pass
+<jusss> nedbat: but it seems javascript allow that, and I don't ruby allowed
+	or not							        [09:30]
+
+<jusss> nedbat: def f(self): self.n=1   return self;    f = f({}) 
+<nedbat> jusss: does that work?
+<jusss> nedbat: of course not work in python, but it works on j
+<jusss> if I directly do {}.on=3 it will fail, but c={}; c.n=3 it will work,
+	but those not work in python...
+
+f=(function(self){self.on=function(){console.log(3)};return self})({})
+
+f()
+TypeError: f is not a function
+f.on()
+3 
+undefined
+
+
+f=(function(self){self.on=3;return self})({})
+
+f.on
+3
+
+f["on"]
+3
+
+{}.on=3
+SyntaxError: expected expression, got '.'[Learn More] debugger eval code:1:2
+c={}
+Object {  }
+c.n=3
+3
+
+c=[]
+Array []
+c.on=3
+3
+c["on"]
+3
+
+za=9
+9
+za.on=2
+2
+za.on
+undefined
+za
+9
+
+
+zzz=""
+""
+zzz.sw=2
+2
+zzz
+""
+zzz.sw
+undefined
+字符串对象不能这么玩, 列表和字典对象都可以这么玩
+
+
+#############################################################
+
+HTML+ mode defined in ‘mhtml-mode.el’:
+Major mode based on ‘html-mode’, but works with embedded JS and CSS.
+C-h m you can check the all modes in current buffer
+###################################################
+
+<jusss> how to know a major mode's all key bindings?
+<jusss> like python-mode
+<twb> jusss: C-h m gives an overview including most (all?) bindings
+######################################
+putty need puttygen to convert ssh-private-key to ssh-rsa type
+run puttygen then load the ssh-private-key and save private key by RSA type
+then you can use it on putty
+https://askubuntu.com/questions/204400/ssh-public-key-no-supported-authentication-methods-available-server-sent-publ
+
+###############################################
+
+>>> class A():
+	def say(self):
+		print('hi')
+		return A()
+
+	
+>>> b=A()
+>>> e=b.say()
+hi
+>>> e
+<__main__.A instance at 0x0303BD50>
+>>> e.say()
+hi
+<__main__.A instance at 0x0303BB48>
+
+__name__ : Every module in Python has a special attribute called __name__ .
+It is a built-in variable that returns the name of the module.
+__main__ : Like other programming languages,
+Python too has an execution entry point, i.e., main. '__main__' is the
+name of the scope in which top-level code executes.
+#############################################
+
+fetch api  取代 ajax (xmlhttprequest)
+websocket 取代 socket.io
+ramda 取代 underscore lodash
+shadow dom 取代 iframe
+
+<nyfair> 用rust写，然后webassembly
+<eiGHttt> 地道。
+
+
+
+#######################################
+#website for algorithm
+http://acm.timus.ru/
+
+-------------------------------------------------------------------
+<jusss> nyfair: 我感觉前端太多要学了 html DOM js css jquery bootstrap ajax 这
+	些都是基础的，再往上还有什么 node vue angular react 还有什么socket.io
+	blablablah
+<jusss> 还有什么 underscore ramda immutable			        [14:46]
+<jusss> lodash	
+########################################
+def lf(f,p):
+    f(p)
+    return f
+
+def p(x):
+    print(x)
+
+def get_names(f):
+    def s(*l):
+        print("function name: " + f.__name__)
+        print("parameters: ")
+        print(l)
+        f(*l)
+    return s
+def p2(x,y):
+    print(x + y)
+
+p=get_names(p)
+p("h")
+p2=get_names(p2)
+p2("h","w")
+
+#########################################
+fold from https://repl.it/repls/LowPracticalAbstractions
+<jusss> eiGHttt: 你的fold里的f从来没变过。。。
+const foldl = (f, acc, xs) => {
+  if (!xs.length) {
+    return acc;
+  }
+
+  const [y, ...ys] = xs;
+
+  return foldl(f, f(acc, y), ys);
+};
+
+const add = (x, y) => x + y;
+console.log(foldl(add, 0, [1, 2, 3]));
+
+fold from https://paste.ubuntu.com/p/XTzzDZ95N3/
+<jusss> LdBeth: 你的fold不是尾递归。。。
+function foldr (f,z,l) {
+    if (l.length == 0) {
+        return z;
+    }
+    else {
+        var a,b;
+        [a,...b] = l;
+        return f(a,foldr(f,z,b));
+    }
+}
+
+<eiGHttt> jusss: https://repl.it/repls/LowPracticalAbstractions	        [15:58]
+<LdBeth> jusss: https://paste.ubuntu.com/p/XTzzDZ95N3/
+<jusss> eiGHttt: LdBeth 你们竟然同时写出，好默契		        [16:29]
+<jusss> 还都是js
+
+<jusss> LdBeth: eiGHttt 我的f(g,alist)里g一直在变，g=g(i)每次执行一次,就把g(i)
+	的值重赋值给了g
+
+<jusss> eiGHttt: 无所谓，就是你们这个fold并没有改变函数，我的那个f却是一直在改
+	变函数							        [17:00]
+
+<jusss> LdBeth: 你上午推荐的是 haskell programming from first principles?
+###########################################################
+
+def z(x):
+    def t(y):
+        if y=="end":
+            return x[-1]
+        else:
+            x.append(x[-1]+y)
+            return t
+
+    return t
+
+ee=z([0])
+
+
+def f(g,alist):
+    if not alist:
+        return ee("end")
+    else:
+        return f(g(alist[0]), alist[1:])
+        
+    
+f(ee,[1,2,3])
+
+#############################################
+def f(g,alst):
+    for i in alst:
+        g=g(i)
+
+    return g
+
+def f(g,alst):
+    if not alst:
+        return sum
+    else:
+        return f(g(alst[0]), alst[1:])
+
+sum=0
+    
+def add(y):
+    def add1(x):
+        global sum
+        if x=="end":
+            return sum
+        else:
+            sum=sum+x
+            return add1
+    return add1(y)
+
+f(add,[1,2,3,5,6,7,"end"])
+### <jusss> LdBeth: 简单点就是 for i in alst: g=g(i)		        [10:48]        
+
+##########################################################################
+if you don't want use *args in python, or ... in javascript, &rest in lisp
+then just pass a list to do that, that would be great!
+
+f = lambda x: lambda y: x(y)      x is a function, y is a list
+add1 = lambda x: x[0] + 1
+add = lambda x: x[0] + x[1]
+addn = lambda x: reduce(lambda x,y: x+y, x)
+reduce? not map, a common function get all the elements out of the list
+
+X = f(add1)    X([3])
+Y = f(add)     Y([3,4])
+Z = f(addn)    Z([3,4,5,6])
+
+Don't use a variable as parameter, always use a list as parameter!
+And always use a curry function
+
+
+###############################################################
+;;; goto-line M-g g 35 jump to line 35
+;;;<bpalmer> or C-x r SPC a  and C-x r j a to jump to it
+;;;<bpalmer> or bookmarks. or ace-jump. or
+;;; randomly-shift-points-until-somebody-presses-space-bar-so-make-sure-you're-watching-the-screen-and-have-good-reflexes
+
+;;;M-x package-install tabbar
+
+;; https://www.emacswiki.org/emacs/TabBarMode
+;;; set all files show on tabbar
+;;;(setq tabbar-buffer-groups-function
+;;;      (lambda ()
+;;;	(list "ALL")))
+;;;(lambda nil (list "ALL"))
+
+(require 'tabbar)
+(tabbar-mode 1)
+
+;;; use M-p and M-n to switch the buffers, but when it's in auto-complete mode
+;;; M-p and M-n can choose the word you want to instead of left or right arrow
+
+(global-set-key [(meta p)] 'tabbar-backward)
+(global-set-key [(meta n)] 'tabbar-forward)
+(setq tabbar-use-images nil)
+
+;;; group all buffers into 3 groups, ERC, * and use buffer
+(defun tabbar-buffer-groups ()
+  (list
+   (cond
+    ((string-equal "*" (substring (buffer-name) 0 1))
+     "Emacs Buffer"
+     )
+    ((eq major-mode 'erc-mode)
+     "ERC"
+     )
+    (t
+     "User Buffer"
+     )
+    ))) 
+
+(setq tabbar-buffer-groups-function 'tabbar-buffer-groups)
+
+;;;<b> erc-mode . You can tell for yourself if you're using erc: go into an
+;;; erc buffer and C-h v major-mode RET
+
+(set-face-attribute 'tabbar-default nil
+		    :family "SimSun"
+		    :height 106
+		    :background "grey80"
+		    :foreground "purple")
+
+(set-face-attribute 'tabbar-selected nil
+		    :inherit 'tabbar-default
+		    :foreground "blue"
+		    :background "grey80")
+
+(setq erc-header-line-format nil)
+(global-set-key (kbd "C-c C-r") 'replace-regexp)
+(global-set-key (kbd "C-;") 'set-mark-command)
+;;;(global-set-key (kbd "C-x C-;") 'pop-global-mark)
+;;;(global-set-key (kbd "C-u C-;") ...)
+;;; C-u C-; do the same as C-x C-x return to last marked position in local buffer
+;;; C-; C-g can mark without select a block or C-; C-;
+;;; C-x C-; can return to last marked position in all buffers
+;;;https://www.emacswiki.org/emacs/MarkCommands
+(global-set-key (kbd "C-x p") 'point-to-register)
+(global-set-key (kbd "C-x j") 'jump-to-register)
+(global-set-eky (kbd "M-g") 'goto-line)
+-----------------------------------------------------------------------
+a_list.append('whatever') will return None, not a list
+but a_list + ['whatever'] will return a new list
+<energizer> jusss: https://github.com/tobgu/pyrsistent
+functional programming,  don't re-assign variables, always return new one
+
+counter = (lambda x: lambda: [x.append(x[-1]+1),x][-1][-1])([0])
+
+
+------------------------------------------------------------------
+f = x => y => y(x);
+add5 = x => y => y(x+5);
+double = x => y => y(x*2);
+fe = x => x;
+f(1)(add5)(double)(fe) will be 12
+--------------------------------------------------------------------------------
+我们发现这个时候有一个问题，就是我们经过调用后，返回的就是一个值了，我们没有办法进行下一步处理。所以我们需要返回一个对象。
+
+class Num{
+       constructor (value) {
+          this.value = value ;
+       }      
+       add5 () {
+           return  new Num( this.value + 5)   ###把类当函数一样返回，awesome!
+       }
+       double () {
+           return  new Num( this.value * 2)
+       }
+    }
+var num = new Num(2);
+num.add5 ().double ()
+
+### what about 5(add)(double) ???
+
+
+
+function double(x) {
+  return x * 2
+}
+function add5(x) {
+  return x + 5
+}
+double(add5(1))
+
+### add5 = function(x) {return function (y) {return y(x+5)}}
+### double = function(x) {return x*2}
+### add5(1)(double)
+## f = function(x) { return function(y) {return y(x)}}
+## add5 = function (x) { return function(y){ return y(x+5)}}
+## double = function(x){ return function(y) { return y(x*2)}}
+## fe = function(x){return x}
+## f(1)(add5)(double)(fe)
+
+上面的代码我们实现的是完成了两个动作，不过我们觉得这样写double(add5(x))，不是很舒服。 换一个角度思考，我们是不是可以把函数合并在一起。 我们定义了一个compose函数
+
+var compose = function(f, g) {
+    return function(x) {
+        return f(g(x));
+    };
+};
+
+链接：https://www.zhihu.com/question/19635359/answer/420267395
+---------------------------------------------------------------
+DOM 常用属性 https://developer.mozilla.org/zh-CN/docs/Web/API/Document_Object_Model/Introduction
+
+在文档中添加点击事件。当用户在文档任何地方点击时，在 id="demo" 的 <p> 元素上输出 "Hello World"：
+document.addEventListener("click", function(){
+    document.getElementById("demo").innerHTML = "Hello World";
+页面加载完再执行函数
+document.addEventListener("DOMContentLoaded", function);
+
+    document.getElementById(id)
+    document.getElementsByTagName(name)
+    document.createElement(name)
+    parentNode.appendChild(node)
+    element.innerHTML
+    element.style.left
+    element.setAttribute()
+    element.getAttribute()
+    element.addEventListener()
+    window.content
+    window.onload
+    window.dump()
+    window.scrollTo()
+
+DOM elements.innerHTML可以改div盒子里的文字
+
+ <div id="fromPepper" class="font1">
+	<p> 开始！</p>
+	</div>
+
+//a=document.getElementById('fromPepper');
+		//a.innerHTML="bla";
+		//a.style.fontSize="100px";
+--------------------------------------------------------
+blog:
+http://icodeit.org/2015/05/functional-programming-again/
+---------------------------------------------------------
+js的函数库有lodash, ramda, underscore,
+关于DOM document.xxx那套，jquery取代了prototype
+Document Object Model,
+
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+规定文档的字符编码
+-----------------------------------------------
+predicate function, 谓词函数，返回值是个bool值
+eg. is_even = function (n) { return n%2 ==== 0 }
+
+gt = function (x) { return function (y) { return y>x }}
+gt3 = gt(3)
+gt3(9)
+
+-------------------------------------------------------
+react.js
+lodash, underscore, ramda, prototype, jquery, 
+
+framework and library 
+在实际中，像angular、backbone、vue就属于框架，而jQuery、React、underscore就是库，在前者中我们完全可以自由的使用后者，同时也可以没有前者的基础之上使用后者，都是很自由，控制权始终在我们的手中，但是使用框架时候就必须按照它的规范来进行模块化的开发；
+
+可能有人会问react也是库么？的确它就是一个库，为什么呢？
+
+评论区：React和react-router, react-redux结合起来才叫框架，本身只是充当一个前端渲染的库而已
+----------------------------------------------------
+函数加括号就是求值
+函数名后面加个括号就是求值一次
+f = function(x) {...}
+f(1) 求值一次
+f(1)(2)求值两次
+f(1)(2)(3)求值三次
+
+return f 和 return f(1) 是不一样的， return f 会返回未求值的f
+而 return f(1) 会返回求值一次之后的结果
+
+把外部的参数传往内部
+
+f = function(x) { return function(y) { return x+y }}
+
+f = function(x) { return function(y) { return function(z) { return y+z}}(x)}
+
+f = function(x) { return function(y) { return y+z}(x)}
+
+----------------------------------------------------------
+用函数来保存变量或函数，相当于用函数创建了个词法环境，
+>>> a=3
+>>> def f(n):
+	def g():
+		return n
+	return g
+
+>>> y=f(a)
+>>> y()
+3
+>>> a=4
+>>> y()
+3
+>>>
+
+
+--------------------------------------
+closure好处就是封装，变量封装，函数封装
+currying好处就是复用，延迟求值
+<jusss`> eiGHttt: 现在感觉currying化就减少了函数复用。。。还有就是多个延迟求值
+<jusss`> eiGHttt: 函数就是用来创建词法环境用来封装(保存)变量和函数
+<jusss`> eiGHttt: 在scheme里创建一个词法环境绑定一个变量就是创建一个lambda壳呀
+--------------------------------------------------------------
+https://developer.mozilla.org/zh-CN/docs/Mobile/Viewport_meta_tag
+即将发布的Mobile Firefox (Fennec) 1.1 增强了对<meta name="viewport"> 标签的支持。 之前的Fennec版本支持width、height及initial-scale 视口属性，然而对于针对一些专为iPhone和Android浏览器设计的网站的支持存在问题。现在我们与移动版Safari支持相同的属性，而且我们也改变了Fennec，为了能在不同大小和分辨率的屏幕更一致渲染移动网站。
+--------------------------------------------------------------
+https://zhuanlan.zhihu.com/p/27494506
+http://jtauber.com/blog/2008/03/30/thunks,_trampolines_and_continuation_passing/
+def mysum(n):
+    if n < 0:
+        return 0
+    else:
+        return n + mysum(n-1)
+
+
+def mysum(n,m):
+    if n < 0:
+        return m
+    else:
+        return thunk(mysum,n-1,m+n)
+
+thunk = lambda name, *args: lambda: name(*args)
+
+def trampoline(f):
+    while callable(f):
+        f=f()
+    return f
+
+trampoline(mysum(1000,0))
+
+-----------------------------------------
+
+trampoline = lambda f: trampoline(f()) if callable(f) else f
+------------------------------------------------------------------
+mysum = lambda x,y: (lambda name,*args: lambda: name(*args))(mysum,x-1,y+x) if x>0 else y
+
+-----------------------------------------------------------------
+<bjs> jusss: no, *args isn't an expression on its own.  If args is an iterable
+      you can do function(*args)  to call the functions, but instead of
+      passing just 1 argument it unpacks the iterable and passes each value as
+      a separate argument
+<KirkMcDonald> jusss: args, without the asterisk, is a tuple.	        [15:53]
+<bjs> jusss: no, *args isn't an expression, *args doesn't have a "value", it's
+      just syntax
+<bjs> jusss: if args=(3,5)  then f(*args) means f(3, 5)
+<jusss> bjs: and what is f(args)?
+<bjs> jusss: f((3,5))						        [15:57]
+<bjs> jusss: f(*[1,2,3,4]) == f(1,2,3,4)
+<bjs> jusss: you can't think *args equals anything, it's not an expression
+<bjs> jusss: it's just how you tell python "please interpret the next argument
+      as a list/tuple/sequence of arguments rather than 1"
+<jusss> bjs: f(*[1,2,3,4]) == f(1,2,3,4) so f(*(1,2,3,4)) == f(1,2,3,4) ?
+<bjs> jusss: yes
+-----------------------------------------------------
+def mysum(n):
+    if n < 0:
+        return 0
+    else:
+        return n + mysum(n-1)
+
+
+def mysum(n,m):
+    if n < 0:
+        return m
+    else:
+        return thunk(mysum,n-1,m+n)
+
+thunk = lambda name, *args: lambda: name(*args)
+
+def trampoline(f):
+    while callable(f):
+        f=f()
+    return f
+
+trampoline(mysum(1000,0))
+
+http://jtauber.com/blog/2008/03/30/thunks,_trampolines_and_continuation_passing/
+
+----------------------------------------
+循环:
+python 直接用爆栈时异常捕捉参数来搞循环更有效率
+TCO 尾递归优化的
+迭代iteration
+trampoline function,
+-------------------------------------------------
+Javascript中的Promise
+
+new Promise(function() {...}
+三种状态 Fulfilled 成功, Rejected 拒绝, Pending 等待
+最主要的是Promise里的这个function有两个参数，这两个参数是两个callback函数，
+当第一个函数执行，会从Pending变成Fulfilled,执行第二个会从Pending变成Rejected
+都没有调用会是Pending
+
+var promise = new Promise(function(resolve, reject) {
+    // async code
+    if (/* async sucess */){
+       resolve(value);
+       }
+     else {
+       reject(error);}});
+
+
+而Promise对象有一个方法then(function(value) {//success}, function(error) {//fail});
+
+promise的then的函数有两个参数，第一个参数对应的是resolved,第二个参数对应的是rejected
+同样这两个参数也是函数
+http://www.cnblogs.com/penghuwan/p/7451409.html
+
+promise.then()返回的依然是一个promise对象，依然可以后续继续then操作,前一个then里面
+return的值，会被下一个then的function里的参数捕捉到
+
+promise.then((msg) => {console.log(msg); return msg}).then((msg) => {console.log(msg)})
+Promise { <state>: "pending" }
+ok 
+ok
+
+Promise的参数是一个函数，这个函数有两个回调函数做参数
+then有两个参数，对应Promise的状态
+
+Promise在创建时就被执行了，用参数把里面的值传出以函数执行的方式
+而在then里面函数的参数就能获得前面的值
+
+var promise=new Promise((resolve,reject) => {setTimeout(function() {resolve('ok');},3000);});
+undefined
+promise
+Promise { <state>: "fulfilled", <value>: "ok" }
+promise.then((msg) => {console.log('first message: '+ msg);})
+Promise { <state>: "pending" }
+first message: ok
+
+<jusss> eiGHttt: "Promise 新建后就会立即执行。"处，打印Promise Hi resolved的三
+	个顺序不懂						        [13:56]
+
+<jusss> eiGHttt: "上面代码中，Promise 新建后立即执行，所以首先输出的是Promise。
+	然后，then方法指定的回调函数，将在当前脚本所有同步任务执行完才会执行，
+	所以resolved最后输出。"
+<jusss> eiGHttt: promise创建后会立即执行，但是then里的调用却会等待外部其它同步
+	执行完毕再执行？					        [13:57]
+
+<eiGHttt> https://zhuanlan.zhihu.com/p/27494506			        [13:58]
+<anotitlebot> Promise是Monad吗? - 知乎
+<eiGHttt> 从普通的回调到简易Promise的实现。			        [14:00]
+<jusss> eiGHttt: 的确，promise.then()会等待后面的console.log('hi')执行完才执行
+								        [14:01]
+<jusss> eiGHttt: 有点感觉continuation了
+
+<jusss> eiGHttt: 连monad都出来啦。。。				        [14:04]
+<eiGHttt> 我把Promise当成Either Monad用。			        [14:05]
+
+<jusss> eiGHttt: 我是不是需要先把monad过一遍			        [14:06]
+<eiGHttt> 不用，你只要知道它是用来解决回调问题就行了。
+<bokuno> 为何不从基本开始写代码 非要玩这些花样			        [14:07]
+<jusss> 这些都是基本的概念呀					        [14:08]
+<bokuno> 那JS可真是太难了
+<jusss> 学习基本的概念，然后知道为什么这么写，这不是一个很正确的学习方法吗
+<jusss> eiGHttt: 为什么在其它文章介绍了，几乎没人提到说promise.then()会在最后
+	同步代码执行完了才执行？				        [14:09]
+<eiGHttt> 不同人对同件事物不同理解罢了。
+<eiGHttt> 同步代码？						        [14:10]
+<jusss> eiGHttt: 我也不知道这么表达是否合适
+<jusss> eiGHttt: promise.then(function() { console.log('resolved.');});
+	console.log('Hi!'); 先打印的是Hi
+<eiGHttt> 因为它们是异步的。前面promise可能会占很长时间，但不会阻塞后面的代码。
+								        [14:11]
+*** iyzsong (~Sou@222.209.233.97) has quit: Ping timeout: 244 seconds   [14:12]
+<eiGHttt> 跟后面是什么代码完全没关系。				        [14:13]
+*** iyzsong (~Sou@222.209.233.97) has joined channel #linuxba	        [14:14]
+<jusss> eiGHttt: 如果后面的代码是个阻塞函数呢？			        [14:15]
+<eiGHttt> 这个我不知道，你可以试试。				        [14:16]
+<jusss> eiGHttt: 我不知道js里有啥阻塞函数
+<eiGHttt> 浏览器环境里，alert是阻塞的。
+<jusss> eiGHttt: 它依然会在阻塞函数后面才执行			        [14:18]
+<jusss> eiGHttt: 阻塞函数变成不阻塞的之后它才执行
+<jusss> eiGHttt: 我有另一个问题，为啥用setTimeout(consolo.log('hi'),3000),根本
+	不到3秒，这个就会执行？					        [14:19]
+<jusss> 在浏览器环境里
+<eiGHttt> setTimeout(() => console.log("hi"), 3000)		        [14:20]
+<jusss> eiGHttt: 为啥要加个函数壳？				        [14:21]
+<jusss> eiGHttt: 我有点晕了
+<jusss> eiGHttt: 好像不加就默认求值了吧
+<eiGHttt> 因为回调。不加就直接当参数传进去了。
+<jusss> eiGHttt: 这种加个壳防止求值，是不是就叫thunk呀？	        [14:22]
+<eiGHttt> 这个不清楚了。					        [14:23]
+<jusss> eiGHttt: 搞js搞的，我感觉js里任何函数做参数都得加个函数壳，后来一想，
+	这不是在其它语言里变量自动求值吗
+<eiGHttt> 大部分语言都是严格求值。
+<jusss> eiGHttt: 应用序和正则序求值				        [14:24]
+<jusss> promise.then(function() { console.log('resolved.'); });
+	console.log('Hi!'); setTimeout( () => console.log('hi test'), 3000);
+								        [14:25]
+<jusss> 这样会依次打印Hi resolved hi test
+<jusss> eiGHttt: setTimeout不是个阻塞函数吧			        [14:27]
+<eiGHttt> 不是。
+<jusss> 算延迟执行? 那setTimeout是不是也算异步？		        [14:28]
+<bokuno> 轮询?
+<jusss> 不懂是不是类似其它语言的select				        [14:29]
+<eiGHttt> js里大部分算是异步吧。
+<jusss> eiGHttt: 我现在感觉promise的最大好处就是，promise.then()里面的函数不会
+	阻塞后面的函数						        [14:30]
+<jusss> eiGHttt: 不知道我这么理解对不对				        [14:31]
+<eiGHttt> 普通的回调也不会呀。f(k => g(k, g => ...)))		        [14:32]
+<eiGHttt> Promise就是为了解决这种回调嵌套问题。			        [14:33]
+<jusss> eiGHttt: 如果是普通回调的话，会阻塞吧
+<eiGHttt> 举个例子？						        [14:34]
+<jusss> eiGHttt: f(f1,f2){f1(),f2()}; f3() 这样f3会在f2()执行完之后才执行吧
+								        [14:35]
+<jusss> eiGHttt: 如果是promise.then(f2());  f3()这样f3会在f2之前执行
+<jusss> eiGHttt: 对吗
+<jusss> 或者我又对callback的概念理解错误了？			        [14:36]
+<eiGHttt> 如果f1、f2、f3仅仅是普通函数，自然是按它的求值策略先后执行了。
+								        [14:38]
+<eiGHttt> const f = (f1, f2) => setTimeout(() => f1(); f2()), 3000);，可以看看
+	  它们的执行顺序。
+<jusss> eiGHttt: f2执行，而f1不执行？				        [14:40]
+<jusss> 不
+<jusss> f2()在传入时就求值了
+<jusss> f1会在3秒后求值
+<jusss> 对? 而且这样写参数没问题？				        [14:41]
+
+<jusss`> eiGHttt: 我刚掉了，你说的啥没看到			        [14:47]
+<jusss`> eiGHttt: 关于回调函数求值策略的讨论			        [14:48]
+<jusss`> eiGHttt: 还有你这种写法 f(k => g(k, g => ...)))  k => g(k,g => 啥意思
+<onlylove> eiGHttt: 你想多了，他一点不老实			        [14:49]
+<jusss`> 我知道箭头函数是 (k) => g(k,g
+<eiGHttt> 没啥，叫你把只有爱娶了。
+<jusss`> eiGHttt: 但是 g => 这样写是？
+<eiGHttt> arrow function.
+<jusss`> eiGHttt: 省略括号对吗？
+<eiGHttt> 'google es6 arrow function
+<varia> eiGHttt: Arrow functions - JavaScript | MDN [
+	https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Functions/Arrow_functions
+	<eiGHttt> 不不不，省略号表示省略，可以理解成多层嵌套。千言万语一句话，Promise
+	  是为了解决多层回调嵌套而存在。
+	  <jusss`> eiGHttt: g => 等同 (g) => 对吗				        [14:52]
+<jusss`> function(g) {...}
+<NightlySky> onlylove: 他刚好第6
+<eiGHttt> 对，单个参数可以省略括号。
+<yunfan> onlylove: 我哪里没上了
+<eiGHttt> arrow function和function略有些区别，但对纯函数没影响就是了。
+<onlylove> yunfan: 我说话痨榜而已，连前五都没			        [14:53]
+<jusss`> eiGHttt: 我真感觉你们js在函数定义方面太省事了
+<yunfan> 我这不是这一阵在折腾工作的事么
+<yunfan> 再说了  现在都是要学习 哪里有闲功夫扯
+<jusss`> eiGHttt: 我们还需要define def呢，你们直接一个箭头完事了，而且连括号都
+	 省略了，跟ruby一样省略括号
+<yunfan> 但是只要你们提到我 我不是随时就到了么
+<eiGHttt> 定义单参数可以省，调用时依然需要加括号，跟ruby完全不一样。
+								        [14:55]
+<jusss`> eiGHttt: 而且我现在搞迷惑了，js里太多的函数定义直接写在函数的调用了，
+	 或者就根本不算定义了吧， f( () => g => y(g))
+<onlylove> yunfan: 我也在学习啊，但是我觉得最近的面试都是他们在应付我，不是问
+	   奇怪的问题就是心不在焉
+<onlylove> yunfan: 不愿意招人直接不打电话不就没事了		        [14:56]
+<yunfan> onlylove: 马上找工作更难了 各大都停止招新了
+<jusss`> eiGHttt: 等同 f( function(){ function(g) {y(g)}}) 对吧
+<onlylove> yunfan: 你放心，外包他们肯定招
+<eiGHttt> 差不多等同吧。					        [14:57]
+<onlylove> yunfan: 这帮吃人不吐骨头的资本家怎么想的我大概有数
+<jusss`> eiGHttt: 我感觉有太多不明确了东西了，js里总是加个函数壳阻止求值一次，
+	 那到底什么时候求值第二次and how?
+<jusss`> eiGHttt: 就像上面这个，第一次自动求值变量后变成 f(function(g) {y(g)})
+								        [14:58]
+<yunfan> onlylove: 难说 也许他们转移到东南亚去了
+<jusss`> 然后里面这个function(g){y(g)}怎么求值以及何时求值
+<onlylove> yunfan: 你看，我这几天外包还能接到，但是其他的一概没有
+<eiGHttt> 函数调用就求值了。
+<jusss`> eiGHttt: 最外层再加个()?				        [14:59]
+<jusss`> f()()?
+<jusss`> f(function(g){y(g)})()
+<onlylove> jusss`: 难道不应该是f(())
+<jusss`> onlylove: 里面是匿名函数
+<jusss`> onlylove: 而且没有变量存储那个匿名函数，想加个()都没名字追加
+								        [15:00]
+<eiGHttt> const add = x => y => x + y; // add(1)(2)
+<jusss`> 对吧，最外层追加()					        [15:01]
+<eiGHttt> '\\ let add = \x y -> x + y in add 1 2
+<varia> eiGHttt: 3						        [15:02]
+<jusss`> eiGHttt: 你这也是js?
+<eiGHttt> 无非就是高阶函数，返回一个函数。			        [15:03]
+<jusss`> 没见过的语法
+*** chcl2050 (~user@unaffiliated/chcl2050) has joined channel #linuxba
+<jusss`> eiGHttt: 再里面再加个变量绑定，形成闭包
+
+
+new Promise((resolve, reject) => {
+  resolve(1);
+  console.log(2);
+}).then(r => {
+  console.log(r);
+});
+// 2
+// 1
+
+http://es6.ruanyifeng.com/#docs/promise
+
+
+var p = new Promise( (resolve,reject) => { console.log('1');resolve(2)}).then( msg => console.log(msg)); console.log(3);
+1
+3
+undefined
+2
+
+promise创建时会立即执行，而then()会放到最后执行
+---------------------------------------------------------------------------
+<jusss> lambda *x:x[-1]
+<jfhbrook> jusss: in this case, *x means "all positional arguments of the lambda as a list"
+*x 把所有参数都传递成一个列表，
+>>> (lambda *x: x[-1])([1,2,3], 3, "a", [1,2])
+[1, 2]
+一个function object可以进行传递，通过function's name, 给这个function's name加个()
+就可以进行function call, 给lambda表达式后面加个()也是进行调用
+
+既然object也是object,所以object的属性有什么?
+function也是object,function的属性有什么?
+--------------------------------------------------------------------------------
+what is **?  **d把字典d展开成key=value这种参数形式
+比如d={"a":"b", "b":"c"}
+**d会是a="b",b="c"
+>>> d={"a":"b", "b":"c"}
+>>> def f(a,b):
+	print(a)
+	print(b)
+
+	
+>>> f(**d)
+b
+c
+--------------------------------------------------------------------------------
+scheme's alist, cl's plist, python's dict
+可以构造变量的值做变量的名
+>>> a="b"
+>>> b="c"
+>>> c={a:b}
+>>> c[a]
+'c'
+--------------------------------------------------------------------------------
+switch case in python, instead of if else
+>>> def ice():
+	print('ice')
+
+	
+>>> def water():
+	print('water')
+
+	
+>>> ice()
+ice
+>>> water()
+water
+>>> a_dict={'ice':ice, 'water':water}
+>>> a_dict['ice']()
+ice
+--------------------------------------------------------------------------------
+
+1 2 3  4 5  6 7
+
+每个元素都只需要和自己之后的元素进行比较即可，1和2 3 4 5 6 7，2和3 4 5 6 7， 。。。 6和7即可遍历所有
+
+1.先去掉重复的，把不重复的放进一个新的列表里
+2.在新的列表里排序
+
+(define remove-same-element
+  (lambda (alist reducelist newlist)
+  	  (if (eq? '() (cdr reducelist))
+	      (if (eq? (car alist) (car reduceist))
+	      	  (remove-same-element (car alist
+  	  (if (eq? (car alist) (car reducelist))
+	      (remove-same-element (cdr alist) (cdr reducelist) newlist)
+	      (remove-same-element alist (cdr reducelist) newlist)
+
+
+
+
+(define (f1 x1 alist)
+  (let ((counter 0))
+    (define (f2 x2 alist2)
+      (if (null? alist2)
+	  counter
+	  (if (eq? x2 (car alist2))
+	      (set! counter (+ counter 1))
+	      (f2 x2 (cdr alist2)))))
+    (f2 x1 alist)))
+
+
+(define a-single-atom is 3)
+(map (let ((count 0))
+     	  (lambda (atom)
+	  	  (if (eq? a-single-atom atom)
+		      (set! count (+ count 1))
+		      count)))
+     '(1 2 3))
+
+
+dot pair in lisp
+(cons 1 2) => (1 . 2)
+(cons 1 '()) => (1)
+(cons 3 (cons 2 1)) => (3 2 . 1) == (3 . (2 . 1))
+(cons '() (2 . 1)) => (2 1)
+(3) is (3.())
+
+python, dot pair like [1 [2 [3]]]
+
+(define (map f alist)
+	(if (null? alist)
+	    '()
+	    (cons (f (car alist)) 
+	    	  (map f (cdr alist)))))
+
+Don't use null!!! in case (() ())  if you (cdr '(() ())) get (())
+(cdr '(())) get (), they both are null!!!
+but (()) is (().())
+and (() ()) is (() ().())
+
+(define (map f alist)
+	(if (eq? alist '())
+	    '()
+	    (cons (f (car alist))
+	    	  (map f (cdr alist)))))
+
+
+(define remove-empty-list
+  (lambda (alist)
+    (if (eq? alist '())
+	'()
+	(if (eq? (car alist) '())
+	    (remove-empty-list (cdr alist))
+	    (cons (car alist) (remove-empty-list (cdr alist)))))))
+
+(map (lambda (x)
+       (if (> (apply + (map (lambda (y)
+			       (if (eq? x y) 1 0))
+			     alist))
+	      1) '() x))
+     alist)
+
+(define remove-same-element
+  (lambda (alist)
+  	  (remove-empty-list
+		(map (lambda (x)
+		       (if (> (apply + (map (lambda (y)
+		       	      	     	       (if (eq? x y) 1 0))
+					     alist))
+	                    1) '() x))
+	             alist))))
+
+(define get-max-value
+  (lambda (alist max)
+    ;max is (car alist) at the first time
+    (if (eq? alist '())
+	max
+	(if (> (car alist) max)
+	    (get-max-value (cdr alist) (car alist))
+	    (get-max-value (cdr alist) max)))))
+
+(define alist '(1 2 3 3 5 9 7 7))
+> (get-max-value (remove-same-element alist) (car alist))
+9
+
+the cons will make a dot pair until alist become an empty list,
+then turn the dot pair into a list through it return an empty list '()
+
+emacs 26.1 on windwos 7, M-x package-list-packages ; M-x package-refresh-contents
+M-x package-install racket-mode
+install and download racket for windows, then put the installed path into environment variable "The Path" on windows 7
+then you can open a new.rkt file and press C-c C-z or F5 call rakcet repl out
+don't forget put #lang racket on the top of file
+if you use emacs 24.3, then racket-mode warn it needs emacs support :nowait, and
+that feature is in emacs 25 and after
+
+M-x package-list-packages; if it tips press U to make some elpa packages for upgrading,
+then press U make them, and press x upgrading them
+
+racket-mode, python-mode, auto-complete
+
+in python-mode, C-c C-c will eval current line
+in racket-mode, F5 will eval entire file, don't forget set system's environment "PATH" point to python or racket installed path
+
+auto-complete, company-mode, M-/
+
+auto-complete for html
+M-x package-install auto-complete  slime cl-lib ac-slime
+https://stackoverflow.com/questions/8095715/emacs-auto-complete-mode-at-startup
+(require 'ac-slime)
+(setq ac-modes '(racket-mode python-mode html-mode web-mode slime-mode))
+(ac-config-default)
+(defun auto-complete-mode-maybe ()
+  "No maybe for you. Only AC!"
+  (auto-complete-mode 1))
+(add-hook 'slime-mode-hook 'set-up-slime-ac)
+ (add-hook 'slime-repl-mode-hook 'set-up-slime-ac)
+ (eval-after-load "auto-complete"
+   '(add-to-list 'ac-modes 'slime-repl-mode))
+ac-slime should now automatically be enabled when you visit a buffer in which slime-mode is active and auto-complete is enabled
+
+-----------------------------------------------------------------------
+M-x package-list-packages
+M-x package-refresh-contents
+M-x package-install auto-complete  slime  cl-clib  and ac-slime
+reference: https://github.com/purcell/ac-slime
+
+wrote this into ~/.emacs
+(require 'ac-slime)
+
+(setq ac-modes '(scheme-mode c++-mode sql-mode racket-mode python-mode html-mode web-mode slime-mode js-mode javascript-mode))
+(ac-config-default)
+(add-hook 'slime-mode-hook 'set-up-slime-ac)
+(add-hook 'slime-repl-mode-hook 'set-up-slime-ac)
+(eval-after-load "auto-complete"
+ '(add-to-list 'ac-modes 'slime-repl-mode))
+
+important! (setq ac-modes '(js-mode javascript-mode html-mode)) if you don't set
+this variable, then you cann't enable auto-complete-mode in js file buffer
+aha, maybe you should use (add-to-list 'ac-modes 'javascript-mode) is better!
+
+ac-slime should now automatically be enabled when you visit a buffer in which slime-mode is active and auto-complete is enabled. (The symbols "Slime" and "AC" should appear in the modeline.)
+
+enable slime-mode and auto-complete in javascript buffer and ac-slime will be enabled
+
+put html-mode into ac-modes list, I guess if html-mode is enabled, auto-complete will auto be enabled
+
+I think you can do it in various ways. To enable it globally you should use
+(global-auto-complete-mode t)
+But it uses auto-complete-mode-maybe, which turn AC on only those listed in ac-modes. You can add them manually just like this
+(add-to-list 'ac-modes 'sql-mode)
+You can make your own list if you wish AC be active only for few modes
+(setq ac-modes '(c++-mode sql-mode))
+Or rewrite it to have AC everywhere.
+(defun auto-complete-mode-maybe ()
+  "No maybe for you. Only AC!"
+  (auto-complete-mode 1))
+https://stackoverflow.com/questions/8095715/emacs-auto-complete-mode-at-startup
+
+CHOPIN - NOCTURNE NO.20 IN C-SHARP MINOR OP.POSTH
+Beethoven Silence
+
+--------------------------------------------------------------------------------
+FUCK! turn out you just need auto-complete will be fine!
+just append the mode which you want auto complete into ac-modes list!
+auto-complete will do that for you! nothing else need!
+(require 'auto-complete)
+;(setq ac-modes '(scheme-mode c++-mode sql-mode racket-mode python-mode html-mode web-mode slime-mode js-mode javascript-mode))
+(add-to-list 'ac-modes 'javascript-mode) 
+(add-to-list 'ac-modes 'html-mode)
+(add-to-list 'ac-modes 'python-mode)
+(add-to-list 'ac-modes 'slime-mode)
+(add-to-list 'ac-modes 'scheme-mode)
+(add-to-list 'ac-modes 'css-mode)
+(ac-config-default)
+--------------------------------------------------------------
+emacs 24.3 on windows 7 is really smooth, 25 and 26 are not
+-------------------------------------------------------
+changing the default directory that  emacs will open when press C-x C-f
+Update: There are three solutions to the problem that I found to work, however I believe solution 3 is Windows only.
+
+    Solution 1: Add (cd "C:/Users/Name/Desktop") to the .emacs file
+
+    Solution 2: Add (setq default-directory "C:/Documents and Settings/USER_NAME/Desktop/") to the .emacs file
+
+    Solution 3: Right click the Emacs short cut, hit properties and change the start in field to the desired directory.
+
+decorator
+<jusss> yunfan: 昨晚看了python的decorator，里面怎么获得传进去的函数的参数，不是
+	很明白							        [10:43]
+
+<yunfan> 下回我调用func（a, b） 其实是调用 wrapper(func)(a, b)
+
+
+---------------------------------------------------------
+Tkinter has been renamed to tkinter in Python 3. The 2to3 tool will automatically adapt imports when converting your sources to Python 3.
+import Tkinter
+Or, more often:
+from Tkinter import *
+
+
+---------------------------------------------------------------------------
+python的类定义里，里面的变量定义需要加上self.var才能在类里面通用
+如果没有加self.则只在本函数里面使用
+
+
+在模块内、在所有函数外面、在class外面，这就是全局变量
+
+在函数内、在class的方法内（未加self修饰），这就是局部变量, 只能在函数内使用
+
+在class内的，但不在class的方法内的，这就是静态变量,也叫类变量，通过类名访问或实例名访问，且全局共享
+
+在class的方法内的，用self修饰的变量，这就是实例变量,不共享
+
+不共享: 局部变量 实例变量
+共享: 全局变量 类变量
+两个文件直接共享实例，可以把这个实例实例化在一个类的定义里面，但是用类变量的方式，在类里但在类里的方法外且没有加self实例化这个实例,然后可以在其它文件里引入这个类然后用类名.方法来操作这个实例  
+---------------------------------------------------------------------------------
+co-routines, asyncio, asyinc/wait, promise/future, continuation, green-thread, twisted-python
+
+if __main__ = name
+When the Python interpreter reads a source file, it executes all of the code found in it.
+
+Before executing the code, it will define a few special variables. For example, if the Python interpreter is running that module (the source file) as the main program, it sets the special __name__ variable to have a value "__main__". If this file is being imported from another module, __name__ will be set to the module's name.
+
+
+return yield 把内部函数返回给外部，而且内部函数还带着内部的参数
+----------------------------------------------------------------------
+
+def a(var):
+	def b():
+		print("hello")
+	
+	
+	def setq(x):
+		name["c"]=x
+	def add(nam):
+		name["nam"]=nam
+	name={"b":b,"c":1,"setq":setq,"add":add}
+	return name[var]
+
+def f(x):
+	if x=="name":
+		return "f"
+
+<jusss> yunfan: 怎样或许变量或函数的名字？怎么把函数的名字变成字符串？
+
+ def a(var):
+	def b():
+		print("hello")
+	
+	
+	def setq(na,va):
+		name[name.index(na) +1]=va
+		
+		return name
+	def add(nam):
+		name[nam.__name__]=nam
+	name=["b",b,"setq",setq,"add",add,"c",1]
+	return name[name.index(var) +1]
+
+ def a(var):
+	def b():
+		print("hello")
+	
+	
+	def setq(na,va):
+		global name
+		name.append(na)
+		name.append(va)
+		return a
+		
+	def add(nam):
+		global name
+		name[nam.__name__]=nam
+	global name
+	name=["b",b,"setq",setq,"add",add]
+	return name[name.index(var) +1]
+
+---------------------------------------------
+success!
+def a(var):
+	def b():
+		print("hello")
+	
+	
+	def setq(na,va):
+		global name
+		name[na]=va
+		return a
+		
+	def add(nam):
+		global name
+		name[nam.__name__]=nam
+	global name
+	name["b"]=b
+	name["setq"]=setq
+	name["add"]=add
+	return name[var]
+
+name={}
+a("setq")("c",9)
+------------------------------
+def a(var):
+	name={}
+	def b():
+		print("hello")
+	
+	
+	def setq(na,va):
+		nonlocal name
+		name[na]=va
+		return a
+		
+	def add(nam):
+		nonlocal name
+		name[nam.__name__]=nam
+	
+	name["b"]=b
+	name["setq"]=setq
+	name["add"]=add
+	return name[var]
+-----------------------------------------------------------------
+wonderful!  https://repl.it/repls/OutlyingPalegreenLesson
+
+def f():
+  name = {}
+  def b():
+    print("b")
+
+  def setq(na,x):
+    name[na] = x
+    return name
+
+  def add(x):
+    name[x.__name__] = x
+    return x
+
+  name.update({
+    "b": b,
+    "c": 1,
+    "setq": setq,
+    "add": add
+  })
+
+  return name
+
+fuck = f()
+
+result = fuck["setq"]("d",9)
+print(result)
+print(fuck["d"])
+print(fuck)
+
+def p():
+  print("hello")
+z=fuck["add"](p)
+z()
+print(fuck)
+------------------------------------------------------------
+https://repl.it/repls/CrookedDistinctLamp
+def f(name):
+  def set_name(k):
+    attr["a"] = k(attr["a"])
+    return attr
+
+  attr = {
+    "a": 1,
+    "set": set_name
+  }
+
+  return attr[name]
+
+result = f("set")(lambda x: x + 1)
+print(result)
+
+<jusss> eiGHttt: 你的这句  attr["a"] = k(attr["a"]) 看不懂，f("set")(lambda
+	...) k是那个(lambda ...) k作用在1?然后给a?
+<jusss> eiGHttt: 哦，你是用a存储了这个lambda的返回值
+-------------------------------------------------------------------
+WONDERFUL!
+def f():
+  name = {}
+  def b():
+    print("b")
+
+  def setq(na,x):
+    name[na] = x
+    return name
+
+  def add_method(x):
+    name[x.__name__] = x
+    return name
+
+  name.update({
+    "b": b,
+    "c": 1,
+    "setq": setq,
+    "add_method": add_method
+  })
+
+  return name
+fuck = f()
+def p():
+  print("world")
+fuck["add_method"](p)
+fuck["p"]()
+fuck["setq"]("c",9)
+print(fuck["c"])
+z=fuck["add_method"](p)
+z["p"]()
+----------------------------------------------------------------------
+
+重要的是闭包，把所有函数里的所有函数和变量存到字典里，然后直接返回字典，
+这个字典就不会被回收，可以继续添加值，返回这个字典赋值给其它名字就相当于实例化
+但是不能保证唯一性，给新的名字，还是共享这个字典
+
+def f():
+  name = {}
+  def b():
+    print("b")
+
+  def setq(na,x):
+    name[na] = x
+    return name
+
+  def add_method(x):
+    name[x.__name__] = x
+    return name
+
+  """
+  name.update({
+    "b": b,
+    "c": 1,
+    "setq": setq,
+    "add_method": add_method
+  })
+  """
+  name["b"]=b
+  name["setq"]=setq
+  name["add_method"]=add_method
+  name["c"]=1
+  return name
+
+fuck = f()
+def p():
+  print("world")
+fuck["add_method"](p)
+fuck["p"]()
+fuck["setq"]("c",9)
+print(fuck["c"])
+z=fuck["add_method"](p)
+z["p"]()
+z["setq"]("c",3)
+print(fuck["c"])
+print(z["c"])
+-------------------------------------------------------
+def f(name):
+  def set_name(k):
+    attr["a"] = k(attr["a"])
+    return attr
+
+  attr = {
+    "a": 1,
+    "set": set_name
+  }
+
+  return attr[name]
+
+result = f("set")(lambda x: x + 1)
+print(result) 
+把lambda当参数传入，lambda读取字典的值做参数，然后把返回值存储替换该字典的值
+----------------------------------------------------
+
+import socket, os, string, time, sys, ssl
+from threading import Thread
+from Tkinter import *
+
+def network_connect(t):
+    show_area=t
+    name={}
+
+    def connect_init():
+        try:
+            name['sock'].connect((name['server_addr'],name['port']))
+        except Exception as e:
+            print(e)
+            time.sleep(10)
+            name.update({
+                'sock':ssl.wrap_socket(socket.socket(socket.AF_INET,socket.SOCK_STREAM))})
+            connect_init()
+        name['sock'].send(('NICK '+name['nick']+'\r\n').encode('utf-8'))
+        name['sock'].send(('USER '+name['username']+' 8 * :'+name['realname']+'\r\n').encode('utf-8'))
+        name['sock'].send(('JOIN '+name['channel']+'\r\n').encode('utf-8'))
+
+    def make_up_data(a_str):
+        ":nick!~2ac8711f@unaffiliated/username PRIVMSG #channel :words"
+        if (a_str.find(":",0) != -1 and a_str.find("!",1) != -1 and a_str.find(":",1) != -1 and a_str.find("PRIVMSG",1) != -1):
+            return("<" + a_str[1:a_str.find("!",1)] + ">: "
+                   + a_str[a_str.find(":",1)+1:])
+        else:
+            return a_str
+
+    def recv_from_server():
+        while True:
+            try:
+                recv_msg=name['sock'].recv(1024)
+            except Exception as e:
+                print(e)
+                name['sock'].close()
+                name.update({
+                'sock':ssl.wrap_socket(socket.socket(socket.AF_INET,socket.SOCK_STREAM))})
+                connect_init()
+            recv_msg=recv_msg.decode('utf-8')
+            # make it read only
+            show_area.configure(state='normal')
+            # PING PONG
+            if recv_msg.find("PING :",0) != -1:
+                name['sock'].send(recv_msg.replace("PING","PONG").encode('utf-8'))
+            else:
+                if (recv_msg.find(name['nick']) != -1) and ((recv_msg.find("PRIVMSG") != -1)
+                                                    or
+                                                    (recv_msg.find("NOTICE") != -1)):
+                    show_area.insert(END,make_up_data(recv_msg),'highlight')
+                else:
+                    show_area.insert(END,make_up_data(recv_msg))
+            show_area.configure(state='disabled')
+            show_area.see(END)   # autoscroll bar to end
+
+
+    def recv_from_keyboard(event=None):
+        msg=my_msg.get()
+        my_msg.set("")
+        if msg.find("/",0) != -1:
+            name['sock'].send((msg[1:]+"\r\n").encode('utf-8'))
+        else:
+            #make it read only
+            show_area.configure(state='normal')
+            show_area.insert(END,"<"+name['nick']+">: "+msg+ "\r\n")
+            show_area.configure(state='disabled')
+            show_area.see(END)
+            msg='PRIVMSG '+name['channel']+' :'+msg+'\r\n'
+            name['sock'].send(msg.encode('utf-8'))
+    name.update({
+        'server_addr':'irc.freenode.net',
+        'port':7000,
+        'nick':'jussssss',
+        'username':'xxxxx',
+        'realname':'xxxxx',
+        'channel':'#linuxba',
+        'sock':ssl.wrap_socket(socket.socket(socket.AF_INET,socket.SOCK_STREAM)),
+        'connect_init':connect_init,
+        'make_up_data':make_up_data,
+        'recv_from_server':recv_from_server,
+        'recv_from_keyboard':recv_from_keyboard
+    })
+    return name
+
+
+if __name__ == '__main__':
+
+    top_window = Tk()
+    show_area=Text(top_window,height=30,width=70)
+    # highlight
+    show_area.tag_configure("highlight",foreground="red")
+    show_area.pack(anchor=NW,expand=True,fill='both')
+    whatever = network_connect(show_area)
+
+    top_window.title("Chat")
+    #top_window.geometry("650x500")
+    my_msg = StringVar()  # For the messages to be sent.
+    my_msg.set("")
+    input_area=Entry(top_window,width=70,textvariable=my_msg)
+    input_area.bind("<Return>",whatever['recv_from_keyboard'])
+    input_area.pack(anchor="sw",expand=True,fill="x")
+    whatever['connect_init']()
+    rt=Thread(target=whatever['recv_from_server'])
+    rt.start()
+    top_window.mainloop()
+
+
+
+写完这个对封装有了点了解，不想让外部接触的变量或函数，就不要写到返回的name这个字典列表里
+当然如果加入了steq和add这两个修改变量和添加函数的方法，就能do whatever you want
+
+-------------------------------------------------------------------------
+>>> a=3
+>>> def b():
+...    a=9
+...    print(a)
+...
+>>> a
+3
+>>> b()
+9
+>>> a
+3
+>>> c={"a":3}
+>>> def d():
+...   c["a"]=9
+...
+>>> d()
+>>> c
+{'a': 9}
+
+字典可以在inner函数里修改外部的字典，而变量不可以
+----------------------------------------------------------------
+emacs 26.1 or 25 只要是24之后版本的的在windows上会出现用C-v翻页卡顿，
+原因上因为没有配置中文字体，遇到中文会自动搜索字体，
+用(setq inhibit-compacting-font-caches t)可以解决这个问题
+或者直接设置字体(set-face-attribute 'default nil :family "SimSun" :height 100)也可以
+http://emacs.1067599.n8.nabble.com/bug-25148-25-1-Slow-scrolling-with-emacs-25-1-and-Windows-10-td415225.html
+------------------------------------------------------------------
+emacs上24之后有且只有两个mode用于python, 默认自带的python.el, 通过package-install安装的python-mode.el
+在windows7上不论上emacs24还是26,使用自带的python.el，然后第一次C-c C-c求值有tk code的buffer,能正常弹出tk窗口，关闭窗口,
+但是第二次再按C-c C-c就没反应了，但是*Messages*里也的确显示Set: from Tkinter import *...所以应该上发送了，但是*Python*的repl
+没反应，应该还是卡在第一个tk窗口上没返回，认为第一个没结束，导致不再接收新的code，而这个问题在archlinux的emacs上也经常发生，
+但是在ubuntu的emacs上却没发生，在ubuntu的emacs上C-c C-c多次都会弹出tk窗口，所以也不知道问题出在哪，ubuntu bionic lts
+------------------------------------------------------------------------------------------------
+in python 2.7, string is bytes string, not unicode, and unicode is not an encoding
+but in python 3, string is unicode
+
+在2.7 "abc"是个str类的实例，而这个"abc"是以bytes string方式呈现的，类似'\xa\xb\xc'之类的bytes string
+而在python 3k里面"abc"是个unicode，而不是bytes string,需要把"abc".encode('utf-8')编码变成bytes string
+unicode不是一种编码，utf-8是编码
+python 2.7里的socket.send(str)要的上bytes string,也是str,
+所以python 3k里socket.send(str.encode())才需要编码
+
+而tkinter的Entry widget返回的是个unicode对象，需要编码才能用socket.send()发送
+------------------------------------------------------------------------------------
+
+
+def all():
+  def a():
+    print('hello')
+  return lambda x: eval(x)
+
+c=all()
+c("a()")
+
+name 'a' is not defined
+
+def all():
+    def a():
+        print('hello')
+    def b():
+        print('world')
+    return {a.__name__:a, b.__name__:b}
+
+c=all()
+c["a"]()
+
+def bll(x):
+    def a():
+        print('h')
+    def b():
+        print('w')
+    return {a.__name__:a, b.__name__:b}[x]
+dd= bll("a")
+dd()
+
+def cll():
+    def a():
+        print('aha')
+    def b():
+        print('bla')
+    def f(x):
+        eval(x)
+    return f
+cc=cll()
+cc("a()")
+--------------------------------------------------------------
+
+try:
+	xxx
+except:
+	pass
+-----------------------------------
+def onIput_onStart(self,p):
+    ...
+    self.onStopped()
+def onInput_onStop(self):
+    self.onUnload()
+    self.onStopped()
+def onUnload(self):
+    pass
+def self.onStopped()
+    pass
+
+通过choregraphe的两个入口函数onInput_onStart和onInput_onStop来执行调用其它函数
+如onStopped()对onStopped输入口，__init__是初始化的，
+在onInput_onStart里最后调用onStopped
+在onInput_onStop里调用onUnload和onStopped
+
+在onUnload里写退出代码，在入口onStop对应的函数onInput_onStop里调用onUnload和onStopped,onStopped对应的是右边的输出口onStopped
+入口onStart对应的是onInput_onStart
+    ---------------------------------------------------
+
+"everyting ends, that's always sad, but everything begins again
+	too,and that's always happy"				        [14:12]
+"be happy"
+--------------------------------------------------
+>>> def f(a):
+	b=1
+	print(eval(a))
+
+	
+>>> f("b")
+1
+>>> 
+---------------------------------------------------------------
+normal-order 正则序求值 and applicative-order应用序求值
+
+python用 lambda: f(x)来当参数传递，预防参数被自动求值，因为python是applicative-order,延迟求值，lazy-evaluation
+而scheme用(quote (f x))来预防(f x)被自动求值，scheme也是applicative-order
+
+对整数求值，返回整数自身，对字符串求值，返回字符串本身
+也可以用python的functools.partial(f,x)
+-----------------------------------------------------------
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+     s.connect((Host,Port))
+
+conn, addr = s.accept()
+with conn:
+     while True:
+     	   data = conn.recv(1024)
+	   if not data:
+	      break
+	   conn.sendall(data)
+
+python 2也有with语句！使用with可以不需要调用s.close(), 但是只有python3的with可以用于socket
+
+--------------------------------------
+<a> j: virtualenv creates isolated environments you can install libraries into.  And you can put that env wherever, such as in a writable directory :]
+<altendky> jesse__: mostly, you should almost always use virtualenv or venv
+	   (py3 only). Even on your desktop etc
+<grym> jesse__: venv is.
+<grym> jesse__: virtualenv is not.  confusingly, people abbreviate both the
+       same :(
+<altendky> jesse__: well, there's venv which is in python3
+---------------------------------------------------------
+twisted instead of socket
+-------------------------------------
+
+self.whatever = {"'stop":stop_all,
+                         "'shutdown":self.system.shutdown,
+                         "'reboot":self.system.reboot,
+                         "'dance":(lambda self.behaviorName="bz10004_hungarian_dance_v/.": self.bm.runBehavior(self.behaviorName))}
+错误在于在lambda的parameter部分赋值变量，不算assignment,只是argument,也就是
+就算写了，也只会在这个lambda这个函数体内这个变量有效，在其它地方依然不存在这个变量
+所以在lambda的parameter给self.x赋值是格式错误
+
+python还有个functools.partial,作用就是返回一个可调用的对象，但是参数已固定
+def int2(x, base=2):
+  return int(x, base)
+
+int2('1010101') => 85
+
+int2 = functools.partial(int, base=2)
+int2('1010101') => 85
+functools.partial的作用就是，把一个函数的某些参数给固定住（也就是设置默认值），返回一个新的函数，调用这个新函数会更简单。
+但是这个base=2只是argument而不是assignment,也就是在这个函数之外是不存在base这个变量的
+-----------------------------------------------------
+列表定义时会自动求值里面元素的值
+字典定义时会自动求值里面元素的值
+applicative-order
+
+lambda : [[var],[f var]][-1]
+------------------------------------------
+python2里的with不能用于socket
+python3里的with可以用于socket
+----------------------------
+socket.close()之后释放端口
+socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+before socket.bind()
+https://stackoverflow.com/questions/6380057/python-binding-socket-address-already-in-use
+-------------------------------------------------
+help(Tkinter.Entry.grid)
+-------------------------------------------------
+def f(para, *args, **kwargs):
+    print(kwargs)  如果要传一个dict进去就加上** 如f(para, *a_tuple, **a_dict)
+*args,把超过2个的参数存储在args这个tuple中
+**kwargs,把关键字参数name="John"存储在kwargs这个dict中
+
+
+-----------------------------------------------
+concurrency with processes, threads, and coroutines
+module: subprocess, signal, threading, multiprocessing, asyncio, concurrent.futures
+
+
+--------------------------------------------------
+python Threading.Thread的target函数里，自己用条件判断语句打断循环来结束线程里的循环
+while True:
+      if name['exit_signal']:
+      	 return "end"
+默认name['exit_signal']=False,在其它函数里设置它为True来结束这个线程
+----------------------------------------------------------------------------
+a_list.remove('element')
+a_list.append('element')
+
+a_dict={'#linuxba':['onlylove','yunfan'], '#python':['abc','def']}
+a_dict['#new']=['a','b']
+
+for k,v in a_dict.items():
+  if 'onlylove' in v:
+     print k
+
+[k for k,v in a_dict.items() if 'onlylove' in v]
+
+3 in [1, 2, 3] 返回 True
+'a' in 'abc' 返回 True
+---------------------------------------------------------------------
+poweroff or reboot in grub2
+
+grub2 support `halt` or `reboot` in command line
+
+edit /etc/grub.d/40_custom and add
+menuentry "Reboot" {
+reboot
+}
+then run sudo update-grub.
+---------------------------------------------------
+python's socket竟然没有readline或者readlines来一次只读一行
+或用event-loop socket buffering 由 twisted trio提供
+或 "ab\r\nc\d\r\n".split("\r\n")把字符串变成字符串列表来处理
+---------------------------------------------
+[i for i in a if 'a' in i]				        [09:49]
+<jusss> [print(i) for i in a if 'a' in i]
+<jusss> why the first one works fine, and the seconds got error?
+
+<aeyxa> print isn't a function in 2.7
+<aeyxa> so you can't use it in list comprehension		        [09:52]
+
+list comprehension的第一个元素需要是expression而不是statement
+
+[3 for i in a if 'a' in i] 
+
+>>> a_str=':Liuyan!what PRIVMSG #linuxba : haha'
+>>> hash_tag = [i if '#' in i else False for i in a_str.split(' ')][0]
+>>> hash_tag
+False
+>>> [i if '#' in i for i in a_str.split(' ')]
+SyntaxError: invalid syntax
+>>> [i for i in a_str.split(' ') if '#' in i]
+['#linuxba']
+>>> [i if '#' in i else False for i in a_str.split(' ')]
+[False, False, '#linuxba', False, False]
+
+1. list comprehension里if else要放在for之前，而if要放在for之后
+2. if else会返回多个值而不是只有一个
+
+
+group = re.match(data).group(1) if re.match(data) else None
+
+_data= [y for x in data if (x) as y is not None]
+data= [y for x in data if (y:=f(x)) is not None]
+
+if (match:=pattern.search(data) is not None:
+
+match=pattern.search(data)
+if match is not None:
+
+if ae:=[i for i in ['abc','def'] if 'a' in i]
+   print(ae[0])
+
+if ae is [], bool(ae) will be False, so print(ae[0]) won't execute
+
+python doesn't provide list.replace() but it can be with list comprehension
+
+<_habnabit> jusss, ['c' if x == 'a' else x for x in mylist]
+
+
+>>> c
+{}
+>>> def g():
+	for k,v in c.items():
+		if '#lin' == k:
+			c['#lin'] = c['#lin'] + 'ux'
+		else:
+			c['#lin'] = 'c'
+
+			
+>>> g()
+>>> c
+{}
+>>> 
+
+because c.items() is [], for k,v in []: won't execute, so g() won't create elements in dict c,
+just give c one element, for-statement will execute, for-statement must need one element to iterate,
+otherwise it won't execute
+
+for i in alist:
+  if m in i:
+     do something
+  else:
+	do something
+
+切记这样会比较每个元素，最终else:会执行多次，而不是一次！每次不匹配的都会被执行一次，这样会执行多次，而不是执行一次！
+最好不要在for-statement里使用else,只使用if
+
+除了list comprehension,原来还有dict comprehension
+>>> c
+{'a': 'b', '#lin': 'c'}
+{k:v for (k,v) in c.items() if 'a' in k}
+{'a': 'b'}
+
+还可以直接 'a' in c 会返回True or False
+
+<Shirakawasuna> jusss, there is syntax that looks like a tuple comprehension,
+		but it creates a generator
+<Shirakawasuna> jusss, which doesn't execute until you iterate over it
+<liste> tuple(x for y in z) :)
+
+if " JOIN #" in a_str and ":" in a_str and "!" in a_str and (name['nick'] not in a_str):
+
+
+<_habnabit> jusss, any('a' in thestring for thestring in thelist)
+<aeyxa> jusss: any(['a' in x for x in ['abc', 'bcd', 'def']])
+
+<altendky> jusss: ['low' if x < 42 else 'high' for x in [1, 53, 42, 30, 60]]
+<altendky> jusss: the part before the `for` can be any expression
+
+<altendky> jusss: don't work directly with the socket module.  don't implement
+	   irc protocols yourself.  probably don't use tk but that's more on
+	   the preference side, sort of.
+
+<altendky> oh, and don't thread
+<_habnabit> twisted integrates neatly with tk
+<altendky> twisted also integrate with pyqt5
+<jusss> _habnabit: altendky why python don't contain twisted in default
+	packages even if python don't suggest handle socket directly
+<jusss> and why not remove Threading and tkinter
+<jusss> even it's not safe
+<_habnabit> jusss, take your pick: 1) putting things in the stdlib is a bad
+	    idea, 2) they did; they just rewrote it from scratch and called it
+	    'asyncio'
+<altendky> jusss: well, they do have asyncio now.  but i personally don't feel
+	   a need for everything to be in stdlib.  stuff in stdlib often gets
+	   used simply because that's what is there, not because it is what is
+	   good.
+<altendky> jusss: as to threads, they have their hazards and in other
+	   languages that may be worthwhile due to the extra cpu time you get.
+	   you don't get extra cpu time from threads for python code though,
+	   so...  whatever, little upside.  and async is fairly mature for
+	   many things.
+<jusss> and yet lots of development still in python 2.7
+<altendky> jusss: true, they aren't adding significant features to py2.  start
+	   new stuff in py3					        [10:37]
+<energizer> craftyguy: what functinoality do you want
+<altendky> jusss: or, use twisted
+
+<altendky> jusss: once something gets into stdlib it's stuck on a 18 month or
+	   whatever release cycle.  it's stuck on massive backward
+	   compatibility and never can be removed.  and people start using it
+	   because of where it is rather than based on merit.  *shrug*  it's
+	   handy to have stuff in stdlib but there's a cost as well
+-------------------------------------------
+c=':ab c :d'
+c.split(':') => ['','ab c','d']
+c.plit(':').remove('') won't work
+d=c.split(':')
+d.remove('') => ['ab c','d'] work    weird
+[s for s in c.split(":") if len(s)>0]
+
+'abcad'.strip('a') => 'bcad'
+------------------------------------------------
+>>> if [3]:
+	print 'hi'
+hi
+>>> if []:
+	print 'hi'
+
+>>> bool([])
+False
+>>> bool([3])
+True
+>>> 
+
+<whateveryouwant> [] is not False, neither True
+<ChrisWarrick> whateveryouwant: because it is not a boolean value
+<ChrisWarrick> whateveryouwant: the `is` operator checks identity, avoid it in
+	       most cases.  The == operator checks equality, and a boolean
+	       value False is not equal to an empty list.
+<ChrisWarrick> whateveryouwant: if []:  does not mean if [] == True.  It
+	       checks bool([]).
+<iivvoo> if you want to be more explicit, you could if len(x) == 0: ...
+<iivvoo> whateveryouwant: just `if value:` - value will be evaluated in a
+	 boolean context
+-------------------------------------------------------
+dl=[]
+def f():
+  dl.append(3)
+def f2():
+  dl=[]
+
+f() dl => [3]
+f2() dl => [3] why f2 don't clear dl?
+-------------------------------------------------------
+python 3k支持f-strings,和ruby很像，就是字符串里的变量展开
+而python 2可以用format来玩 'abc{0} cd{1}'.format(variable-a,variable-b)
+------------------------------------------------------------------------------
+Microsoft Speech To Text REST API:
+
+import requests
+def saf():
+    with open('/home/jesse/Downloads/a.wav', 'rb') as f:
+        while 1:
+            data=f.read(1024)
+            if not data:
+                break
+            yield data
+ 
+headers = {
+    'Transfer-Encoding': 'chunked',
+    'Ocp-Apim-Subscription-Key': 'af1fa0c264124c7c914e51106d7142c9',
+    'Content-type': 'audio/wav; codec=audio/pcm; samplerate=16000'
+    
+}
+ 
+response = requests.post('https://speech.platform.bing.com/speech/recognition/interactive/cognitiveservices/v1?language=zh-CN&format=detailed', headers=headers,  data=saf())
+ 
+print(response.content)
+
+----------------
+ final_result = json.loads(response.content)['NBest'][0]['Display']
+        self.tts.say(final_result)
+
+------------------------------------------------------------------------------------
+jesse@cube:~/Downloads$ cat STT.sh
+#!/bin/bash
+curl -v -X POST "https://speech.platform.bing.com/speech/recognition/interactive/cognitiveservices/v1?language=zh-CN&format=detailed" -H "Transfer-Encoding: chunked" -H "Ocp-Apim-Subscription-Key: af1fa0c264124c7c914e51106d7142c9" -H "Content-type: audio/wav; codec=audio/pcm; samplerate=16000" --data-binary @whatsday.wav
+--------------------------------------------------------------------------------------------------
+'Transfer-Encoding': 'chunked' 需要把文件分段上传，所以才需要data=saf(), 而saf()每次执行都会返回一段的binary data,而不是文件的全部
+reference; https://www.taygan.co/blog/2018/02/09/getting-started-with-speech-to-text
+https://curl.trillworks.com/
+-----------------------------------------------------------------------------
+the keyword 'is' in python is not equal '=='
+<SnoopJeDi> `is` tests identity, `==` tests equality. They aren't the same concept.
+<KirkMcDonald> jusss: 'is' tests whether two things refer to the same object.
+<_habnabit> jusss, 'is' is only used for 'x is None'		        [09:26]
+<SnoopJeDi> jusss, "is exactly the same object"
+<cluelessperson> jusss: == means equal value;  is tests if it identifies as the same object
+<SnoopJeDi> you rarely ever need to use `is`
+<cluelessperson> does "is" test if it's the same Type?
+<cluelessperson> if a is True;
+<_habnabit> cluelessperson, implicitly
+<KirkMcDonald> cluelessperson: The same *object*.
+<cluelessperson> KirkMcDonald: so,  a=True;  is the same object as a b=True;
+<_habnabit> cluelessperson, the same object must necessarily be the same type
+<KirkMcDonald> It is both possible for 'a is b' to be False while 'a == b'
+	       returns True, and vice versa.
+<jusss> so what 'is' is used for?
+<_habnabit> jusss, 'a is None'
+<_habnabit> jusss, that is the only example
+<jusss> _habnabit: ok
+<jusss> you guys create a keyword and only use it for one situation :)
+<_habnabit> jusss, yes, python has some pretty bad ideas in it
+<jusss> _habnabit: is there other keyword for instead of '==' ?
+<_habnabit> jusss, no
+<jusss> but I tried it in python2.7, a='s'; a is 's' will return a True
+<_habnabit> jusss, that will give you a random value which may or may not be
+	    true
+<jusss> _habnabit: ok
+<SnoopJeDi> jusss, the simple version is that you should use == when you mean
+	    ==, which is always
+<KirkMcDonald> jennie: 'is' is basically meaningless when applied to immutable
+	       objects.
+>>> [1,2,3] is [1,2,3]
+False
+<SnoopJeDi> jusss, if you want a preview of why `is` will mislead you, try
+	    `[1,2,3] is [1,2,3]`
+<jusss> SnoopJeDi: wow, it is False
+<SnoopJeDi> jusss, because when evaluating that statement, Python creates
+	    *two* list objects which are NOT the same object.	        [09:46]
+<jusss> KirkMcDonald: what is immutable objects? you mean strings?
+<SnoopJeDi> They *are* equal, though, so `[1,2,3] == [1,2,3]`
+<Jonno_FTW> why are you so concerned about the behaviour of `is`? It only
+	    returns when two things point to the same memory. Of course it's
+	    going to give odd behaviour in edge cases
+<KirkMcDonald> jusss: Strings, integers, and others.
+<SnoopJeDi> jusss, "mutable" means something that can change. Immutable means
+	    the opposite.
+<Jonno_FTW> some things get interned and will always point to the same memory,
+	    for everything else you probably want ==
+<SnoopJeDi> Jonno_FTW, the point is that you can't count on `is`
+<Jonno_FTW> SnoopJeDi: this is well known
+<SnoopJeDi> Jonno_FTW, not to beginners
+<jusss> ok							        [09:48]
+<SnoopJeDi> hence...the reason this conversation is happening
+<Jonno_FTW> SnoopJeDi: right, the recommendation I read was that you only use
+	    `is None` and that's it. There's rarely a usecase
+
+--------------------------------------------------------------------------------
+
+<jusss> use dict to implement switch, there's a problem, what if the
+	'condition' isn't in the 'key'?
+<altendky> jusss: .get() to specify a default?
+<jusss> altendky: more details?
+<jusss> altendky: eg, c={'a':'b'}, c['d'] will keyerror		        [10:08]
+<altendky> jusss: sure, i said .get()
+<altendky> jusss: `{'option a': the_first_function, 'option b':
+	   the_second_function}.get('but i want something else',
+	   too_bad_try_again_function)`
+<jusss> altendky: wow, I see
+
+get(...)
+   D.get(k[,d]) -> D[k] if k in D, else d.  d defaults to None.
+
+---------------------------------------------------------------------
+<jusss> can I use if-else in function's parameters? like f(x if a=3 else b) ?
+								        [13:15]
+<_habnabit> jusss, `a=3` isn't an expression
+<jusss> _habnabit: then a==3
+<_habnabit> jusss, then yes					        [13:16]
+<jusss> _habnabit: wonderful_
+*** dxiri (~dxiri@186.32.223.123) has joined channel #python
+<jusss> _habnabit: I can use if-else in anywhere I want? 
+<_habnabit> jusss, sure
+<jusss> where I can't use it					        [13:17]
+<_habnabit> jusss, an import statement
+<ironfroggy> why can docstrings not be f-strings?
+<jusss> _habnabit: ok
+<jusss> but I tried it in python2.7, a='s'; a is 's' will return a True
+<_habnabit> jusss, that will give you a random value which may or may not be
+	    true
+<KirkMcDonald> jennie: 'is' is basically meaningless when applied to immutable
+	       objects.
+<SnoopJeDi> jusss, the simple version is that you should use == when you mean
+	    ==, which is always
+<SnoopJeDi> jusss, if you want a preview of why `is` will mislead you, try
+	    `[1,2,3] is [1,2,3]`
+<jusss> SnoopJeDi: wow, it is False
+<SnoopJeDi> jusss, because when evaluating that statement, Python creates
+	    *two* list objects which are NOT the same object.	        [09:46]
+<jusss> KirkMcDonald: what is immutable objects? you mean strings?
+<SnoopJeDi> They *are* equal, though, so `[1,2,3] == [1,2,3]`
+<Jonno_FTW> why are you so concerned about the behaviour of `is`? It only
+	    returns when two things point to the same memory. Of course it's
+	    going to give odd behaviour in edge cases
+*** tomvolek (~tomvolek@2601:647:4201:97a0:15f8:7129:f46a:6c8) has joined
+    channel #python
+<KirkMcDonald> jusss: Strings, integers, and others.
+*** Blue_Hat (~alciann@72.27.185.6) has joined channel #python
+<SnoopJeDi> jusss, "mutable" means something that can change. Immutable means
+	    the opposite.
+<jusss> if-else is statement or expression?
+<KirkMcDonald> jusss: Python has both.				        [13:26]
+<jusss> and put statements in the position of parameters of functions, that's
+	right?
+<KirkMcDonald> jusss: There is an if statement, and there is a conditional
+	       expression.
+
+<jusss> KirkMcDonald: so can I use statement as parameter in function?
+<jusss> I suppose it only support expressions
+<KirkMcDonald> jusss: Yeah. Function arguments are expressions.
+<jusss> in list comprehension, if there's only if statement ,you must put it
+	front of 'for' statement, if it's if-else then put it behind the
+	'for'
+<jusss> KirkMcDonald: that means I can use if-else as parameter, but I can't
+	use if-statement as parameter, and if-else is expression, if is just a
+	statement, am I correct?				        [13:32]
+<SnoopJeDi> jusss, no
+<KirkMcDonald> More or less. Note that the 'if' clause of a list comprehension
+	       is a third, different thing.			        [13:33]
+<SnoopJeDi> yea, it's easiest to just think of them as separate things
+	    entirely.
+<astronavt> it's basically SQL SELCT or LINQ
+<jusss> I'm fused						        [13:35]
+<jusss> confused
+<astronavt> [ <expression> for <variables> in <iterable> if <conditional> ]
+								        [13:36]
+<jusss> one by one, can I use statement as paramter?
+<jusss> [expression if-else for ...]
+<astronavt> oh i was talking about list comprehensions
+<astronavt> ohh
+<jusss> [expression for ... if without else]
+<SnoopJeDi> jusss, the grammar of Python is here:
+	    https://docs.python.org/3/reference/grammar.html Notice that
+	    `if_stmt` describes the valid form of a conditional block, but
+	    'if' also appears in several over valid contexts.
+<astronavt> yeah those are 2 different things
+<SnoopJeDi> they're just completely different things that happen to share
+	    tokens
+<astronavt> 'a if b then c' is just Python syntax for a conditional operator
+<astronavt> jusss so that 'a if b else c' is a standalone thing
+<astronavt> that can occur just about anywhere and it has nothing to do with
+	    list comprehensions
+<jusss> so I'm wonder f(x=3)   so that means I can use statement as parameter?
+*** lbalhar (~lbalhar@93.185.13.26) has joined channel #python	        [13:39]
+<astronavt> not in general, no
+<_habnabit> jusss, x=3 isn't a statement there
+<astronavt> f(x=while True: break)
+<_habnabit> jusss, it doesn't do assignment
+<jusss> confused again						        [13:40]
+<SnoopJeDi> jusss, even if you can do something like that, it's harder to read
+	    vs. just writing out the if-statement
+<SnoopJeDi> usually before the call
+<astronavt> jusss no you cannot use a statement as a function parameter, and
+	    it wouldn't make sense if you could
+<astronavt> can you give an example of a statement that you would like to use
+	    as a function parameter
+<jusss> I don't know, I though x=3 is a statemnt and if-else is a statement
+	too, now you tell me they're not			        [13:41]
+*** fprstn (~miller@62.241.196.200) has joined channel #python
+<_habnabit> jusss, confusingly, they're both
+<astronavt> x=3 is not a statement in that context
+<astronavt> neither is the conditional expression 'a if b else c'
+<jusss> so 'x=3' as parameter, it's not a statement , and what it is?
+<jusss> an expression?
+<_habnabit> jusss, keyword argument
+<astronavt> 'a if b else c' is special syntax for a conditional
+	    operator. 'f(x=3)' is special syntax that binds the value '3' to
+	    the function parameter 'x'
+<jusss> and except statement and expression, what those 'keyword' and
+	'operator' stuff are?
+<jusss> I'm so confused about those concepts
+<astronavt> jusss a "keyword argument" is "an argument that is bound by name,
+	    not position"
+<astronavt> in this case, f(x=3) means "bind to the argument named x" not
+	    "bind to the argument in the first position"	        [13:45]
+<astronavt> therefore "x" is a keyword argument here
+<astronavt> whereas in f(3) you only have the first positional argument
+<astronavt> jusss what other languages have you used? C?	        [13:46]
+<jusss> astronavt: scheme
+<astronavt> ah
+<astronavt> jusss have you used common lisp? or just scheme
+<jusss> astronavt: both
+<astronavt> (f :x 3)						        [13:47]
+<astronavt> or whatever the syntax is in CL
+<astronavt> (f &key :x 3)
+<astronavt> thats the one
+<jusss> astronavt: I know that, but mostly I just use the old way like
+	((lambda (x) ...) 3) 
+<astronavt> ok. well f(x=3) is equivalent to (f &key :x 3)
+<astronavt> an "operator" would just be a function that has special syntax
+<astronavt> like in python "3 + 4" the "+" still acts like a function even
+	    though it doesnt look like one
+<astronavt> same for 'a if b else c'
+<jusss> astronavt: a:b is true?c				        [13:50]
+<jusss> kind of?
+<deniska> `a if b else c` is fundamentally not a function
+<jusss> I forget it
+<astronavt> jusss yeah its like 'a ? b : c'
+<astronavt> deniska it is mathematically!			        [13:51]
+<astronavt> jusss ack i messed up the order. its 'b ? a : c'
+<deniska> astronavt: yeah, but in python it only evaluates an operand which is
+	  needed
+<jusss> astronavt: I don't know that either
+<astronavt> deniska true
+<deniska> I don't know the broader context of a discussion, just picking on
+	  technically wrong things, like people on irc do :)
+<astronavt> jusss its common in C-flavored languages		        [13:52]
+<jusss> astronavt: yeah, it is a operator
+<jusss> an
+<astronavt> (f &key :x (if a b c))  <==>  f(x=a if b else c)
+<astronavt> (f &key :x (if a b c))  <==>  f(x=b if a else c)
+<astronavt> scratch the first one... kinda tired
+<jusss> operator not are fucntions? that's right?		        [13:53]
+<jusss> a special syntax?
+<astronavt> mathematically they are, from python's perspective they can be
+	    anything
+<jusss> a special syntax created by functions?
+<astronavt> not necessarily created by...			        [13:54]
+<deniska> well, some operators in python are a special way of calling
+	  functions, some operators are, well, operators
+<astronavt> Wikipedia to the rescue				        [13:55]
+<astronavt> "Programming languages typically support a set of operators:
+	    constructs which behave generally like functions, but which differ
+	    syntactically or semantically from usual functions."
+<jusss> a + b, what is the function ways? add(a,b)?
+<jusss> why not +(a,b) ?
+<deniska> jusss: a.__add__(b)
+<jusss> oh yeah, OOP
+<deniska> well, it's what python actually does :)
+<astronavt> jusss i have never seen someone so steeped in lisp as you   [13:56]
+*** lifeai (~lifeand@80.240.20.120) has joined channel #python
+<astronavt> im kind of impressed
+<jusss> astronavt: just lambdas
+<deniska> in lisp + is just an ordinary function		        [13:57]
+<thebigj> I am trying to auto fix pep8 errors. I am using autopep8 for that.
+<jusss> astronavt: I'm so loving those without many symbols language, it is
+	simple and plain
+<jusss> just functions
+<jusss> and return tings
+<astronavt> jusss understandable
+<jusss> things
+<astronavt> jusss its written "a + b" and not "+(a, b)" because when people
+	    write regular math they write "a + b"
+<astronavt> and because most programming languages already did it that way :)
+<jusss> astronavt: yeah, I thought it would be (+ a b)
+<jusss> :)							        [13:59]
+<jusss> everything keeps in a list
+<jusss> or a dotted pair
+<astronavt> jusss sadly python code is not so easily represented as data
+<astronavt> but most python objects are based around associative arrays
+	    internally (i.e. hash tables, i.e. dicts)
+<astronavt> i think the only exceptions are basic built-in types
+<jusss> astronavt: speak of hash tables, now I have a question	        [14:04]
+<astronavt> but im probably wrong on some aspect of that
+*** libertyprime (~libertypr@uo-uod-student-04.nat.otago.ac.nz) has quit: Ping
+    timeout: 244 seconds					        [14:05]
+<astronavt> jusss whats the question
+*** EdJoJob (~EdJoJob@203.41.122.242) has quit: Ping timeout: 252 seconds
+*** XCE (~XCE@2601:646:8a01:4720:4d60:85a3:3ecf:3ca1) has joined channel
+    #python
+<jusss> astronavt: https://paste.ubuntu.com/p/k26KMpHVSv/
+<astronavt> jusss a list is not "hashable", therefore it can't be used as the
+	    key in a dictionary
+<astronavt> what are you trying to do with that line?
+<jusss> astronavt: you see I store functions as value in dict, and I want run
+	that functions
+<jusss> astronavt: like c={'a':f} then c['a']()
+<jusss> astronavt: use dict to avoid if-else
+<astronavt> jusss are you trying to run each function in sequence?
+<astronavt> oh
+<jusss> astronavt: not run each fucntion in sequence, just run one matched by
+	string 'p'
+<astronavt> jusss what happens if it's more than one?
+<astronavt> in your case there aren't any overlapping characters, but what if
+	    there is?
+<jusss> astronavt: then just trigger the first one I think
+<astronavt> jusss ok
+<astronavt> jusss do beware that in python 2.7 dictionary order is unspecified
+	    and cannot be relied on
+<astronavt> so the notion of "first" will be somewhat random in this case
+<jusss> astronavt: what if p isn't in k, what get_first() will get?
+<astronavt> jusss get_first just gets the next element of something
+	    iterable. if the iterable thing is empty, it returns the value of
+	    `default`, which is None in this case
+<astronavt> so if p isn't in k, get_first will get an empty sequence
+<astronavt> and return None
+<jusss> astronavt: doesn't it need a [] to contain k for ...?	        [14:29]
+<astronavt> nope :D
+<jusss> if I put [] in there, that would be wrong?
+*** astronavt_ (~astronavt@8.37.179.150) has joined channel #python
+<jusss> put[k for ..] not just 'k for..'
+<astronavt> jusss nope you dont need the []
+<astronavt> again, more syntax
+<astronavt> [] is for list comprehensions. that computes the whole result and
+	    collects it into a list
+<jusss> astronavt: because I heard there're dict comprehesion, so I don't want
+	mix that
+<astronavt> () is for *generator* comprehensions
+<astronavt> it's a lazy iterable
+<astronavt> so (i for i in range(10) if i > 5)
+<astronavt> is a lazy iterable of 6, 7, 8, 9
+<jusss> wow, now we have list comprehesion, generator comprehensions, dict
+	comprehension, and what else we have?
+<astronavt> thats about it i think
+<astronavt> oh, set comprehension
+<jusss> is there tuple comprehension
+<jusss> ?
+<astronavt> nope
+<jusss> and why?
+<astronavt> but...
+<astronavt> a generator comprehension lets you do something special     [14:32]
+<astronavt> f([i for i in range(10) if i > 5])
+<astronavt> thats valid right?
+*** MessedUpHare (~MessedUpH@213.205.198.145) has joined channel #python
+<jusss> yeah
+<astronavt> ok. and f((i for i in range(10) if i > 5)) is also valid
+<astronavt> you just replace the list comp with a generator comp
+<astronavt> now, heres the fun part
+-----------------------------------------------------------------------
+<astronavt> f(i for i in range(10) if i > 5) is equivalent to f((i for i in
+	    range(10) if i > 5))
+--------------------------------------------------------------------
+<astronavt> so get_first(k for k in self.procedures if p in k) is equivalent
+	    to get_first((k for k in self.procedures if p in k))
+
+<jusss> that's I'm confused, tuple use () too, and how I can know it is a
+	tuple or not						        [14:34]
+<astronavt> and (k for k in self.procedures if p in k) is a lazy iterable
+<astronavt> syntax, again
+<astronavt> (1, 2, 3)  <-  tuple
+<astronavt> (i for i in range(4) if i > 0)  <-  generator
+<jusss> [1,2,3] <- list
+<astronavt> (('a', i) for i in range(4) if i > 0)  <- generator that yields
+	    tuples :)
+<jusss> [if for whatever] <- list
+<astronavt> ((i for i in range(3)), (i for i in range(5))  <- tuple of
+	    generators!!					        [14:35]
+<astronavt> whoops i left out a trailing )
+<astronavt> ((i for i in range(3)), (i for i in range(5)))
+<jusss> ok, the key is the ',' I suppose
+<astronavt> pretty much						        [14:36]
+<astronavt> in fact, the () for a tuple aren't always necessary
+<astronavt> x = 1, 2
+<astronavt> that assigns the tuple (1, 2) to x
+<jusss> wow, wonderful
+<jusss> never heard
+<jusss> too many skills in python
+<astronavt> yes, its very heavy on syntax
+<astronavt> its just that if you are a native english speaker, it looks like
+	    written english. so its easy for us
+<energizer> all generators are iterators, not all iterators are generators
+<ziggylazer> astronavt, why would iteration be lazy or did I miss something?
+<astronavt> ziggylazer iteration with 'for' is lazy in that it calls next()
+	    repeatedly. in a generator, next() lazily produces the following
+	    value
+<ziggylazer> I see what you mean astronavt
+<jusss> how to express an empty sequence? like I can use [] to express an
+	empty list
+<jusss> use () ?
+<energizer> jusss: () is a tuple. you can use [] or () or set()
+<jusss> energizer: if generator comprehension return an empty sequence, how I
+	should now it's or not ?				        [15:48]
+<jusss> know
+<energizer> jusss: what do you want to do with it?
+<jusss> energizer: liek astronavt's code, on
+	https://paste.pound-python.org/show/vMjFFDaP6wSgxHkhhTCd/  
+<jusss> astronavt: you use try-except to catch en empty sequece, is there
+	other method
+<astronavt> jusss yes i found it out tonight			        [15:50]
+<astronavt> jusss next(some_generator, -1) will return -1 if some_generator is
+	    empty
+<jusss> I wonder how python to express an empty sequence?
+<astronavt> jusss usually an empty list is fine
+<astronavt> theres no generic notion of an empty sequence
+<jusss> astronavt: if I use [] to compare your code, that empty sequence, what
+	will happend
+<jusss> happen
+<astronavt> jusss you mean like next([], None) ?
+<energizer> i think juss is asking about == []
+<jusss> astronavt: I mean iterator == [] in your  return next(iterator)
+<astronavt> jusss next([]) will raise StopIteration error. next([], None) will
+	    return None.
+<astronavt> jusss: () or tuple() is empty tuple, [] or list() is empty list,
+	    {} or dict() is empty dictionary, and set() is empty set
+<jusss> generator comprehension may return an empty sequence, and can I use an
+	empty list to compare it or empty dict or tuple???
+<jusss> what is the proper way to do that
+<astronavt> no you cant
+<astronavt> if you need to compare to a dict, just use another dict
+<jusss> so I wonder how to express an empty sequence that generated by
+	generator comprehensions				        [15:57]
+<astronavt> jusss its not really the same thing
+<astronavt> an empty dict is an empty container
+<astronavt> an "empty generator" isnt a container, its a source of values that
+	    is no longer producing values
+
+--------------------------------------------------------------------
+python 2.7 dictionary order is unspecified  and cannot be relied on  
+字典是顺序是不明确的和不可依赖的
+
+-------------------------------------------------------------------
+
+用dict.get()来取代dict['whatever']来做switch取代if-else
+-----------------------------------------------------------------------
+-------------------------------------------------------------------------
+expression, statement, operator, syntax, keyword argument
+--------------------------------------------------------------------------
+list comprehension, generator comprehension, dict comprehension, set comprehension,
+-----------------------------------------------------------------------
+ 可以在函数的参数里用expression或operator但不能用statement
+
+f(a if b==3 else c) 这里面的是operator
+
+除了不能在import statement里用 xx if xx else这种operator,可以在其它任何地方使用
+
+express if what else xxx 是个operator,就像C里面的a:b?c是个syntax，不是expresson or statement
+if在list里面和不在list里面是不一样的
+
+'a if b else c' 和 'if a: b else: c'是不一样的，前者是个syntax,后者是个if-statement加个expression
+
+x=3做函数的参数时并不是assignment statement,不做参数时，是，
+---------------------------------------------------------------------------
+generator comprehension,  (i for i in range(10) if i > 5) and it's not a tuple and there's no tuple comprehension, but you can use that to generate a tuple just put ',' into it
+如果generator comprehension里面什么都不匹配的话会返回一个empty sequence,然后用try: next(this-empty-sequence)来判断是否是empty sequence
+而如果是list comprehension的话不匹配会返回一个empty list即[]
+
+区别是generator comprehension的返回值和tuple有什么区别，主要是','
+
+generator和iterator都是用于延迟求值，而generator是由yield生成，而iterator则是可iterable的东西
+如list, tuple, dict, str... generator都是iterator,而iterator并不全是generator
+
+<astronavt> (i for i in range(4) if i > 0)  <-  generator
+<astronavt> (('a', i) for i in range(4) if i > 0)  <- generator that yields
+	    tuples :)
+
+<astronavt> in fact, the () for a tuple aren't always necessary
+<astronavt> x = 1, 2
+<astronavt> that assigns the tuple (1, 2) to x
+
+<astronavt> jusss: () or tuple() is empty tuple, [] or list() is empty list,
+	    {} or dict() is empty dictionary, and set() is empty set
+<astronavt> if you need to compare to a dict, just use another dict
+<astronavt> an "empty generator" isnt a container, its a source of values that
+	    is no longer producing values
+
+r = (i for i in range(0,9) if i > 10)
+r是个generator object,而且是个不可iterable的generator, 如果对它做next(r)会raise exception
+可以用next(r,None)来判断是否是个空的generator, 如果是empty，则会返回None
+
+但是好像没有一个专门的keyword来表述这个empty generator,也就是empty sequence
+比如empty list有[]
+------------------------------------------------------------------------------
+dict有.keys()和.values()方法，还有.get(key,if-not)方法
+proc = next((k for k in self.procedures if p in k), None)
+(k for k in ...)是个generator comprehension,返回的是个generator object,可以用
+next()作用在上面，得到第一个迭代出来的值，如果是不可迭代就返回None
+-----------------------------------------------------------------------------
+清空列表 alist[:]=[]
+--------------------------------------
+str(a_str.split(':')[2:])  this is wrong to get a string, this will get a list within a string,
+
+>>> a='ab : cd :ed w'
+>>> a.split(':')[2:]
+['ed w']
+>>> str(a.split(':')[2:])
+"['ed w']"
+>>> c=str(a.split(':')[2:])
+>>> ''.join(c)
+"['ed w']"
+
+
+>>> a='ab : cd :ed w :waht'
+>>> a.split(':')[2:]
+['ed w ', 'waht']
+>>> a.split(':',2)[2]
+'ed w :waht'
+
+S.split([sep [,maxsplit]]) -> list of strings
+
+String to List, and List to String
+---------------------------------------------------
+
+JavaScript代码可以直接嵌在网页的任何地方，不过通常我们都把JavaScript代码放到<head>中：
+<head>
+  <script>
+    alert('Hello, world');
+  </script>
+</head>
+第二种方法是把JavaScript代码放到一个单独的.js文件，然后在HTML中通过<script src="..."></script>引入这个文件：
+<head>
+  <script src="/static/js/abc.js"></script>
+</head>
+这样，/static/js/abc.js就会被浏览器执行。
+<script type="text/javascript">
+是没有必要的，因为默认的type就是JavaScript，所以不必显式地把type指定为JavaScript。
+
+下面的一行代码就是一个完整的赋值语句：
+var x = 1;
+
+if (2 > 1) {
+    x = 1;
+    y = 2;
+    z = 3;
+}
+
+以//开头直到行末的字符被视为行注释
+另一种块注释是用/*...*/把多行字符包裹起来，
+JavaScript严格区分大小写
+JavaScript不区分整数和浮点数，统一用Number表示，以下都是合法的Number类型
+-99; // 负数
+NaN; // NaN表示Not a Number，当无法计算结果时用NaN表示
+Infinity; // Infinity表示无限大，当数值超过了JavaScript的Number所能表示的最大值时，就表示为Infinity
+十六进制用0x前缀和0-9，a-f表示，
+布尔值只有true、false两种
+&&运算是与运算，只有所有都为true，&&运算结果才是true：
+||运算是或运算，只要其中有一个为true，||运算结果就是true：
+!运算是非运算，它是一个单目运算符，把true变成false，false变成true：
+由于JavaScript这个设计缺陷，不要使用==比较，始终坚持使用===比较。
+另一个例外是NaN这个特殊的Number与所有其他值都不相
+唯一能判断NaN的方法是通过isNaN()函数：
+null表示一个“空”的值，它和0以及空字符串''不同，0是一个数值，''表示长度为0的字符串，而null表示“空”。
+[1, 2, 3.14, 'Hello', null, true];
+另一种创建数组的方法是通过Array()函数实现：
+
+new Array(1, 2, 3); // 创建了数组[1, 2, 3]
+
+var arr = [1, 2, 3.14, 'Hello', null, true];
+
+JavaScript的对象是一组由键-值组成的无序集合，例如：
+
+var person = {
+    name: 'Bob',
+    age: 20,
+    tags: ['js', 'web', 'mobile'],
+    city: 'Beijing',
+    hasCar: true,
+    zipcode: null
+};
+
+JavaScript对象的键都是字符串类型，值可以是任意数据类型。上述person对象一共定义了6个键值对，其中每个键又称为对象的属性，例如，person的name属性为'Bob'，zipcode属性为null。
+
+要获取一个对象的属性，我们用对象变量.属性名的方式：
+
+person.name; // 'Bob'
+person.zipcode; // null
+
+变量在JavaScript中就是用一个变量名表示，变量名是大小写英文、数字、$和_的组合，且不能用数字开头。变量名也不能是JavaScript的关键字，如if、while等。申明一个变量用var语句
+在JavaScript中，使用等号=对变量进行赋值。可以把任意数据类型赋值给变量，同一个变量可以反复赋值，而且可以是不同类型的变量，但是要注意只能用var申明一次，例如：
+
+var a = 123; // a的值是整数123   assign
+a = 'ABC'; // a变为字符串        re-assign
+
+这种变量本身类型不固定的语言称之为动态语言，与之对应的是静态语言。静态语言在定义变量时必须指定变量类型，如果赋值的时候类型不匹配，就会报错。例如Java是静态语言，赋值语句如下：
+
+int a = 123; // a是整数类型变量，类型用int申明
+a = "ABC"; // 错误：不能把字符串赋给整型变量
+
+和静态语言相比，动态语言更灵活，就是这个原因。
+
+var x = 100;
+console.log(x);
+
+如果一个变量没有通过var申明就被使用，那么该变量就自动被申明为全局变量：
+
+i = 10; // i现在是全局变量
+由于多行字符串用\n写起来比较费事，所以最新的ES6标准新增了一种多行字符串的表示方法，用反引号 ` ... ` 表示
+要把多个字符串连接起来，可以用+号连接
+var message = `你好, ${name}, 你今年${age}岁了!`;  //变量在字符串里展开
+var s = 'Hello, world!';
+s.length; // 13
+s[0]; // 'H'
+JavaScript为字符串提供了一些常用方法，注意，调用这些方法本身不会改变原有字符串的内容，而是返回一个新字符串：
+s.indexOf('world'); // 返回7 otherwise it will return -1
+s.substring(0, 5); // 从索引0开始到5（不包括5），返回'hello'
+var arr = [1, 2, 3];
+arr.length = 6;
+arr; // arr变为[1, 2, 3, undefined, undefined, undefined]
+slice()就是对应String的substring()版本，它截取Array的部分元素，然后返回一个新的Array：
+
+var arr = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
+arr.slice(0, 3); // 从索引0开始，到索引3结束，但不包括索引3: ['A', 'B', 'C']
+arr.slice(3); /
+var arr = ['A', 'B', 'C', 1, 2, 3];
+arr.join('-'); // 'A-B-C-1-2-3'
+
+concat()方法把当前的Array和另一个Array连接起来，并返回一个新的Array：
+
+JavaScript的默认对象表示方式{}可以视为其他语言中的Map或Dictionary的数据结构，即一组键值对。
+
+但是JavaScript的对象有个小问题，就是键必须是字符串。但实际上Number或者其他数据类型作为键也是非常合理的。
+Map是一组键值对的结构，具有极快的查找速度。
+var m = new Map([['Michael', 95], ['Bob', 75], ['Tracy', 85]]);
+m.get('Michael'); // 95
+m.delete('Adam'); // 删除key 'Adam'
+m.set('Adam', 67); // 
+
+Set和Map类似，也是一组key的集合，但不存储value。由于key不能重复，所以，在Set中，没有重复的key。
+
+要创建一个Set，需要提供一个Array作为输入，或者直接创建一个空Set：
+
+var s1 = new Set(); // 空Set
+var s2 = new Set([1, 2, 3]); // 含1, 2, 3
+重复元素在Set中自动被过滤：
+
+var s = new Set([1, 2, 3, 3, '3']);
+s; // Set {1, 2, 3, "3"}
+
+for (i=0; i<arr.length; i++) {...}
+for (var key in o) {...}
+while () {}
+do {} while ()
+
+for ... in循环由于历史遗留问题，它遍历的实际上是对象的属性名称。一个Array数组实际上也是一个对象，它的每个元素的索引被视为一个属性。
+
+当我们手动给Array对象添加了额外的属性后, key会使用，value不会
+for ... of循环则完全修复了这些问题，它只循环集合本身的元素, key不会被使用
+
+然而，更好的方式是直接使用iterable内置的forEach方法，它接收一个函数，每次迭代就自动回调该函数。以Array为例
+a.forEach(function (element, index, array) {
+    // element: 指向当前元素的值
+    // index: 指向当前索引
+    // array: 指向Array对象本身
+    console.log(element + ', index = ' + index);
+});
+
+如果对某些参数不感兴趣，由于JavaScript的函数调用不要求参数必须一致，因此可以忽略它们。例如，只需要获得Array的element：
+
+var a = ['A', 'B', 'C'];
+a.forEach(function (element) {
+    console.log(element);
+});
+
+
+----------------------------------------------------------------------------------------------
+python, list object is not an iterator!!!
+<energizer> jusss: iterable not iterator, because it doesnt implement the iterator protocol, https://nedbatchelder.com/text/iter.html
+但是list object有list.__iter__()方法，可以返回一个iterator,或者使用iter(list)
+>>> iter(a)
+<listiterator object at 0x02D6B9B0>
+>>> c=iter(a)
+>>> next(c)
+1
+>>> a.__iter__()
+<listiterator object at 0x02D7C530>
+---------------------------------------------------------------------------
+
+在JavaScript中，定义函数的方式如下：
+
+function abs(x) {
+    if (x >= 0) {
+        return x;
+    } else {
+        return -x;
+    }
+}
+
+由于JavaScript的函数也是一个对象，上述定义的abs()函数实际上是一个函数对象，而函数名abs可以视为指向该函数的变量。
+
+因此，第二种定义函数的方式如下：
+
+var abs = function (x) {
+    if (x >= 0) {
+        return x;
+    } else {
+        return -x;
+    }
+};
+
+在这种方式下，function (x) { ... }是一个匿名函数，它没有函数名。但是，这个匿名函数赋值给了变量abs，所以，通过变量abs就可以调用该函数。
+
+上述两种定义完全等价，注意第二种方式按照完整语法需要在函数体末尾加一个;，表示赋值语句结束。
+
+JavaScript还有一个免费赠送的关键字arguments，它只在函数内部起作用，并且永远指向当前函数的调用者传入的所有参数。arguments类似Array但它不是一个Array
+用rest获取剩下的
+function foo(a, b, ...rest) {}
+
+在JavaScript中，用var申明的变量实际上是有作用域的。
+不在任何函数内定义的变量就具有全局作用域。实际上，JavaScript默认有一个全局对象window，全局作用域的变量实际上被绑定到window的一个属性：
+
+'use strict';
+
+var course = 'Learn JavaScript';
+alert(course); // 'Learn JavaScript'
+alert(window.course); // 'Learn JavaScript'
+
+因此，直接访问全局变量course和访问window.course是完全一样的。
+你可能猜到了，由于函数定义有两种方式，以变量方式var foo = function () {}定义的函数实际上也是一个全局变量，因此，顶层函数的定义也被视为一个全局变量，并绑定到window对象：
+'use strict';
+
+function foo() {
+    alert('foo');
+}
+
+foo(); // 直接调用foo()
+window.foo(); // 通过window.foo()调用
+进一步大胆地猜测，我们每次直接调用的alert()函数其实也是window的一个变量
+这说明JavaScript实际上只有一个全局作用域。任何变量（函数也视为变量），如果没有在当前函数作用域中找到，就会继续往上查找，最后如果在全局作用域中也没有找到，则报ReferenceError错误。
+----------------------------------------------------------------
+名字空间
+
+全局变量会绑定到window上，不同的JavaScript文件如果使用了相同的全局变量，或者定义了相同名字的顶层函数，都会造成命名冲突，并且很难被发现。
+
+减少冲突的一个方法是把自己的所有变量和函数全部绑定到一个全局变量中。例如：
+
+// 唯一的全局变量MYAPP:
+var MYAPP = {};
+
+// 其他变量:
+MYAPP.name = 'myapp';
+MYAPP.version = 1.0;
+
+// 其他函数:
+MYAPP.foo = function () {
+    return 'foo';
+};
+
+把自己的代码全部放入唯一的名字空间MYAPP中，会大大减少全局变量冲突的可能。
+
+许多著名的JavaScript库都是这么干的：jQuery，YUI，underscore等等。
+
+为了解决块级作用域，ES6引入了新的关键字let，用let替代var可以申明一个块级作用域的变量：
+
+'use strict';
+
+function foo() {
+    var sum = 0;
+    for (let i=0; i<100; i++) {
+        sum += i;
+    }
+    // SyntaxError:
+    i += 1;
+}
+ES6标准引入了新的关键字const来定义常量，const与let都具有块级作用域：
+
+'use strict';
+
+const PI = 3.14;
+PI = 3; // 某些浏览器不报错，但是无效果！
+PI; // 3.14
+
+var局部作用域变量声明，let用于for中的块作用域，const用于不可变的常量
+
+在ES6中，可以使用解构赋值，直接对多个变量同时赋值：
+var [x, y, z] = ['hello', 'JavaScript', 'ES6'];
+[...]指代[x,y,z]
+
+快速获取当前页面的域名和路径：
+
+var {hostname:domain, pathname:path} = location;
+
+在JavaScript中，对象的定义是这样的：
+
+var xiaoming = {
+    name: '小明',
+    birth: 1990
+    age: function () {
+        var y = new Date().getFullYear();
+        return y - this.birth;
+};
+在一个方法内部，this是一个特殊变量，它始终指向当前对象，也就是xiaoming这个变量。所以，this.birth可以拿到xiaoming的birth属性。
+如果单独调用函数，比如getAge()，此时，该函数的this指向全局对象，也就是window
+
+var fn = xiaoming.age; // 先拿到xiaoming的age函数
+fn(); // NaN
+
+也是不行的！要保证this指向正确，必须用obj.xxx()的形式调用！
+修复的办法也不是没有，我们用一个that变量首先捕获this：
+ age: function () {
+        var that = this; // 在方法内部一开始就捕获this
+        function getAgeFromBirth() {
+            var y = new Date().getFullYear();
+            return y - that.birth; // 用that而不是this
+        }
+
+js的函数对象竟然还有apply和call方法
+function getAge() {
+    var y = new Date().getFullYear();
+    return y - this.birth;
+}
+
+var xiaoming = {
+    name: '小明',
+    birth: 1990,
+    age: getAge
+};
+
+xiaoming.age(); // 25
+getAge.apply(xiaoming, []); // 25, this指向xiaoming, 参数为空
+
+另一个与apply()类似的方法是call()，唯一区别是：
+
+    apply()把参数打包成Array再传入；
+
+    call()把参数按顺序传入。
+
+比如调用Math.max(3, 5, 4)，分别用apply()和call()实现如下：
+
+Math.max.apply(null, [3, 5, 4]); // 5
+Math.max.call(null, 3, 5, 4); // 5
+
+----------------------------------------------------
+var whatever = function () {...} 这个匿名函数不就是lambda???
+var whatever = {};
+whatever.bla='xxx'; 直接把命名空间挂到全局变量window.whatever里
+所有函数对象还有apply和call方法，可以用来做装饰器
+'use strict';
+
+var count = 0;
+var oldParseInt = parseInt; // 保存原函数
+
+window.parseInt = function () {
+    count += 1;
+    return oldParseInt.apply(null, arguments); // 调用原函数
+};
+
+修饰器就是在函数运行前或后插入一些代码，但是无法在函数里插入,不像newlisp，
+newlisp的lambda list就是个普通的list,可以car cdr whatever you want
+
+迄今为止感觉最bold的两个语言就是js和newlisp了，newlisp的lambda list和f-expression, js的function全是匿名函数且全挂在一个全局变量window上，命名空间也挂在一个变量上，函数对象还有apply和call方法，而且感觉它的类或者命名空间就是python的dict 
+
+<eiGHttt> js没有类的概念，只是原型链模拟，class只是个语法糖。连个多重继承都没有，
+	  只能用mixin方式实现。
+
+-----------------------------------------------------------------
+Higher-order function高阶函数，以函数为参数的函数
+js的Array对象竟然还自带map方法，屌！
+
+'use strict';
+
+function pow(x) {
+    return x * x;
+}
+
+
+var arr = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+var results = arr.map(pow); // [1, 4, 9, 16, 25, 36, 49, 64, 81]
+console.log(results);
+
+var arr = [1, 3, 5, 7, 9];
+arr.reduce(function (x, y) {
+    return x + y;
+}); // 25
+
+要把[1, 3, 5, 7, 9]变换成整数13579，reduce()也能派上用场：
+
+var arr = [1, 3, 5, 7, 9];
+arr.reduce(function (x, y) {
+    return x * 10 + y;
+}); // 13579
+
+filter()接收的回调函数，其实可以有多个参数。通常我们仅使用第一个参数，表示Array的某个元素。回调函数还可以接收另外两个参数，表示元素的位置和数组本身：
+
+var arr = ['A', 'B', 'C'];
+var r = arr.filter(function (element, index, self) {
+    console.log(element); // 依次打印'A', 'B', 'C'
+    console.log(index); // 依次打印0, 1, 2
+    console.log(self); // self就是变量arr
+    return true;
+});
+--------------------------------------------------------------
+<jusss> function called callback when it's as a parameter, function called
+	closure when it's by returned and inside a function, do something
+	before or after function, that called decorator, is there anything
+	else like those concepts?
+<energizer> jusss: there's a lot of stuff like that in functional programming
+<energizer> jusss:
+	    https://github.com/dbrattli/oslash/wiki/Functors,-Applicatives,-And-Monads-In-Pictures
+<jusss`> eiGHttt: 函数做参数叫callback, 把函数当返回值返回，叫closure, 在函数运
+	 行前或后添加些code叫decorator, 还有其它的没？？？
+<eiGHttt> 来一套柯里化函数？
+--------------------------------------------------------------
+
+一个函数A做另一个函数B的参数，这个A就叫callback函数
+一个函数A在另一个函数B里面被返回,A且调用了B里面的变量，这个函数A就叫closure
+在函数A运行前或后添加一些code然后重命名为A,这个叫做decorator
+函数A的参数是一个函数，这个函数A就叫higher-order function
+
+-----------------------------------------------------------------
+js的Array对象有map, reduce, filter, sort等方法,这四个都是higher-order function
+'use strict';
+
+var arr = [10, 20, 1, 2];
+arr.sort(function (x, y) {
+    if (x < y) {
+        return -1;
+    }
+    if (x > y) {
+        return 1;
+    }
+    return 0;
+});
+console.log(arr); // [1, 2, 10, 20]
+
+Array.sort()会修改当前的array,所以最好还是先保存当前的array为其它的名字
+
+----------------------------------------------------------
+Python’s closures are late binding. This means that the values of variables used in closures are looked up at the time the inner function is called.
+
+adders=[0,1,2,3]
+
+for i in [0,1,2,3]:
+   adders[i]=lambda a: i+a
+
+print adders[1](3)
+
+https://docs.python-guide.org/writing/gotchas/#late-binding-closures
+
+调用时去定义的环境里寻找变量
+
+解决方方法就是让其求值，adders[i]= lambda a,b=i: a+b
+或 adders[i] = (lambda b: lambda a: a+b)(i)
+-------------------------------------------------------------
+Arrow Function
+x => x*x 等同 function (x) { return x*x; }
+x => { if (x>0) {return x*x;}
+       else {return - x*x;}}
+(x,y) => x*x + y*y
+() => 3.14
+(x,y, ...rest) => { 
+ var i, sum = x + y;
+    for (i=0; i<rest.length; i++) {
+        sum += rest[i];
+    }
+    return sum;
+}
+
+x => { foo: x } 返回的是个对象 {foo: x}    
+x => ({foo: x})
+
+
+generator跟函数很像，定义如下：
+
+function* foo(x) {
+    yield x + 1;
+    yield x + 2;
+    return x + 3;
+}
+
+generator和函数不同的是，generator由function*定义（注意多出的*号），并且，除了return语句，还可以用yield返回多次。
+调用generator对象有两个方法，一是不断地调用generator对象的next()方法
+第二个方法是直接用for ... of循环迭代generator对象，这种方式不需要我们自己判断done
+
+
+------------------------------------------------------------
+The Lumineers - Sleep On The Floor
+-----------------------------------------------
