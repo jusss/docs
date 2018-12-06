@@ -1,3 +1,124 @@
+
+python的类定义里，里面的变量定义需要加上self.var才能在类里面通用
+如果没有加self.则只在本函数里面使用
+
+
+在模块内、在所有函数外面、在class外面，这就是全局变量
+
+在函数内、在class的方法内（未加self修饰），这就是局部变量, 只能在函数内使用
+
+在class内的，但不在class的方法内的，这就是静态变量,也叫类变量，通过类名访问或实例名访问，且全局共享
+
+在class的方法内的，用self修饰的变量，这就是实例变量,不共享
+
+不共享: 局部变量 实例变量
+共享: 全局变量 类变量
+两个文件直接共享实例，可以把这个实例实例化在一个类的定义里面，但是用类变量的方式，在类里但在类里的方法外且没有加self实例化这个实例,然后可以在其它文件里引入这个类然后用类名.方法来操作这个实例  
+
+
+定义self变量只能在第一层函数内
+只有第一层函数有self
+在第一层函数外定义的没有self的变量，是全局变量，类和所有实例都会共享，一个改变，都会改变
+self指的是实例
+
+class C:
+    print('running early 1')
+    class_attribute = [42]
+
+    def __init__(self, value):
+        print('running late')
+        self.instance_attribute = [value]
+
+    print('running early 2')
+
+
+print('about to create a = C()')
+a = C(37)
+print('about to create b = C()')
+b = C(25)
+
+C.class_attribute.append(19)
+
+a.class_attribute.append(17)
+a.instance_attribute.append(13)
+b.instance_attribute.append(9)
+
+print(C.class_attribute)
+print(a.class_attribute)
+print(b.class_attribute)
+print(a.instance_attribute)
+print(b.instance_attribute)
+
+[42, 19, 17]
+[42, 19, 17]
+[42, 19, 17]
+[37, 13]
+[25, 9]
+
+---------------------------------------------------------------------------------------------------
+
+class fs:
+    pass
+
+def add_att(self):
+    self.x=3
+
+    def y():
+        print(y.__name__)
+
+    self.y=y
+
+    return self
+
+fs = add_att(fs)
+
+but in real class, you can't use self directly in class
+
+class fs:
+  self.x=3          self is not defined
+
+you have to put self.x=3 into a function, you have to define variables in functions,
+cause function have the parameter 'self'
+then you need put self.x=3 into __init__(self) or other functions f(self)
+
+
+___________________________________________________________________________________________________
+js里[]是object 而""不是object 是primitive data type, new String("")是object
+
+f= (function(self){self.s=function(x){return x+1}; private_function=function(){}; self.a=3; private_a=9; return self})(windows.f||{})
+如果window.f存在就追加method和attribute,还可以在里面玩私有的method and attribute
+
+用闭包加动态给类添加属性的玩法玩  from github.com/ happy pepper hacking 
+=============================================================================
+
+用闭包模拟类, 双层闭包, 用list instead of dict, {"a":a, "b":b} (("a" a) ("b" b))
+
+; let over lambda over let over lambda
+(define let-create-obj
+	(let ((hidden 5))
+	     (lambda ()
+	     	     (let ((state 1))
+		     	  (list (lambda () (+ hidden state))
+			  	(lambda (v) (set! state v)))))))
+(define obj1 (let-create-obj))
+(define obj1-get-state (car obj1))
+(define obj1-set-state (cadr obj1))
+(define obj2 (let-create-obj))
+(define obj2-get-state (car obj2))
+(define obj2-set-state (cadr obj2)) ; test
+(obj1-get-state) ; 6
+(obj1-set-state 2)
+(obj1-get-state) ; 7
+(obj2-get-state) ; 6
+(obj2-set-state 3)
+(obj2-get-state) ; 8
+
+
+
+https://www.jianshu.com/p/322945f44f18
+
+__________________________________________________________________
+
 动态作用域就是整个程序运行的时候只有一个env。什么是env呢？env就是一组binding。binding是什么呢？
 binding就是从identifer到value的映射。dynamic scope在每次函数求值的时候都会在这唯一的一个env里查询或更新
 而static scope是每次函数求值的时候都创建一个新的env，包含了函数定义时候的所能访问到的各种binding。
