@@ -1,0 +1,3 @@
+deepin desktop environment on archlinux
+支持触摸板操作，lightdm + mutter
+最好先开lightdm再开fcitx, 而fcitx在emacs里总是预输入,

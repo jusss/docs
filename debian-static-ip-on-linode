@@ -1,0 +1,39 @@
+# check current ip
+ip -0 addr
+
+# check how it wrote
+cat /etc/network/interfaces
+
+# after change interfaces file then restart it
+service networking status    #same as systemctl restart networking
+
+# vim interface
+
+$ cat interfaces 
+# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+
+source /etc/network/interfaces.d/*
+
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+# The primary network interface
+allow-hotplug eth0
+#iface eth0 inet dhcp
+
+iface eth0 inet static
+
+address your-public-ip/24
+gateway your-public-ip-v4-gateway
+
+iface eth0 inet6 static
+address your-ipv6/64
+gateway fe80::1
+
+iface eth0 inet6 static
+address your-ipv6/64
+
+https://linode.com/docs/networking/linux-static-ip-configuration/
+

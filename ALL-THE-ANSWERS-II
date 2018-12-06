@@ -1,4 +1,307 @@
 
+python's requests not work, there're curl urllib httplib tornado
+twisted, aiohttp,
+
+######################## microsoft stt tornado without chunked ######################
+
+class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+        import json, urllib, tornado.httpclient
+        self.headers = {'Ocp-Apim-Subscription-Key': '3d6784e3a60a48468d582d3ad5edca3f','Content-type': 'audio/ogg; codec=audio/pcm; samplerate=16000','Accept': 'application/json'}
+        self.filename='/home/nao/test2.ogg'
+        self.http_client = tornado.httpclient.HTTPClient()
+
+    def onInput_onStart(self,p):
+        self.p=p
+        self.filename='/home/nao/test2.ogg'  if self.p == "even" else '/home/nao/test1.ogg'
+        try:
+           response = self.http_client.fetch('https://westus.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=zh-CN',method='POST',headers=self.headers,body=open(self.filename,'rb').read())
+           self.final_result = json.loads(response.body).get("DisplayText","I Don't Understand ")[:-1]
+           
+        except:
+            self.final_result = "I Don't Understand"
+
+        self.stt_output(self.final_result.encode('utf-8'))
+
+#################### turing123 tornado ######################
+
+class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+        import tornado.httpclient, urllib, json
+        self.http_client = tornado.httpclient.HTTPClient()
+    def onLoad(self):
+
+        #put initialization code here
+        pass
+
+    def onUnload(self):
+        #put clean-up code here
+        pass
+
+    def onInput_onStart(self, p):
+        if p == "I Don't Understand":
+            self.ai_output("I Don't Understand")
+        else:
+            try:
+                post_data={"reqType":0,"perception":{"inputText":{"text":p},"inputImage":{"url": "imageUrl"},"selfInfo":{"location":{"city":"北京","province":"北京","street":"信息路"}}},"userInfo":{"apiKey":"79229c49d0014c68ab90b9282ebf7156","userId": "360371"}}
+                data_send = json.dumps(post_data).encode("utf-8")
+                response = self.http_client.fetch('http://openapi.tuling123.com/openapi/api/v2',method='POST',body=data_send)
+        
+                t=json.loads(response.body)["results"][0]["values"].get("text","我还不知道，换个吧")
+                self.ai_output(t.encode('utf-8'))
+            except:
+                self.ai_output("我还不知道，换个吧")
+
+    def onInput_onStop(self):
+        self.onUnload() #it is recommended to reuse the clean-up as the box is stopped
+        self.onStopped() #activate the output of the box
+
+
+############ turing123 ########################################
+
+import requests, json
+        if p == "I Don't Understand":
+            self.ai_output("I Don't Understand")
+        else:
+            try:
+                r = requests.post('http://openapi.tuling123.com/openapi/api/v2', json={"reqType":0,"perception":{"inputText":{"text":p},"inputImage":{"url": "imageUrl"},"selfInfo":{"location":{"city": "北京","province":"北京","street":"信息路"}}},"userInfo":{"apiKey":"79229c49d0014c68ab90b9282ebf7156","userId": "360371"}})
+                t=json.loads(r.content)["results"][0]["values"].get("text","我还不知道，换个吧")
+                #print(t.encode('utf-8'))
+                self.ai_output(t.encode('utf-8'))
+            except:
+                self.ai_output("我还不知道，换个吧")
+
+
+################ microsoft stt #########################
+
+ self.headers = {
+            'Transfer-Encoding': 'chunked',
+            'Ocp-Apim-Subscription-Key': '3d6784e3a60a48468d582d3ad5edca3f',
+            'Content-type': 'audio/wav; codec=audio/pcm; samplerate=16000'}
+        self.filename='/home/nao/test2.ogg'
+
+ def saf(self,m):
+        with open(m, 'rb') as f:
+            while 1:
+                data=f.read(1024)
+                if not data:
+                    break
+                yield data
+
+
+ import requests
+        self.p=p
+        if self.p == "even":
+            self.filename='/home/nao/test2.ogg'
+
+        else:
+            self.filename='/home/nao/test1.ogg'
+
+        self.response = requests.post('https://westus.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=zh-CN', headers=self.headers,  data=self.saf(self.filename))
+
+        #print(response.content)
+        try:
+            self.final_result = json.loads(self.response.content)["DisplayText"][:-1]
+
+        except:
+            self.final_result = "I Don't Understand"
+
+        #os.popen("rm " + self.filename)
+        #self.stt_end()
+        self.stt_output(self.final_result.encode('utf-8'))
+
+#####################################################
+emacs有个输入法框架eim  https://www.emacswiki.org/emacs/EimForChinese
+还有quail 和 pyim
+
+#########################################################################
+
+假设有这样一个传感器，每次接触，它会连续输出两个信号(每输出一次信号执行一次函数signal)，
+这个传感器连着一个灯泡，传感器输出"on"信号和"off"信号可以开关灯泡(use light("on"))，
+我希望接触一下传感器输出"on"打开灯泡，再接触一下输出"off"关闭灯泡，
+
+think: 1 1 1 1 1 1 1 1 1 1 1 1 1
+
+outputer = (lambda x: lambda y: (lambda z: lambda: [z[-1], z.append(False) if z[-1] else z.append(True)][0])([x<y]))(3)(4)
+counter = (lambda x: lambda: [x.append(x[-1]+1),x][-1][-1])([0])
+odd=lambda x: False if x%2 == 0 else True
+
+define signal():
+       if odd(counter()):
+            if outputer():
+	         light("on")
+            else:
+	         light("off")
+
+
+
+
+#######################################################################
+
+#json  json is a string like '{"hi":"hello"}'
+but python's requests takes a dict and then serializes that as JSON
+so it's json={...} in requrest.post() and it's not json='{...}'
+
+and "1" is json,    https://tools.ietf.org/html/rfc7159
+
+#####################################################################
+
+### Promise call-way in python, not really Promise like in js
+
+def gf(f):
+    x=1
+    return f(x)
+## same as Promise.then(function(x){...}).then(function(y){...})
+## f is function(x){...}
+## or you want gf()(f(x)) and x is gf()
+## then
+def gf():
+    x=1
+    return lambda y: y(x)
+def g(x):
+    return x+1
+
+gf()(lambda x: x+1) actually is gf()(g)
+
+## Promise.then(function(x){...}) it's just f not f(x)
+
+
+################################################################################
+
+#longline
+when one line is too long, it will slow emacs
+;;; close long line
+M-x toggle-truncate-lines 
+M-x font-lock-mode
+
+disable the color
+
+(defun turn-off-font-lock-when-long-lines ()
+  (when (and (buffer-file-name)
+             (< 1 (point-max))          ; skip empty buffers
+             (<
+              ;; "threshhold" newline ratio --- one newline every X chars
+              ;; UPDATE: 132 ("wide terminal") width was a little too narrow for edge cases, e.g. prisonpc.xcd's ratio is 138.
+              150
+              ;; current file's mean codepoints-per-line ("newline ratio")
+              (/ (- (point-max) (point-min))
+                 (count-lines (point-min)
+                              (point-max)))))
+    (font-lock-mode -1)
+    (message "Emacs syntax highlighting struggles on files with no/few newlines, like this one.  Therefore, I have disabled it.  To turn it back on, M-x font-lock-mode RET.")))
+turn-off-font-lock-when-long-lines
+
+(add-hook 'find-file-hook 'turn-off-font-lock-when-long-lines)
+(turn-off-font-lock-when-long-lines global-auto-complete-mode-check-buffers url-handlers-set-buffer-mode global-eldoc-mode-check-buffers global-font-lock-mode-check-buffers epa-file-find-file-hook vc-refresh-state)
+
+
+##################################################################################
+
+### implement closure with closure, another useless thought
+### a=3; b=[a]; and b is [3] but I want [a], I want it can return a idenfifier so I can operate
+### but it seems only macro in lisp can do that, or use eval to evaluate strings, but that is not what I want
+### I want identifier
+
+def f(x):
+    def set(k,v):
+        id[k]=v
+        return lambda i: id[i]
+    id={"set":set}
+    return id[x]
+
+"""
+f9=(lambda id:
+lambda x:
+def set(k,v):
+    id[k]=v
+    return lambda i: id[i]
+id['set']=set
+return id[x]
+)({})
+"""
+
+def wrap_func(id):
+
+    def real_func(x):
+        
+        def set(k,v):
+            id[k]=v
+            #return lambda i: id[i]
+
+        #def get_id():
+            #return id
+
+        id['set']=set
+        #id['get_id']=get_id
+        id['id']=id
+
+        return id[x]
+
+    return real_func
+
+f2=wrap_func({})
+
+
+or use list instead of variable, don't use dict, because dict is not sequenced 
+
+def wrap_func(id):
+
+    def real_func(x):
+        
+        def set(k,v):
+            id[k]=v
+            #return lambda i: id[i]
+
+        #def get_id():
+            #return id
+
+        id['set']=set
+        #id['get_id']=get_id
+        id['id']=id
+
+        return id[x]
+
+    return real_func
+
+
+
+###################################################
+def f(x):
+
+    #no variables, use dict, because you can not operate identifier,
+    #lots of languages dont return identifier, but macro in lisp
+
+    identifier_dict={"x":3,"y":4}
+    def setq(k,v):
+    	if k == "x":
+
+	   x=v
+	  
+    return {"x":x,"setq":setq}
+
+#########################################################
+
+a=3;  b=[a]; 其实b is [3]; but I want b[a] 我想通过b操作a这个identifier
+有点像C语言的指针， 我想把一个词法闭包环境内部的命名空间返回给外部空间，
+如果是object的话，可以直接在外部修改内部的命名空间,我在想如果是函数的话怎么写
+
+js里a={"b":"dd"}是dict   a={b:"dd"}是object
+
+def f(x):
+    x=3;
+    def setq():
+    	pass
+    return {"x":x,"setq":setq}
+
+在应用序求值策略的语言里阻止identifier的自动求值
+在函数外部修改函数内部的命名空间, 比如 object.var=3就可以直接搞，好奇函数怎么搞
+    	
+
+
+
+--------------------------------------------------------------------------------
 python's function object and javascript's dict object can do something wonderful!
 
 f.on=3
