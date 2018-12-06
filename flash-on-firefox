@@ -1,0 +1,8 @@
+get flash from adobe.com
+and choose .tar.gz then tar -xvzf this.tar.gz
+vim readme.txt
+and 
+sudo cp libflashplayer.so /usr/lib/mozilla/plugins
+sudo cp -r usr/* /usr    ### this won't replace the exist directories, only append files to them
+
+or pacman -S flashplugin
