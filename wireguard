@@ -1,3 +1,30 @@
+ipv6 wireguard on Linode Tokyo 2 (failure, I don't know how to push one ISP's ipv6 address to another ISP's network, because there's no private addr on ipv6 vpn)
+#server
+root@localhost:~# cat /etc/wireguard/wg0.conf 
+[Interface]
+Address = 10.0.0.1/24, 2400:xxxx::1000/64  this is you ipv6 block
+ListenPort = 24002
+PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE; ip6tables -A FORWARD -i wg0 -j ACCEPT; ip6tables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE; ip6tables -D FORWARD -i wg0 -j ACCEPT; ip6tables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+PrivateKey = server-private-key
+
+[Peer]
+PublicKey = client-public-key
+AllowedIPs = 10.0.0.2/24, 2400:xxxx::2000/64 ipv6 block
+
+#client
+[Interface]
+Address = 10.0.0.2/24, 2400:xxxx::2000/64
+PrivateKey = client-private-key
+DNS = 114.114.114.114, 2400:8902::5
+
+[Peer]
+PublicKey = server-public-key
+AllowedIPs = 0.0.0.0/0, ::/0
+Endpoint = server-ipv4:24002, [server-ipv6-not-block]:24002 this will be wrong,
+you cant use ipv4 and ipv6 both in Endpoint, so delete one
+
+------------------------------------------
 wireguard创建的网段不能和现有的私有网段冲突，比如在192.168.3.1上创建wg0 10.0.0.1 然后在192.168.3.2上创建wg0 10.0.0.2 endpoint连到192.168.3.1 而192.168.3.1有公网ip
 然后在外网上创建wg0 10.0.0.3 endpoint 192.168.3.1的公网ip 
 这样就能在外网访问内网的192.168.3.2用10.0.0.2访问

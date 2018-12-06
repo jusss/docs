@@ -1,3 +1,13 @@
+# generate certificate
+cd /etc/stunnel/
+sudo openssl genrsa -out server.key 4096
+sudo openssl req -new -key server.key -out server.csr
+sudo openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
+sudo bash
+cat server.key > server.pem && cat server.crt >> server.pem
+chmod 400 /etc/stunnel/server.pem
+
+-------------------------------------
 TIMEOUTidle = 30
 ---------------------------------------
 ON SERVER:

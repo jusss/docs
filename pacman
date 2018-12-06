@@ -1,3 +1,6 @@
+pacman -Syu show key xxx could not be looked up remotely
+sudo pacman -S archlinux-keyring
+-------------------------------------
 pacman -Si package get info about package
 pacman -Ql package see what it installed
 -----------------------

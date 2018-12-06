@@ -2,7 +2,7 @@ install outline on server:
 sudo wget -qO- https://raw.githubusercontent.com/Jigsaw-Code/outline-server/master/src/server_manager/install_scripts/install_server.sh | bash
 this will output a dict like {"apiUrl":..., "sha256":} and it will be stored in ~/shadowbox/access.txt
 
-then download outline.appimage on client:
+then download outline.appimage from github on client:
 install shadowsocks-qt5
 then run it on client, click "get started"
 copy the dict message from server into it,
