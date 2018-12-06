@@ -1,0 +1,19 @@
+def f(n):
+    if n > 10000:
+        return 0
+    else:
+        return n + f(n+1)
+
+
+def f(n):
+    if n> 10000:
+        return 0
+    else:
+        return lambda: n+f(n+1)
+
+def trampoline(f):
+    while isFunction(f):
+        f=f()
+    return f
+
+
