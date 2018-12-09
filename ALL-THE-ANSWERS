@@ -1,4 +1,25 @@
+there's a library called __future__ in python2.7
+https://docs.python.org/2/library/__future__.html
+https://zhuanlan.zhihu.com/p/32756176
 
+from __future__ import absolute_import
+in the old way, python import your own library from current directory
+not the $PATH, with this, it will import from $PATH, and 
+you can use `from previous-directory import you-own-lib`
+
+from __future__ import division
+3/10 0.3
+
+from __future__ import print_function
+use print like in python3, it must need braces and it's a function
+
+from __future__ import unicode_literals
+turn str to unicode
+
+in python2, type('hi')  you got class 'str'
+but from __future__ import unicode_literals type('hi') got type 'unicode'
+
+---------------------------------------------
 fold from https://repl.it/repls/LowPracticalAbstractions
 <jusss> eiGHttt: 你的fold里的f从来没变过。。。
 const foldl = (f, acc, xs) => {
@@ -239,6 +260,8 @@ high-order function, list comprehension
 
 <jusss> onlylove: co-routine, promise/future, generator, yield之类的感觉都来自
 	于continuation, 而decorator什么的来自于macro?  [21:36]
+
+python: twisted, tornado, django, flask, urllib, requests, curl, aiohttp
 -------------------------------------------
 python 3.6+ 有f-string 类似于ruby　bash的变量在字符串中展开
 python 2.7可以用''.format来玩
