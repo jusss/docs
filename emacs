@@ -1,3 +1,49 @@
+
+;;; python-mode will not eval python buffer if there is threading code
+(defun my-python-compile ()
+  (interactive)
+  (setq tmp-file (concat (buffer-file-name) ".tmp"))
+  (write-region (point-min) (point-max) tmp-file)
+  (compile (concat "python " tmp-file)))
+
+(add-hook 'python-mode-hook
+          (lambda () (local-set-key (kbd "<f5>") 'my-python-compile)))
+
+(setq compilation-save-buffers-predicate '(lambda () nil))
+##################################### 
+
+(set-fontset-font "fontset-default"  
+                  'gb18030' ("微软雅黑" . "unicode-bmp"))
+
+ 
+ 
+https://segmentfault.com/q/1010000000125755
+ 
+
+;; ============================================================
+;; Setting English Font
+(set-face-attribute
+ 'default nil :font "DejaVu Sans Mono 11")
+;; Setting Chinese Font
+(dolist (charset '(kana han symbol cjk-misc bopomofo))
+  (set-fontset-font (frame-parameter nil 'font)
+            charset
+            (font-spec :family "Microsoft Yahei" :size 14)))
+
+ 
+ 
+
+(set-default-font "Monaco-12")
+(set-fontset-font "fontset-default"  
+                  'gb18030' ("微软雅黑" . "unicode-bmp")
+
+详细可以看下这里
+http://emacser.com/torture-emacs.htm
+
+然后我自己的配置在这里，有兴趣可以参考一下
+https://bitbucket.org/lisp/dot-emacs/src/9e3f0ec2acd2432798da5e5d4b4cc35b29c9e3ed/site-lisp/font-settings.el?at=default
+
+-------------------------------
 python.el bug, If it's the only thingthen it prints the output but with anything else
 it doesn't, Bug #29592 
 in python code buffer with python-mode (python.el)
