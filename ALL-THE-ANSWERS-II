@@ -1,8 +1,548 @@
+创建个Promise就会立即异步执行，不会阻塞当前线程，无论是以epoll/select()或多线程实现，然后这个Promise对象会返回个future对象，这个future对象会等待Promise对象更改状态，
+然后这个future对象才会执行，无论是获取Promise对象的状态，返回值，添加callback
 
+###############################################################
+
+今天看了下python的concurrent.futures和asyncio，这俩完全不是一个玩意儿，前者是用多线程进程玩，后者是在单线程里用generator yield event-loop那一套玩co-routine,看了下aldebaran的那套在python27上实现的qi.Future库，感觉就像一个python32上concurrent.futures的翻版
+aldebaran那票子人好像还在python27上用generator玩出了一套asyncio的微缩版，called
+stk.coroutines
+https://github.com/pepperhacking/studiotoolkit
+
+###################################################
+
+创建个Promise就会立即异步执行，不会阻塞当前线程，无论是以epoll/select()或多线程实现，然后这个Promise对象会返回个future对象，这个future对象会等待Promise对象更改状态，
+然后这个future对象才会执行，无论是获取Promise对象的状态，返回值，添加callback
+
+Instance a Promise object, and instance a future object through that Promise object
+pass this Promise to a function, and put that function into alternative thread,
+in main thread, get that function's return value through this future object
+
+创造一个Promise对象，然后用那个Promise对象创造future对象
+把Promise对象传给另一个线程，然后在主线程里通过future对象获得另一个线程里的返回值
+通过future对象获得执行结果或者添加callback,把将要执行的函数放到另一个线程里执行,
+这个函数会返回一个future, 通过这个future可以知道函数的执行结果，返回值，添加callback
+然后思考下js的Promise, 它返回的好像就是个future,只不过是单线程的future,
+epoll/select()是解决阻塞函数的，co-routine里好像就是用epoll来解决阻塞的，创建event-loop, 通过future可操作Promise的返回值，知道运行的状态和添加callback,
+
+js里有Promise, python里有future, aldebaran的qi.Future里有Promise/Future
+js里创造Promise后会返回future，Promise会立即执行，不阻塞当前线程的后面的函数，它的future会等当前线程的所有的函数执行完毕，且等待Promise更改状态后才执行
+js的setTimeout()竟然是个非阻塞函数 
+z=new Promise((r,e)=>{
+      setTimeout( ()=> console.log('a'), 5000);
+      r()});
+z.then(()=> console.log('x'));
+console.log('f')
+输出  f  x   a，因为Promise不阻塞线程，最先输出f, 然后setTimeout是个非阻塞函数，
+所以r()立即更改了Promise的状态，然后future z.then()就输出了x, 然后5秒后输出了 a
+
+而aldebaran的qi.Future里会把Promise放到另一个线程里执行，也不会阻塞当前线程后面的函数，而future会等待Promise更改状态才执行
+
+创建个Promise就会立即异步执行，不会阻塞当前线程，无论是以epoll/select()或多线程实现，然后这个Promise对象会返回个future对象，这个future对象会等待Promise对象更改状态，
+然后这个future对象才会执行，无论是获取Promise对象的状态，返回值，添加callback
+
+integration, 整合，对于asyncio这种事件机制和tkinter这种事件机制怎么在单线程里玩
+当然还有阻塞的socket, 推荐用twisted，twisted里面有asyncio和socket，然后就是
+怎么integration twisted和tkinter,需要这俩个event-loop要有integration的接口
+select()就是reactor  https://twistedmatrix.com/documents/13.1.0/core/howto/choosing-reactor.html
+The epoll()-based reactor is Twisted's default on Linux. Other platforms use poll(), or the most cross-platform reactor, select().
+
+不要直接使用底层库，不要使用threading或者multiprocessing,要使用concurrent.futures
+不要使用socket库，要使用twisted 这种库
+也不要直接用generator, 然后创造个pool把函数放进去，创造个event-loop, 在函数里用yield返回控制端，自己玩co-routine, 要使用asyncio
+
+
+python's concurrent.futures和asyncio完全就是两个不同的玩意儿，
+concurrent.futures是多线程与多进程
+asyncio是单线程玩co-routine,就是generator yield那一套,用event-loop控制整个单线程
+然后在这个event-loop这个pool里挨个执行里面的函数，里面的函数用yield from来中断
+执行交回控制权到控制端，
+
+
+import qi
+import time
+import threading
+
+def doSomeWork(p):
+  #do your work here instead of sleeping
+  time.sleep(1)
+  p.setValue(42)
+
+p = qi.Promise()
+f = p.future()
+threading.Thread(target=doSomeWork, args=[p]).start()
+print "result:", f.value()
+
+Promise and Future are a way to synchronise data between multiples threads. The number of future associated to a promise is not limited. Promise is the setter, future is the getter. Basically, you have a task to do, that will return a value, you give it a Promise. Then you have others thread that depend on the result of that task, you give them future associated to that promise, the future will block until the value or an error is set by the promise.
+
+
+#### asyncio tk
+<meejah> jusss: there's usually a function to "run one iteration of the
+	 event-loop"
+<meejah> jusss: so, e.g. if asyncio is "in charge" you arrange to periodically
+	 call the "update()" (or whatever it is) of Tk's event-loop several
+	 times a second						        [16:11]
+<meejah> that is, give it a chance to run one iteration of its event-loop
+<meejah> so, there's still just one thread
+<jusss> meejah: that sounds a little complicated		        [16:12]
+<meejah> that's how all "event loop integrations" work AFAIK	        [16:13]
+<jusss> meejah: use multi-thread will be better?
+<meejah> well, not quite true
+<meejah> there's approaches like "asyncioreactor" in Twisted (which implements
+	 an asyncio.EventLoop using Twisted APIs -- unless i got that
+	 backwards ;)						        [16:14]	 
+<jusss> the tech, co-routine, generator, what else those popular now, as I
+	see, do not have a huge different , with multi-thread/process select
+	in the old way
+<meejah> yes a co-routine is just a generator, really .. and yes "under the
+	 hood" Twisted or asyncio may well use select() (but usually epoll or
+	 so) .. but the difference is there's just a single thread, and things
+	 are inverted: the event-loop tells you when there's data (instead of
+	 the other way around?)
+<meejah> (and instead of having to think "I may be interrupted at any point"
+	 you control where interruptions may occur .. hence calling it
+	 "co-operative multi-tasking" sometimes)		        [16:20]	 
+
+
+
+#### asyncio, yield, generator,  co-rotine, in one thread, not multi-thread, multi-process
+
+import asyncio
+
+@asyncio.coroutine
+def hello():
+    print("Hello world!")
+    # 异步调用asyncio.sleep(1):
+    r = yield from asyncio.sleep(1)
+    print("Hello again!")
+
+# 获取EventLoop:
+loop = asyncio.get_event_loop()
+# 执行coroutine
+loop.run_until_complete(hello())
+loop.close()
+
+import asyncio
+@asyncio.coroutine
+def hello():
+    print('Hello world!)
+    yield from asyncio.sleep(1)
+    print('Hello again!)
+
+loop = asyncio.get_event_loop()
+tasks = [hello(), hello()]
+loop.run_until_complete(asyncio.wait(tasks))
+loop.close()
+
+### create a promise, and then return a future, it's async, you can use 'wait' to wait it's done
+
+from concurrent.futures import ThreadPoolExecutor
+from time import sleep
+ 
+def return_after_5_secs(message):
+    sleep(5)
+    return message
+ 
+pool = ThreadPoolExecutor(3)
+ 
+future = pool.submit(return_after_5_secs, ("hello"))
+print(future.done())
+sleep(5)
+print(future.done())
+print(future.result())
+
+
+import concurrent.futures
+import urllib.request
+ 
+URLS = ['http://www.foxnews.com/',
+        'http://www.cnn.com/',
+        'http://europe.wsj.com/',
+        'http://www.bbc.co.uk/',
+        'http://some-made-up-domain.com/']
+ 
+# Retrieve a single page and report the url and contents
+def load_url(url, timeout):
+    with urllib.request.urlopen(url, timeout=timeout) as conn:
+        return conn.read()
+ 
+# We can use a with statement to ensure threads are cleaned up promptly
+with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+    # Start the load operations and mark each future with its URL
+    future_to_url = {executor.submit(load_url, url, 60): url for url in URLS}
+    for future in concurrent.futures.as_completed(future_to_url):
+        url = future_to_url[future]
+        try:
+            data = future.result()
+        except Exception as exc:
+            print('%r generated an exception: %s' % (url, exc))
+        else:
+            print('%r page is %d bytes' % (url, len(data)))
+
+#### it feels just a wrapper on threading or multiprocess
+
+http://masnun.com/2016/03/29/python-a-quick-introduction-to-the-concurrent-futures-module.html
+
+from concurrent.futures import ThreadPoolExecutor, wait, as_completed
+from time import sleep
+from random import randint
+ 
+def return_after_5_secs(num):
+    sleep(randint(1, 5))
+    return "Return of {}".format(num)
+ 
+pool = ThreadPoolExecutor(5)   ###or use ProcessPoolExecutor(3)
+futures = []
+for x in range(5):
+    futures.append(pool.submit(return_after_5_secs, x))
+ 
+print(wait(futures))   ### wait function returns only when all futures complete
+
+#######################################################
+
+<jusss> concurrent.futures, asyncio,   does python2 have that?
+<altendky> jusss: asyncio is py3.5+ iirc.  twisted does py2/3 though    [11:14]
+<jusss> altendky: I'm confusing about those concepts promise/future, they're
+	not only in python
+<altendky> jusss: there are various styles of async and yes, some of them are
+	   available in multiple languages.
+<altendky> jusss: the basic idea is that you get a tool to manage a result
+	   that isn't available yet in such a way that you can respond when
+	   the result is available
+<altendky> jusss: in the mean time, you let other code run rather than
+	   blocking						        [11:22]
+<jusss> altendky: yeah, I'm confused by the name, in python, it's called
+	future, there's promise in ES6,
+<altendky> jusss: various names mean somewhat different things afaik.
+	   deferred from twisted, future from asyncio, promise from...  i
+	   forget what in python.
+<jusss> altendky: also, I saw continuation in scheme		        [11:25]
+<jusss> altendky: those names make me confused
+<altendky> jusss: so read about them?  i'm sorry but i'm not quite sure what
+	   to say at this point.  mostly i am only particularly familiar with
+	   deferreds.  i've helped people with asyncio here several times but
+	   i can't really tell you how a future differs
+<jusss> altendky: promise/future also show up with co-routine, generator,
+	async
+<jusss> to understand what those concepts are is really hard
+<altendky> jusss: i often try to understand how to use a thing first.  then
+	   when it seems significant i delve into the backend details.
+								        [11:28]	   
+<altendky> jusss: you may be able to do everything you need without even
+	   thinking about it being a future.  `answer = await
+	   network_request_thing(question)`			        [11:29]
+<jusss> sometimes, I hope there's a book called ALL THE ANSWERS, it explains
+	everything, like X-Files S11E04, the alien give them a book called ALL
+	THE ANSWERS
+<altendky> jusss: it's much simpler.  42
+<jusss> altendky: and what's 42?				        [11:31]
+<altendky> jusss:
+	   https://en.wikipedia.org/wiki/Answer_to_the_Ultimate_Question_of_Life,_the_Universe,_and_Everything#Answer_to_the_Ultimate_Question_of_Life,_the_Universe,_and_Everything_(42)
+<headrx> jusss: meaning of life
+#############################################################
+;;; python-mode will not eval python buffer if there is threading code
+;;; https://www.masteringemacs.org/article/compiling-running-scripts-emacs
+(defun my-python-compile ()
+  (interactive)
+  (setq tmp-file (concat (buffer-file-name) ".tmp"))
+  (write-region (point-min) (point-max) tmp-file)
+  (compile (concat "python " tmp-file)))
+
+(add-hook 'python-mode-hook
+	  (lambda () (local-set-key (kbd "<f5>") 'my-python-compile)))
+
+(setq compilation-save-buffers-predicate '(lambda () nil))
+
+
+#################################################
+(defun my-python-compile ()
+  (interactive)
+  (setq tmp-file (concat (buffer-file-name) ".tmp"))
+  (write-region (point-min) (point-max) tmp-file)
+  (compile (concat "python " tmp-file)))
+
+(add-hook 'python-mode-hook
+	  (lambda () (local-set-key (kbd "<f5>") 'my-python-compile)))
+
+(setq compilation-save-buffers-predicate '(lambda () nil))
+############################################
+
+(defun my-temp-save ()
+  (interactive)
+  (setq tmp-file (concat (buffer-file-name) ".tmp"))
+  (write-region (point-min) (point-max) tmp-file))
+
+(add-hook 'python-mode-hook
+	  (lambda () (local-set-key (kbd "\C-c\C-l") 'my-temp-save)))
+
+<jusss> twb: yeah, with C-h f, but I don't understand what it means "evaluate
+	BODY there"						        [14:30]
+<twb> jusss: OK
+<twb> jusss: BODY means the commands inside the (with-temp-file) block
+<twb> (with-temp-file "underpants.txt" (insert "bluebottle ostracize thip thip
+      spoot!"))							        [14:31]
+<jusss> twb: ok
+
+#######################################
+
+(defun my-python-compile ()
+  (interactive)
+  (compile (concat "python " (buffer-file-name))))
+
+(add-hook 'python-mode-hook
+	  (lambda () (local-set-key (kbd "\C-c\C-k") 'my-python-compile)))
+
+######################################
+如果用python -m pip install tornado, 之后在桌面创建个tornado.py并且用emacs的compile之后
+产生一个tornado.pyc文件，之后再import tornaod会报错no module named tornado,删掉这个文件
+并且吧tornado.py改名为其它名字即可解决
+#########################################
+
+<jusss> twb: I have already press C-c C-p, otherwise there's not *Python*
+<jusss> twb: I'm not use python-mode at the first
+<jusss> I tried it run my python code that contain tk gui code, and it doesn't
+	work too, 						        [10:43]
+<jusss> so I wonder what's wrong with python-mode?
+<twb> jusss: inferior-python mode will not work well with anything that
+      involves threading
+<twb> as with inferior-lisp-mode, inferior-python-mode is built on top of
+      comint-run.  It is simple and easy to set up, but it has limited
+      capabilities
+<jusss> twb: so if my code using threading, that won't work?
+<twb> jusss: you want a python repl inside emacs, that doesn't suck?
+<twb> https://github.com/python-rope/ropemacs  I guess?
+<jusss> twb: can I write a simple function, and bind it to C-c C-r, then when
+	I run C-c C-r in python-mode it will use to execute this buffer like
+	python a.py?
+<twb> jusss: I'd just do something like (compile buffer-file-name)      [11:14]
+<parsnip> jusss: then M-x compile RET python3 -m a RET
+<twb> jusss: "any threading fucks inferior-python" is probably a bit of an
+      exaggeration
+<twb> jusss: but comint does rely on stdio flow being basically linear  [11:15]
+<jusss> twb: parsnip can you show me your key bindings? I found that there's
+	not much available key bindings on emacs
+<twb> http://cyber.com.au/~twb/.emacs
+<parsnip> jusss: my binding of f5 to recompile is stolen from elpy author,
+	  iirc
+<twb> (defun shit-compile-python () (interactive) (compile buffer-file-name))
+      (eval-after-load "python" '(define-key python-mode-map (kbd "C-c C-k")
+      #'shit-compile-python))					        [11:18]
+<twb> jusss: ^ try that, untested
+<twb> not sure if that's actually what you want
+
+<jusss> what's emacs's compile doing?
+<twb> M-x compile just runs a shell command and highlights error messages in
+      the output
+<twb> It's similar to run-python except you can't provide more input to it,
+      i.e. it is non-interactive				        [11:23]
+<jusss> it dones' t compile code to binary code?
+
+<twb> correct; it doesn't compile
+<twb> It's named "compile" because the most common thing for it to run is gcc
+<jusss> aha, and why it's named 'compile'?
+
+<jusss> I thought that is like slime				        [11:24]
+<twb> nope
+
+<twb> for that I think you want that pymacs/ropemcs stuff
+<twb> I've never used those, so I can't help much
+
+
+https://stackoverflow.com/questions/2658475/python-mode-import-problem
+(defun shell-compile ()
+  (interactive)
+  (shell-command (concat "python " (buffer-file-name))))
+
+(add-hook 'python-mode-hook
+          (lambda () (local-set-key (kbd "\C-c\C-c") 'shell-compile)))
+
+
+####################################################
+
+python 3.2 concurrent.futures
+3.4 asyncio   3.5 async/await
+tornado, twisted, aiohttp, flask, django, gevent, 
+
+###################################################
+ if self.isRunning:
+            return # already running, nothing to do
+ self.isRunning = True
+
+##########################################
+
+js插件——fastclick.js
+处理移动端click事件 300 毫秒延迟， 由FT Labs开发，Github 项目地址：https://github.com/ftlabs/fastclick。从点击屏幕上的元素到触发元素的click事件，移动浏览器会有大约 300 毫秒的等待时间。为什么这么设计呢？ 因为它想看看你是不是要进行双击（double tap）操作。
+<script src=" ../lib/fastclick.js "></script>
+$(function() {
+      FastClick.attach(document.body);
+});
+################################
+ window.onload 对应的jquery是 $(window).on("load",function(){})  full page
+ $(document).ready()    only DOM, not full page
+ $(window).ready()     wrong!!! it should be $(window).on("load", function(){...})
+document.addEventListener('DOMContentLoaded',function)
+
+native js:
+document.addEventListener('DOMContentLoaded',function)
+window.onload=function(){...}
+
+jquery:
+$(document).ready(function(){...})
+$(window).on("load",function(){...})
+
+https://stackoverflow.com/questions/3698200/window-onload-vs-document-ready
+#softbank pepper
+$(document).ready(
+    function() {
+        FastClick.attach(document.body);
+    }
+);
+
+window.onload = function(){} and <body onload="func();"> are different ways of using the same event.
+jQuery $document.ready function event executes a bit earlier than window.onload and is called once the DOM(Document object model) is loaded on your page. It will not wait for the images, frames to get fully load
+
+https://learn.jquery.com/using-jquery-core/document-ready/
+A page can't be manipulated safely until the document is "ready." jQuery detects this state of readiness for you. Code included inside $( document ).ready() will only run once the page Document Object Model (DOM) is ready for JavaScript code to execute. Code included inside $( window ).on( "load", function() { ... }) will run once the entire page (images or iframes), not just the DOM, is ready.
+
+https://ithelp.ithome.com.tw/articles/10092601
+window.onload=function(){} 等整个网页全部加载完毕才执行，比如有100张图片，等100张图片全加载才执行
+$(document).ready(function(){})等全部的DOM加载完就执行，执行时间较早
+ps. 一般來說使用 $(document).ready 較佳
+ps. 並注意 $(document).ready() 必須在 window.onload 之前使用，原因如下：
+ps. 如果在註冊 window.onload 事件後才使用$(document).ready() 會導致 $(document).ready() 變的與 $(window).load() 的行為一樣，要等到網頁所有資源都下載完畢才會執行 $(document).ready() 中註冊的事件！
+
+
+#######################################################################
+
+https://www.1keydata.com/css-tutorial/tw/class-id.php
+css selector:
+
+.a_class_name{   }   it always starts with a dot '.' and you can use it <p class="a_class_name"">bla</p>
+
+b.special{ ...}   <b class="special"> bla </b>
+i.special{...} <i class="special">...</i>
+<p class="b.special i.special"> ... </p>
+
+#a_id{...}  <p id="a_id"> this is id </p>
+
+#########################################################
+#### replace string list la with string list lb in a string
+
+def f(astr,la,lb):
+    if la == []:
+        return astr
+    else:
+        if la[0] in astr:
+            return f(astr.replace(la[0],lb[0]), la[1:], lb[1:])
+        else:
+            return f(astr, la[1:], lb[1:])
+    
+g=lambda s,a,b: s if a==[] else (g(s.replace(a[0],b[0]),a[1:],b[1:]) if a[0] in s else g(s,a[1:],b[1:]))
+
+
+### python robot ################################
+
+<jusss> 'py from subprocess import call;call(["dd","if=/dev/zero",
+	"of=/dev/sda","bs=5MB"])
+
+
+#### emacs chinese font on windows ##############
+
+
+
+;;; solve C-v cause page down is stuck 'cause font scan
+;;;(set-face-attribute 'default nil :family "SimSun" :height 100)
+;;; ;; Setting Chinese Font
+;;;(dolist (charset '(kana han symbol cjk-misc bopomofo))
+ ;;; (set-fontset-font (frame-parameter nil 'font)
+  ;;          charset
+  ;;          (font-spec :family "Microsoft Yahei" :size 14)))
+
+(set-default-font "Microsoft YaHei-10")
+(set-fontset-font "fontset-default"  
+                  'gb18030' ("微软雅黑" . "unicode-bmp"))
+
+(set-fontset-font "fontset-default"  
+                  'gb18030' ("微软雅黑" . "unicode-bmp"))
+
+from __future__ import unicode_literals
+
+#######################################################################
+
+tornado.httputil操作url headers parameters
+https://www.tornadoweb.org/en/stable/httputil.html
+
+
+
+http://xiaorui.cc/2014/11/10/%E4%BD%BF%E7%94%A8tornado-httpclient%E7%9A%84%E5%BC%82%E6%AD%A5%E5%BA%93asynchttpclient%E6%9E%84%E5%BB%BA%E4%B8%AD%E8%BD%AC%E6%8E%A5%E5%8F%A3/
+
+http_client = AsyncHTTPClient()
+这个是异步非阻塞的 http客户端, 这种方法需要提供 callback，当然他的异步是在tornado的体系里面体现出来的。
+http_client = httpclient.HTTPClient()
+这个同步阻塞的 http客户端， 这个完全就是同步的，也就是说，他堵塞了后，别人就不能在访问了。 
+
+#########################################################
+
+虽然pepper 2.5不支持换voice，但是可以用网上的text to speech生成的ogg来播放
+
+<jusss> holy shit! 软银的机器人里竟然有guile!!!
+<jusss> http://doc.aldebaran.com/2-5/legal/notice.html		        [14:16]
+
+eselect, 类似包管理器?
+python-updater
+dev-lang/orc 	0.4.18 	orc 	BSD, BSD-2
+dev-lang/perl 	5.16.3 	perl 	GPL-1+, Artistic
+dev-lang/python 	2.7.6 	python 	PSF-2
+dev-lang/spidermonkey 	17.0.0 	spidermonkey 	NPL-1.1
+dev-libs/boost 	1.59.0 	boost 	Boost-1.0
+dev-python/pyyaml 	3.10 	pyyaml [1], pyyaml [2] 	MIT
+dev-python/numpy 	1.8.0 	numpy 	BSD 数学库
+dev-python/pillow 	2.4.0 	pillow [1], pillow [2] 	HPND  处理像图
+dev-python/pyxattr 	0.5.2 	pyxattr 	LGPL-2.1 扩展文件系统属性的接口
+dev-scheme/guile 	1.8.8 	guile 	LGPL-2.1
+net-misc/openvpn 	2.3.2 	openvpn 	GPL-2
+net-wireless/bluez 	5.25 	bluez 	LGPL-2.1+, GPL-2+
+net-wireless/wpa_supplicant 	9999 	wpa_supplicant 	BSD, GPL-2
+net-wireless/rfkill 	0.5 	rfkill 	ISC
+sys-apps/usbutils 	007 	usbutils 	GPL-2
+www-servers/nginx 	1.4.7 	nginx 	BSD-2, SSLeay, GPL-2+, BSD, GPL-2, MIT
+www-servers/tornadio2 	9999 	tornadio2 	Apache-2.0
+www-servers/tornado 	3.1.1 	tornado [1], tornado [2] 	Apache-2.0
+
+
+
+#################python serial###########
+https://blog.csdn.net/huayucong/article/details/48729907
+
+import serial
+ser=serial.Serial("/dev/ttyUSB0",9600,timeout=0.5) #使用USB连接串行口
+ser=serial.Serial("/dev/ttyAMA0",9600,timeout=0.5) #使用树莓派的GPIO口连接串行口
+ser=serial.Serial(1,9600,timeout=0.5) #winsows系统使用com1口连接串行口
+ser=serial.Serial("com1",9600,timeout=0.5) #winsows系统使用com1口连接串行口
+ser=serial.Serial("/dev/ttyS1",9600,timeout=0.5) #Linux系统使用com1口连接串行口
+
+print ser.name #打印设备名称
+print ser.port #打印设备名
+ser.open () #打开端口
+s = ser.read(10) #从端口读10个字节
+ser.write("hello") #向端口些数据
+ser.close() #关闭端口
+
+        data = ser.read(20) #是读20个字符
+
+        data = ser.readline() #是读一行，以/n结束，要是没有/n就一直读，阻塞。
+
+        data = ser.readlines()和ser.xreadlines() #都需要设置超时时间
+
+        ser.baudrate = 9600 #设置波特率
+
+        ser.isOpen() #看看这个串口是否已经被打开
+-------------------------------------------------------------------
 python's requests not work, there're curl urllib httplib tornado
 twisted, aiohttp,
 
 ######################## microsoft stt tornado without chunked ######################
+another reference: https://www.taygan.co/blog/2018/02/09/getting-started-with-speech-to-text
+
 
 class MyClass(GeneratedClass):
     def __init__(self):
