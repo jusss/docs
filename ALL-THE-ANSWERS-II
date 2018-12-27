@@ -1,3 +1,266 @@
+<jusss> nyfair: 这些框架全是那种事件机制的，和那一坨GUI一样，最后都是一个事件
+	阻塞主进程然后才运行，我现在用torando的websocket和浏览器建立连接，然后
+	用socket和其他服务器建立连接，怎么合适的把socket的数据转发到浏览器上去？
+	我尝试写了个loop函数直接插入到tornado.websocket.WebSocketHandler的类里
+	面open()里，不知道这样做是不是推荐的做法
+<nyfair> jusss: 直接学rails，然后你django(python), lavarel(php), express(node)，
+	 buffalo(go)就全会了					        [15:42]
+<nyfair> 这堆破烂全是rails的蹩脚抄袭品
+<jusss> 感觉现在用'合适的'这个词的频率特别高，properly
+<jusss> nyfair: 那我是不是需要先学ruby?				        [15:43]
+<nyfair> 什么乱七八糟玩意，这就是js promise玩傻了的人换了屁眼松继续瞎搞而已
+<nyfair> ruby就算作为一门纯面向对象语言也是值得学习的
+<jusss> nyfair: 今天还和python社区的讨论，能不能动态的更新类
+<jusss> nyfair: update code on running process
+<nyfair> 你看10年前那些所谓面向对象吹破天的玩意
+<jusss> nyfair: 比如更新类之后，以前的instance怎么办
+<nyfair> 1是对象么，true是对象么
+<nyfair> 语法是对象么
+<jusss> 在python里1是对象					        [15:46]
+<jusss> python没有primitive data type
+<jusss> 1的type是int
+<nyfair> python的1算个毛线对象
+<jusss> 对呀，因为不可以1.times=func()				        [15:47]
+<bokuno> (object-p 1) => nil
+<jusss> 我问过他们，他们说因为用__slot__禁止了添加属性
+<nyfair> c艹都比屁眼松更面向对象				        [15:49]
+
+<jusss> nyfair: 我感觉有点很神奇，tornado的websocketk就是你写个类，这个类基于
+	torando.websocket.WebSocketHandler，然后直接把这个类塞到
+	tornado.web.Application里就玩了，也不用实列化
+<jusss> nyfair: 需要你重新覆盖你基于的那个类里的几个方法	        [15:51]
+<jusss> nyfair: 我突然发现和我现在用的软银的这套开发工具里的python box很像，都
+	是给你个已经预先定义好的类，然后让你在那个类里写东西
+								        [15:52]
+<jusss> nyfair: 但是感觉云里雾里的，一点不明白
+<jusss> eiGHttt: nyfair 我打算用python写irc客户端，然后用websocekt和网页来做交
+	互界面							        [15:57]
+<nyfair> 蛤？websocket自带的onMessage啊
+<nyfair> 用个毛线websocket					        [15:58]
+<nyfair> webassembly，请
+<jusss> nyfair: 那我是不是先要把程序编译成binary code然后加载？手机浏览器能跑吗
+<nyfair> 能
+<jusss> nyfair: 牛牛真棒！					        [16:01]
+<jusss> nyfair: webassembly技术是不是太超前了			        [16:32]
+<nyfair> 前端娱乐圈没有超时这种说法，都是标准没定直接开用。webassembly的问题在
+	 于，娱乐圈都不会写汇编
+###############################################
+
+<html>
+<head>
+    <title>Websocket</title>
+    <script type="text/javascript">
+    var ws = null;
+    function init() {
+        if ("WebSocket" in window) {
+            ws = new WebSocket("ws://127.0.0.1:8888/ws");
+            ws.onopen = function() {
+                console.log("Connection is opened");
+            }
+            ws.onclose = function() {
+                console.log("Connection is closed");
+            }
+            ws.onmessage = function(msg) {
+                document.getElementById("display").innerHTML = msg.data;
+            }    
+        } else {
+            console.log('Your browser doenst support WebSocket!')
+        }
+    }
+
+    function send() {
+        ws.send(document.getElementById("txt").value);
+    }
+    </script>
+</head>
+<body onload="init();">
+    <h2>Try websocket</h2>
+    <input type="text" id="txt">
+    <input type="button" onclick="send()" value="Send">
+    <h3>Response:</h3>
+    <p id="display"></p>
+</body>
+</html>
+
+#####################################
+
+import tornado.websocket
+import tornado.ioloop
+from tornado.options import define, options, parse_command_line
+class EchoWebSocket(tornado.websocket.WebSocketHandler):
+    def open(self):
+        print("opened")
+    def on_message(self, msg):
+        self.write_message(u"you said: "+msg)
+    def on_close(self):
+        print("closed")
+    def check_origin(self, origin):
+        return True
+
+app=tornado.web.Application([(r'/ws', EchoWebSocket)])
+define("port", default=8888, type=int)
+app.listen(options.port)
+tornado.ioloop.IOLoop.instance().start()
+
+################################################
+
+url, websocket need a url,
+ws://127.0.0.1:8888/whateveryouwant
+
+if you wrote this in js:
+ var ws = new WebSocket("ws://localhost:8888/whateveryouwant");
+then you need this in python:
+app=tornado.web.Application([(r'/whateveryouwant', EchoWebSocket)])
+
+if you restart your python server script, then you need re-fresh your website for new connection
+and  you need set check_origin function in tornado, otherwise you will get 403 error
+put this
+def check_origin(self, origin):
+        return True
+into your tornado.websocket.WebSocketHandler class, it's necessary!
+
+#################################
+;;;display-line-numbers-mode instead of linum-mode since 26.1
+;;; https://www.masteringemacs.org/article/whats-new-in-emacs-26-1
+(dolist (hook '(python-mode-hook
+                javascript-mode-hook
+                html-mode-hook
+                css-mode-hook
+                js-mode
+               mhtml-mode
+	  c-mode-common-hook))
+(add-hook hook (lambda () (display-line-numbers-mode t))))
+
+<jusss> nyfair: w3m and eww won't support javascript!		       
+
+#######################################
+
+def makeClosure(f):
+    a=0
+    def realFunc(*args, **kwargs):
+        nonlocal a
+        a=a+1
+        print(a)
+        f(*args,**kwargs)
+    return realFunc
+
+@makeClosure
+def t():
+    print('hello')
+
+
+about decorator, it always needs a function as it parameter, no matter what it is
+@app.route("/secret")
+@login_required
+def secret():
+the function app.route("/secret") will need a function, it is like
+    app.route("/secret")(login_required(secret))   
+
+@dec2
+@dec1
+def func(arg1, arg2, ...):
+    pass
+
+it's like dec2(dec1(func))(arg1, arg2, ...)
+
+@decomaker(argA, argB, ...)
+def func(arg1, arg2, ...):
+    pass
+
+it's like decomaker(argA, argB, ...)(func)
+reference: http://python.jobbole.com/86687/
+	   https://realpython.com/primer-on-python-decorators/
+actually decorator is not like closure I think, it's just another wrapper function,
+decorator can handle function's parameters
+def f(g):
+    def wrapper(*args, **kwargs):
+        print("function's name: ",g.__name__)
+        print("function's parameters: " *args,**kwargs)
+    return wrapper
+
+decorator to me it's like it can handle before or after the function's run, not insider of the function
+but function object is not immutable, so if you turn it to string, then you can change it and run
+###########################################
+
+from concurrent.futures import ThreadPoolExecutor
+import time
+cond=[1]
+def s():
+    while True:
+        if cond[-1] == 0:
+            print('ok')
+            cond[-1]=1
+        else:
+            pass
+        time.sleep(1)
+
+#with ThreadPoolExecutor() as e:
+#    future=e.submit(s)
+
+e=ThreadPoolExecutor()
+future=e.submit(s)
+#cond[0]=0, dont do future.result(), it will stuck
+cond[-1]=0
+
+
+##############################################
+
+future.addCallback()也是不阻塞的，wonderful!
+functools.wraps 这个decorator是为了保留函数的原始信息
+https://docs.python.org/3.7/library/functools.html#functools.wraps
+##############################################
+
+with a as b:
+assign a to b, like b=a, but if it used for socket, file, thread, it doesn't need to close by manually
+with后面跟的这个对象要有__exit__()属性，否则会报属性错误
+
+from concurrent.futures import ThreadPoolExecutor
+s=lambda: 3
+with ThreadPoolExecutor() as e:
+    future=e.submit(s)
+    print future.result()
+
+
+###############################################
+results = list(pool.map(gcd, numbers))
+list function only take one argument, and it is a iterable object, not must be a iterator
+>>> c= (x for x in range(0,9))
+>>> c
+<generator object <genexpr> at 0x02E59238>
+>>> list(c)
+[0, 1, 2, 3, 4, 5, 6, 7, 8]
+>>>
+
+>>> d=(x for x in range(0,200000))
+>>> next(d)
+0
+>>> next(d)
+1
+>>> next(d)
+2
+
+<altendky> jusss: itertools.cycle((True, False))
+
+>>> a=itertools.cycle((True,False))
+>>> a
+<itertools.cycle object at 0x02E4C8C8>
+>>> next(a)
+True
+>>> next(a)
+False
+
+函数是一等公民，对象是一等公民，一等公民可以出现在任何变量出现的地方，可以做参数传递，可以做返回值返回
+
+>>> a=itertools.cycle((True,False)) 可以替代 #counter #outputer
+################################
+
+SQL bash are DSL,
+epoll/select are reactor,
+list function are functor,
+decorator is higher-order function
+
+#####################################
+
 创建个Promise就会立即异步执行，不会阻塞当前线程，无论是以epoll/select()或多线程实现，然后这个Promise对象会返回个future对象，这个future对象会等待Promise对象更改状态，
 然后这个future对象才会执行，无论是获取Promise对象的状态，返回值，添加callback
 
@@ -106,6 +369,18 @@ Promise and Future are a way to synchronise data between multiples threads. The 
 
 #### asyncio, yield, generator,  co-rotine, in one thread, not multi-thread, multi-process
 
+>>> import asyncio
+>>> async def main():
+	print('hi')
+	await asyncio.sleep(1)
+	print('again')
+
+	
+>>> asyncio.run(main())
+
+
+
+
 import asyncio
 
 @asyncio.coroutine
@@ -134,6 +409,12 @@ loop.run_until_complete(asyncio.wait(tasks))
 loop.close()
 
 ### create a promise, and then return a future, it's async, you can use 'wait' to wait it's done
+
+from concurrent.futures import ThreadPoolExecutor
+s=lambda: 3
+with ThreadPoolExecutor() as e:
+    future=e.submit(s)
+    print future.result()
 
 from concurrent.futures import ThreadPoolExecutor
 from time import sleep
@@ -251,7 +532,7 @@ print(wait(futures))   ### wait function returns only when all futures complete
 	  (lambda () (local-set-key (kbd "<f5>") 'my-python-compile)))
 
 (setq compilation-save-buffers-predicate '(lambda () nil))
-
+(setq compilation-always-kill t)
 
 #################################################
 (defun my-python-compile ()
