@@ -1,3 +1,340 @@
+<meejah> jusss: there's better I/O APIs than select()		        [14:56]
+<meejah> "the event loop" handles I/O for you in Twisted or asyncio...and then
+	 tells you when you get data				        [14:57]
+<jusss> meejah: but what if it's not I/O?  what if it is a while loop
+	function?
+<meejah> jusss: you can't block the reactor like that		        [15:12]
+<meejah> e.g. you have to arrange to let it do some work (like do 20
+	 iterations at a time or whatever)			        [15:13]
+<jusss> meejah: for example, I don't want a function end, how I can stop it
+	end and put it in asyncio event loop?			        [15:17]
+<jusss> meejah: that is a function, it wait a signal or check variables, the
+	it do something every 5 sec, and I don't want it to quite
+<meejah> twisted has LoopingCall, I'm sure asyncio has similar .. or just
+	 "call_later()" to yourself at the end of the function
+
+Promise/Future  Async/Await Select/Epoll 
+asyncio do async in one thread, and concurrent.futures do async in multiple threads or process, asyncio within APIs can handle I/O like socket or file, but if it's CPU bound, then put
+it in concurrent.futures,  asyncio have 'run_in_executor' put it into threads
+executor should be an instance of ThreadPoolExecutor.
+
+async def main():
+      loop=asyncio.get_running_loop()
+      result = await loop.run_in_executor(None, the-block-function)
+      print(result)
+      with concurrent.futures.ThreadPoolExecutor() as pool:
+      	   result=await loop.run_in_executor(pool,the-block-function)
+	   print(result)
+
+###########################################
+I/O block use select() in one thread,  CPU block use thread or process 
+
+import asyncio
+async def  or use @asyncio.coroutine
+those functions return coroutine objects when called
+Calling either of these doesn't actually run them,
+but instead a coroutine object is returned,
+which can then be passed to the event loop to be executed later on.
+or asyncio.run(coroutine-objects)
+
+There are a few ways to actually call a coroutine,
+one of which is the yield from method. 
+use yield from within @asyncio.coroutine
+
+@asyncio.coroutine
+def get_json(client, url):
+  file_content = yield from load_file('/Users/scott/data.txt')
+
+or
+async def ping_local():  
+    return await ping_server('192.168.1.1')
+
+#so I think use '@asyncio.coroutine' or 'async def' to create functions, and call that functions will return coroutin objects, that functions are never really run, put those coroutine objects into a list, then create a loop run them, and use 'yield from' or 'await' to make them return from themself for that the list can iterate next function,and asyncio provide get_event_loop(), you can use that to instead of list
+loop = asyncio.get_event_loop()  
+loop.run_until_complete(coroutine-objects)  #blocking
+loop.close()  
+
+# 'async with' is like 'with (yield from ...)' so I think it is return to main controler before it enter the with block and return to main controler again after it leaves the with block, just like run yield from twice
+<jusss> meejah: so 'async with' will 'await' before it enter the block, and
+	'await' again when it leave the block, right/
+<jusss> just like 'yielf from' twice
+<meejah> jusss: yes
+
+asyncio.run()
+loop=asyncio.get_event_loop()
+loop.run_until_complete
+asyncio.ensure_future
+loop.run_forever()
+loop.close()
+
+https://stackabuse.com/python-async-await-tutorial/
+
+###################################
+ERC always make that tabbar mode vanish
+<jgkamat> jusss: tabbar mode and erc both use the header: (setq
+	  erc-header-line-uses-tabbar-p t)
+<parsnip> jusss: eyebrowse seems similar and more popular	  
+######################################
+https://www.youtube.com/watch?v=MCs5OvhV9S4&t=32s
+yield that block function, and use select to run them
+from concurrent.futures import ThreadPoolExecutor as Pool
+pool=Pool(5)
+pool.submit(function)
+
+one thread, use select()/epoll() to handle block function
+or put it into thread
+#########################################
+yeah, first-class object, function, variable, closure, class,
+define a class in a class, inner class, pass class, return class, operate class like decorator
+class A:
+    class B:
+        def p(self):
+            print('b')
+
+z=A()
+z.B.p()
+B need to be instanced
+
+class A:
+    def __init__(self):
+        self.B=self.B()
+    class B:
+        def __init__(self):
+            pass
+        def p(self):
+            print('b')
+
+z=A()
+z.B.p()
+
+class A:
+    def __init__(self):
+        self.B=self.returnB()
+    def returnB(self):
+        return A.B()
+    class B:
+        def __init__(self):
+            pass
+        def p(self):
+            print('b')
+
+z=A()
+z.B.p()
+https://pythonspot.com/inner-classes/
+
+class Human:
+    def __init__(self):
+        self.name = 'Guido'
+        self.head = self.createHead()
+    def createHead(self):
+        return Human.Head(self)
+    class Head:
+        def __init__(self, human):
+            self.human = human
+        def talk(self):
+            return 'talking...', self.human.name
+
+###########################################################
+
+<jusss> how asyncio handle blocking functions?			        [11:00]
+<altendky> jusss: the function blocks, nothing else gets to do anything.  what
+	   function?
+<jusss> altendky: https://paste.ubuntu.com/p/hwvmKZ5sZ6/
+<altendky> jusss: so tornado, not asyncio?			        [11:02]
+<altendky> jusss: don't time.sleep() in async code.  use their async sleep
+	   function
+<jusss> altendky: I think they have the same promblem, that event-base loop
+	how to handle blocking function
+<altendky> jusss: what function?
+<jusss> altendky: aT is loop function, 				        [11:03]
+<altendky> jusss: ok, so a made up thing you shouldn't write that way?
+<jusss> altendky: I put it in a event-loop, and it blocks
+<altendky> 22:02 <altendky> jusss: don't time.sleep() in async code.  use
+	   their async sleep function
+<altendky> jusss: twisted has deferToThread, asyncio has run_in_executor.
+	   tornado likely has something.  but really the answer is that first
+	   you avoid the blocking function entirely.
+<jusss> altendky: that event-loop frames, if I want put a loop in it, how I
+	should do?
+<altendky> jusss: are you asking how to sleep in async code without blocking?
+<altendky> jusss: i don't know what you mean by 'that event-loop frames'
+								        [11:08]
+<jusss> altendky: tornado is event-loop, you see, aT is a loop function, I put
+	aT in there, it blocks tornado's event-loop
+<altendky> jusss: are you referring to a loop you wrote as an event loop?
+<altendky> jusss: yes.  you call time.sleep.  for the third time here, don't
+	   do that.  async libraries provide async ways of sleeping
+<jusss> altendky: like     tornado.ioloop.IOLoop.instance().start() or asyncio
+	whatever , they all put a block function at the last
+<altendky> jusss: you seem to be ignoring me.  can we please talk about the
+	   sleeps?						        [11:09]
+<jusss> altendky: sorry, I don't know why this is related with sleep?
+<altendky> jusss: because time.sleep() _blocks_
+<altendky> jusss: it tells your thread to do nothing at all for however long.
+	   thus _blocking_ the event loop
+<jusss> altendky: but while make this block
+<altendky> jusss: no.  sleep() blocks
+<jusss> altendky: ok, I will try it
+<altendky> jusss: if you used the proper async sleep then that second in every
+	   loop would let the tornado event loop process other things
+<altendky> jusss: you may also need to mark your function properly as async
+	   however you do that in tornado
+<jusss> altendky: wow, that would be wonderful
+<altendky> jusss:
+	   https://www.tornadoweb.org/en/stable/gen.html#tornado.gen.sleep
+<altendky> jusss: please do ask about the things i say instead of ignoring
+	   them repeatedly
+<jusss> altendky: sorry again
+<altendky> jusss: just trying to make sure we get answer quickly :]
+<altendky> jusss: err, that may be the 'old' style.  let me see if there's a
+	   separate sleep for async/await syntax
+<jusss> altendky: how they solved the block function? with select() or
+	epoll()?
+<altendky> jusss: that's the gist down in the guts, yeah
+<altendky> jusss: if you want to watch a fun video,
+	   https://www.youtube.com/watch?v=MCs5OvhV9S4&t=32s evolves through
+	   some various approaches				        [11:16]
+<jusss> altendky: I think concurrent.futures is doing something in
+	multi-thread, and asyncio is doing something in one single thread, it
+	is right? 
+<altendky> jusss:
+	   https://www.tornadoweb.org/en/stable/faq.html#why-isn-t-this-example-with-time-sleep-running-in-parallel
+	   almost seems like they are suggesting asyncio.sleep()?  or maybe
+	   you can just `await tornado.gen.sleep()`?  i don't know tornado
+	   offhand
+<altendky> jusss: concurrent.futures could be separate processes or separate
+	   threads.  async starts in one thread, yes.
+<altendky> jusss: but you can often kick things into other threads (twitsed's
+	   deferToThread, asyncio's run_in_executor, etc)	        [11:20]
+<altendky> not the first place to go though.  first try to get rid of the
+	   blocker
+<jusss> altendky: yeah, that's the promblem, 
+<altendky> jusss: actually my last link does show exactly `await gen.sleep(1)`
+	   so use that
+<altendky> jusss: your functions aren't even written as `async def` yet so, do
+	   that and replace the sleep's with tornado.gen.sleep.  and await
+	   them.
+<jusss> altendky: I thought that 'while' was the blocker, it seems I have a
+	wrong thought						        [11:22]
+<altendky> jusss: while keeps you in the function (longer anyways), sure.  but
+	   you can still `await` things which leaves it open for the loop to
+	   get some time.  so in general, no, while isn't an issue with async
+	   code.						        [11:23]
+<jusss> altendky: I see, thanks
+
+##########################
+https://www.emacswiki.org/emacs/ErcProxy
+ERC through a socks proxy
+socks.el comes with Emacs. (Emacs 22 and older can get it from w3.) If you set ‘socks-override-functions’ before loading the library, all the network functions will be using socks:
+
+ (setq socks-override-functions 1)
+ (setq socks-noproxy '("localhost"))
+ (require 'socks)
+
+Alternatively, you can use the following for ERC only:
+
+ (setq socks-noproxy '("localhost"))
+ (require 'socks)
+ (setq erc-server-connect-function 'socks-open-network-stream)
+
+The location of the socks server is in the variable ‘socks-server’. To set it you can do:
+
+ (setq socks-server (list "My socks server" "socks-server-hostname" 1080 5))
+
+Where “My socks server” is the description of the server, “socks-server-hostname” is the host name for the server, 1080 is the port, and 5 is the socks version (can be 4 as well)
+
+‘socks-noproxy’ holds a list of regexps for which the network calls are not socksified. I’ve excluded localhost from the connections so that I can still connect to BitlBee.
+
+################################################
+https://en.wikipedia.org/wiki/Object-oriented_programming#Class-based_vs_prototype-based
+
+python is class-based OO, and javascript is prototype-based OO
+python use "self", js use "this"
+<twb> AJTJ: I think "this" is due to js being prototype-based OO, where python
+      is class-based OO
+ <twb> I believe js's OO was taken from Self/Slate		        [17:11]
+###################################################
+
+import module在类的def __init__(self):里
+在别人的类里添加方法，然后在他的类里指定触发的方法里运行自己的方法
+
+decorator可以修改函数，当然也可以修改类，给类添加方法和变量或者闭包？
+closure和class在我看来都是namespace而已，没有什么不同
+closure需要返回一个inner function来捕捉外部的作用域来保存那个作用域,捕捉
+inner function内部的无意义呀，因为每次执行都会初始化，但外部的作用域不会
+
+既然closure可以放到函数里面，那当然class也可以放到函数里面，
+closure和class和function都是一等公民，都可以像argument一样被当作
+parameter或 return value进行传递
+
+def addId(cls):
+    class AddId(cls):
+        def print1(self):
+            print(1)
+    return AddId
+
+@addId
+class Foo:
+    pass
+
+c=Foo()
+c.print1()
+
+class MyDecorators:
+    def __init__(self):
+        import time
+        pass
+    def while1s(self,f):
+        def wrapper(*args,**kwargs):
+            while True:
+                try:
+                    f()
+                    time.sleep(1)
+                except:
+                    break
+        return wrapper
+c=MyDecorators()
+@c.while1s
+def p():
+    print(1)
+    print(0)
+
+p()
+
+tornado不光是个web server还是个web frames还是个socket libraries
+tornado还有tornado.concurrent.Future可以在python2里用，因为python 2.7.6
+没有concurrent.futures,但2.7.15有
+AsyncHTTPClient()返回的是个异步的对象，可以async def定义, await等待
+HTTPClient()是阻塞的
+
+使用tornado，感觉和用softbank的choregraphe里的python box一样，
+都是给你个pre-defined class,然后把你的code放到那个class里，你需要
+知道那个class的各个method的意义，放到enter point里，确保它的method
+执行时也会调用你的method,在def __init__(self)里添加import module
+它们都是事件机制的 event-loop
+class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+在子类中初始化父类
+super class?
+http://funhacks.net/explore-python/Class/super.html
+在子类中定义同名方法会覆盖父类的方法，这时可以使用super()来避免
+在子类的methodA中调用super(子类,self).methodA()可以执行父类中的methodA
+
+<jusss> initial parent class in subclass, what it's good for?	        [16:54]
+<twb> jusss: if you have a class B whose parent class is A, and you define a
+      method B.foo(), it will completely replace A.foo().	        [16:55]
+<twb> jusss: sometimes you want to extend the method, instead of replacing it
+<twb> jusss: so from within B.foo() you can call super().foo() to reach A.foo
+<twb> Does that make sense?
+<jusss> twb: yeah, it makes sense, but like class B(A): def __init__(self):
+	A.__init(self) what it's good for?
+<jusss> initial parent class's __init__ in subclass
+<twb> 19:55 <twb> jusss: sometimes you want to extend the method, instead of
+      replacing it
+
+########################################################
+
 <jusss> nyfair: 这些框架全是那种事件机制的，和那一坨GUI一样，最后都是一个事件
 	阻塞主进程然后才运行，我现在用torando的websocket和浏览器建立连接，然后
 	用socket和其他服务器建立连接，怎么合适的把socket的数据转发到浏览器上去？

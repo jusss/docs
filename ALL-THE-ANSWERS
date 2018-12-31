@@ -1,3 +1,153 @@
+
+
+<head>
+<title>Tornado WebSockets</title>
+ <meta charset="utf-8" />
+ </head>
+     
+  <body>
+    <div id="fromPepper">
+        <h1 style="font-size:70px; color:green;"> Pepper </h1>
+      
+    </div>
+</body>
+
+ 
+ <script type="text/javascript">
+     change = function (state) {
+         k=document.getElementById('fromPepper');
+	 k.innerHTML=state;
+//        k.innerHTML=k.innerHTML+'<br>'+state;
+    };
+ 
+ 
+    var ws = new WebSocket("ws://127.0.0.1:22222/ws");
+    ws.onopen = function() {
+               ws.send("Hello, world");
+            };
+    ws.onmessage = function (evt) {
+               change(evt.data);
+            };
+      
+ 
+</script>
+
+####################################################################
+
+#!/usr/bin/env python3
+import tornado.websocket
+import tornado.ioloop
+import datetime, time
+from tornado.options import define, options, parse_command_line
+from concurrent.futures import ThreadPoolExecutor
+e=ThreadPoolExecutor()
+x=(i for i in range(0,100000))
+wsl=[]
+cl=[]
+def createClosure(f):
+    a=0
+    def realFunc():
+        nonlocal a
+        a=a+1
+        f.write_message(str(a))
+    return realFunc
+
+def runClosure():
+    for i in cl:
+        i()
+
+def test():
+    for i in wsl:
+       i.write_message(str(next(x)))
+
+def t2():
+    if cl:
+        return
+    else:
+        for i in cl:
+            i.write_message(str(next(x)))
+        
+class IndexHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.render("websocket.html")
+class EchoWebSocket(tornado.websocket.WebSocketHandler):
+    def open(self):
+        self.websocket_ping_interval=30
+        wsl.append(self)
+        cl.append(createClosure(self))
+    def on_message(self, msg):
+        for i in wsl:
+            self.write_message(u"you said: "+msg)
+
+    def on_close(self):
+        print("closed")
+    def check_origin(self, origin):
+        return True
+
+#e=ThreadPoolExecutor()
+def t():
+    time.sleep(20)
+    x[0]='wonderful'
+
+def s():
+    app=tornado.web.Application([(r'/',IndexHandler),(r'/ws', EchoWebSocket)])
+    define("port", default=22222, type=int)
+    app.listen(options.port,'0.0.0.0')
+
+    tornado.ioloop.PeriodicCallback(runClosure,1800).start()
+    tornado.ioloop.IOLoop.instance().start()
+    #http://xiaorui.cc/2016/01/20/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90tornado-periodiccallback-crontab%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1%E5%AE%9E%E7%8E%B0/
+    #mainLoop.run_in_executor(e,test)
+    #mainLoop.add_callback(t2)
+
+s()
+
+###################################################################
+import asyncio
+@asyncio.coroutine
+def p():
+    print('hello')
+    yield from asyncio.sleep(0.5)
+    print('world')
+@asyncio.coroutine
+def p2():
+    print('john')
+    yield from asyncio.sleep(0.5)
+    print('it is')
+
+def p3(f):
+    print(f.result())
+    
+loop=asyncio.new_event_loop()
+asyncio.set_event_loop(loop)
+
+task = [asyncio.ensure_future(p()), asyncio.ensure_future(p2())]
+task[1].add_done_callback(p3)
+#task = [p(), p2()]
+loop.run_until_complete(asyncio.wait(task))
+
+#asyncio.run(p())
+#asyncio.run(p2())
+
+#async def define a function, call that function and it return a coroutine object
+#asyncio.ensure_future on that coroutine object and return a future object
+#asyncio.get_event_loop() return a loop, loop.run_until_complete work on
+# that future object, 
+#task object is sub-class of future object
+#loop.run_until_complete will auto turn coroutine object to task object
+#loop.create_task(coroutine-object) to task object, same to asyncio.ensure_future(coroutine-object)
+#print that future object to know its state
+#future object has add_done_callback(callback-function) and that callback-function defined with future as parameter
+#
+#RuntimeError: There is no current event loop in thread 'MainThread'.
+#every thread only has one event-loop, if you use asyncio.get_event_loop it will auto create one event loop
+#and set it as default event-loop in current thread, if you call it in other threads so it will be error
+#you need create it and set it by hand, loop=asyncio.new_event_loop(); asyncio.set_event_loop(loop)
+#then you can use  get_event_loop in other threads
+#loop.call_soon_threadsafe(task)
+
+################################################
+there's a library called futures in python 2
 there's a library called __future__ in python2.7
 https://docs.python.org/2/library/__future__.html
 https://zhuanlan.zhihu.com/p/32756176
