@@ -1,6 +1,86 @@
 
+多线程，每个线程里跑一个event loop,每个线程监听的端口不同，甚至多ip就ip也不同
+
+#########################################
+
+IOLoop.current().run_sync(lambda: divide(1, 0))
+if the IOLoop is not yet running, you can start the IOLoop, run the coroutine, and then stop the IOLoop with the IOLoop.run_sync method. 
+
+IOLoop.current().run_in_executor(None, blocking_func, args)
+if it needs a executor, then from concurrent.futures import ThreadPoolExecutor
+and executor = ThreadPoolExecutor()
+from concurrent.futures import ThreadPoolExecutor
+class EchoWebSocket(tornado.websocket.WebSocketHandler):
+      executor = ThreadPoolExecutor()
+      def whatever(self):
+      	  tornado.ioloop.IOLoop.current().run_in_executor(executor,blocking_func,args)
 
 
+#################################################
+
+怎么合并两个event-loop成一个？比如合并tornado和asyncio的event-loop? 或者把asyncio的future object插入到tornado的event-loop里?
+
+tornado 5.1之后直接支持在它的类里写native coroutine,然后还是用tornado的event-loop去执行，不用写asyncio的event-loop, 旧版本如果要Integration with other services就用tornado.platform.asyncio
+
+tornado.ioloop.IOLoop.current().spawn_callback(self.ttt)
+把self.ttt这个coroutine-object添加到当前线程的IOLoop里，但是不等待结果
+await self.ttt()会等待self.ttt()的退出，但是如果self.ttt如果是个while-loop它就不会退出
+用await 会卡在这, 可以用 spawn_callback，不等待结果
+
+或者不把self.ttt写出while-loop, 然后tornado.ioloop.PeriodicCallback(self.ttt,1800).start()来循环
+
+在tornado里可以用await执行另一个coroutine-object,在asyncio里也可以，
+比如在A里await B,然后asyncio.run(A)这样也会执行B
+
+IOLoop.current().run_sync(lambda: divide(1, 0))
+IOLoop.current().run_in_executor(None, blocking_func, args)
+
+'await' will wait for the exit of its paremeter, what if the coroutine-object is a while-loop,
+it never exits, so await will stuck here, use 'spawn_callback' instead of 'await'
+
+tornado.ioloop.IOLoop.current().spawn_callback(self.ttt) will affect the IOLoop object in
+the current thread, it will store the self.ttt coroutine object into this IOLoop object
+
+#######################################################
+
+one thread only have one event loop, use asyncio.get_event_loop get current thread's event loop,
+or use l=asyncio.new_event_loop() then asyncio.set_event_loop(l)
+this event loop object can plus future object in, think it's like a tree, and the future objects are apples on the tree
+loop.create_task(coroutine-object) will turn this coroutine-object into future object and plug it in the loop object
+or use t=asyncio.ensure_future(coroutine-object), then put this t to a task list, then use
+loop.run_until_complete(asyncio.wait(task))  or [loop.run(t) for t in task] or loop.run_forever()
+async def and await, async def define a function and call it get a coroutine object, and await's parameter is coroutine object, await will return the control and run the coroutine object
+@coroutine and yield from is an old way
+
+
+#######################################
+
+any function that calls a coroutine must be a coroutine itself, and use the await or yield keyword in the call.
+#so the 'await' or 'yield from's parameter is a coroutine object,
+
+import asyncio
+count=[0]
+task=[]
+async def a():
+    if count[0] > 100:
+        return
+    else:
+        print(1)
+        count[0] += 1
+        await b()
+async def b():
+    if count[0] > 100:
+        return
+    else:
+        print(0)
+        count[0] += 1
+        await a()
+loop=asyncio.get_event_loop()
+#get current thread's event loop
+task.append(loop.create_task(a()))
+task.append(loop.create_task(b())) #turn those coroutine object into future object, and add them to the loop object
+loop.run_until_complete(asyncio.wait(task))
+print('end')
 
 ###########################################################
 
