@@ -1,4 +1,110 @@
 
+yield from generator-object   is like yield from [1,2,3]  or yield from range(3)
+like yield next(generator-object)
+
+def g1():
+    yield 1
+    yield 2
+    yield 3
+f1=g1()
+def g2():
+    yield next(f1)
+    yield next(f1)
+    yield next(f1)
+f2=g2()
+
+def g2():
+    for i in f1:
+        yield i
+
+def g2():
+    yield from f1
+
+def g1():
+    yield from [1,2,3]
+    
+yield from generator-object will take next(generator-obejct)'s return value to main control
+
+#####################################
+so I wonder if it can yield itself or its current possition in f()? for just run part of it, not whole
+
+####################################################
+
+yield isn't a statement any more, it's an expression now!
+now yield without an expression is now legal, 'x=yield' equivalent to 'x=yield None'
+https://www.python.org/dev/peps/pep-0342/
+
+generator object, d=f(); f() won't execute immedly until you call next(d)
+so I wonder if it can yield itself or its current possition in f()? for just run part of it, not whole
+you can do d.send(3) that would be yield 's return value in f()
+so I wonder if it can go anywhere that yield show up with send?
+what do 'send' 'throw' 'close' do?
+
+what is a frame? it seems, that give you a pre-class, and you want
+to add method into that class, pass that class to the event-loop for run
+
+use yield everywhere, a=yield b(), yield a generator or future object,
+yield from iterator is like
+for i in iterator:
+    yield i
+
+<runciter> jusss, what do you want to know exactly?
+<altendky> runciter: but presumably `yield from` provides something that
+	   `yield` didn't when it comes to async uses?		        [11:58]
+<jusss> runciter: how that yield stuff replace callback in that example
+	https://www.tornadoweb.org/en/stable/gen.html
+<runciter> altendky, yes, it "delegates" execution the sub generator,
+	   obviating the need for a trampoline
+<jusss> yield from iterator   it's like  for i in iterator :  yield i
+<runciter> kind of, but it does more				        [11:59]
+<altendky> runciter: so inlineCallbacks implemented some 'version' of `from`
+	   on standard `yield`.  mm
+<runciter> altendky, yup!
+<runciter> jusss, the fundamental problem is that `yield` conflates iteration
+	   and more general control flow
+<runciter> jusss, so, if all you care about iterating over "generation", then
+	   `for i in generator: yield i` works fine
+<runciter> jusss, but there's a lot more to generators, that makes `x = yield`
+	   work
+<runciter> the fact that "yield" is an expression that can evaluate to a value
+	   is what allows it to replace callbacks
+<runciter> https://www.python.org/dev/peps/pep-0342/ - pay close attention to
+	   `send`, `throw`, and `close`				        [12:03]	   
+
+############################################
+
+asyncio, aldebaran's async(),    tornado's @gen,   es2017 async/await
+
+#asyncio
+async def f(), await coroutine-object, loop.run(), @asyncio.coroutine, yield from
+
+#aldebaran
+qi.async(f,delay=usec,arg)  return a future, qi.future have value, addCallback,cancel,wait
+also qi.PeriodicTask, qi.Promise will return a qi.Future with qi.Promise.future(), and
+qi.Promise.setValue() can call that qi.Future
+http://doc.aldebaran.com/2-5/dev/libqi/api/python/future.html
+http://doc.aldebaran.com/2-5/dev/libqi/api/python/async.html
+
+#tornado
+@tornado.gen.coroutine, yield,
+tornado.gen.coroutine or tornado.gen.engine, Decorator for asynchronous generators.
+Any generator that yields objects from this module must be wrapped in either this decorator or engine.Functions with this decorator return a Future
+
+#es2017
+
+
+aldebaran's qi.Future qi.async() is base on threading.Thread? not generator?
+module qi point to _qi.so, they don't provide _qi.py
+
+##################################################
+
+asynchorous programming, you control the flow, jumps in functions, with select() or
+epoll() on blocking functions, it's more safe than multi-threads, you don't need a lock,
+
+await always wait for the result of its parameter which is a coroutine object, and then
+await take its result return to the control stuff
+
+
 多线程，每个线程里跑一个event loop,每个线程监听的端口不同，甚至多ip就ip也不同
 
 #########################################
