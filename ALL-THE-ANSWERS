@@ -1,4 +1,31 @@
 
+Asynchronous & Promise/Future
+Asynchronouse就是不等待阻塞函数就直接返回，但是会给阻塞函数一个callback函数，
+Promise就是一旦阻塞函数运行结束，就会改变Promise对象的状态，然后执行callback
+而且js里Promise是非阻塞的，
+就是把一个阻塞函数塞到Promise对象里，然后给那个Promise对象添加大量的callback以.then()那种方式，而不是函数调用那种方式.
+一旦这个Promise对象里的阻塞函数运行结束就会更改里面的状态，会执行后面那一坨.then()构建的函数callback链
+
+js的Promise就是把一个阻塞函数塞到Promise对象里，然后后面加上一坨的函数调用链,检测Promise对象里状态的变化去执行
+
+把 Promise/Future想象成一条链子，链子上有n个函数，最开始的函数可能是阻塞的，也可能是非阻塞的
+
+把namespace想象成一个cave, 变量和函数就是cave里面挂着的果子
+                                                                                                       .then() .addCallback()                                 y(g(f(x)))                                            
+Promise/Future就是构建了一个函数执行链，但是这个链子是不阻塞的，不影响其它函数的运行，如果是函数回调那种方式是会阻塞的
+
+python的Future对象呢，最主要的就是addCallback,也是和Promise一样，根据检测对象里面状态的变化，然后执行后面一坨的函数链
+aldebaran的qi.Future用的是多线程实现的这个Future对象,它用的是Promise.setValue更改状态,asyncio用.result(),js用resolve()
+而python3的concurrent.futures也是多线程，而asyncio的里面的future对象呢，也一样，也是个函数执行链，但是asyncio是在一个
+线程里玩Asynchronous, 就是用在阻塞函数前通过yield返回，把函数里面的阻塞函数放到一个列表里，用select()/epoll()轮询这个列表
+里的阻塞函数，一旦这个阻塞函数执行了，就把这个阻塞函数后面的那一坨函数执行链运行了，所以这个阻塞函数也是被搞成了Future对象.
+await等待的是个Future对象，Future对象里面有一坨的函数执行链，用yield generator那一套制作了那一坨函数执行链, 不是和async/await
+很一样，因为generator虽然有send()等方法，但是没有Future.addCallback()那一坨，addCallback添加的是完整的函数，而generator那套
+添加的是部分的函数执行块, 所以用generator那套实现的Asynchronous和asyncio那坨async/await实现的并不一样
+
+
+
+#################################
 
 co-routine base on generator
 
