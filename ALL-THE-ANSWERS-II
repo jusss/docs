@@ -1,4 +1,146 @@
 
+
+
+
+yield future-object will not run once the future object,
+yield from future-object, will run once the future obejct
+
+the class/frame/libarary that tornado provide will return a future object in their class itself
+so don't worry about blocking, because you override their pre-class, they want you to change that, and it will future object, and you can yield that , don't worry about blocking stuff!
+
+Most asynchronous functions in Tornado return a Future; yielding this object returns its Future.result.
+###########################################
+
+
+Asynchronous & Promise/Future
+Asynchronouse就是不等待阻塞函数就直接返回，但是会给阻塞函数一个callback函数，
+Promise就是一旦阻塞函数运行结束，就会改变Promise对象的状态，然后执行callback
+而且js里Promise是非阻塞的，
+就是把一个阻塞函数塞到Promise对象里，然后给那个Promise对象添加大量的callback以.then()那种方式，而不是函数调用那种方式.
+一旦这个Promise对象里的阻塞函数运行结束就会更改里面的状态，会执行后面那一坨.then()构建的函数callback链
+
+js的Promise就是把一个阻塞函数塞到Promise对象里，然后后面加上一坨的函数调用链,检测Promise对象里状态的变化去执行
+
+把 Promise/Future想象成一条链子，链子上有n个函数，最开始的函数可能是阻塞的，也可能是非阻塞的
+
+把namespace想象成一个cave, 变量和函数就是cave里面挂着的果子
+                                                                               .then() .addCallback()  await                              y(g(f(x)))                                            
+Promise/Future就是构建了一个函数执行链，但是这个链子是不阻塞的，不影响其它函数的运行，如果是函数回调那种方式是会阻塞的
+
+python的Future对象呢，最主要的就是addCallback,也是和Promise一样，根据检测对象里面状态的变化，然后执行后面一坨的函数链
+aldebaran的qi.Future用的是多线程实现的这个Future对象,它用的是Promise.setValue更改状态,asyncio用.result(),js用resolve()
+而python3的concurrent.futures也是多线程，而asyncio的里面的future对象呢，也一样，也是个函数执行链，但是asyncio是在一个
+线程里玩Asynchronous, 就是用在阻塞函数前通过yield返回，把函数里面的阻塞函数放到一个列表里，用select()/epoll()轮询这个列表
+里的阻塞函数，一旦这个阻塞函数执行了，就把这个阻塞函数后面的那一坨函数执行链运行了，所以这个阻塞函数也是被搞成了Future对象.
+await等待的是个Future对象，Future对象里面有一坨的函数执行链，用yield generator那一套制作了那一坨函数执行链, 不是和async/await
+很一样，因为generator虽然有send()等方法，但是没有Future.addCallback()那一坨，addCallback添加的是完整的函数，而generator那套
+添加的是部分的函数执行块, 所以用generator那套实现的Asynchronous和asyncio那坨async/await实现的并不一样
+用async/await构建一个函数执行链，但是await都是最后的返回值，然后用asyncio.run执行这个函数链，并把这个asyncio.run用concurrent.futures放到
+另一个线程执行，这样就和js的Promise一样了
+
+concurrent.futures.Future 的确和 asyncio.Future不一样，不是一个Object
+https://docs.python.org/3/library/asyncio-future.html#asyncio.wrap_future
+
+可以用这个去连接完整的函数来构建函数执行链，替代callback
+https://docs.python.org/3/library/asyncio-future.html#asyncio.Future.add_done_callback
+
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
+
+async def f1():
+    print(1)
+    await f2(1)
+
+async def f2(x):
+    print(x+1)
+    await f3(x+1)
+
+async def f3(x):
+    print(x+1)
+    await asyncio.sleep(1)
+
+def async_chain():
+    asyncio.run(f1())
+    
+    
+executor=ThreadPoolExecutor()
+futures=executor.submit(async_chain)
+print(futures.result())
+
+
+"""
+for x in y:
+    z.append(await f(x))
+
+<jusss> altendky: in js Promise.then().then() can always append callback
+	function into the Promise object, I wonder python's future can do
+	that?  future.addFuture() ?
+<altendky> jusss: did you look at the docs? Was there a function? And asyncio
+	   future isn't concurrent.futures iirc			        [10:16]
+<altendky> jusss: but mostly you'd use async/await rather than callbacks
+<_habnabit> they are indeed (quite confusingly) different types of futures
+<altendky> jusss:
+	   https://docs.python.org/3/library/asyncio-future.html#asyncio.Future.add_done_callback
+<jusss> altendky: it seems I can use asyncio.future object to instead of
+	callback function way?					        [10:20]
+<altendky> jusss: I'm not sure what you mean. But in case you want to mix the
+	   futures
+	   https://docs.python.org/3/library/asyncio-future.html#asyncio.wrap_future
+<altendky> jusss: normally you'd just write an async def with `await x(await
+	   y(z))` or such to do multiple things and not really deal with
+	   futures
+<altendky> Or intermediate variables, either way		        [10:22]
+<jusss> altendky: ok, the Future object are not same, in asyncio, I can use
+	async def to create a coroutine object, which method I should use to
+	turn it to Future object? loop.create_task or asyncio.ensure_future?
+<altendky> jusss: what are you trying to do?
+<jusss> altendky: make a Future object, and use Future.add_done_callback to
+	make a future chain, like callback
+<jusss> is that possible? 
+<altendky> jusss: isn't that the link I shared?
+<altendky> 21:18 <altendky> jusss:
+	   https://docs.python.org/3/library/asyncio-future.html#asyncio.Future.add_done_callback
+<jusss> altendky: yeah, it is, I just don't know why people always said that
+	async way are better than callback, I assume maybe I should use that
+	async way 
+<altendky> jusss: because it's way more legible. Especially looping etc
+<altendky> jusss: would you like to write sync code with callbacks? No loops,
+	   context managers, try/except, etc?
+<jusss> altendky: you mean 'async code with callback'?
+<altendky> jusss: nope
+<jusss> altendky: what is 'sync code'?
+<altendky> jusss: I mean that async/await let's you write async code that
+	   looks like sync code.  If you like callbacks then shouldn't you be
+	   willing your sync code with callbacks too?
+<altendky> altendky: code that isn't async			        [10:36]
+<altendky> jusss: you could certainly code like '{}x{}'.format(1, 2,
+	   callback=f) but that'd make the code incomprehensible... So if it's
+	   bad for sync code, why would we want it for async code?
+<altendky> jusss: sure, occasionally it fits better, maybe, but mostly not
+								        [10:38]
+<altendky> jusss: try writing a loop with callbacks. See what it looks like
+	   and compare with `for x in y: z.append(await f(x))`
+<jusss> altendky: yeah, I just use that js's Promise thought to think in
+	python, like I can put a blocking function A into a future object, and
+	I want when A is done, run B, then C and D,but it won't block current
+	thread
+<altendky> jusss: there's another too for that
+<jusss> altendky: sorry, what is 'a loop with callbacks'?
+<jusss> altendky: while-loop or what?
+<jusss> for-loop?
+<altendky> jusss: go implement that loop I just wrote but with callbacks
+<altendky> 21:42 <altendky> jusss: try writing a loop with callbacks. See what
+	   it looks like and compare with `for x in y: z.append(await f(x))`
+<altendky> jusss:
+	   https://docs.python.org/3/library/asyncio-eventloop.html#executing-code-in-thread-or-process-pools
+<altendky> jusss: you can directly await the function you want shoved into
+	   another thread. Well, directly via that run in executor stuff
+
+"""
+### it seems that js's Promise in pythin is like just the throw the first blocking
+### function into another thread, and then give it lots of callback with await x(await (y(z)))
+
+
 yield from generator-object   is like yield from [1,2,3]  or yield from range(3)
 like yield next(generator-object)
 
@@ -1588,6 +1730,66 @@ g=lambda s,a,b: s if a==[] else (g(s.replace(a[0],b[0]),a[1:],b[1:]) if a[0] in 
                   'gb18030' ("微软雅黑" . "unicode-bmp"))
 
 from __future__ import unicode_literals
+<nedbat> jusss: second, unicode_literals only change what "quoted strings"
+	 mean in the one file where the __future__ import is.
+<nedbat> jusss: it doesn't matter what module you pass the string to. what
+	 matters is where the string comes from.
+<_habnabit> jusss, unicode_literals doesn't change what 'str' or 'bytes' or
+	    'unicode' _means_
+<_habnabit> jusss, the only thing it changes is "things in quotes like this"
+<jusss> nedbat: _habnabit I see
+
+if that string from outside, and it is bytes, not unicode object, and py2 can't print unicode
+if it's a unicode object, and print on it, it will try encode that unicode object with ascii to bytes object, and of course it will cause an error like
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 89-94: ordinal not in range(128)
+
+from urllib import quote
+import tornado.httpclient
+import urllib, json
+
+def curlmd5(src):
+    m = hashlib.md5(src.encode('utf-8'))
+    return (m.hexdigest().upper()).decode('utf-8')
+
+def get_params(questionBytes):
+    time_stamp=str(int(time.time())).decode('utf-8')
+    nonce_str = ''.join(random.sample(string.ascii_letters + string.digits, 10))
+    app_key='URY2h67ATeRGJIRK'
+    paramsDict = {'app_id':'2111117142',
+              'question':questionBytes,
+              'time_stamp':time_stamp,
+              'nonce_str':nonce_str,
+              'session':'10000'
+             }
+    sign_before = ''
+    for key in sorted(paramsDict):
+         sign_before += '{}={}&'.format(key,quote(paramsDict[key], safe=''))
+    sign_before += 'app_key={}'.format(app_key)
+    print(sign_before)
+    t=curlmd5(sign_before)
+    paramsDict['sign'] = t
+    return paramsDict
+
+def get_content(question):
+    url = "https://api.ai.qq.com/fcgi-bin/nlp/nlp_textchat"
+    sendDataDict = get_params(question.encode('utf-8'))
+    print(sendDataDict)
+    body = urllib.urlencode(sendDataDict)
+    response = http_client.fetch(url, method='POST', body=body,  validate_cert = False)
+    print(response.body)
+    print(type(response.body))
+    a=(response.body.decode('utf-8','ignore'))
+    b=json.loads(a)["data"]["answer"]
+    print(type(b))
+    print(b.encode('utf-8'))
+
+if __name__ == '__main__':
+    http_client=tornado.httpclient.HTTPClient()
+    print(get_content('hello'))
+
+
+
+
 
 #######################################################################
 
@@ -3715,10 +3917,25 @@ def int2(x, base=2):
 
 int2('1010101') => 85
 
-int2 = functools.partial(int, base=2)
+int2 = functools.partial(int, base=2)        lambda: int(x,2)
 int2('1010101') => 85
 functools.partial的作用就是，把一个函数的某些参数给固定住（也就是设置默认值），返回一个新的函数，调用这个新函数会更简单。
 但是这个base=2只是argument而不是assignment,也就是在这个函数之外是不存在base这个变量的
+
+
+<jusss> functools.partial() is better than lambda form?		        [11:07]
+<altendky> jusss: lambda can 'throw away' parameters, partial can't.  partial
+	   nicely expresses specifying some parameters
+<jusss> altendky: what you mean 'throw away'?
+<jusss> they are not equivalent?
+<altendky> jusss: `lambda x, y, *args, **kwargs: f(x, *args, **kwargs)`
+	   doesn't pass `y` on to the wrapped `f`
+<jusss> altendky: ok then
+<jusss> 'throw away'
+<altendky> jusss: there are cases where functools.partial and lambda can both
+	   do the same thing.  but yes, they are very different tools
+								        [11:13]
+
 -----------------------------------------------------
 列表定义时会自动求值里面元素的值
 字典定义时会自动求值里面元素的值
