@@ -1,4 +1,45 @@
 
+#variable
+DO NOT USE GLOBAL VARIABLES, USE CLOSURE OR OBJECT TO CONTAIN VARIABLES
+
+#loop
+while in while, control condition outside of 'while' statement
+
+switch_all=Ture
+switch_one=Ture
+while switch_all:
+      do-something
+      while switch_one:
+      	    do-something
+      while switch_two:
+          do-something
+
+this while statement is a blocking stuff, put it into another thread or the last of the code,
+change switch_all and switch_one to False will affect that 'while' execution, and it can keep current state, better than function
+
+put those 'while' statement into an alternative thread or an coroutine object(return with yield), and the control condition is
+charged by outside of 'while' statement, then you can call it with change the condition in the outsider of 'while' statement
+
+
+#synchronous
+in other languages, functions are blocking each other as default, they want to be asynchronous,
+but in javascript, most functions are non-blocking, if function a run before function b, a may be not yet done when b is done,
+so if you want it to be synchronous, then callback b in a, or make a Promise
+
+
+##############################################################################################
+
+
+在top-level用var定义变量，变量是global variable, 在top-level的function里用var定义变量，就是local variable
+
+think how long time it will check the condition once?
+def sleep(n):
+    startTime=getTime()
+    while (getTime() - startTime < n):
+    	  pass
+
+########################################
+
 Asynchronous & Promise/Future
 Asynchronouse就是不等待阻塞函数就直接返回，但是会给阻塞函数一个callback函数，
 Promise就是一旦阻塞函数运行结束，就会改变Promise对象的状态，然后执行callback
