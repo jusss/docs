@@ -1,4 +1,164 @@
 
+
+
+
+
+<jusss> sinclair_:  I solved it!  const delay = ms => new Promise(resolve =>
+	setTimeout(resolve, ms));  var a=3;  async function loop() {
+	while(a==3) { await delay(1000); console.log(3) } };  loop();   a=2;
+	the whole point is making the while-loop return to the
+	WHERE-I-DONT-KNOW, and then change the condition!
+<jusss> sinclair_: WHERE-I-DONT-KNOW, is there a name for it?    [02:07]
+<ljharb> jusss: the caller
+
+while-loop is a blocking statement! it will block event-loop, so onclick event will be blocked too,
+use yield or await in that while-loop to make it return to the caller, so it won't be blocking any more,
+it's asynchronous now! the asynchronouse's whole point is that it can return to the caller and it can run some
+functions or statements that is after it
+
+
+<jusss> sinclair_: a new question come to me, yield is different with
+	async/await,  async/await can auto return to the insider of the async
+	function and run functions that are after it, but yield, I have to
+	call next() on it, how to do that with yield?  [02:30]
+
+<jusss> sinclair_: graingert const delay = ms => new Promise(resolve =>
+	setTimeout(resolve, ms));  var a=3;  async function loop()
+	{while(a==3) { await delay(1000); console.log(3) } };  loop();     the
+	loop will print 3 and return to caller, and it still print 3 in the
+	background right?
+<graingert> jusss: no
+<sinclair_> jusss: const result = await loop()
+<sinclair_> jusss: use typescript, things will be clearer
+<sillyslux_> but then you need return in your loop() functino  [02:35]
+<sinclair_> jusss: like, its not obvious that 'ALL' async functions return a
+	    Promise, so use TypeScript and it will tell you that
+<sillyslux_> now it'll just be undefined
+<jusss> graingert: sinclair_ but I saw that number are increasing on the
+	console
+<graingert> Yes but not in the background
+<sinclair_> jusss: numbers go up and down all the time tho
+<sillyslux_> how is it not obvious?!
+
+<graingert> JS has wait for all the caller's code to finish before going back
+	    to other tasks
+	    
+<sillyslux_> you don't need ts to tell you *that
+
+
+<sinclair_> jusss: so, that is going to cause JS to block, but you can make it
+	    not block by moving outside of the event loop
+<sinclair_> const delay = ms = new Promise(resolve => setTimeout(resolve, ms))
+<sinclair_> async function loop() { while(true) { await delay(1000) } }
+<sinclair_> jusss: the 'delay' in this scenario is moving the event loop out
+	    to that setTimeout
+<sinclair_> jusss: JS won't die in this scenario
+<sinclair_> jusss: it will loop and loop, but you need to move execution out
+	    of the event loop  [00:59]
+
+<sinclair_> jusss: so, in this example, i used 'delay', but it could be any
+	    asynchronous op that moves out of the JS event loop
+<jusss> sinclair_: const delay = ms => new Promise(resolve =>
+	setTimeout(resolve, ms)) ?  [01:00]
+<sinclair_> jusss: yes, ms means 'millisecond' its just a promise thing
+<sinclair_> jusss: so, i put a while(true) here, you just need something to
+	    stop it from looping, so make a ...  [01:04]
+<sinclair_> let running = true
+<sinclair_> then you need something to stop it from running
+
+<jusss> yield a-Promise-object would be better  [01:09]
+<sinclair_> jusss: that will suspend execution at the 'yield'
+<sinclair_> jusss: JS supports that
+<jusss> sinclair_: yeah, co-routine is popular in most languages now
+<sinclair_> async function generatorAsync*() {  while(true) { yield
+	    Promise.resolve(1) } }
+
+<sinclair_> const x = generatorAsync()
+<sinclair_> x.next().then(console.log)
+<sinclair_> x.next().then(console.log)
+<sinclair_> x.next().then(console.log)
+<sinclair_> or to be exact
+<sinclair_> x.next().then(result => console.log(result.value))
+<sinclair_> or...
+<sinclair_> console.log((await x.next()).value)  [01:11]
+<sinclair_> or whatever
+<sinclair_> jusss: the point is, you can suspend execution with yield (as you
+	    would expect) in JS
+<sinclair_> jusss: so you can handle things that way.. you can even cause the
+	    'yielding' function to return early on some condition.
+
+<jusss> sinclair_: a new question come to me, yield is different with
+	async/await,  async/await can auto return to the insider of the async
+	function and run functions that are after it, but yield, I have to
+	call next() on it, how to do that with yield?  [02:30]
+<graingert> jusss: co
+<sillyslux_> there is no "too slow" only "premature optimization"
+<jusss> graingert: what is co
+<sinclair_> graingert: why bring up random stuff?
+<graingert> jusss: https://www.npmjs.com/package/co
+
+<sinclair_> jusss: forget about co
+<graingert> jusss: you didn't really describe what you wanted very clearly
+								        [02:31]
+<graingert> jusss: maybe show an example from another language
+<sinclair_> graingert: you should have mentioned leftPad to complete the cycle
+	    of random
+<sinclair_> graingert: complete the cycle bro
+<graingert> jusss: what do you mean by "auto return"  [02:32]
+
+<sinclair_> jusss: graingert has a point, i have nfi what you're actually
+	    trying to do
+
+<sillyslux_> you mean nhi  [02:33]
+<graingert> !xy @ jusss
+<ecmabot> jusss: The XY problem: You want to do X, but don't know how. You
+	  think you can solve it using Y, but don't know how to do that
+	  either. You ask about Y, which is a strange thing to want to
+	  do. Just ask about X. See also: http://xyproblem.info/
+<sillyslux_> nih
+
+<sinclair_> jusss: someone linked the XY problem earlier
+<graingert> And you get another one
+<sillyslux_> that was me
+<graingert> xy is transitive btw
+<sinclair_> jusss: i usually scoff at someone bringing up the XY problem, but
+	    its possibly apt in this scenario
+
+								        [02:34]
+<jusss> sinclair_: graingert const delay = ms => new Promise(resolve =>
+	setTimeout(resolve, ms));  var a=3;  async function loop()
+	{while(a==3) { await delay(1000); console.log(3) } };  loop();     the
+	loop will print 3 and return to caller, and it still print 3 in the
+	background right?
+
+<graingert> jusss: no
+<sinclair_> jusss: const result = await loop()
+
+<sinclair_> jusss: use typescript, things will be clearer
+<sillyslux_> but then you need return in your loop() functino  [02:35]
+
+<sinclair_> jusss: like, its not obvious that 'ALL' async functions return a
+	    Promise, so use TypeScript and it will tell you that
+<sillyslux_> now it'll just be undefined
+<jusss> graingert: sinclair_ but I saw that number are increasing on the
+	console
+<graingert> Yes but not in the background
+<sinclair_> jusss: numbers go up and down all the time tho
+<sillyslux_> how is it not obvious?!
+
+<graingert> JS has wait for all the caller's code to finish before going back
+	    to other tasks
+<sillyslux_> you don't need ts to tell you *that
+
+http://es6.ruanyifeng.com/#docs/async
+async 函数的实现原理，就是将 Generator 函数和自动执行器，包装在一个函数里。
+so I think there's still an event-loop, all those Promise, async/await functions will run after all the caller's code to finish
+and they're asynchronous, they won't block the thread, and thread can receive something from event, affect on those things.
+
+I think JS still have an event-loop like asyncio in python, they all put it on the last, after all the normal functions
+
+############################################################
+
 #variable
 DO NOT USE GLOBAL VARIABLES, USE CLOSURE OR OBJECT TO CONTAIN VARIABLES
 
