@@ -157,6 +157,11 @@ and they're asynchronous, they won't block the thread, and thread can receive so
 
 I think JS still have an event-loop like asyncio in python, they all put it on the last, after all the normal functions
 
+我猜JS是有个默认的event loop,因为它是基于事件机制的，还要监测键盘等事件，所以把函数写成异步非阻塞的
+Promise Async/Await就是非阻塞的，跟python不同的是，你不需要手动创建event-loop, JS自己建好了,然后自动把Promise Async/Await插入进event-loop
+JS在单线程里不停的轮询那些事件并执行, 前面那个问题，console.log在async里不是在后台打印3，是在前台，但它打印3会
+回归the caller,然后能执行其它的co-routine，JS默认把这些Promise Async/Await放到最后执行，和其它语言把event-loop放到代码的最后一样
+
 ############################################################
 
 #variable
