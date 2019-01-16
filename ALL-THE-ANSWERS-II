@@ -1,4 +1,482 @@
 
+function* f(){
+	  yield new Promise(function(r,e){
+	  	console.log(1);
+		setTimeout(function(){r(1); g.next()},3000)})
+                        .then(function(_){console.log(2);setTimeout(function(){r(1);g.next()},3000)})
+                        .then(function(_){console.log(3)})}
+g=f()
+g.next()
+
+##################################
+
+#while-loop #while-loop-yield
+var cond=true
+function* f() {
+	  while (cond){
+	  	  console.log(1);
+		   yield setTimeout(function(){g.next()}, 1000)}}
+g=f()
+g.next()
+
+cond=false
+
+########################################
+
+function* f() {
+	  console.log(1);
+	  yield delay(5000)
+	  	.then(function(){console.log(2); g.next()})
+		.then(function(){console.log(3)})}
+g=f()
+g.next()
+
+#############################################
+
+delay = function(t) {
+      return new Promise(function(resolve){
+      	     setTimeout(function() {resolve(t)}, t)})};
+
+var clicked=false;
+
+run = function(cond){
+    if (cond) { return; };
+    console.log(2);
+    return delay(100).then(function(){return clicked}) .then(run) ; };
+
+run(clicked);
+
+// create a loop with Promise+Recursion, and control it by the outside condition
+// the whole point is that it can return to the main thread or caller
+
+clicked=true;
+
+
+################################################################
+
+<eiGHttt> https://paste.ubuntu.com/p/5mBzCY43k4/		        [09:48]
+
+const delay = t => {
+    return new Promise(resolve => {
+        setTimeout(_ => resolve(t), t);  //brilliant, even never use _,  _ instead of ()
+    });
+};
+
+const run = times => {
+    if (times > 5000) {
+        return console.log("done");
+    }
+
+    console.log(`running ${times}`);
+
+    return delay(times)            //brilliant, this is a Promise
+        .then(times => times + 1000)   // return a times+1000 to change the times 
+        .then(run)                       // expand run it will be function(times){...}
+    ;
+};
+
+run(0);
+
+###################################################
+
+#Promise #Future #PartThree
+<jusss> grym: in JS, Promise may be a just placeholder, it represent a result, 
+<jusss> grym: in python, what Future represent?			        [11:43]
+<jusss> grym: return new Promise().then().then() it return just ONE promise in
+	JS, what if return Future.addCallback().addCallback will return?
+<meejah> jusss: Future doesn't have addCallback (but the answer is: there's
+	 still just one Future and/or Deferred if that's what you meant)	
+<meejah> (but also, why does that matter?)
+<jusss> meejah: it matters about what 'return' will return
+<meejah> jusss: Future represents a promise to at some point return a result
+	 (same with Deferred). They're both analagous to Promise
+<meejah> jusss: addCallback() returns the Deferred so you can chain like that
+	 .. don't recall about Future.add_done_callback		        [11:48]
+<jusss> meejah: I saw that JS people always use Promise().then().then(). and I
+	never saw that usage in python 
+<jusss> yeah, python do have that thing, but I dont see people use it   [11:49]
+<energizer> that's d.addCallback().addCallback(), isn't it?
+<meejah> yes
+<energizer> aka `await`
+<meejah> Personally, I don't do it because a) "async def" and "await" read
+	 better anyway and b) even if you're using "plain Deferreds" I find
+	 declaring named functions and adding them one at a time reads better
+<meejah> ...and that sort of "cascade + indent stuff" pattern from JS isn't
+	 very common in Python
+<energizer> i usually see that "fluent style" in pandas and sqlalchemy  [11:52]
+<meejah> ah, okay haven't really used those (I'm not saying it's wrong, I just
+	 haven't seen it very much)
+<altendky>
+	   https://docs.python.org/3/library/asyncio-future.html#asyncio.Future.add_done_callback
+	   relates i tihnk
+<jusss> those concepts completely confused me
+<energizer> take a look at trio, it doesnt have those concepts	        [12:00]
+<jusss> even I can use them, but I still have a idea what they are
+<jusss> still don't
+<jusss> it's a wonderful thing that you don't need to understand them before
+	you use them
+<altendky> energizer: how do you implement the bottom layers in trio?  like i
+	   do here to 'translate' between qt signal/slot and deferred (that
+	   could be used with async/await)
+	   https://github.com/altendky/altendpyqt5/blob/develop/src/altendpyqt5/twisted.py
+	   (i've got similar in asyncio if that'd be easier to comment on)
+								        [12:03]
+<altendky> jusss: a deferred sits there remembering what to call when it's
+	   'done'.  at some point some code tells it it is done and the
+	   deferred then calls that thing it was supposed to
+<energizer> altendky: https://github.com/python-trio/trio/issues/399
+<altendky> energizer: i started to read that the other day.  but i meant more
+	   in general.  i've also used a deferred that i return and then
+	   eventually .callback() with my query/response canbus code
+<altendky> energizer: in my head future/deferred/etc are the underlying
+	   building blocks, things that an application may never need to see.
+	   but, the upper layers seem to need them.  i'm wondering how trio
+	   does away with them entirely.
+<altendky> what do you do when you are building an awaitable from something
+	   that isn't async/await already
+<energizer> altendky: you mean like sockets?			        [12:08]
+<altendky> energizer: that'd be one scenario, though i'd think that that'd
+	   already be wrapped up by them never to be touched directly again.
+								        [12:09]
+<energizer> altendky: ya
+<energizer> altendky: is that signal=signal from the signal module?
+<altendky> energizer: sorry, no.  that's a qt signal.  signal/slot in qt is
+	   basically a callback registration tool.  a button has a 'clicked'
+	   signal and you .connect() to your thing you want called when the
+	   button is clicked.
+<altendky> energizer: so i was making it so you could await a signal rather
+	   than having to write the response in a separate function
+<altendky> energizer: in the case of my canbus query/response code i would
+	   send a canbus message, return the deferred, then when the matching
+	   canbus response is received (in that case triggered by a receive in
+	   a thread firing through a signal/slot to cross the thread boundary)
+	   i fire the deferred as the activity is complete	   
+#############################################
+#Promise #Future #PartTwo #linuxba
+
+<jusss> LdBeth: eiGHttt morning					        [09:29]
+<jusss> eiGHttt: https://paste.ubuntu.com/p/MTxdBz2myv/  看下怎么改错，让
+	generator自带执行					        [09:30]
+<eiGHttt> 什么是“自带执行”？					        [09:37]
+<eiGHttt> while g.next()?
+<jusss> eiGHttt: 就是写个promise,然后每5秒执行一次并yield返回
+								        [09:40]
+<jusss> eiGHttt: 这样因为yield返回，而不会阻塞其它事件的检测和执行
+								        [09:41]
+<jusss> eiGHttt: Promise(1).then(2).then(3) 第一次执行1回到线程, 然后5秒后执行
+	2,回到线程，然后5秒后执行3				        [09:42]
+<jusss> eiGHttt: 有点像async/await? 我不知道js的async/await是不是和python的一
+	样，比较js没有手工创建event-loop并添加属性		        [09:43]
+<eiGHttt> timeout不就是了。
+<jusss> eiGHttt: 就是写个promise,然后每5秒执行一次并yield返回, 这样因为yield返
+	回，而不会阻塞其它事件的检测和执行, Promise(1).then(2).then(3) 第一次
+	执行1回到线程, 然后5秒后执行2,回到线程，然后5秒后执行3, 有点像
+	async/await? 我不知道js的async/await是不是和python的一样，比较js没有手
+	工创建event-loop并添加属性		        [09:43]
+								        [09:45]
+<jusss> eiGHttt: 然后我这样写报错，typeError generator已经执行，
+<jusss> eiGHttt: 我yield一个promise,而这个promise里会执行一个setTimeout
+								        [09:46]
+<jusss> eiGHttt: 相当于执行完这个setTimeout, yield才会返回，然后一定时间之后就
+	会再执行这个Promise.then()				        [09:47]
+<jusss> eiGHttt: 但是又不会阻塞其它事件的检测和执行，因为有yield返回
+<eiGHttt> https://paste.ubuntu.com/p/5mBzCY43k4/		        [09:48]
+<jusss> eiGHttt: aha						        [09:51]
+<jusss> eiGHttt: Promise + setTimeout就能实现async/await了?  那yield一个
+	Promise是有什么特殊用途？				        [09:53]
+<eiGHttt> 感觉你只会语法，对它们作用完全不知。			        [09:54]
+<jusss> eiGHttt: 对，我还不理解它们为什么这样写			        [09:55]
+<eiGHttt>
+	  https://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000/0014317799226173f45ce40636141b6abc8424e12b5fb27000
+								        [09:57]
+<jusss> eiGHttt:  return delay(times) .then(times => times + 1000) .then(run)
+	会执行完delay(times)直接返回吗
+<jusss> 
+<eiGHttt> delay()返回的是一个promise，相当于(let (promise (delay times)) (then
+	  promise))。上面变成链式写法而已。			        [10:05]
+<jusss> eiGHttt: return返回的是一个Promise到线程, 而且这个Promise会被理解求值
+								        [10:09]
+<jusss> ?
+<jusss> 立即
+<jusss> 我不知道的是return是只返回delay(times)这个Promise,还是这个
+	delay(times).then().then() Promise链			        [10:10]
+<eiGHttt> ……							        [10:11]
+<jusss> 我理解力很差						        [10:12]
+<jusss> eiGHttt: nyfair LdBeth "promises are placeholders for values; they
+	represent a result, futures represent an operation" 这句话对吗?
+								        [11:12]
+<jusss> 我真的被promise这个概念搞晕了, promise是个占位符，	        [11:13]
+<nyfair> ?????							        [11:16]
+<nyfair> jusss: 关于这种东西，我只能告诉你不要把自己绕进粪坑，这是ecma最糟粕的
+	 地方
+<eiGHttt> https://tokio.rs/docs/getting-started/futures/ 那就来看futures吧。
+<jusss> nyfair: 我是被return new Promise().then().then()搞晕的，如果new
+	Promise().then().then()是个result, 那return返回的就是这个final result,
+	如果Promise是个operation, 那return的可能就只是第一个Promise(), 而不是
+	Promise().then().then()
+<nyfair> jusss: 去看楼上发的rust实现
+<nyfair> rust一时爽，一直rust一直爽				        [11:22]
+<eiGHttt> 我一直没能找到好的futures教程，知道它在干什么，但不知道怎么用。
+<jusss> 我感觉编程是个很神奇的事情，可以不理解它的概念，但是却能用
+<eiGHttt> 这就是封装，隐藏底层，你只管用就行了。		        [11:28]
+<jusss> A future is a value that represents the completion of an asynchronous
+	computation. 						        [11:31]
+<jusss> eiGHttt: 所以 future表达的也是result，对吗		        [11:32]
+<eiGHttt> 不知道怎么理解你这句话。
+<jusss> eiGHttt: future是个结果还是个动作
+<jusss> 我的理解力是不是惊人的差
+<eiGHttt> 你认为是结果就是结果，认为是动作就是动作。
+<jusss> future表达的是个动作的结果				        [11:36]
+
+###############################################################
+
+#Promise #Future #PartOne ##javascript
+<jusss> function* f(){yield new
+	Promise(function(resolved,rejected){console.log(1);
+	setTimeout(g.next(),5000)}).then(function(r,e){console.log(2);setTimeout(g.next(),5000)}).then(function(r,e){console.log(3)})}
+<jusss> g=f()
+<jusss> g.next() will cause TypeError
+<jusss> already executing generator
+<rook0> TypeScript is pretty nice sinclair_
+<jusss> rook0: how to fix it? I want the generator auto be iteration
+<jusss> when 'return new Promise().then().then()' it just return the head of
+	Promise() or all the whole Promise().then().then()?	        [10:31]
+<jusss> return will eval its parameter, so the Promise() will be evaluated and
+	return, but just evaluated the head of Promise or evaluated the whole
+	Promise().then().then() then return to caller???
+<jusss> someone can help me?
+<devsnek> its the same as `return (new Promise.then().then().then())`   [10:34]
+<jusss> devsnek: return will wait the value of the whole Promise.then().then()
+	?							        [10:35]
+<zsocw> there's no "value of the whole"
+<zsocw> it only returns 1 promise
+<zsocw> which resolves to the whatever the final promise in the chain resolves
+	to
+<devsnek> what's the difference between zsoc and zsocw		        [10:36]
+<jusss> return will wait for the the final promose's return value?
+<jusss> zsocw has a 'w
+<devsnek> return won't wait for the final promises's value
+<devsnek> `x.y().z()` is one expression
+<jusss> devsnek: but return always evaluated its parameter, so `x.y().z()`
+	will return a what?
+<devsnek> whatever `.z()` returns				        [10:38]
+<devsnek> in this case its `.then()`
+<devsnek> so it returns a promise
+<jusss> devsnek: it returns a promise and this promise will be evaluated,
+	right?							        [10:39]
+<devsnek> "evaluated"
+<jusss> I express wrong?
+<zsocw> promises don't get evaluated
+<zsocw> they are either pending, fufilled, or rejected		        [10:41]
+<jusss> zsocw: how to describe a promise's execution?		        [10:42]
+<zsocw> There's no way to describe it because a promise doesn't execute
+<zsocw> it's a placeholder
+<zsocw> The thing that a promise chain returns is a promise, whether it's just
+	`Promise.resolve()` or it's 100 chains of .then's
+<jusss> zsocw: the 'x.y().z()' is one promise, or 'x.y().z()' return one
+	promise?
+<zsocw> "is" doesn't make sense in this context			        [10:48]
+<zsocw> 'Promise.resolve().then(() => {}).then(() => {})' is an expression
+	which returns a promise
+<jusss> zsocw: return 'Promise.resolve(1).then((2) => {2}).then((3) => {3})'
+	to caller, caller will get 1 or 2 or 3?
+<zsocw> caller will get a promise :)
+<zsocw> that resolves to 3
+<zsocw> i mean, that's not valid js, but assuming you fix the part with the
+	number literal params... then the caller will get a promise which
+	resolves to 3
+<jusss> zsocw: yeah, but what if from 1 to 2 it need a little time?
+<zsocw> ... for what?						        [10:53]
+<zsocw> 'a little time' is another of many things you've said which have no
+	contextual meaning
+<jusss> zsocw: blocking for 2s ?
+<zsocw> no
+<zsocw> why do you want to 'block' for 2 seconds?
+<jusss> not every function is non-block				        [10:54]
+<jusss> there always are some functions are blocking
+<zsocw> every i/o functions should be non-blocking
+<zsocw> other functions, sure, mostly they are synchronous
+<zsocw> but there is never "Arbitrarily block for 2 seconds" unless your use
+	case is literally "a 2 seconds timer"			        [10:55]
+<zsocw> in which case, sure, use a promise wrapper around setTimeout :p
+<jusss> the promise concept blow my mind up
+<zsocw> it's really not that complex - and it's not a javascript thing  [10:56]
+<zsocw> many general purpose languages have Futures, some even also call them
+	Promises :p
+<jusss> zsocw: in python, they have Future, but I don't see they use
+	Future.addCallback , in js I saw you guys always use
+	Promise.then().then()					        [10:57]
+<zsocw> What do you think goes inside the .then()?		        [10:59]
+<zsocw> (spoiler, it's a callback)
+<jusss> yeah, it's a callback, but I don't know why pyther don't use that
+<jusss> they just wrote all things in a Future and await or yield, and put
+	those Future into a list then iterate the list
+<zsocw> `await Promise.all(listOfPromises)`... it's the same thing in js
+<jusss> they don't use Futures.addCallback like Promise.then()
+<GreenJello> jusss, JS also has async/await			        [11:01]
+<jusss> zsocw: GreenJello but there's another thing different, python need you
+	to create a event loop and put those Future object into this
+	event-loop, and the event-loop will run at the last of the code and
+	it's blocking the thread, but in JS, I never saw an event-loop be
+	created or be plug-in something by handle		        [11:02]
+<jusss> or by manual?
+<zsocw> javascript *has* an event loop already (at least the environment
+	you're running it in, does)				        [11:03]
+<zsocw> so you don't have to do squat
+<zsocw> which is why dealing with asynchronous stuff in general is just
+	superior (well, in most comparisons)
+<jusss> 'return new Promise.then().then()' return one Promise, ok, this I can
+	accept, but I still don't know how to describe or express this
+	Promise's execution/evalated? 				        [11:06]
+<jusss> then callback in the Promise, they need to be evaluated
+<jusss> or execution
+<jusss> the callbacks						        [11:07]
+<GreenJello> jusss, promises are placeholders for values; they represent a
+	     result
+<GreenJello> futures represent an operation
+<GreenJello> the work has already started by the time you have a promise
+<GreenJello> you don't have to execute promises. If you just do
+	     returns_promise() and discard it, the work still happens
+								        [11:08]
+<jusss> GreenJello: wow, that really blow my mind up
+<jusss> promise is not future!!!
+<zsocw> It's a type of future
+<zsocw> https://en.wikipedia.org/wiki/Futures_and_promises	        [11:09]
+<zsocw> :p
+<jusss> if what GreenJello said is right, then I will understand promise and
+	future :)
+<jusss> promise is a result, and future is an operation		        [11:10]
+<GreenJello> wikipedia seems to disagree with my understanding
+<zsocw> well, that happens often lol... wikipedia also loves the term
+	'associative array'					        [11:12]
+
+##################################################################
+
+setTimeout is keypoint for callback/ jump back to Promise,
+yield a Promise, and that head of Promise is a setTimeout for callback this return value, so the generator will auto run
+
+
+################################################
+
+android's camera as a plug-in camera of a laptop
+
+download IP Webcam by Pavel Khlebovich from Google Play,
+turn laptop and android wifi and data off, then connect laptop
+and android with usb cable, enable android usb-tethering for that
+laptop can get an IP from android, once laptop get an IP from android
+via dhcp, now run IP Webcam on android, click the last option "enable server",
+android will open camera and show an IP address you need to connect with browser,
+once you get there, click "browser" tag not "flash" in "Video" section on that website
+and click "fullscreen" it will pop up a new website, click the video and it will expand,
+then press F11 to fullscreen, and also you can plug an external monitor via hdmi/vga,
+you can make what android's camera captured to show in the external monitor at the
+same time.
+
+####################################################
+
+before ES6/ES2015, use 'var' keyword define local variable in function
+
+jQuery.fx.off = true|false; true 	Specifies that animations should be disabled
+
+jquery, $("#id") get element
+Return the value of an attribute:
+$(selector).attr(attribute)
+Set the attribute and value:
+$(selector).attr(attribute,value)
+Set attribute and value using a function:
+$(selector).attr(attribute,function(index,currentvalue))
+
+
+##############################################
+
+When a function is created in JavaScript, JavaScript engine adds a prototype property to the function.
+https://hackernoon.com/prototypes-in-javascript-5bba2990e04b
+Prototype object of the constructor function is shared among all the objects created using the constructor function.     that's why it called prototype linked OOP
+function Person(){}  # create an empty constructor function
+Person.prototype.name = "Ashwin" ;
+var person1 = new Person();
+console.log(person1.name)// Output" Ashwin     
+
+
+#############################################
+
+'this' keyword in js,  javascript is OOP based on prototype ,
+The this keyword evaluates to the value of the ThisBinding of the current execution context
+
+https://stackoverflow.com/questions/3127429/how-does-the-this-keyword-work
+notice that  Function.prototype.apple call bind 
+
+#this #namespace
+this means the namespace where the function is called  when it's running
+
+object.function(a,b,c){ this-means-the-object}
+
+#scope #namespace
+<jusss> 'scope' is where variables can visit, and 'namespace' is where
+	variables be created, right?
+<nedbat> jusss: something like that: a scope is a region of code where a name
+	 means a particular variable.				        [09:19]
+<nedbat> jusss: a namespace is a collection of names.
+<energizer> nedbat: whats a variable
+<nedbat> energizer: a binding of a name to a value		        [09:25]
+<energizer> nedbat: its a name-value pair?
+<jusss> nedbat: my thought was wrong or improper?
+<nedbat> energizer: ok
+<nedbat> jusss: no, not wrong, i'm just trying to clarify
+<energizer> nedbat: that was a yes or no question :)
+<nedbat> energizer: you can put it that way if you like		        [09:26]
+<jusss> nedbat: I see
+<energizer> nedbat: are these terms at all fuzzy for you?	        [09:27]
+<Ninpo> I'm gonna guess: no
+<nedbat> energizer: it is difficult to be precise, yes.
+
+
+####################################
+
+AJAX, Fetch API, WebSocket
+https://developer.mozilla.org/en-US/docs/Web/API
+
+
+
+AJAX is a developer's dream, because you can:
+    Read data from a web server - after the page has loaded
+    Update a web page without reloading the page
+    Send data to a web server - in the background
+
+an event occurs, create an XMLHttpRequest object, send HttpRequest to server
+server process HttpRequest, create a response and send data to browser
+browser process the data and update page content
+
+click button can be an event, XMLHttpRequest object can send a request to web server
+the server process the request and return back, once js receive it then
+perform update-page
+
+var = new XMLHttpRequest();
+var.open("GET", url, true); or POST, if it's true then asynchronous, flase for synchronouse
+var.send();     send(string) for POST
+var.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+var.send("fname=Henry&lname=Ford");  like 'data' in requests of python
+
+XMLHttpRequest.onreadystatechange = function (){}   once it receive the answer then run the function
+XMLHttpRequest.responseText will be anwser
+
+<script>
+function loadDoc() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      document.getElementById("demo").innerHTML =
+      this.responseText;
+    }
+  };
+  xhttp.open("GET", "ajax_info.txt", true);
+  xhttp.send();
+}
+</script>
+
+
+
+############################################################
 #TencentAI #aldebaran #assign module to variable
 
 class MyClass(GeneratedClass):
