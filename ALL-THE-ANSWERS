@@ -1,7 +1,29 @@
 
+https://segmentfault.com/a/1190000007546512
+什么模式？把promise与yield结合，使得可以在执行完成后恢复generator的流程。
+我们需要控制generator的iterator，它将接受到yield返回的那个promise，同时通过next(...)恢复generator运行，并把他们传递下去，我增加了一个runGenerator(...)方法来做这件事。
+ep=function* g() { doSomething; yield new Promise(function(r,e){setTimeout(next(ep), 3000)} }}
 
+##############################################################
 
+while-loop-yield
 
+while (cond) { doSomeRepeatThing; yield whatever};
+this will not block the thread, and you can change 'cond' in the outside of  'while' statement to
+control the execution,
+
+http://www.ruanyifeng.com/blog/2014/10/event-loop.html
+"简言之就是JS只有一个主线程，主线程执行完执行栈的任务后去检查异步的任务队列，如果异步事件触发，则将其加到主线程的执行栈。"
+写while-loop要让它能回到主线程，它才能轮询其它事件，
+js自动把async/await用这种while-loop-yield方式加到了默认的event-loop里
+
+yield promise + setTimeout,  自动执行generator
+
+promise + yield 可以实现 async/await, 重点是用的promise的resolve判断是否整个promise链结束，要不要yield
+
+function* g() { while (condition) {console.log(3); yield 3}}
+
+#################################################
 
 <jusss> sinclair_:  I solved it!  const delay = ms => new Promise(resolve =>
 	setTimeout(resolve, ms));  var a=3;  async function loop() {

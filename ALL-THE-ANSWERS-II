@@ -1,4 +1,50 @@
 
+#socket
+auto change socket port when it's in use
+On Server
+        self.sock=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        for i in range(10000,10100):
+            try:
+                self.sock.bind(('0.0.0.0',i))
+            except:
+                pass
+            else:
+                break
+            
+        self.sock.listen(122)
+        self.net_init()
+        self.sock.close()
+
+On Client
+    for i in range(10000,10100):
+        try:
+            sock.connect(('192.168.31.222',i))
+        except:
+            pass
+        else:
+            break
+    sock.send('connected'.encode('utf-8'))
+
+#####################################################
+
+<sinclair_> SAFE: function loop() { /* your code */ if (cond) { setTimeout(()
+	    => loop(), 1) } }
+<sinclair_> UNSAFE: function loop() { /* your code */ if (cond) { loop() } }
+<sinclair_> jusss: all you need to know here is that by moving the recursive
+	    call into that setTimeout, you have removed the call from the
+	    callstack, and it can loop forever safely
+<GreenJello> setTimeout is going to be really slow		        [13:39]
+<sinclair_> jusss: if you look at best practice render loops in the browser
+	    they do the same thing
+<sinclair_> jusss: except they replace setTimeout with requestAnimationFrame
+<sinclair_> jusss: the exact same mechanisms (moving out of the callstack)
+	    apply
+<jaawerth> sinclair_: don't recommend process.nextTick for recursion
+<sinclair_> jaawerth:
+	    https://nodejs.org/api/process.html#process_process_nexttick_callback_args
+##########################################
+
 function* f(){
 	  yield new Promise(function(r,e){
 	  	console.log(1);
@@ -349,7 +395,21 @@ run(0);
 <GreenJello> wikipedia seems to disagree with my understanding
 <zsocw> well, that happens often lol... wikipedia also loves the term
 	'associative array'					        [11:12]
-
+<jusss> sinclair_: some people told me that Promise is double-barrelled CPS, I
+	have no idea what they said				        [13:40]
+<jusss> CPS is short for Continaution Passing Style	
+<jusss> jaawerth: I just wonder are they the same? Promise and Future, also
+	the meaning of they use them like that
+<jaawerth> jusss: well, a promise is just a wrapper for a future value. it's
+	   just an object with .then and .catch methods you can pass callbacks
+	   into. The main benefit over regular CPS is that you can pass them
+	   into and return them from functions, which makes interop and
+	   control flow easier
+<jaawerth> jusss: the only real difference between a promise and a future is
+	   that promises will automatically "flatten" = if you return a
+	   promise from within a promise, it will resolve to the value
+	   resolved by the inner promise so you don't have to invoke .then()
+	   twice						        [13:45]	   
 ##################################################################
 
 setTimeout is keypoint for callback/ jump back to Promise,
