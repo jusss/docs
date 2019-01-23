@@ -1,4 +1,261 @@
 
+
+<jusss> yunfan: generator可能做coroutine, Continuation可以做coroutine, future
+	可以做coroutine,但是这三个并不是完全一样的，future还可以做Promise,
+	double barrelled continuation也可以做Promise, 但generator好像就不行
+								        [17:22]
+<jusss> yunfan: 我知道这些是不是还是很没用，我还是不会django flask aiohttp,
+	postgresql, mysql, 					        [17:25
+<jusss> 我以前也抵触OOP,我现在也会OOP了，我还知道OOP还分based on Prototype和
+	Class两种，还知道有个东西叫constructor 有啥用。。。	
+
+#####################################
+
+insertInt : String -> Int -> DataDict -> DataDict
+insertInt key val =
+    Dict.insert key (Json.Encode.int val)
+
+函数调用 insertInt key1 val1 Dict1返回一个Dict2
+
+######################################
+
+函数签名                  函数实现               函数调用
+f : Int -> String       f Int = "hello"       f 1
+
+https://guide.elm-lang.org/appendix/function_types.html
+
+函数签名  
+update : Msg -> Model -> Model  等于 update Msg : Model -> Model
+至于最后返回的那个Model是个函数还是值，看函数自己的实现
+
+update Msg返回一个参数是Model类型的函数，
+
+update Msg Model 返回一个没有参数的函数，这个函数的返回值是Model类型
+也可能是update Msg Model返回一个参数是Model的函数
+
+update Msg Model返回的是一个Model类型的值
+
+update Msg 返回一个参数是Model并且返回值也是Model的函数
+
+函数实现
+update msg model =
+case msg of
+    Increment ->
+      model + 1
+
+    Decrement ->
+      model - 1
+####################################
+
+<jusss> eiGHttt: insertInt : String -> Int -> DataDict -> DataDict what this
+	means?							        [10:29]
+<eiGHttt> DataDict insertInt(String a, Int b, DataDict c) {} C++的写法，唯一区
+	  别它是柯里化函数。					        [10:31]
+<jusss> eiGHttt: insertInt接受一个String类型参数key然后返回一个函数，再接受一
+	个Int类型val,再返回一个函数接受DataDict类型参数，最后返回的DataDict是
+	个类型数据还是函数？
+<eiGHttt> 差不多这个过程。add x y z = x + y + z; 就可以有add1 = add 1, add1 :
+	  Int -> Int -> Int。
+<eiGHttt> 找个repl逐个检查它的类型就明白了。
+<jusss> eiGHttt: add1: Int -> Int -> Int, 最后这个Int不再是函数了吧？
+<eiGHttt> 就是个值，函数也是值，Int与(Int -> Int)的区别。	        [10:50]
+<jusss> eiGHttt: 因为你们去掉了(), 我不知道你们对函数f求值是求出函数的定义，还
+	是对函数执行一次求值，在js里对f求值，求值出的是它的表达式，而f()是对表
+	达式求值一次						        [10:51]
+<eiGHttt> 因为括号是多余的。f x y z = ((f(x))(y)(z)		        [10:55]
+<eiGHttt> 而不是f(x, y, z)这种。				        [10:56]
+<jusss> eiGHttt: (f(x)(y))(z) 返回的是函数还是数值？		        [10:57]
+<eiGHttt> 由f的定义决定。
+<eiGHttt> 柯里化其实很简单，接受一个值，返回一值，如此而已。
+<jusss> eiGHttt: 那我 定义 f x y z, 然后我 f x y = do-something 算什么？
+<jusss> insertInt : String -> Int -> DataDict -> DataDict ;    insertInt key
+	val =   Dict.insert key (Json.Encode.int val)		        [11:00]
+<eiGHttt> 如果f : Int -> Int -> Int -> String，则f x y : Int -> String。
+<jusss> eiGHttt: 意 f x y返回一个函数，这个函数的参数是Int 然后返回类型是
+	String?							        [11:01]
+<eiGHttt> 对。
+<eiGHttt> 对于已有函数，你可以只关心它的函数类型，它的实现不用关心。
+<jusss> eiGHttt: 那回到上面我发的那个, insertInt key val 返回的是个函数，这个
+	函数的参数是个DataDict，它返回一个DataDict, 但是现在直接 这个函数 =
+	Dict.insert what-ever是什么意思？			        [11:03]
+<jusss> 我发现你们的=好像和其它语言的=意义不一样		        [11:04]
+<jusss> 你们用 function parameter = function-body来定义函数
+<eiGHttt> insertInt key val : DataDict -> DataDict，那么等号右边必须也满足
+	  (DataDict -> DataDict)，你可以查看它们的类型推出来。
+<eiGHttt> “等号”表示定义。
+<eiGHttt> f : Int -> String，可以写f x = "hello"，也可以写f x = show x，只要满
+	  足条件。						        [11:06]
+<jusss> eiGHttt: 那f: Int -> String算函数声明？  f x = "hello" 算函数调用？
+<eiGHttt> 不要用C那套东西。					        [11:08]
+<jusss> eiGHttt: 那应该怎么来描述				        [11:10]
+<eiGHttt> 也就是一起的呀，一个表明类型签名，一个表明具体实现。
+<eiGHttt> 有些语言允许类型自动推导，类型可以不用写，有些不允许，两者必须同时出
+	  现。							        [11:13]
+<eiGHttt> 入门这种函数式，要先放弃命令式思维。			        [11:14]
+<jusss> eiGHttt: f: Int -> String,   f Int : String ,  is same?	        [11:16]
+<jusss> eiGHttt: f x = "hello",    f = what?
+<jusss> eiGHttt: 类型签名你们用 : -> 可是到实现直接用 = ...	        [11:18]
+<jusss> 符号都不一样
+<jusss> f = x "hello" ?
+<eiGHttt> f : Int -> String; (f 1) : String。			        [11:19]
+<eiGHttt> 我觉得这么空泛讨论，你不如先把elm文档过一遍。		        [11:21]
+<eiGHttt> 最好能动手写写。					        [11:22]
+<jusss> eiGHttt: 我在看elm的文档，https://guide.elm-lang.org/   但是我没理解到
+	里面在讲函数式						        [11:23]
+<anotitlebot> Introduction · An Introduction to Elm
+<jusss> eiGHttt: 里面是直接在用函数式，而没有讲
+<jusss> https://guide.elm-lang.org/core_language.html		        [11:24]
+<anotitlebot> Core Language · An Introduction to Elm
+<eiGHttt> https://guide.elm-lang.org/appendix/function_types.html       [11:27]
+<anotitlebot> Function Types · An Introduction to Elm
+
+<jusss> eiGHttt: 函数式总是强调它们不会改变变量的值，那它们怎么保存最后产生的
+	值呢？创建新的绑定？					        [14:57]
+<eiGHttt> 差不多。
+<jusss> 还有就是闭包，在其它语言里，闭包都是对函数捕捉到的那个变量进行重新赋值
+	来存储结果，函数式怎么解决的呢？
+<jusss> 还有就是如果是闭包，那岂不是每次同样的调用都会产生不同的结果，这点不是
+	和函数式编程违背了玛					        [14:59]
+<eiGHttt> 跟闭包没关系，用js也可以写出纯函数。以foldr为例，你在外面绑了变量，
+	  它就不纯了，如果把新值传递下去，自然不存在重新赋值问题。
+<eiGHttt> 现实当然离不开全局变量这种事，haskell现有做法是用StateMonad，后续还
+	  有effect monad，我对后者不熟悉。			        [15:02]
+<jusss> eiGHttt: 这样一个很基本的操作都要用到Monad吗？		        [15:03]
+<jusss> eiGHttt: 可是我不会 “自函子范畴上的一个幺半群”
+<eiGHttt> 到处都是Monad，你感受不到而已。当然这一切是为纯度。
+<jusss> eiGHttt: 我不喜欢css，所以我才想找个能生成css的elm,现在发现学习elm的时
+	间长度可能要远远大于css...				        [15:10]
+<jusss> eiGHttt: 其它语言都只能生成js,而不能把dom js css xml那一坨都生成
+<jusss> 我对js并不是很反感					        [15:11]
+<eiGHttt> 找个能看的css框架耍耍就行了。				        [15:12]
+<jusss> eiGHttt: 除了bootstrap less不知道还有什么		        [15:16]
+<eiGHttt> 'google css框架					        [15:17]
+<varia> eiGHttt: 2017 年20 个最佳的极简CSS 框架- 知乎 [
+	https://zhuanlan.zhihu.com/p/27767048 ] 2017年7月8日 ... 如果你和我一
+	样热衷极简主义, 那么本文分享的内容, 一定是你的“菜”. 在文章中, 我们将
+	与大家分享20 个最佳的极简CSS 框架, 它们能够为你提供 ...
+<anotitlebot> 2017 年 20 个最佳的极简 CSS 框架 - 知乎
+##########################################
+
+Double-barrelled Continuation Passing Style, to implement Promise in JS,
+also you can use Future to implement Promise, and Promise can be flatten
+###############################
+
+elm
+
+func-name parameters = doSomething
+
+double n = n * 2
+numbers = [1,4,3,2]
+List.map double numbers
+
+########################################
+
+#linux on phone
+
+https://wiki.postmarketos.org/wiki/Xiaomi_Redmi_2_(wingtech-wt88047)
+
+#####################################################
+
+#constructor         which is what created the object
+
+javascript constructor
+
+class FooBar {
+  constructor(baz) {
+    this.baz = baz
+  }
+}
+const foo = new FooBar('7')
+
+The equivalent of this before ES6, was creating a function that instantiates an object as such
+
+var FooBar = function(baz) {
+  this.baz = baz;
+}
+
+python's constructor is class's __new__(), it can return something that is not an instance
+
+The new method is called with the class as its first argument; its responsibility is to return a new instance of that class. 
+Compare this to init: init is called with an instance as its first argument,
+and it doesn't return anything; its responsibility is to initialize the instance. 
+
+__new__ is forged by @classmethod,  it can return a number to replace an instance
+or return other class's instance as its instance
+https://stackoverflow.com/questions/674304/why-is-init-always-called-after-new
+
+http://blog.51cto.com/853056088/2134300?source=dra
+#单例的作用就是为了节约系统资源,每每生成一个对象的时候都回去占用内存空间,因此单例就可以结局这个问题
+#非单例模式,非单例模式在每次实例化的时候都会去调用内存生,这样调用的次数多了,就可能会造成内存的浪费
+
+class B(object):
+    __instrance = None #定义一个变量
+    def __new__(cls):
+        if cls.__instrance == None:
+            cls.__instrance = object.__new__(cls) #如果变量是None说明是第一次调用,就生成一个对象,
+            return cls.__instrance
+        else:
+            return cls.__instrance #如果不是就直接返回上次生成好了的对象
+c=B()
+d=B()
+print(id(c))
+print(id(d))
+
+输出结果
+3000151571592
+3000151571592
+
+
+#######################################################
+
+from tkinter import *
+root = Tk()
+
+def recv_from_kbd(event=None):
+    msg=my_msg.get()
+    my_msg.set("")
+    listbox.insert(END,msg)
+
+
+my_msg = StringVar()  # For the messages to be sent.
+my_msg.set("")    
+
+listbox = Listbox(root)
+listbox.pack(fill=BOTH, expand=True)
+
+input_area=Entry(root,textvariable=my_msg)
+input_area.bind("<Return>",recv_from_kbd)
+input_area.pack(anchor="sw",fill="x")
+
+for i in range(20):
+    listbox.insert(END, str(i))
+
+mainloop()
+
+"""
+https://stackoverflow.com/questions/40323850/second-frame-with-fill-both-and-expand-true-not-expanding-fully
+expand and fill are completely independent of each other. expand answers the question "do I get extra space?", and fill answers the question "how do I use the extra space that was given to me?".
+So, you have two frames both of which have expand=True. That means that tkinter will give half of the extra space to one frame, and half the extra space to the other, regardless of how those widgets plan to use the extra space.
+"""
+class Promise:
+    def __init__(self):
+        self.value=None
+    def then(self, f):
+        try:
+            self.value = f(self.value)
+        except:
+            return "Exception"
+        else:
+            return self
+    def result(self):
+        return self.value
+
+The Tkinter Frame Widget. A frame is rectangular region on the screen.
+The frame widget is mainly used as a geometry master for other widgets,
+or to provide padding between other widgets.
+
+################################################################
+
 #socket
 auto change socket port when it's in use
 On Server
