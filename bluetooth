@@ -1,4 +1,25 @@
 systemctl start bluetooth.service
+
+blueman-applet   #stat the deamon, if there's exception, then 
+
+"/etc/polkit-1/rules.d/90-blueman.rules
+/* Allow users in wheel group to use blueman feature requiring root without authentication */
+polkit.addRule(function(action, subject) {
+    if ((action.id == "org.blueman.network.setup" ||
+         action.id == "org.blueman.dhcp.client" ||
+         action.id == "org.blueman.rfkill.setstate" ||
+         action.id == "org.blueman.pppd.pppconnect") &&
+        subject.isInGroup("wheel")) {
+        return polkit.Result.YES;
+    }
+});
+"
+
+blueman-manager  # search devices, then pair, then right on the device audio sink or send file
+mpv whatever.mp3 --ao alsa   #there're two outputs in pulseaudio
+
+--------------------------------------
+systemctl start bluetooth.service
 blueberry
 choice the bluetooth device and connect, run pavucontrol ,Output Devices tag choose Headphones(unplugged) in Port section
 
