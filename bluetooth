@@ -16,7 +16,8 @@ polkit.addRule(function(action, subject) {
 "
 
 blueman-manager  # search devices, then pair, then right on the device audio sink or send file
-mpv whatever.mp3 --ao alsa   #there're two outputs in pulseaudio
+#mpv whatever.mp3 --ao alsa   #there're two outputs in pulseaudio
+pavucontrol #in configuration tag, turn off built-in audio by chose off in profile section, and another device chose profile by default
 
 --------------------------------------
 systemctl start bluetooth.service
