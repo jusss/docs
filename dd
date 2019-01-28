@@ -1,0 +1,5 @@
+github/docs/chroot-android-archlinuxarm:dd if=/dev/zero of=arch.img bs=512K count=8000
+github/docs/kali:dd if=kali.iso of=/dev/sdb
+github/docs/mount-bind-chroot:dd if=/dev/zero of=./x.img bs=512K count=10000
+github/docs/recovery-deleted-files:sudo dd if=/dev/sda10 of=/tmp/rec.zz skip=logic-address bs=4096 count=zz-size
+
