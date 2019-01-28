@@ -1,3 +1,21 @@
+systemctl start bluetooth
+blueman-applet
+blueman-manager
+choose RAPOO BT3.0 KB, right click, pair, it pops up a window, and 
+there is a six code, type that code on keyboard and press Enter,
+then right click choose HID, bingo! bluetooth keyboard is connected!
+#############################
+or another way, on keyboard, press Fn + 2 for 3 seconds, choose channel 2,
+sudo systemctl start bluetooth
+blueman-applet
+blueman-manager #click search icon on toolbar
+choose RAPOO BLE KB not RAPOO BT3.0 KB, right click on it then choose trust, then pair
+##################
+choose RAPOO BT3.0 KB  and right click on it, then choose trust
+then choose setup, in Paring tag, select Proceed without Pairing,
+then next Connect to HID, 
+######################################
+
 systemctl start bluetooth.service
 
 blueman-applet   #stat the deamon, if there's exception, then 
