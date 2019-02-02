@@ -1,0 +1,56 @@
+$xinput set-prop 'Elan Touchpad' "libinput Natural Scrolling Enabled" 1
+
+reference: https://www.topbug.net/blog/2017/02/23/enable-natural-scrolling-for-trackpads-using-libinput/
+
+[john@moon ~]$ xinput --list
+⎡ Virtual core pointer                    	id=2	[master pointer  (3)]
+⎜   ↳ Virtual core XTEST pointer              	id=4	[slave  pointer  (2)]
+⎜   ↳ Elan Touchpad                           	id=12	[slave  pointer  (2)]
+⎣ Virtual core keyboard                   	id=3	[master keyboard (2)]
+    ↳ Virtual core XTEST keyboard             	id=5	[slave  keyboard (3)]
+    ↳ Power Button                            	id=6	[slave  keyboard (3)]
+    ↳ Asus Wireless Radio Control             	id=7	[slave  keyboard (3)]
+    ↳ Video Bus                               	id=8	[slave  keyboard (3)]
+    ↳ Video Bus                               	id=9	[slave  keyboard (3)]
+    ↳ Sleep Button                            	id=10	[slave  keyboard (3)]
+    ↳ USB Camera: USB Camera                  	id=11	[slave  keyboard (3)]
+    ↳ Asus WMI hotkeys                        	id=13	[slave  keyboard (3)]
+    ↳ AT Translated Set 2 keyboard            	id=14	[slave  keyboard (3)]
+
+[john@moon ~]$ xinput --list-props 'Elan Touchpad'
+Device 'Elan Touchpad':
+	Device Enabled (152):	1
+	Coordinate Transformation Matrix (154):	1.000000, 0.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000, 0.000000, 1.000000
+	libinput Tapping Enabled (287):	1
+	libinput Tapping Enabled Default (288):	0
+	libinput Tapping Drag Enabled (289):	1
+	libinput Tapping Drag Enabled Default (290):	1
+	libinput Tapping Drag Lock Enabled (291):	0
+	libinput Tapping Drag Lock Enabled Default (292):	0
+	libinput Tapping Button Mapping Enabled (293):	1, 0
+	libinput Tapping Button Mapping Default (294):	1, 0
+	libinput Natural Scrolling Enabled (295):	1
+	libinput Natural Scrolling Enabled Default (296):	0
+	libinput Disable While Typing Enabled (297):	1
+	libinput Disable While Typing Enabled Default (298):	1
+	libinput Scroll Methods Available (299):	1, 1, 0
+	libinput Scroll Method Enabled (300):	1, 0, 0
+	libinput Scroll Method Enabled Default (301):	1, 0, 0
+	libinput Click Methods Available (302):	1, 1
+	libinput Click Method Enabled (303):	1, 0
+	libinput Click Method Enabled Default (304):	1, 0
+	libinput Middle Emulation Enabled (305):	0
+	libinput Middle Emulation Enabled Default (306):	0
+	libinput Accel Speed (307):	0.000000
+	libinput Accel Speed Default (308):	0.000000
+	libinput Left Handed Enabled (309):	0
+	libinput Left Handed Enabled Default (310):	0
+	libinput Send Events Modes Available (272):	1, 1
+	libinput Send Events Mode Enabled (273):	0, 0
+	libinput Send Events Mode Enabled Default (274):	0, 0
+	Device Node (275):	"/dev/input/event7"
+	Device Product ID (276):	1267, 5
+	libinput Drag Lock Buttons (311):	<no items>
+	libinput Horizontal Scroll Enabled (312):	1
+
+[john@moon ~]$ xinput set-prop 'Elan Touchpad' "libinput Natural Scrolling Enabled" 1
