@@ -1,8 +1,50 @@
 
+
+#natural scroll like Mac OSX 
+
+$xinput set-prop 'Elan Touchpad' "libinput Natural Scrolling Enabled" 1
+
+reference: https://www.topbug.net/blog/2017/02/23/enable-natural-scrolling-for-trackpads-using-libinput/
+
+#touchpad    1/2/3 fingers tap meaning left/middle/right 
+
+[john@moon ~]$ cat /etc/X11/xorg.conf.d/30-touchpad.conf 
+Section "InputClass"
+	Identifier "Elan Touchpad"
+	Driver "libinput"
+	MatchIsTouchpad "on"
+	Option "Tapping" "on"
+	Option "TappingButtonMap" "lmr"
+EndSection
+
+
+
+###########################################
+
+write classes, every classes has onStart onStop onStopped three methods,
+connect their instances with obj1.onStart( obj2.onStopped)
+
+class Example:
+      def __init__(self):
+      	  pass
+     def onStart(self):
+     	 print('test')
+	 self.onStopped()
+    def onStop(self):
+    	pass	
+    def onStopped(self):
+    	return None
+
+
+
+
+
+#################################################
+
 https://segmentfault.com/a/1190000007546512
 什么模式？把promise与yield结合，使得可以在执行完成后恢复generator的流程。
 我们需要控制generator的iterator，它将接受到yield返回的那个promise，同时通过next(...)恢复generator运行，并把他们传递下去，我增加了一个runGenerator(...)方法来做这件事。
-ep=function* g() { doSomething; yield new Promise(function(r,e){setTimeout(next(ep), 3000)} }}
+ep=function* g() { doSomething; yield new Promise(function(r,e){setTimeout(function(){next(ep)}, 3000)} }}
 
 ##############################################################
 
