@@ -1,0 +1,81 @@
+https://askubuntu.com/questions/1029436/enable-fractional-scaling-for-ubuntu-18-04
+
+Xorg scale
+xrandr --output eDP1 --scale 1.25x1.25
+
+wayland scale
+gsettings set org.gnome.mutter experimental-features "['scale-monitor-framebuffer']"
+
+then open Settings->Devices->Displays  scale 
+
+
+#install
+pacman -S gnome
+
+#startx to run gnome
+[john@moon ~]$ cat .xinitrc 
+#startdde
+xhost +local: &
+#pgrep wpa_supplicant || ~/network/wifi.sh &
+setxkbmap -layout us -option ctrl:nocaps
+xcape
+fcitx -rd&
+#ibus-daemon -rdx&
+xss-lock -- xlock -timeout 1800 &
+#disable xcompmgr, it will be more smooth, but conky will not be background transparent
+#xcompmgr &
+### blank the scren after a half hour
+xset dpms 1800 1800 1800
+xset s 1800
+#exec fvwm
+export GDK_BACKEND=x11
+exec gnome-session
+[john@moon ~]$ 
+
+
+#set touchpad
+gpasswd -a john input
+[john@moon ~]$ cat /etc/X11/xorg.conf.d/30-touchpad.conf 
+Section "InputClass"
+	Identifier "Elan Touchpad"
+	Driver "libinput"
+	MatchIsTouchpad "on"
+	Option "Tapping" "on"
+	Option "TappingButtonMap" "lmr"
+EndSection
+
+$ gsettings set org.gnome.desktop.peripherals.touchpad click-method 'fingers'
+https://wiki.archlinux.org/index.php/GNOME#Mouse_and_touchpad
+
+[john@moon ~]$ pacman -Ss xf86-input-libinput 
+extra/xf86-input-libinput 0.28.1-1 (xorg-drivers) [installed]
+    Generic input driver for the X.Org server based on libinput
+[john@moon ~]$ pacman -Ss xorg-xinput
+extra/xorg-xinput 1.6.2-2 (xorg-apps xorg) [installed]
+    Small commandline tool to configure devices
+[john@moon ~]$ gsettings set org.gnome.desktop.peripherals.touchpad send-events enabled
+[john@moon ~]$ gsettings set org.gnome.desktop.peripherals.touchpad tap-to-click true
+[john@moon ~]$ gsettings set org.gnome.desktop.peripherals.touchpad natural-scroll true
+
+#touchpad gesture
+pacman -S chrome-gnome-shell
+https://extensions.gnome.org/extension/1253/extended-gestures/
+https://extensions.gnome.org/extension/97/coverflow-alt-tab/
+https://extensions.gnome.org/extension/104/netspeed/
+pacman -S xdotool libinput-tools ruby gem
+gem install fusuma
+export PATH=$PATH:/home/john/.gem/ruby/2.5.0/bin
+fusuma
+
+#touchpad
+gnome-tweaks  also you can change windows focus way
+Keyboard&Mouse Mouse Click Emulation
+choose Area, click the bottom right of the touchpad for right-click 
+and the bottom middle for middle-click
+
+then three fingers will be right-click
+and two fingers will be middle-click
+
+#dock
+pacman -S plank
+plank --preferences
