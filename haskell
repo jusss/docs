@@ -1,0 +1,148 @@
+x:xs means a list's head is x and the rest are xs, if the list have only one element then xs is an empty list
+_ means multi-variables
+head' :: [a] -> a
+head' [] = error "empty"
+head' (x:_) = x      _ must come with ()
+#############################
+point-free stype A.K.A pointless style
+
+sum' :: (Num a) => [a] -> a
+sum' xs = foldl (+) 0 xs
+
+pointless
+sum' :: (Num a) => [a] -> a
+sum' = foldl (+) 0
+####################################
+
+function application operator $
+space split,left to right, f a b c == ((f a) b) c
+$ make it right to left, sqrt (3+4+9) eq sqrt $ 3+4+9
+it seems like $ in bash, expand variable and get its value, $a it means a's value
+##########################
+function composition
+(f . g)(x) = f(g(x))
+map (negate . abs) [5,-3,2,-19,24]     [-5,-3,-2,-19,-24]
+map (negate . sum . tail) [[1..5], [3..6], [1..7]]      [-14,-15,-27]
+
+###########################
+
+foldl takes a two-parameter function, an initial value and a list
+just like map, the difference is it has an initial value 
+sum' :: (Num a) => [a] -> a
+sum' xs = foldl (\acc x -> acc + x) 0 xs
+sum' [3,5,2,1]     11
+
+fold list from left to right of a list, called foldl
+from right to left, called foldr
+foldll and foldrl don't need the initial value, they use the first or last as initial value
+
+currying and map
+what if currying on map?
+g = map f
+g alist
+
+#######################
+lambda 
+\x -> x + 3
+#################################
+
+| means guard
+catchall pattern like case
+guard like if-else   bool
+
+bmiTell :: Double -> String
+bmiTell bmi
+    | bmi <= 18.5 = "underweight"
+    | bmi <= 25.0 = "normal"
+    | bmi <= 30.0 = "fatty"
+    | otherwise = "whale"
+that after '=' it acctually can be a function
+
+filter :: (a->Bool) -> [a] -> [a]    (a->Bool) a function takes a and return Bool
+filter _ [] = []    if it's empty list then return empty list whatever the function it is
+filter p (x:xs)
+    | p x = x : filter p xs        if p x is true, put x to new list
+    | otherwise = filter p xs
+
+##########################
+applyTwice :: (a -> a) -> a -> a
+applyTwice       f        x =  f (f x)
+(a->a) means this is a function and it takes a and return a
+
+predicate function is a function whos return value is Bool type
+
+map :: (a->b) -> [a] -> [b]
+map _ [] = []
+map f (x:xs) = f x : map f xs    this x:xs:[] == [x:xs] finally it returns []
+############################
+about partial function,
+a function's curring, it doesn't evaluate something immediately, it just changes the form
+f(x,y)   to f(x)(y)   f(x) will not evaluate immediately, it will wait for y, unless you 
+change something in the function f inside, reference curring in javascript
+###############################################3
+max :: (Ord a) => [a] -> a
+=> is type constraint, it declares type variable a is a instance of the typeclass Ord
+
+(==) :: (Eq a) => a -> a -> Bool
+
+typeclass: Eq, Ord, Show, Read, Enum, Bounded, Num, Floating, Integeral
+
+"I think typeclass is used for specify the type of the type variable"
+typeclass Floating has two type instance, Float and Double
+
+#######################################################
+pacman -S ghc
+
+ghci
+
+* + are called infix function, others are prefix function, split with space 
+
+[john@moon lab2]$ cat test.hs 
+doubleMe x = x + x 
+
+###load file in ghci repl
+Prelude> :l test.hs
+[1 of 1] Compiling Main             ( test.hs, interpreted )
+Ok, one module loaded.
+*Main> doubleMe 3
+6
+
+
+doubleSmallNumber x = if x > 100 then x else x*2
+if must come with else , if-else is an expression not a statement in haskell
+
+[1,2,3] ++ [9,2]    [1,2,3,9,2]   ++ only used in list, and string is a list of characters
+cons operator :
+'A' : " SMALL CAT"     "A SMALL CAT"
+5:[1,2,3]    [5,1,2,3]
+
+cons is short for construct!    constructor in JS construct object with function,
+in python construct in class, in Elm construct data with type
+
+[9.4, 33.2] !! 0     9.4  get value by offset 
+
+[3,2,1] > [2,1,0] 
+
+[1..20] is short for [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
+['a'..'z']
+['K'..'Z']
+[2,4..20]
+[3,6..20] [3,6,9,12,15,18]
+[13,26..24*13]
+take 24 [13,26..]
+[x*2 | x <- [1..10]]     set comprehension  2x (1<=x<=10)
+[x*2 | x <- [1..10], x*2 >= 12]  this x*2 >= 12 is a predicate expression, return a bool value, true or false
+
+haskell support type inference, no need for type declare
+:t 'a'     'a' :: Char
+4 == 5 :: Bool
+
+addThree :: Int -> Int -> Int -> Int
+addThree x y z = x + y + z
+
+type must start with upper-case character
+:t head    head :: [a] -> a       a is a type variable, a can be any type
+a function which used type variable is polymorphic function
+
+type is an instance of a typeclass,
+
