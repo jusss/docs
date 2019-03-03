@@ -1,0 +1,36 @@
+so file on linux, dll file on windows
+
+a.c
+#include <stdio.h>
+ 
+void show() {
+    printf("this is a test\n");
+}
+ 
+int add(int a, int b) {
+    return a + b;
+}
+
+gcc a.c -fPIC -shared -o a.so
+
+
+
+sudo pip install cffi
+from cffi import FFI
+ffi=FFI()
+libc=ffi.dlopen('./a.so')
+ffi.cdef("int add(int a, int b);")
+libc.add(3,3)   => 6
+>>> ffi.cdef("void show();")
+>>> libc.show()
+this is a test>>>
+
+
+or use ctypes
+
+from ctypes import cdll
+cur = cdll.LoadLibrary('./a.so')
+cur.show()
+print cur.add(1, 2)
+
+https://www.cnblogs.com/jkred369/p/7406084.html
