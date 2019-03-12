@@ -1,3 +1,6 @@
+pacman -S ntp
+systemctl start ntpd
+systemctl enable ntpd
 timedatectl set-ntp true
 timedatectl set-timezone Asia/Shanghai
 
