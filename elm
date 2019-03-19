@@ -1,3 +1,94 @@
+https://zhuanlan.zhihu.com/p/21338799
+update : Msg -> Model -> (Model, Cmd Msg)
+
+update函数接受两个参数：
+
+    事件，比如鼠标移动、用户点击等，也就是Msg参数
+    系统的当前状态，也就是Model参数
+
+每当有新事件发生时，Elm自动用该事件调用update函数，update函数返回新的状态，当状态发生变化时，Elm自动调用view函数
+
+view : Model -> Html Msg
+
+view函数根据Model来生成Html，Elm识别这次生成的Html和之前的Html之间的差异，并在浏览器上做相应的渲染。
+
+当+ 和 - 按钮按下时，会发出相应的Decrement和Increment这两种Msg。 Msg又会被喂给update函数用来计算新的Model，新的model又计算出新的view。如此循环，生生不已。
+
+#########################
+有ports就用main=Browser.element  没有就用Browser.sandbox
+0.16的Mouse模块现在也在Browser模块里
+##################################
+
+Main.elm
+
+port module Main exposing (..)
+
+import Html exposing (Html, button, div, text)
+import Html.Events exposing (onClick)
+import Browser exposing (sandbox)
+type alias Model = Int
+
+type Msg
+  = Inc
+  | Dec
+  | GetHello String
+
+model : Model
+model = 0
+
+port sayHello : String -> Cmd msg
+port jsHello : (String -> msg) -> Sub msg 
+
+init : flags -> ( Model, Cmd Msg )
+init dataFromJSwhenInit = (model, Cmd.none)
+
+update : Msg -> Model  -> (Model, Cmd msg)
+update msg model2 =
+  case msg of
+    Inc ->
+      (model2 + 1, sayHello "i")
+    Dec ->
+      (model2 - 1, sayHello "d")
+    GetHello str ->
+     (model2, sayHello str)
+
+view : Model -> Html Msg
+view model1 =
+  div []
+    [ button [ onClick Inc] [ text "Inc" ]
+    , text (String.fromInt model1)
+    , button [ onClick Dec ] [ text "Dec" ]
+    ]
+
+subscriptions : Model -> Sub Msg
+subscriptions model3 = jsHello GetHello
+
+main : Program () Model Msg
+main =  Browser.element
+       { init = init
+       , view = view
+        , update = update , subscriptions = subscriptions}
+
+#####################################################
+elm make Desktop\Ports\Main.elm --output=main.js
+
+###############################
+<script> src="main.js" </script>
+<script> src="hello.js"</script>
+<script>
+     
+  var app = Elm.Main.init({
+    node: document.getElementById('elm')
+  });
+      app.ports.sayHello.subscribe(function(data) { console.log(data)});
+	  //app.ports.jsHello.send("Elm! hellooooo");
+	  toE = function(x) {app.ports.jsHello.send(x);};
+      
+
+      <!-- messager = function(msg){hello.hello(msg)} -->
+ 
+    </script>
+####################################################
 python中文交流 on telegram
 elm on slack
 
