@@ -1,0 +1,77 @@
+
+#FFI #ffi #Aldebaran #Pepper #pepper 
+python FFI on C++
+
+from ctypes import cdll
+cur=cdll.LoadLibrary('./libqic.so')
+initValue=cur.qi_session_create()
+cur.qi_session_connect(initValue,"tcp://127.0.0.1:9559")
+tts=cur.qi_session_get_service(initValue,"ALTextToSpeech")
+obj=cur.qi_future_get_object(tts)
+
+ from ctypes import cdll
+ cur=cdll.LoadLibrary('./libqic.so')
+ initValue=cur.qi_session_create()
+ future=cur.qi_session_connect(initValue,"tcp://192.168.31.222:9559")
+ future2=cur.qi_session_get_service(initValue,"ALTextToSpeech")
+ obj=cur.qi_future_get_object(future2)
+
+message=cur.qi_value_create("(s)")
+str = cur.qi_value_create("s")
+cur.qi_value_set_string(str,"what ever you want")
+ss=cur.qi_value_get_string(str)
+cur.qi_value_tuple_set(message,0,str)
+fut2=cur.qi_object_call(obj,"say",message)
+
+reference https://github.com/aldebaran/libqi-capi/blob/master/bin/qiclient-c/qimain.c
+
+cur.qi_value_set_string(str,"what ever you want")
+cur.qi_value_tuple_set(message,0,str)
+fut2=cur.qi_object_call(obj,"say",message)
+
+cur.qi_value_set_string(str,"nothing last forever!")
+cur.qi_value_tuple_set(message,0,str)
+fut2=cur.qi_object_call(obj,"say",message)
+
+[周三 3月 20 2019]
+*** You have joined channel #qi                                         [09:03]
+*** Topic for #qi: qiBuild: https://github.com/aldebaran/qibuild | libqi:
+    https://github.com/aldebaran/libqi
+*** #qi: topic set by Phlogistique, 2016-02-05 17:01:14
+*** Users on #qi: jusss StormPhlegyas vbarbaresi dmerejkowsky alkino blastrock
+    Phlogistique thegameg smartin
+*** #qi modes: +ct
+*** #qi was created on 2010-01-30 07:53:26
+<jusss> alkino: blastrock hello there                                   [15:04]
+*** newnick (~newnick@laubervilliers-656-1-272-22.w193-248.abo.wanadoo.fr) has
+    joined channel #qi                                                  [16:33]
+<blastrock> Hi jusss                                                    [17:13]
+<blastrock> For yesterday's question, the order of the calls are like
+            qi_session_create(); future = qi_session_connect("address of the
+            robot"); wait for the future and check error; future2 =
+            qi_session_get_service("ALTextToSpeech"); wait for that future
+            too; obj = qi_future_get_object(future2);                   [17:15]
+<blastrock> Then you construct a qi any value tuple with the argument "hello",
+            and you call qi_object_call("say", arguments);              [17:16]
+<blastrock> That's from the top of my head, I don't remember the details
+*** StormPhlegyas (~Phlegyas@lstlambert-657-1-100-146.w90-63.abo.wanadoo.fr)
+    has quit: Ping timeout: 250 seconds                                 [18:48]
+<jusss> blastrock: what is "a qi any value"?                            [18:58]
+<jusss> how to implement a qi value with python?                        [19:05]
+<jusss>  qi_object_call(qi_object_t *object, const char *signature,
+        qi_message_t *message)                                          [19:16]
+<jusss> >>> msg=cur.qi_value_create("hello")   terminate called after throwing
+        an instance of 'std::runtime_error',   what():  Invalid signature,
+        Aborted                                                         [19:18]
+*** StormPhlegyas (~Phlegyas@lstlambert-657-1-100-146.w90-63.abo.wanadoo.fr)
+    has joined channel #qi                                              [19:26]
+<jusss> blastrock: yeah! I got it!                                      [19:29]
+*** StormPhlegyas (~Phlegyas@lstlambert-657-1-100-146.w90-63.abo.wanadoo.fr)
+    has quit: Ping timeout: 246 seconds                                 [19:30]
+<jusss> message=cur.qi_value_create("(s)");   str = cur.qi_value_create("s");
+        cur.qi_value_set_string(str,"what ever you want");
+        ss=cur.qi_value_get_string(str);
+        cur.qi_value_tuple_set(message,0,str);
+        fut2=cur.qi_object_call(obj,"say",message)                      [19:32]
+<jusss> reference
+        https://github.com/aldebaran/libqi-capi/blob/master/bin/qiclient-c/qimain.c
