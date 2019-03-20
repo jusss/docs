@@ -1,5 +1,2172 @@
 
 
+#Elm #elm #ports #port #Port #Ports
+###############
+https://qiita.com/jooex/items/5ff2d3b86563cf5dbd84
+
+index.html
+<!doctype html>
+<html>
+  <head>
+    <title>WebSockets Hello World</title>
+    <meta charset="utf-8" />
+    <style type="text/css">
+    </style>
+	 <script src="main.js"></script> 
+	  <script src="hello.js"></script>
+  </head>
+  <body>
+  <div id="elm"></div>
+ </body>
+  <script>
+  var app = Elm.Main.init({
+    node: document.getElementById('elm')
+  });
+      app.ports.sayHello.subscribe(function(data) { console.log(data)});
+	  //app.ports.jsHello.send("Elm! hellooooo");
+	  toE = function(x) {app.ports.jsHello.send(x);};
+    </script>
+</html>
+#############################################
+Main.elm
+port module Main exposing (..)
+
+import Html exposing (Html, button, div, text)
+import Html.Events exposing (onClick)
+import Browser exposing (sandbox)
+type alias Model = Int
+
+type Msg
+  = Inc
+  | Dec
+  | GetHello String
+
+model : Model
+model = 0
+
+port sayHello : String -> Cmd msg
+port jsHello : (String -> msg) -> Sub msg 
+
+init : flags -> ( Model, Cmd Msg )
+init dataFromJSwhenInit = (model, Cmd.none)
+
+update : Msg -> Model  -> (Model, Cmd msg)
+update msg model2 =
+  case msg of
+    Inc ->
+      (model2 + 1, sayHello "i")
+    Dec ->
+      (model2 - 1, sayHello "d")
+    GetHello str ->
+     (model2, sayHello str)
+
+
+view : Model -> Html Msg
+view model1 =
+  div []
+    [ button [ onClick Inc] [ text "Inc" ]
+    , text (String.fromInt model1)
+    , button [ onClick Dec ] [ text "Dec" ]
+    ]
+
+subscriptions : Model -> Sub Msg
+subscriptions model3 = jsHello GetHello
+
+
+main : Program () Model Msg
+main =  Browser.element
+       { init = init
+       , view = view
+        , update = update , subscriptions = subscriptions}
+##############################################
+hello.js
+hello = (function(self) {
+	self.hello = function(world) {console.log(world)};
+	 return self;
+
+})(window.hello || {});
+	
+
+##########################
+
+http://vanilla-js.com/
+
+####################
+
+
+<jusss> ljharb: const ds = box.querySelectorAll("div");
+ds is a node list, not array, so you can not do shift() pop() on a node list
+
+#########################
+turn ES6 code to ES5,
+https://babeljs.io/
+
+################################################
+
+box=document.getElementById("box")
+e=document.createElement("div")
+box.appendChild(e)                      e.innerHTML="whatever";      e.style.display="block" or "none"
+or use
+var newDiv = document.createElement("div"); 
+// and give it some content 
+var newContent = document.createTextNode("Hi there and greetings!"); 
+// add the text node to the newly created div
+newDiv.appendChild(newContent);  
+https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement
+####################################################
+<style>
+.box {
+	position:'absolute';
+	top:0px;
+	left:300px;
+	background-color: lightblue;
+}
+
+.box > div {
+	display: none;
+}
+	
+</style>
+<body>
+	<main id="box" class="box">
+	</main>
+</body>
+
+var noticeStr = "请点击屏幕上的按钮或读出上面的文字";
+var offset=100;
+var offset_origin = offset;
+var noticeList = noticeStr.split('');
+const box = document.getElementById("box");
+	
+var ce = function(n){ if (n<0) {return;} else { box.appendChild(document.createElement("div")); ce(n-1)}};
+ce(noticeList.length);
+const textDiv = box.querySelectorAll("div");
+var inner_html = function(_parentNode, character_list){ 
+		
+	for(i=0;i<=character_list.length;i++) {
+		_parentNode[i].innerHTML = character_list[i];
+	}
+};
+inner_html(textDiv,noticeList);
+const showDiv = (div, k) => {
+  setTimeout(() => {
+	div.style.display = "block";
+	offset = offset + 50;
+	div.style.position = 'absolute';
+	div.style.left = offset.toString() + "px";
+	div.style.top = "0px";
+	div.style.fontSize = "35px";
+	div.style.color="white";
+	k();
+  }, 1000);
+};
+
+const show = ds => {
+  if (!ds.length) {
+	for (const d of textDiv) {
+	  d.style.display = "none";
+	  offset=offset_origin;
+	}
+	console.log("clearing");
+	return show(textDiv);
+  }
+  
+  const [div, ...rest] = ds;
+  
+  showDiv(div, () => show(rest));
+};
+
+show(textDiv);
+
+
+#################################################
+<html>
+  <body>
+    <main id="box" class="box">
+      <div>你</div>
+      <div>好</div>
+      <div>啊</div>
+      <div>.</div>
+    </main>
+  </body>
+</html>
+
+.box {
+  width: 100px;
+  height: 100px;
+  background-color: lightblue;
+}
+
+.box > div {
+  display: none;
+}
+
+const box = document.getElementById("box");
+const textDiv = box.querySelectorAll("div");
+
+const showDiv = (div, k) => {
+  
+  setTimeout(() => {
+    div.style.display = "block";
+    k();
+  }, 1000);
+};
+
+const show = ds => {
+  if (!ds.length) {
+    for (const d of textDiv) {
+      d.style.display = "none";
+    }
+    console.log("clearing");
+    return show(textDiv);
+  }
+  
+  const [div, ...rest] = ds;
+  
+  showDiv(div, () => show(rest));
+};
+
+show(textDiv);
+########################################
+#fifth 
+let iterable = [10, 20, 30];
+
+for (const value of iterable) {
+  console.log(value);
+}             for ( variable of iterable)
+
+#fourth
+
+[a, ...rest] = [42];     rest will be [], and rest.lengh is 0
+!rest.lengh is true
+
+#####################################
+#third #css #selector #div #container
+different signs (+,> and ~) in CSS selector
+<div id="container">            
+   <p>First</p>
+    <div>
+        <p>Child Paragraph</p>
+    </div>
+   <p>Second</p>
+   <p>Third</p>      
+</div>
+
+div#container p{
+font-weight:bold;
+}   It will target all p tags within container div.
+
+div#container > p {
+  border: 1px solid black;
+}  It will target all P element which are direct children of container div, not children of child div.
+
+div + p {  
+   color: green;  
+} It is Adjacent sibling combinator. It combines two sequences of simple selectors
+having the same parent and the second one must come IMMEDIATELY after the first.
+It will only select the first element that is immediately preceded by the former selector.
+In our example, it will target to Second ONLY because the owner P element comes just after Div tag.
+
+div ~ p{
+background-color:blue;
+} It is general sibling combinator and similar to Adjacent sibling combinator.
+the difference is that the second selector does NOT have to immediately follow
+the first one means It will select all elements that is preceded by the former selector.
+It will target both second and third.
+
+https://techbrij.com/css-selector-adjacent-child-sibling
+
+###########################
+#second
+element.querySelectorAll('div,p')
+to ALL DOM, document.querySelectorAll('div')
+
+<main id="box" class="box">
+      <div>你</div>
+      <div>好</div>
+      <div>啊</div>
+</main>
+
+const box = document.getElementById("box");
+const textDiv = box.querySelectorAll("div");
+
+#############################
+#first
+#es6 #ES6
+destructuring assignment
+var a,b,rest
+[a,b]=[10,20]
+[a,b, ...rest] = [10,20,30,40,50]
+rest is [30,40,50]
+
+#######################################
+
+<html>
+  <body>
+    <main id="box" class="box">
+      <div>你</div>
+      <div>好</div>
+      <div>啊</div>
+    </main>
+  </body>
+</html>
+
+.box {
+  width: 100px;
+  height: 100px;
+  background-color: lightblue;
+}
+
+.box > div {
+  display: none;
+}
+
+const box = document.getElementById("box");
+const textDiv = box.querySelectorAll("div");
+
+const showDiv = (div, k) => {
+  setTimeout(() => {
+    div.style.display = "block";
+    k();
+  }, 1000);
+};
+
+const show = ds => {
+  if (!ds.length) {
+    for (const d of textDiv) {
+      d.style.display = "none";
+    }
+    console.log("clearing");
+    return show(textDiv);
+  }
+  
+  const [div, ...rest] = ds;
+  
+  showDiv(div, () => show(rest));
+};
+
+show(textDiv);
+
+https://codepen.io/anon/pen/GeQggG
+
+########################################
+
+t=()=>console.log(1)
+f = function () { return new Promise((r,e) => {t();
+                                               setTimeout(r,3000)
+                                              }).then(f)}
+
+#####################################
+
+f = function () { return new Promise((r,e) => {console.log(1);
+                                               setTimeout(r,3000)
+                                              }).then(f)}
+
+###################################
+
+const point = [10, 25, -34];
+const [x, y, z] = point;
+https://www.jianshu.com/p/87008f4f8513
+
+#Promise #promise #recursive #recursion
+
+f = function () { return new Promise((r,e) => {console.log(1);
+                                               setTimeout(r,3000)
+                                              })}
+g = function () { return f().then(g)}
+
+###############################################
+
+const g = () => Promise.resolve(1).then(console.log).then(g);
+
+g();
+
+########################################
+delay = function(t) {
+      return new Promise(function(resolve){
+      	     setTimeout(function() {resolve(t)}, t)})};
+
+var clicked=false;
+
+run = function(cond){
+    if (cond) { return; };
+    console.log(2);
+    return delay(100).then(function(){return clicked}) .then(run) ; };
+
+run(clicked);
+
+// create a loop with Promise+Recursion, and control it by the outside condition
+// the whole point is that it can return to the main thread or caller
+
+clicked=true;
+
+
+##################################################
+
+<jusss> eiGHttt https://codepen.io/anon/pen/GeQggG   昨天这个代码，如果想显示
+        完你好啊这三个字之后，就让这三个字消失，然后再循环显示，我发现如果我用
+        map来操作div的block很容易递归超极限，我突然发现setTimeout是非阻塞的，
+        的确相当于很快就递归上千次，我突然想到个新问题，因为js的函数的非阻塞，
+        怎么等待上一个结束完才执行下一个呢？然后我想到了Promise,但是如果在
+        Promise里用setTimeout，Promise然后递归，是不是相当于创造了一个无限长的
+        Promise链，每个里面都是一个setTimeout延迟显示字符的函数，会怎么样？
+
+<eiGHttt> 普通回调也行，总之是个递归。
+<jusss> eiGHttt 那这个因为setTimeout是非阻塞的，递归很快就会到底上千次
+<jusss> eiGHttt 在setTimeout里递归倒不是会爆                            [09:57]
+<jusss> eiGHttt t=new Promise((r,e)=>{setTimeout(_ => {console.log(1);
+        r(2)},3000)}).then((r,e)=>{setTimeout( _ => {console.log(2)},4000)})
+                                                                        [10:09]
+<jusss> 的确是可以等前面执行结束才执行后面的then                        [10:10]
+<eiGHttt> Promise本来就是为了解决异步问题。
+<jusss> eiGHttt const [div, ...rest] = ds; 你这个是解构赋值？我还真没见过好像
+                                                                        [10:16]
+<eiGHttt> 解构数组，跟car、cdr差不多。
+<jusss> eiGHttt 我现在还在android 4.0哪个浏览器上工作，连ES6都不支持，
+        websocket, array function 
+<eiGHttt> jusss:真要往前端发展，你可以考虑做打包工作，例如用babel把新标准编译
+          到es5。
+<jusss> eiGHttt JS里真是把回调函数用到了极致，感觉所有函数的参数都是回调函数，
+        我看Array.forEach(f)时我还有点蒙，后来一想f是forEach的回调函数才明白
+                                                                        [10:22]
+<eiGHttt> 回调就是个高阶函数。
+<jusss> eiGHttt C++里有continuation的实现，那岂不是说我可以通过FFI在任何语言里
+        都能用continuation?                                             [10:28]
+<jusss> eiGHttt 我还看到有人把python的那些数学库用web assembly移到了浏览器上，
+        甚至可以在浏览器上直接用Python                                  [10:29]
+<jusss> eiGHttt 在js里用Python
+<eiGHttt> 没懂那么多，我不是真正意义上的前端。                          [10:30]
+<jusss> eiGHttt  https://alpha.iodide.io                                [10:31]
+##############################
+array.forEach(function(currentValue, index, arr), thisValue)
+they all are optional but currentValue,
+currentValue is the element of the list, and index is the index number of the list
+you need create a function and it has two parameters or arguments,
+and JS's array.forEach(f) will pass two parameters to f, that's weird,
+because f is a callback function in forEach
+#################################
+
+document.querySelector("className")   instead of getElementByClass or ID
+document.createElement("div")     js write div css
+they both return the element, 
+array.forEach(f)  and array.map()
+const let and var 
+#######################################
+
+<html>
+  <body>
+    <main id="box" class="box">
+    </main>
+  </body>
+</html>
+
+.box {
+  width: 100px;
+  height: 100px;
+  background-color: lightblue;
+}
+
+const box = document.getElementById("box");
+const text = "你好啊";
+
+const delayCreate = (text, index) => {
+  const delay = index * 3000;
+  const element = document.createElement("div");
+  element.innerText = text;
+  
+  setTimeout(() => box.appendChild(element), delay);
+};
+
+text.split("").forEach(delayCreate);
+
+################################################
+
+html块级元素和内联元素
+块级元素(block)特性： div , dl , fieldset , form , h1 ,  menu , noframes , noscript , ol , p , pre , table , ul , li
+    总是独占一行，表现为另起一行开始，而且其后的元素也必须另起一行显示;
+    宽度(width)、高度(height)、内边距(padding)和外边距(margin)都可控制
+内联元素(inline)特性：a , abbr , acronym , b , bdo , big , br , cite , code , dfn , em , font , i , img , input , kbd 
+  和相邻的内联元素在同一行;
+    宽度(width)、高度(height)、内边距的top/bottom(padding-top/padding-bottom)和外边距的top/bottom(margin-top/margin-bottom)都不可改变，就是里面文字或图片的大小;
+
+##############################################
+
+[周四 3月 14 2019]
+*** You have joined channel #qi                                         [09:15]
+*** Topic for #qi: qiBuild: https://github.com/aldebaran/qibuild | libqi:
+    https://github.com/aldebaran/libqi
+*** #qi: topic set by Phlogistique, 2016-02-05 17:01:14
+*** Users on #qi: jusss lugu newnick vbarbaresi dmerejkowsky alkino blastrock
+    Phlogistique smartin thegameg
+*** #qi modes: +ct
+*** #qi was created on 2010-01-30 07:53:26
+<jusss> alkino: blastrock hello
+<alkino> Yeah that's a libqi signature                                  [14:02]
+<alkino> The meaning of the chars is more or less documented here
+<alkino>
+         http://doc.aldebaran.com/libqi/api/cpp/type/signature.html#enumerations
+<alkino> You cant pass a string directly to qi_object_call I think
+<alkino> You must create an anyvalue of type tuple with the arguments
+<alkino> He should use the other bindings as a base, for example in go:
+<alkino>
+         https://github.com/aldebaran/libqi-go/blob/master/src/qi/qiobject.go#L65
+         and
+<alkino>
+         https://github.com/aldebaran/libqi-go/blob/master/src/qi/value.go#L288
+<alkino> for you from blastrock, jusss
+<jusss> alkino: thanks!                                                 [14:03]
+<jusss> I will try it now!
+<jusss> I'm not familiar with go ...                                    [14:08]
+ERC> 
+
+
+#######################################################
+
+
+[周三 3月 13 2019]
+*** You have joined channel #qi                                         [09:49]
+*** Topic for #qi: qiBuild: https://github.com/aldebaran/qibuild | libqi:
+    https://github.com/aldebaran/libqi
+*** #qi: topic set by Phlogistique, 2016-02-05 17:01:14
+*** Users on #qi: jusss newnick thegameg smartin Phlogistique blastrock alkino
+    dmerejkowsky vbarbaresi
+*** #qi modes: +ct
+*** #qi was created on 2010-01-30 07:53:26
+<jusss> hello                                                           [10:44]
+<jusss> alkino: hi there,                                               [15:38]
+<alkino> hi o/
+<alkino> where are you?
+<alkino> we are in france, we have some delay with you                  [15:39]
+<alkino> Phlogistique: ok, je vois ça cette semaine
+<alkino> 24 ~ 10h => 30 ~ 16h
+<alkino> ce sont les horaires approximatifs de ta présence à la gare de lyon
+<alkino> 23*                                                            [15:41]
+*** lugu (~ludo@softbank-robotics-gw1.ter4.eqx2.par.cust.as8218.eu) has joined
+    channel #qi                                                         [16:54]
+<jusss> alkino: I'm in Beijing                                          [18:00]
+<alkino> oh
+<alkino> ok
+<jusss> alkino: I watch that libqi-capi, I don't know how to operate that qi
+        function by orders, for example, I can use qi_session_create()
+        qi_session_connect qi_session_get_service, but I don't know how to
+        call a like ALTextToSpeech.say('something')                     [18:03]
+<jusss> alkino: and qi_session_get_service return a Integer,not an object
+                                                                        [18:04]
+<alkino>
+         https://github.com/aldebaran/libqi-capi/blob/master/bin/qiclient-c/qimain.c
+         read this example                                              [18:05]
+<jusss> it seems those all return Integer
+<alkino> it's c
+<alkino> i Don't know at all c api
+<jusss> alkino: not cpp?
+<alkino> but example seems good
+<alkino> libqi-capi is c                                                [18:06]
+<alkino> libqi is c++
+<alkino> libqi-capi is the c binding of c++ code
+<jusss> this line qi_object_call(object, "reply::(s)", message);  I don't
+        understand what is replay::(s)                                  [18:07]
+<alkino> blastrock: a libqi signature?                                  [18:08]
+<jusss> qi_session_create() return an IntegerA, then
+        qi_session_connect(IntegerA, addr); and return Integer B
+<jusss> qi_future_get_object(qi_session_get_service(IntegerA, "serviceTest"));
+        return Integer C                                                [18:09]
+<jusss> qi_object_signal_connect(IntegerC, "testEvent::(s)", &evcb, 0); 
+                                                                        [18:10]
+<alkino> seems me good :p
+<alkino> interger are identifier
+<alkino> of c++ objects
+<jusss> alkino: the question is how I can call a function by those Integers
+<jusss> alkino: like ALTextToSpeech.say('whatever')                     [18:11]
+<alkino> qi_session_get_service(IntegerA, "ALTextToSppech")             [18:12]
+<alkino> qi_future_get_object(integerC)
+<alkino> qi_objcet_call(object, "say::(s)", "whatever")                 [18:13]
+<alkino> not sure
+<alkino> but smth like that
+<jusss> alkino: what that (s) means
+<alkino> (string) ?
+<alkino> i'm not sure                                                   [18:14]
+<alkino> I guess
+<jusss> alkino: ok, I will try it now
+<jusss> :)
+<jusss> alkino: Segmentation fault                                      [18:20]
+<alkino> \o/                                                            [18:21]
+<alkino> read example better so :(
+<alkino> print each integer
+<alkino> if one is null it means an error, I guess
+<jusss> alkino: https://paste.ubuntu.com/p/KtcrBhHK97/                  [18:22]
+<alkino> print each value                                               [18:23]
+<jusss> alkino: https://paste.ubuntu.com/p/FWs7DfkdT7/                  [18:24]
+<jusss> alkino: the value seems good
+<alkino> can't help you more                                            [18:26]
+<jusss> alkino: anyway thanks                                           [18:27]
+<jusss> alkino: I saw that one japanese lab is doing something with LISP, and
+        I think it's guile                                              [18:29]
+*** lugu (~ludo@softbank-robotics-gw1.ter4.eqx2.par.cust.as8218.eu) has quit:
+    Ping timeout: 252 seconds                                           [18:55]
+ERC> 
+############################################
+
+<jusss> yunfan: 比如把sqlserver的库导入到mysql，会有问题吗
+<ystyle> 导不进去                                                       [14:21]
+<jusss> ystyle: 那mysql和postgresql呢
+<jusss> ystyle: 只要是不一样的库就没法导入吗
+<ystyle> 都不行吧， 一般不一要的都 导不进去
+<yunfan> jusss: 有办法的  导入标准的sql92只要不是非标类型还是行的
+<jusss> ystyle: 把a库的所有表导出，然后再导入b库，不可以吗？通过一个中间的
+<ystyle> 一般支持跨库导入的工具都是收费的，自己高的话可以用kettle写转换脚本
+<ystyle> 要么库->excel->库的工具也行。
+<jusss> ystyle: 那不同的库也可以？
+<ystyle> kettle 的话甚至可以nosql                                       [14:24]
+<ystyle> kettle开源的
+<yunfan> ystyle: 自带的工具不都可以导出 ？
+<ystyle> 导出可以啊， 但导不进去别的数据库                              [14:25]
+<ystyle> 比如oracle的文件都 是dmp的其它确定不行， sqlserver的语法和其它的不一
+         样。。。
+<ystyle> mysql和pg的话，用了不支持的类型也没法导                        [14:27]
+
+##############################################
+"Better" is subjective.
+querySelector is the newer feature.
+getElementById is better supported than querySelector.
+querySelector is better supported than getElementsByClassName.
+querySelector lets you find elements with rules that can't be expressed with getElementById and getElementsByClassName
+You need to pick the appropriate tool for any given task.
+(In the above, for querySelector read querySelector / querySelectorAll).
+https://stackoverflow.com/questions/26848289/javascript-queryselector-vs-getelementbyid
+
+I heard that bootstrap 4 without jquery is using querySelectorAll to instead of jquery's function
+var x = document.querySelectorAll("h2, div, span");
+var i;
+for (i = 0; i < x.length; i++) {
+  x[i].style.backgroundColor = "red";
+}
+
+In this example, the first element in the document with the class "myclass" is returned:
+var el = document.querySelector(".myclass");
+
+https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector
+################################################
+
+<jusss> eiGHttt html里顶部滚动一个文字，但是又不占用屏幕其它的div盒子的空间，
+        怎么写？就像两个层面                                            [10:48]
+<eiGHttt> position: absolute?                                           [10:49]
+<jusss> eiGHttt 那滚动文字呢                                            [10:50]
+<jusss> eiGHttt marquee?
+<eiGHttt> setInterval.
+<eiGHttt> 或者上动画。                                                  [10:51]
+<jusss> eiGHttt setInterval能滚动文字？                                 [10:53]
+<eiGHttt> 定时改变位置。                                                [10:54]
+
+https://www.1keydata.com/css-tutorial/tw/class-id.php
+class and id both are selector
+.class-name {attribute:xxx}
+<p class="class-name">whatever</p>
+b.class-name {attribute:xxx}
+<b class="class-name">whatever</b>
+.a1{ }   .a2{}
+<p class="a1 a2">xxx</p>
+#id{}      <p id="id">xxx</p>
+
+<jusss> eiGHttt 我能把那个文字写到什么里面来操作呢？如果不是div
+<jusss> 因为我现在的这套东西会改div, 我不想在div里操作，其它怎么操作
+<eiGHttt> 不是很懂，写样式跟标签没多少关系。                            [11:00]
+<eiGHttt> https://codepen.io/anon/pen/aMLLRO                            [11:04]
+<html>
+  <body>
+    <div class="box">
+      <div class="text">text</div>
+    </div>
+  </body>
+</html>
+
+.box {
+  position: relative;
+  background-color: lightblue;
+  width: 100px;
+  height: 50px;
+  overflow: hidden;
+}
+
+.text {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+const text = document.querySelector(".text");
+
+let pos = 0;
+
+setInterval(() => {
+  pos += 10;
+  pos = pos % 100;
+  text.style.left = `${pos}px`;
+}, 300);
+
+<jusss> eiGHttt 其实我有个东西很好奇，为什么是<h> <p> ?  能是
+        <whateveryouwant>吗                                             [11:06]
+<eiGHttt> 我给你个<abc>，你知道要解析成什么吗？这些都是预定义好的。
+<eiGHttt>
+          https://stackoverflow.com/questions/10830682/is-it-ok-to-use-unknown-html-tags
+
+<p> <li> <span> <h> are tags
+<a> is for hyper-link <b> is bold
+<li> list item <br> new line
+<h1> head  <textarea rows="4" cols="50">
+https://www.w3schools.com/tags/tag_u.asp
+
+##########################################
+<jusss> elm port, python ffi on c++ library, python frames, sql, blablablah
+##########################################
+#FFI #ffi #Aldebaran #Pepper #pepper 
+python FFI on C++
+
+from ctypes import cdll
+cur=cdll.LoadLibrary('./libqic.so')
+initValue=cur.qi_session_create()
+cur.qi_session_connect(initValue,"tcp://127.0.0.1:9559")
+tts=cur.qi_session_get_service(initValue,"ALTextToSpeech")
+obj=cur.qi_future_get_object(tts)
+
+ from ctypes import cdll
+ cur=cdll.LoadLibrary('./libqic.so')
+ initValue=cur.qi_session_create()
+ future=cur.qi_session_connect(initValue,"tcp://192.168.31.222:9559")
+ future2=cur.qi_session_get_service(initValue,"ALTextToSpeech")
+ obj=cur.qi_future_get_object(future2)
+
+message=cur.qi_value_create("(s)")
+str = cur.qi_value_create("s")
+cur.qi_value_set_string(str,"what ever you want")
+ss=cur.qi_value_get_string(str)
+cur.qi_value_tuple_set(message,0,str)
+fut2=cur.qi_object_call(obj,"say",message)
+
+reference https://github.com/aldebaran/libqi-capi/blob/master/bin/qiclient-c/qimain.c
+
+cur.qi_value_set_string(str,"what ever you want")
+cur.qi_value_tuple_set(message,0,str)
+fut2=cur.qi_object_call(obj,"say",message)
+
+cur.qi_value_set_string(str,"nothing last forever!")
+cur.qi_value_tuple_set(message,0,str)
+fut2=cur.qi_object_call(obj,"say",message)
+
+[周三 3月 20 2019]
+*** You have joined channel #qi                                         [09:03]
+*** Topic for #qi: qiBuild: https://github.com/aldebaran/qibuild | libqi:
+    https://github.com/aldebaran/libqi
+*** #qi: topic set by Phlogistique, 2016-02-05 17:01:14
+*** Users on #qi: jusss StormPhlegyas vbarbaresi dmerejkowsky alkino blastrock
+    Phlogistique thegameg smartin
+*** #qi modes: +ct
+*** #qi was created on 2010-01-30 07:53:26
+<jusss> alkino: blastrock hello there                                   [15:04]
+*** newnick (~newnick@laubervilliers-656-1-272-22.w193-248.abo.wanadoo.fr) has
+    joined channel #qi                                                  [16:33]
+<blastrock> Hi jusss                                                    [17:13]
+<blastrock> For yesterday's question, the order of the calls are like
+            qi_session_create(); future = qi_session_connect("address of the
+            robot"); wait for the future and check error; future2 =
+            qi_session_get_service("ALTextToSpeech"); wait for that future
+            too; obj = qi_future_get_object(future2);                   [17:15]
+<blastrock> Then you construct a qi any value tuple with the argument "hello",
+            and you call qi_object_call("say", arguments);              [17:16]
+<blastrock> That's from the top of my head, I don't remember the details
+*** StormPhlegyas (~Phlegyas@lstlambert-657-1-100-146.w90-63.abo.wanadoo.fr)
+    has quit: Ping timeout: 250 seconds                                 [18:48]
+<jusss> blastrock: what is "a qi any value"?                            [18:58]
+<jusss> how to implement a qi value with python?                        [19:05]
+<jusss>  qi_object_call(qi_object_t *object, const char *signature,
+        qi_message_t *message)                                          [19:16]
+<jusss> >>> msg=cur.qi_value_create("hello")   terminate called after throwing
+        an instance of 'std::runtime_error',   what():  Invalid signature,
+        Aborted                                                         [19:18]
+*** StormPhlegyas (~Phlegyas@lstlambert-657-1-100-146.w90-63.abo.wanadoo.fr)
+    has joined channel #qi                                              [19:26]
+<jusss> blastrock: yeah! I got it!                                      [19:29]
+*** StormPhlegyas (~Phlegyas@lstlambert-657-1-100-146.w90-63.abo.wanadoo.fr)
+    has quit: Ping timeout: 246 seconds                                 [19:30]
+<jusss> message=cur.qi_value_create("(s)");   str = cur.qi_value_create("s");
+        cur.qi_value_set_string(str,"what ever you want");
+        ss=cur.qi_value_get_string(str);
+        cur.qi_value_tuple_set(message,0,str);
+        fut2=cur.qi_object_call(obj,"say",message)                      [19:32]
+<jusss> reference
+        https://github.com/aldebaran/libqi-capi/blob/master/bin/qiclient-c/qimain.c
+ERC> 
+ 
+
+##############################################
+
+Haskell的n种求阶乘方法：1.  从C过来的新手：fac n = if n == 0 
+           then 1
+           else n * fac (n-1)
+2. 学了scheme来的fac = (\(n) ->
+        (if ((==) n 0)
+            then 1
+            else ((*) n (fac ((-) n 1)))))
+3.刚学模式匹配fac  0    =  1
+fac (n+1) = (n+1) * fac n
+4. 强行foldfac n = foldr (*) 1 [1..n]
+5.当然fold的方向还是有讲究的fac n = foldl (*) 1 [1..n]
+6.强行foldlfac n = foldr (\x g n -> g (x*n)) id [1..n] 1
+7.我要尾递归！facAcc a 0 = a
+facAcc a n = facAcc (n*a) (n-1)
+
+fac = facAcc 1
+8. 迭代器！fac n = snd (until ((>n) . fst) (\(i,m) -> (i+1, i*m)) (1,1))
+9. CPSfacCps k 0 = k 1
+facCps k n = facCps (k . (n *)) (n-1)
+
+fac = facCps id
+10. Y-combinatory f = f (y f)
+
+fac = y (\f n -> if (n==0) then 1 else n * f (n-1))
+11. 花式组合子s f g x = f x (g x)
+
+k x y   = x
+
+b f g x = f (g x)
+
+c f g x = f x g
+
+y f     = f (y f)
+
+cond p f g x = if p x then f x else g x
+
+fac  = y (b (cond ((==) 0) (k 1)) (b (s (*)) (c b pred)))
+12. 强行自己写【我从来就没碰过自己不喜欢的语言！-- a dynamically-typed term language
+
+data Term = Occ Var
+          | Use Prim
+          | Lit Integer
+          | App Term Term
+          | Abs Var  Term
+          | Rec Var  Term
+
+type Var  = String
+type Prim = String
+
+
+-- a domain of values, including functions
+
+data Value = Num  Integer
+           | Bool Bool
+           | Fun (Value -> Value)
+
+instance Show Value where
+  show (Num  n) = show n
+  show (Bool b) = show b
+  show (Fun  _) = ""
+
+prjFun (Fun f) = f
+prjFun  _      = error "bad function value"
+
+prjNum (Num n) = n
+prjNum  _      = error "bad numeric value"
+
+prjBool (Bool b) = b
+prjBool  _       = error "bad boolean value"
+
+binOp inj f = Fun (\i -> (Fun (\j -> inj (f (prjNum i) (prjNum j)))))
+
+
+-- environments mapping variables to values
+
+type Env = [(Var, Value)]
+
+getval x env =  case lookup x env of
+                  Just v  -> v
+                  Nothing -> error ("no value for " ++ x)
+
+
+-- an environment-based evaluation function
+
+eval env (Occ x) = getval x env
+eval env (Use c) = getval c prims
+eval env (Lit k) = Num k
+eval env (App m n) = prjFun (eval env m) (eval env n)
+eval env (Abs x m) = Fun  (\v -> eval ((x,v) : env) m)
+eval env (Rec x m) = f where f = eval ((x,f) : env) m
+
+
+-- a (fixed) "environment" of language primitives
+
+times = binOp Num  (*)
+minus = binOp Num  (-)
+equal = binOp Bool (==)
+cond  = Fun (\b -> Fun (\x -> Fun (\y -> if (prjBool b) then x else y)))
+
+prims = [ ("*", times), ("-", minus), ("==", equal), ("if", cond) ]
+
+
+-- a term representing factorial and a "wrapper" for evaluation
+
+facTerm = Rec "f" (Abs "n" 
+              (App (App (App (Use "if")
+                   (App (App (Use "==") (Occ "n")) (Lit 0))) (Lit 1))
+                   (App (App (Use "*")  (Occ "n"))
+                        (App (Occ "f")  
+                             (App (App (Use "-") (Occ "n")) (Lit 1))))))
+
+fac n = prjNum (eval [] (App facTerm (Lit n)))
+13. 当然还有忽悠新手用的fac n = product [1..n]
+以上转载于http://www.willamette.edu/~fruehr/haskell/evolution.html
+
+https://www.zhihu.com/question/31253429/answer/53644708
+
+####################################################
+
+<jusss> how I can get 3 from Just 3?
+<merijn> jusss: Well, what should happen if you have Nothing?           [17:38]
+<jusss> merijn: I don't know, like this value Just 3 is not like in other
+        languages, they don't have this value, they have string and integer
+<jusss> Just 3 is a value in haskell is really blow up my mind
+<merijn> jusss: What you have is a value of type "Maybe Int", which means you
+         either *have* an Int (like "Just 3") or you have Nothing. The best
+         way to get the three depends on how you plan to use it
+<merijn> jusss: For example, if you want "the number or some default value"
+         there is:
+<merijn> :t fromMaybe
+<lambdabot> a -> Maybe a -> a
+<merijn> > fromMaybe 0 (Just 3)                                         [17:41]
+<lambdabot>  3
+<merijn> > fromMaybe 0 Nothing
+<lambdabot>  0
+<merijn> jusss: If you wanna apply a function, but only IF you have a number,
+         there's fmap
+<merijn> > fmap (+1) (Just 3)
+<lambdabot>  Just 4
+<merijn> > fmap (+1) Nothing
+<lambdabot>  Nothing
+<merijn> > fmap even (Just 3)                                           [17:42]
+<lambdabot>  Just False
+<jusss> merijn: put value and Nothing into Just?
+<merijn> Not sure what you mean by that? :)
+<jusss> merijn: my bad English
+<jusss> merijn: put value into a box, and operate value by operate box,
+                                                                        [17:43]
+<merijn> :t pure
+<lambdabot> Applicative f => a -> f a
+<jusss> I don't box if it's a proper express
+<merijn> > pure 3 :: Maybe Int                                          [17:44]
+<lambdabot>  Just 3
+<Ariakenom> jusss: You can compare to a list that has zero or one element
+                                                                        [17:47]
+<jusss> Ariakenom: Just 3 is 3 or Nothing?
+
+<merijn> jusss: No, "Maybe Int" means something is "Just 3" or "Nothing"
+
+
+<jusss> merijn: is there a value "Maybe 3"?                             [17:49]
+<merijn> jusss: "Just" is a constructor that takes a value of type 'a' to make
+         a value of type 'Maybe a' and Nothing is a constructor that has no
+         arguments and makes values of type 'Maybe a'
+
+<Ariakenom> "Just 3 :: Maybe Int", "Nothing :: Maybe Int" "[3] :: [Int]"
+
+
+<jusss> eiGHttt 当时我就在想Just 3是值，那怎么玩，毕竟不能Just 3 + Just 3, 后
+        来我发现原来这个值还能再展开提取3
+<jusss> eiGHttt 我现在感觉你如果给我说 A B C D E F whatever是个值，我都信了
+                                                                        [17:28]
+<eiGHttt> (+)的类型是Num a => a -> a -> a，Just 3明显不满足。
+<eiGHttt> 装个ghci看看每个值的类型，不要瞎想。                          [17:29]
+<jusss> 问题是这么一长串用空格分隔的东西竟然能是一个值
+<eiGHttt> 柯里函数再了解一下。
+<jusss> eiGHttt 还有个最大的问题，在其它语言，除了identifier的名字如函数名和变
+        量名，其它都是字符串，而在haskell有太多的如 Point {a=3, b=2}这种值
+                                                                        [17:31]
+<eiGHttt> '\\ (+) <$> Just 3 <*> Just 3
+<jusss> Point虽然是个函数，但a在其它字典里也应该是字符串"a", 虽然这里也是函数，
+<varia> eiGHttt: Just 6
+<eiGHttt> 不明白你的纠结什么。                                          [17:32]
+<jusss> eiGHttt haskell里有很多名字不需要加字符串" "
+
+<jusss> eiGHttt 那个haskell提取这种Just 3值里的3，怎么提取的? 
+*** houye (~houye@124.160.215.51) has quit: Ping timeout: 240 seconds   [17:36]
+<eiGHttt> 有个just可以取出Maybe a的a，如果是Nothing会中断。             [17:37]
+<eiGHttt> 一般都不会直接取出来的，到后面Functor会有更加通用的做法。
+                                                                        [17:38]
+<eiGHttt> 像上面(+) <$> Just 3 <*> Just 3，这是Applicative处理方式。如果有
+          Nothing有不出问题。
+<eiGHttt> '\\ (+) <$> Nothing <*> Just 3
+<varia> eiGHttt: Nothing                                                [17:39]
+<eiGHttt> 不要眼钉着Just，Maybe还有另一值——Nohting。
+
+<jusss> eiGHttt t :: Maybe a -> a 这个定义咋写
+<jusss> eiGHttt 我见别的是用record 那种方式 Point = { a =b } 可以在定义时 把b
+        提取                                                            [18:04]
+<jusss> 或者 in case of 什么的提取
+<eiGHttt> data Point = Point { a :: int }，a的类型就是a :: Point -> Int。
+                                                                        [18:06]
+<eiGHttt> haskell没有“对象.属性”这种用法，数值和操作分开。
+<eiGHttt> 多看几遍书，拿出ghci动动手操作一下。                          [18:07]
+
+
+
+#################################
+
+haskell的入口点是main=
+main = putStrLn "hello world"
+
+connect multiple I/O
+main = do
+       putStrLn "hello, what's you name?"
+       name <- getLine
+       putStrLn ("Hey " ++ name ++ ", you rock!")
+
+module X where
+main :: IO()
+main = do
+  putStrLn "what's your name"
+  name <- getLine
+  putStrLn ("hi " ++ name)
+
+##########################################################
+
+data定义类型时等号左边的是type constructor,右边的是value constructor
+Just 3就是一个值，Just 3的type是Just Int
+
+###############################################################
+
+Just 3是个value。它的type是Maybe Int
+data Point = Point Int Int,     Point 3 3也是个值，它的type是Point
+data Point a b = Point a b,    Point 3 3的type 是Point Int Int
+
+<jusss> Just 3 is a value? and its type is Maybe Int?
+<cocreature> jusss: technically integer literals are polymorphic so it’s type
+             is Num a => Maybe a                                        [14:37]
+<cocreature> but since Int is an instance of Num you can use it as type Maybe
+             Int                                                        [14:38]
+<jusss> cocreature: and Just 3 is a value?                              [14:39]
+<Axman6> yes
+<jusss> cocreature: in other languages, I know String Int can be value, but in
+        haskell this type stuff really blow up my mind                  [14:40]
+<jusss> Axman6:  Just 3 is a value and it's a value of the type Maybe Int,
+        right?                                                          [14:41]
+<Axman6> yep
+<jusss> data Point = Point Int Int,      let p1 = Point 1 1, and p1 is Point 1
+        1,    this Point 1 1 is a value too?                            [14:42]
+<jusss> and Point 1 1's type is ?
+<jusss> is Point Int Int?                                               [14:43]
+<Axman6> it's worth exploring a little further; 1 is a value of type Int
+         (which can be written more concisely as 1 :: Int). Just is a
+         _function_ of type a -> Maybe a, a.k.a, Just :: a -> Maybe a. since a
+         can be anything, when Just, which is a function, is applied to 1
+         which is an Int, Just 1, the a is chosen to be Int, and you get Just
+         1 :: Maybe Int
+<Axman6> Point 1 2 :: Point - Point does not have any type parameters
+<cocreature> using different names for the constructor and the type might be
+             more helpful
+<cocreature> "data PointTy = PointConstr Int Int"                       [14:44]
+<cocreature> PointConstr 1 1 :: PointTy
+<Axman6> you could have data Tuple a = Tuple a a, and in that case, Tuple 1 2
+         :: Tuple Int
+<jusss> Axman6: Point 1 1 is a value and its type is Point, right?
+<Axman6> yep
+<jusss> data Point a b = Point { what = a, ever = b}      let x = Point 3 5
+<jusss> Axman6: so I can define any types if I want in haskell?
+<dminuoso> jusss: The syntax is slightly off, but yes you can create custom
+           data types - and you should.
+
+<jusss> eiGHttt[m]: Just 3可以是一个值吗？
+<eiGHttt[m]> 你需要进去ghci具体操作一下。                               [14:36]
+<jusss> eiGHttt[m]: 我怎么判断一个东西是不是值
+<eiGHttt[m]> 基本都是值，函数也是值。
+<eiGHttt[m]> Point 3 :: Int -> Point                                    [14:37]
+<eiGHttt[m]> Point 3 3 :: Point
+<eiGHttt[m]> 写成Point 3 $ Point 3也可以，只是编译器会告诉你类型不对。
+<jusss> eiGHttt[m]: data Point = Point Int Int,    Point 3 3竟然是一个值，
+                                                                        [14:50]
+<jusss> eiGHttt[m]: Just 3也是一个值
+<jusss> eiGHttt[m]: 和其它语言的只有字符串 整数才能做值完全不一样
+<eiGHttt[m]> Point :: Int -> Int -> Point，haskell参数调用可以省略括号，Point
+             3 3 = Point(3, 3)                                          [14:51]
+<eiGHttt[m]> Just同理。                                                 [14:52]
+
+#######################################################
+
+data Person = Person ( firstName :: String
+                                        , lastName :: String
+                                        , age :: Int
+                                        ) deriving (Eq)
+
+turn it to an instance of the typeclass Eq, you can use == or /=
+
+mikeD = Person (firstName = "Michael", lastName = "Diamond", age=43)
+adRock = Person (firstName = "Adam", lastName="Horovitz",age=41)
+mca=Person(firstName="Adam",lastName="Yauch",age=44)
+
+mca==adRock     False
+mikeD == adRock False
+mikeD == mikdeD  True
+
+http://aducode.github.io/posts/2015-07-02/learn_haskell_lession1.html
+
+-- 定义了一种新的类型Test
+-- 但是他没有构造函数，只能用作类型参数
+data Test
+
+--定义了一种新的类型Person，构造函数也是Person
+data Person = Person
+
+data Person = Person String Int
+这样定义Person类型，可以保存两种数据:String类型和Int类型 注意:上面代码等号左边的Person是类型，右边Person叫做构造函数(constructor)，左右并不一定要名字一致，而且构造函数可以有多个，之间用"|"隔开
+
+data Person = Student String Int | Teacher String Int Double
+Person是类型,Student是一个构造函数(Student::String->Int->Person),Teacher也是一个构造函数(Teacher::String->Int->Double->Person)
+
+let person1 = Student "XiaoMing" 12
+let person2 = Teacher "LaoZhang" 30  5000
+这样person1和person2就都是Person类型数据了 若要取Person类型中的名字，我们可以定义这样的函数
+
+getName::Person->String
+getName (Student name _) = name
+getName (Teacher name _  _) = name
+getName (Teacher "LaoZhang" 30 5000)
+
+为了自定义类型用起来方便，haskell还提供了另外一种构造函数(haskell的语法糖)
+
+
+-- 注意字段之间的逗号
+data Person = Student{name::String,age::Int}
+            |Teacher{name::String,age::Int,wage::Double}
+let person1 = Student{name="XiaoMing", age=12}
+let person2 = Teacher{name="LaoZhang", age=30, wage=5000}
+name person2
+
+用这种构造函数，haskell会自动生成相应的取值函数，比如name::Person->String age::Person->Int
+
+类型也可以带参数(不是构造函数带参数哦~)，就像这样：
+
+
+data Entry a b = Entry{key::a,value::b}
+let p1 = Entry 1 "Foo"
+let p2 = Entry "Bar" 3.5
+let p3 = Entry{key="A",value="HHHH"pp}
+let p4 = Entry (1::Double)  2
+let p5 = Entry{key=1::Double, value=2}
+
+上面的Entry中可以保存任何类型的a和b
+
+除了上面标准的data用法外，还可以使用Generalised algebraic datatype(GADT)
+
+
+{-# LANGUAGE GADTs #-}
+data Person where
+    Student::String->Int->Person
+    Teacher::String->Int->Double->Person
+
+
+data Entry a b where
+    --前面的Entry是构造函数名 后面的Entry是定义的new type名称
+    Entry::a->b->Entry 
+
+--使用GADTs还可以添加更多的类型限定
+data E a where
+    A::Eq b=>b->E b
+
+Record Wildcards扩展，可以让代码更简洁
+
+{-# LANGUAGE RecordWildCards    #-}
+data Person = Person{
+        name::String,
+        age::Int
+}deriving(Show)
+
+getPerson::IO Person
+getPerson = return $ Person "Duyang" 13
+
+main::IO ()
+main = do
+        -- 不使用扩展
+        person <- getPerson
+        putStrLn $ show $ name person
+        putStrLn $ show $ age person
+        -- 使用扩展,其中person2代表匹配到的Person类型整体
+        person2@Person {..} <- getPerson
+        putStrLn $ show name
+        putStrLn $ show age
+        putStrLn $ show person2
+
+#########################################################
+<jusss> about type constructor and value constructor, I'm confused,   data
+        Maybe a = Nothing | Just a,   Maybe is a type constructor and it takes
+        one type then construct this type with Nothing and Just a, and what is
+        the a in Just a?                                                [09:36]
+<slack1256> Just (5 :: Int) :: Maybe Int
+<lyxia> jusss: it's the type of the only field of the Just data constructor
+<jusss> lyxia: Just is a value constructor, and put Just in the type parameter
+        a, that's ok?                                                   [09:38]
+<jusss> or the a after = is not a type , is a value?
+<c_wraith> the syntax for data declarations does mix types and values, yes
+<c_wraith> data Foo a = Bar String Int a
+<c_wraith> Bar is a value, String, Int and a are all types.
+-------------------------------------------------
+module Main where
+data Foo a = Bar String Int a
+:t Bar
+Bar :: String -> Int -> a -> Foo a
+let p1 = Bar "3" 3 2
+:t p1
+p1:: Num a => Foo a
+------------------------------------------------------------
+<jusss> what?
+<c_wraith> data constructors are values.
+<jusss> c_wraith: what it means? Bar String Int a
+<c_wraith> you can't just extract that one portion in a meaningful way.
+<c_wraith> you need the whole line.
+<c_wraith> it is declaring a data type named Foo. the type takes one
+           parameter, named a within the scope of the declaration.      [09:43]
+<jusss> c_wraith: Bar String Int a, is what I don't understand,         [09:44]
+<c_wraith> the type is defined as the constructor Bar with 3 arguments. in
+           order, the arguments have the types String, Int, and a
+<c_wraith> that's just the syntax for a (non-record) data
+           declaration. constructor name followed by the types of the
+           arguments of the constructor. if there are multiple constructors,
+           they each have the same syntax with a | separating them.     [09:47]
+<c_wraith> it's a very concise syntax, but it definitely has some clarity
+           issues for beginners.                                        [09:49]
+<jusss> it really makes me confused, the type stuff in haskell          [09:52]
+<c_wraith> well, we could simplify a lot. here's an actual definition from the
+           standard library:                                            [09:53]
+<c_wraith> data Bool = False | True
+<c_wraith> the Bool data type has two constructors. neither takes an argument.
+<c_wraith> is that a thing that makes sense?                            [09:55]
+<jusss> Bool is a type constructor, it doesn't take one type parameter, and it
+        constructs two type by False and True, and False and True is what?
+<jusss> type constructor or value constructor
+<jusss> and what 's the different between value and value constructor?
+
+<jusss> type constructor ,follow the name, it should consturct a type, so Bool
+        should construct a type                                         [09:59]
+<c_wraith> well, um.. type constructors make types. data constructors make
+           values of a particular type.
+<c_wraith> types exist at compile time - they let you specify which values are
+           possible in different places.                                [10:00]
+<c_wraith> values are the things that actually exist in memory when the
+           program runs.
+<jmcarthur> jusss: One could imagine a syntax more like some imperative
+            languages.  Bar("string", 42, True) would have type Foo<Bool>           
+
+##########################
+
+module Main where
+
+data Point = Point Int  Int deriving (Show)
+
+main :: IO ()
+main = do
+  let p1 = Point 1 2
+  let p2 = Point 3 2
+  print p1
+  print p2
+
+<eiGHttt[m]> data Point = ...，定义一个叫Point的类型， ... = Point Int Int，定
+             义了Point这个函数，它的类型是Point :: Int -> Int -> Point。
+                                                                        [11:18]
+<eiGHttt[m]> 左侧是数值，右侧是类型，没有递归。
+<eiGHttt[m]> data Point = P Int Int，P :: Int -> Int -> Point。
+<eiGHttt[m]> 它可以跟类型同名而已。                                     [11:19]
+<jusss> eiGHttt[m]: 那这个P是个函数？
+<eiGHttt[m]> 都说了值构造器就是个函数。
+<eiGHttt[m]> 类构造器也是函数，它接受的参数是类型；值构造器的参数是数值。
+                                                                        [11:20]
+<jusss> eiGHttt[m]: 那直接下一步，类型是为了给值用的，那什么值是这个类型
+<jusss> eiGHttt[m]: 给我个P类型的值
+<eiGHttt[m]> 不，P不是类型，Point才是。P是用来制成Point的，不然你用何种方式才
+             能生成Point？                                              [11:21]
+<jusss> eiGHttt[m]: 那给我个Point类型的值
+<jusss> eiGHttt[m]: 我是不是还要定义给P函数？
+<eiGHttt[m]> P已经帮你定义好了。                                        [11:22]
+<jusss> eiGHttt[m]: 哪里？
+<eiGHttt[m]> P 1 2 :: Point
+<jusss> eiGHttt[m]: 那Point类型的值长啥样
+<eiGHttt[m]> 写出data Point = ..就已经定义好了。
+<eiGHttt[m]> 无法回答。                                                 [11:23]
+<eiGHttt[m]> https://paste.ubuntu.com/p/7RSFd2x4kk/                     [11:24]
+<jusss> eiGHttt[m]: Point 1 2                                           [11:29]
+
+###############################################
+
+data Tree a = Branch (Tree a) (Tree a) | Leaf a
+Here, one of the constructors, Branch of Tree takes two trees as parameters to the constructor, while Leaf takes a value of type a. This type of recursion is a very common pattern in Haskell. 
+
+等号左边的是type constructor, 右边的是value constructor
+type constructor构造出type, 然后签名时可以使用这个type
+
+module X where
+
+data Car = Car {company::String
+  ,model::String
+  ,year::Int
+  } deriving(Show)
+ 
+main = Car {company="Ford",model="Mustang",year=1999}
+
+##############################################
+
+type constructor and value constructor
+
+It's a bit like saying "why do we need classes and objects if objects are the only thing that actually runs?"
+
+The two sorts of constructors do different jobs. Type constructors go in type signatures. Value constructors go in runnable code.
+
+In the simplest case, a type "constructor" is just a type name. In the simplest case, a type has only one value constructor. So you end up with things like
+
+data Point = Point Int Int
+
+You might say to yourself "now why the heck to I need to write Point twice?"
+
+But now consider a less trivial example:
+
+data Tree x = Leaf x | Branch (Tree x) (Tree x)
+
+Here Tree is a type constructor. You give it a type argument, and it "constructs" a type. So Tree Int is one type, Tree String is another type, and so on. (Like templates in C++, or generics in Java or Eiffel.)
+
+On the other hand, Leaf is a value constructor. Given a value, it makes a 1-node tree out of it. So Leaf 5 is a Tree Int value, Leaf "banana" is a Tree String value, and so on.
+
+Similarly for Branch. It takes two tree values and constructs a tree node with those trees as children. For example, Branch (Leaf 2) (Leaf 7) is a Tree Int value.
+
+https://stackoverflow.com/questions/10242709/why-is-there-a-value-constructor-in-addition-to-the-type-constructor-in-haskell
+
+##############################################
+
+data Maybe a = Nothing | Just a
+a is a type parameter, Maybe is a type constructor,  if it's not Nothing,
+it can be Maybe Int, Maybe String ,   Maybe is not a type, is a type constructor
+
+give the type Char to Maybe , it returns Maybe Char type
+Just 'a' type is Maybe Char
+
+<eiGHttt[m]> 定义个类型Maybe a，a可以是其它任何具体类型。顺便有两个函数可以构
+	     造出这个类型。
+<eiGHttt[m]> 把Maybe理解成枚举也不差。				        [17:04]
+<eiGHttt[m]> jusss: Maybe理解不了的话，去理解Bool吧。		        [17:05]
+<eiGHttt[m]> 到很后面会有类型的类型的概念，叫kind，Maybe的kind :: * -> *，
+	     Maybe Int的kind :: *。				        [17:23]
+<eiGHttt[m]> 简单来理解，Maybe a，表示需要个a类型才能现在出完整的类型信息，你
+	     可以写出f :: Int -> Maybe Int，但写不出f :: Int -> Maybe。
+<eiGHttt[m]> 跟列表[]对比，“给我一个列表”没什么意义，“给我一个苹果的列表”
+	     才会表现出具体类型。所以[]的kind跟Maybe一样。
+
+enumeration /ɪˌnjuːmə'reɪʃn/ 列举
+
+declaration
+enum days-of-week { sun, mon, tue,  wed, thu, fre, sat}
+
+instance, instantiation
+enum days-of-week special-day;
+
+operation
+special-day = mon;      and day is 1
+
+######################################
+
+data Person = Person String String Int Float String String deriving (Show)
+let guy = Person "Buddy" "Finklestein" 43 184.2 "526-2928" "Chocolate"
+
+record syntax			   
+data Person = Person { firstName :: String
+     	      	           ,lastName :: String
+			   ,age :: Int
+			   ,height::Float
+			   ,phoneNumber::String
+			   ,flavor::String} deriving (Show)
+firstName is a function auto generated by haskell
+firstName :: Person -> String
+
+Person (firstName="Ford", lastName="Wonders", age=35, height=1.80 ,phoneNumber="18000000000", flavor="movie")
+			   
+###################
+module Shapes
+(Point(..)
+,Shape(..)
+,area
+) where          import all the value constructor of Shape by append (..) to Shape
+
+#####construct your own data type
+
+data Bool = False | True           the part after = is value constructor
+data Int = -2147483648 | -2147483647 | ... | -1 | 0 | ... | 2147483647
+data Shape = Circle Float Float Float | Rectangle Float Float Float Float
+Circle and Rectangle are value constructor
+
+a value constructor is a function!
+
+data Shape = Circle Float Float Float Float | Rectangle Float Float Float Float deriving (Show)
+deriving (Show) will make it into the Show typeclass
+
+####module in haskell
+Geometry.hs
+module Geometry
+( f1
+,f2
+,f3
+) where
+
+f1 :: Float -> Float
+f1 radius = (4.0 / 3.0) * pi * (radius ^ 3)
+
+
+you can import it in other file, use     import Geometry
+
+or it can have sub modules
+Directory Geometry, there're Sphere.hs Cuboid.hs and Cube.hs
+
+Sphere.hs
+module Geometry.Sphere
+(volume
+,area
+) where
+
+volume :: Float -> Float
+volume radius = (4.0/3.0) * pi * (radius ^ 3)
+
+you can import it by import Geometry.Sphere then use volume function
+
+################################################
+
+<eiGHttt[m]> 如果是说haskell的话，记得关键字符号就几个：->、=>、<-。
+<jusss> eiGHttt[m]: $ >>  << `a` |
+<eiGHttt[m]> 这些都是函数，只不过它们名字就叫这个。		        [11:23]
+<eiGHttt[m]> `f`是中缀函数。其它都是函数，你要不喜欢，写成字母也行。
+<eiGHttt[m]> <$> = fmap
+<eiGHttt[m]> '\\ (+ 1) `fmap` Just 1				        [11:26]
+<jusss> '\\(+ 1) <$> Maybe 1					        [11:27]
+<eiGHttt[m]> jusss: Maybe是类型构造器，用来构造类型的。
+<jusss> eiGHttt[m]: oh
+<eiGHttt[m]> jusss: Just和Nothing才是用来构造值。		        [11:28]
+
+#################################################
+
+windows 10 iso download
+https://pc-karuma.net/windows10-october-2018-update-1809-install-media/
+download the mediacreationtool1809.exe and run to download the iso
+use ultroiso to burn this iso into an usb-stick, then boot the computer from it
+down the neccesary drivers from the official website of computer, and use win10's
+default device-manager to update other drivers, if you download the same version
+iso as your default system version that comes with you computer, it may be activited
+by default through motherboard number
+
+###############################################
+<jusss> eiGHttt[m]: A :: Int -> Maybe Float 这句话怎么立即？	        [17:48]
+<eiGHttt[m]> 跟Bool一样，你不可能同时即是True又是False，Maybe Float要么是Float，
+	     要么是Nothing。					        [17:50]
+<eiGHttt[m]> 所以你要处理是Nothing的另一个情况。
+
+<jusss> eiGHttt[m]: quicksort :: (Ord a) => [a] -> [a]		        [17:55]
+<jusss> (Ord a) 怎么理解？ 比较a的大小？			        [17:56]
+<eiGHttt[m]> 对，Ord表示可比较大小。				        [17:57]
+<eiGHttt[m]> 你创建新类型，满足Ord，也能用这个函数。类型类就是为了函数复用。
+
+<jusss> eiGHttt[m]: 关于类型类 typeclass, 这个怎么理解呢？比如经常见到 Eq Ord
+<jusss> eiGHttt[m]: 类型约束经常见到				        [17:52]
+<jusss> (Eq a) -> a -> a -> Bool
+<eiGHttt[m]> 字面意思了，就是要么类型必须满足某种条件（约束）。
+<jusss> (Eq a) => a
+<eiGHttt[m]> 上面a必须满足Eq。					        [17:53]
+<jusss> 但是Eq这个typeclass到底是啥
+<eiGHttt[m]> 看它的定义。
+<eiGHttt[m]> 除了Eq，Ord，还有Foldable，Num等等，你也可以自己创建。
+								        [17:54]
+<jusss> eiGHttt[m]: quicksort :: (Ord a) => [a] -> [a]		        [17:55]
+<jusss> (Ord a) 怎么理解？ 比较a的大小？			        [17:56]
+<eiGHttt[m]> 对，Ord表示可比较大小。				        [17:57]
+<eiGHttt[m]> 你创建新类型，满足Ord，也能用这个函数。类型类就是为了函数复用。
+<jusss> eiGHttt[m]: 哦，我刚开始看learn you a haskell for great good
+								        [17:58]
+<eiGHttt[m]> data MyBool = B | T deriving (Eq, Ord)，那么你就能写  B == T 或 B
+	     > T。
+<jusss> eiGHttt[m]: 就是想看懂elm才发现需要先看haskell		        [17:59]
+<eiGHttt[m]> 学haskell是个漫长的过程，尤其没人指导的情况下。
+<jusss> eiGHttt[m]: 干啥都先写个格式				        [18:00]
+<eiGHttt[m]> 格式？
+<jusss> eiGHttt[m]: type
+<jusss> eiGHttt[m]: type declaration
+<eiGHttt[m]> type就是类型别名，相当于shell的alias。看个人喜好吧，类型太长会这
+	     么写。
+<jusss> eiGHttt[m]: 强制currying感觉有个好处就是，我甚至可以 可以把map 也
+	currying
+<jusss> f = map f'						        [18:02]
+<jusss> f alst
+<eiGHttt[m]> 个人喜好，有人喜欢point-free风格，自然会有人不喜欢。
+<jusss> eiGHttt[m]: pointless					        [18:03]
+<jusss> eiGHttt[m]: 这两天烦恼FFI, guile or python , 然后最后发现看不懂C, FFI卒
+								        [18:04]
+<jusss> eiGHttt[m]: 听说haskell特别擅长写DSL
+<jusss> 我感觉看懂haskell的syntax 都比其它语言费时间		        [18:05]
+<eiGHttt[m]> 没括号和逗号，自身看来像DSL而已。如果用它写解释器就另一回事了。
+<jusss> eiGHttt[m]: 而且它和bash很像，都有$ 还有 catchall pattern
+<jusss> eiGHttt[m]: 还有中缀 `x`
+<eiGHttt[m]> $也是函数。
+<jusss> 这才像命令式语言
+<eiGHttt[m]> 跟bash相比较……下班了。				        [18:07]
+<jusss> eiGHttt[m]: bye
+<jusss> 又一天一事无成
+<jusss> 我的comprehension太差
+
+###########################################
+
+#define QIC_API QI_LIB_API(qic)
+typedef struct qi_session_t_s qi_session_t;
+
+ QIC_API qi_session_t *qi_session_create();
+
+
+#################################
+typedef interpretation is performed by the compiler whereas #define statements are processed by the pre-processor.
+
+The syntax of #define is :-
+
+#define CNAME (expression)       #define MAX(a, b)   ((a)>(b)? (a) : (b))
+OR
+#define CNAME value
+
+#######################################
+
+structure in C
+
+Structures are used to represent a record.
+To define a structure, you must use the struct statement.
+struct Books {
+   char  title[50];
+   char  author[50];
+   char  subject[100];
+   int   book_id;
+} book;     /* variable book is a Books structure, same as struct Books book, if its p[20] means variable p having 20 elements of type struct Books */
+struct Books Book1;        /* Declare Book1 of type Book */
+ Book1.book_id = 6495407;
+
+/* function declaration */
+void printBook( struct Books book );
+
+/* function definition */
+void printBook( struct Books book ) {
+
+   printf( "Book title : %s\n", book.title);
+   printf( "Book author : %s\n", book.author);
+   printf( "Book subject : %s\n", book.subject);
+   printf( "Book book_id : %d\n", book.book_id);
+}
+
+/* function call */
+printBook( Book1 );
+
+/* Pointers to Structures */
+struct Books *struct_pointer;
+struct_pointer = &Book1;
+/* access member via pointers */
+struct_pointer->title;       https://www.tutorialspoint.com/cprogramming/c_structures.htm
+
+typedef, which you can use to give a type a new name.
+
+typedef unsigned char BYTE;
+
+After this type definition, the identifier BYTE can be used as an abbreviation for the type unsigned char, for example..
+BYTE  b1, b2;
+
+typedef struct Books {
+   char title[50];
+   char author[50];
+   char subject[100];
+   int book_id;
+} Book;  /* alias */
+
+Book book;  same as struct Books book
+
+fire up, /* start the engine */
+
+
+###############################################################
+
+[周三 2月 27 2019]
+*** You have joined channel #qi					        [13:08]
+*** Topic for #qi: qiBuild: https://github.com/aldebaran/qibuild | libqi:
+    https://github.com/aldebaran/libqi
+*** #qi: topic set by Phlogistique, 2016-02-05 17:01:14
+*** Users on #qi: jusss alkino newnick blastrock dmerejkowsky Phlogistique
+    vbarbaresi smartin thegameg
+*** #qi modes: +ct
+*** #qi was created on 2010-01-30 07:53:26
+<alkino> hi							        [14:53]
+*** StormPhlegyas (~Phlegyas@lstlambert-657-1-100-146.w90-63.abo.wanadoo.fr)
+    has joined channel #qi					        [15:11]
+*** StormPhlegyas (~Phlegyas@lstlambert-657-1-100-146.w90-63.abo.wanadoo.fr)
+    has quit: Ping timeout: 255 seconds				        [15:16]
+<jusss> alkino: are you familar with guile?			        [16:04]
+<jusss> I'm tring do FFI with guile, but my comprehension is not good   [16:05]
+<alkino> not at all						        [16:06]
+<alkino> I don't know what is guile
+<jusss> alkino: it's scheme variant
+<jusss> alkino: I saw guile on the pepper
+<alkino> anybody here work in the company anymore		        [16:09]
+<alkino> it's not gramatically correct but you get the point, I guess
+<jusss> yeah, 							        [16:10]
+<alkino> so we are no more aware of everything new		        [16:11]
+<jusss> alkino: could you help me do FFI in python?
+<jusss> even it provides something, I'm tring to learn something about FFI
+								        [16:12]
+<jusss> but no one can help me that people around me
+<alkino> in softbank we use boost-python			        [16:13]
+<alkino> https://www.boost.org/doc/libs/1_69_0/libs/python/doc/html/index.html
+	 really powerful library above ffi
+<alkino> you can see examples here : https://github.com/aldebaran/libqi-python
+<jusss> ok
+<jusss> https://github.com/aldebaran/libqi-capi			        [16:33]
+<jusss> where is the session.h?					        [16:34]
+<jusss> oh, I found it						        [16:35]
+<jusss> it's in qic
+<alkino> qic : public headers					        [16:41]
+<alkino> src : private headers / sources
+<alkino> _p.h means private					        [16:42]
+*** StormPhlegyas (~Phlegyas@lstlambert-657-1-100-146.w90-63.abo.wanadoo.fr)
+    has joined channel #qi					        [17:07]
+*** StormPhlegyas (~Phlegyas@lstlambert-657-1-100-146.w90-63.abo.wanadoo.fr)
+    has quit: Ping timeout: 244 seconds				        [17:12]
+*** StormPhlegyas (~Phlegyas@lstlambert-657-1-100-146.w90-63.abo.wanadoo.fr)
+    has joined channel #qi					        [17:15]
+<jusss> alkino: I still have no idea how to do FFI in python, I saw an
+	ariticle about cffi, it said just ffi.cdef(""" header code """) then
+	ffi.dlopen("whatever.so") then I can call it, but I don't know to do
+	with libqi, I should use ffi.cdef import those headers and dlopen
+	libqic.so? but there're so many files, I have no idea about sequence,
+	it's beyond my capability now				        [17:21]
+*** mizux (~mizux@104.132.117.85) has joined channel #qi	        [17:34]
+ERC> 
+
+https://www.boost.org/doc/libs/1_69_0/libs/python/doc/html/index.html
+boost python
+
+###########################
+
+/home/nao/.local/bin/pip install --user CFFI
+ from cffi import FFI
+ffi = FFI()
+ffi.cdef("""
+	head-file like function declare or typedef struct
+	""")
+lib = ffi.dlopen('./libvect3.so')
+lib.function-defined-in-head-file(parameters)
+
+reference:  https://blog.csdn.net/itisyang/article/details/54426631
+############################################
+
+Archive libraries (.a) are statically linked i.e when you compile your program with -c option in gcc. So, if there's any change in library, you need to compile and build your code again.
+The advantage of .so (shared object) over .a library is that they are linked during the runtime i.e. after creation of your .o file -o option in gcc. So, if there's any change in .so file, you don't need to recompile your main program. But make sure that your main program is linked to the new .so file with ln command.
+
+
+telegram can be registed by textnow or google voice, 'cause textnow use america
+so choose +1 then you textnow code, if you choose america as you country
++1 (91x) 78x-689x
+
+safe strage
+yandex mail -> textnow -> telegram -> paypal ->apple account
+
+####################################
+.a are static libraries. If you use code stored inside them, it's taken from them and embedded into your own binary. In Visual Studio, these would be .lib files.
+.so are dynamic libraries. If you use code stored inside them, it's not taken and embedded into your own binary. Instead it's just referenced, so the binary will depend on them and the code from the so file is added/loaded at runtime. In Visual Studio/Windows these would be .dll files (with small .lib files containing linking information).
+
+Scheme Procedure: dynamic-link [library]    A.K.A dlopening
+Scheme Procedure: dynamic-unlink dobj
+Scheme Procedure: dynamic-func name dobj    Return a “handle” for the func name in the shared object referred to by dobj. The handle can be passed to dynamic-call to actually call the function.
+Scheme Procedure: dynamic-call func dobj
+Scheme Procedure: load-extension lib init
+Scheme Procedure: pointer->procedure return_type func_ptr arg_types [#:return-errno?=#f]
+
+#########################################
+
+pip install cffi
+ffi.dlopen(libqic.so)
+
+"""
+FFI(Foreign Function Interface)是用来与其它语言交互的接口，
+在有些语言里面称为语言绑定(language bindings)，
+Java 里面一般称为 JNI(Java Native Interface) 或 JNA(Java Native Access)。
+由于现实中很多程序是由不同编程语言写的，必然会涉及到跨语言调用，比如 A 语言写的函数如果想在 B 语言里面调用，这时一般有两种解决方案：一种是将函数做成一个服务，通过进程间通信(IPC)或网络协议通信(RPC, RESTful等)；另一种就是直接通过 FFI 调用。前者需要至少两个独立的进程才能实现，而后者直接将其它语言的接口内嵌到本语言中，所以调用效率比前者高。
+"""
+
+############################################################
+
+[周二 2月 26 2019]
+*** You have joined channel #qi					        [10:12]
+*** Topic for #qi: qiBuild: https://github.com/aldebaran/qibuild | libqi:
+    https://github.com/aldebaran/libqi
+*** #qi: topic set by Phlogistique, 2016-02-05 17:01:14
+*** Users on #qi: jusss mizux alkino StormPhlegyas thegameg smartin vbarbaresi
+    Phlogistique dmerejkowsky blastrock newnick
+*** #qi modes: +ct
+*** #qi was created on 2010-01-30 07:53:26
+<jusss> anyone here?
+
+[周二 2月 26 2019]
+*** You have joined channel #qi					        [12:05]
+*** Topic for #qi: qiBuild: https://github.com/aldebaran/qibuild | libqi:
+    https://github.com/aldebaran/libqi
+*** #qi: topic set by Phlogistique, 2016-02-05 17:01:14
+*** Users on #qi: jusss mizux alkino StormPhlegyas newnick blastrock
+    dmerejkowsky Phlogistique vbarbaresi smartin thegameg
+*** #qi modes: +ct
+*** #qi was created on 2010-01-30 07:53:26
+<alkino> yes jusss						        [14:28]
+<jusss> alkino: how I can use javascript to make pepper do something without
+	python?							        [14:29]
+<jusss> alkino: I know there're python tornado and SimpleHTTPServer on pepper,
+	can I use javascript to make pepper do something without ALTablet?
+								        [14:31]
+<alkino> yes							        [14:32]
+<jusss> alkino: I'd like to make pepper as a web server, and it doesn't
+	display something on the its tablet, I want to control it through
+	javascript that on the website				        [14:33]
+<jusss> alkino: how ?
+<alkino> i can't remember well (don't work for the company for 2 years now)
+								        [14:40]
+<alkino> there is a file ".js" which talk in websocket to the python tornadio
+<alkino> that's the way
+<jusss> alkino: the libqi, 					        [14:42]
+<alkino> which language for you?
+<alkino> I find a french website which explained well
+<jusss> alkino: English
+<alkino> hum							        [14:43]
+<jusss> alkino: french is ok, I can use google translate
+<alkino> http://doc.aldebaran.com/2-4/dev/js/index.html
+<jusss> alkino: I saw this page, but this only works in choregraphe     [14:44]
+<alkino> ok							        [14:47]
+<alkino> do you know packagemanager?
+<jusss> alkino: yeah
+<alkino> you can forge a package and install it through packagemanager
+<alkino> (that's the dirty way)
+<jusss> alkino: there's package manager for js? I saw there's python and java
+								        [14:48]
+<alkino> ?
+<alkino> I speak about the packagemanaer of pepper
+<jusss> ok, I know you mean					        [14:49]
+<alkino> http://doc.aldebaran.com/2-4/naoqi/core/packagemanager.html
+<jusss> alkino: you mean I should do something in choregraphe and use package
+	manager to install it?
+<alkino> yes							        [14:51]
+<alkino> and next you can run it on your tablet
+<jusss> ok, 							        [14:52]
+<alkino>
+	 http://doc.aldebaran.com/2-4/naoqi/core/packagemanager-api.html#PackageManager::onPackageInstalled__qi::Signal:qi::PackageInfo:
+	 je sais pas qui est le connard qu'a fait la doc, mais il manque la
+	 moitié des infos					        [14:56]
+*** mizux_ (~mizux@104.132.117.85) has joined channel #qi	        [15:01]
+<alkino> good luck						        [15:03]
+*** mizux_ (~mizux@104.132.117.85) has quit: Client Quit
+<alkino> tell us if you success or not				        [15:10]
+<jusss> alkino: ok						        [15:17]
+<jusss> alkino: I wonder is there other qi libraries for other langaues? like
+	haskell or scheme, I saw there's guile on the robot	        [15:19]
+<jusss> it even provides libs for julia
+<alkino> blastrock, do you remember all the funny languages you, cédric and
+	 mathieu did?						        [16:16]
+<blastrock> mathieu did haskell, cedric did julia		        [16:55]
+<blastrock> I don't know if haskell is still somewhere
+<blastrock> And I'm not sure they still compile :s
+<jusss> blastrock: where I can find it? or how I can build it?	        [17:19]
+<jusss> alkino: I found this
+	https://github.com/pepperhacking/studiotoolkit/blob/master/doc/js_robotutils.md
+								        [17:20]
+<blastrock> There's julia here https://github.com/aldebaran/libqi-julia
+								        [17:22]
+<blastrock> Basically, they're just wrappers over the c api	        [17:23]
+<blastrock> I think haskell has been lost			        [17:24]
+<blastrock> And I don't work at aldebaran anymore, so I can't help more ^^
+<jusss> blastrock: c api or c++ api?				        [17:25]
+<blastrock> c							        [17:27]
+<jusss> techically I can compile it if I have the c source code?
+<blastrock> The python and java bindings are written in c++, they are more
+	    efficient and maybe better integrated into the language, but they
+	    are much harder to write
+<jusss> if I have c code, I can do FFI in other languages, right?       [17:28]
+<blastrock> You don't need to recompile libqi I think you can use the one
+	    that's in your robot or in choregraphe for your desktop
+<blastrock> Yes
+<blastrock> That's the c api https://github.com/aldebaran/libqi-capi
+<blastrock> But I think it's already compiled, you don't need to do it
+	    yourself						        [17:29]
+<jusss> blastrock: it's compiled and on the robot?		        [17:30]
+<jusss> I found /opt/aldebaran/lib/libqi.so   libqic.so  libqicore.so   [17:38]
+<jusss> libqipython.so
+<alkino> libqic I guess						        [17:43]
+<blastrock> Yes, it's libqic.so					        [17:48]
+<vbarbaresi> omg les bindings julia, j'avais oublié. 5 years ago, sûr que ça
+	     marche plus					        [17:49]
+<vbarbaresi> https://github.com/aldebaran/libqi-julia/blob/master/qi/future.jl
+<vbarbaresi> très pro :D
+<blastrock> Hahaha						        [17:50]
+<blastrock> Actually, we tried to keep the c api very stable, so they might
+	    still work
+<jusss> finally, I should to learn FFI in haskell, and try do something with
+	haskell on pepper
+<jusss> or scheme						        [17:51]
+<jusss> and there's guile on the robot 				        [17:52]
+<blastrock> Here are other examples that use the c api if you need
+	    inspiration: https://github.com/aldebaran/libqi-go
+	    https://github.com/aldebaran/libqi-dotnet		        [17:53]
+<jusss> ok, 							        [17:54]
+ERC> 
+
+
+#######################################
+
+
+python comes with SimpleHTTPServer
+http://2ality.com/2014/06/simple-http-server.html
+$python -m SimpleHTTPServer 8080     it will search for index.html on current directory
+
+
+
+#############################
+
+
+type variable,   head :: [a] -> a   a is a type variable
+type is an instance of a typeclass,
+:t (==)   (==) :: (Eq a) => a -> a -> Bool
+=> means type constraint,
+
+check input is 7 or not
+lucky :: Int -> String
+lucky 7 = "lucky"
+lucky x = "out of lucky"        catchall pattern
+
+sayMe :: Int -> String
+sayMe 1 = "One"
+sayMe 2 = "Two"
+sayMe 3 = "Three"
+sayMe 4 = "Four"
+sayMe 5 = "Five"
+sayMe x = "Not between 1 and 5"
+
+"haskell use catchall pattern like that thing in iptables to instead of if-then-else chain"
+
+factorial :: Int -> Int
+factorial 0 = 1
+factorial n = n * factorial (n-1)
+
+third :: (a,b,c) -> c
+third (_,_,z) = z
+
+let xs = [(1,3), (4,3)]   
+[a+b | (a,b) <- xs]       [4,7]    list comprehension
+
+[1,2,3] is 1:2:3:[]
+x:xs is a list that head is x and the rest is xs
+
+
+
+
+#############################
+
+ String.toFloat
+<function> : String -> Maybe Float
+port cache : E.Value -> Cmd msg
+
+这个Maybe Float是个box里面存着Float
+Maybe是个type,
+type Maybe a = Just a | Nothing
+Cmd也是一个box里面装着一个msg
+
+
+### disable systemd-resolved in ubuntu
+sudo systemctl disable systemd-resolved.service
+sudo systemctl stop systemd-resolved
+
+Then put the following line in the [main] section of your /etc/NetworkManager/NetworkManager.conf:
+
+dns=default
+
+Delete the symlink /etc/resolv.conf
+
+rm /etc/resolv.conf
+
+Restart network-manager
+
+sudo service network-manager restart
+
+#################################################
+
+https://docs.python.org/3/library/argparse.html
+import argparse
+import qi
+
+###
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--ip", type=str, default="127.0.0.1",
+                        help="Robot IP address. On robot or Local Naoqi: \
+                        use '127.0.0.1'.")
+    parser.add_argument("--port", type=int, default=9559,
+                        help="Naoqi port number")
+
+    args = parser.parse_args()
+    session = qi.Session()
+    try:
+        session.connect("tcp://" + args.ip + ":" + str(args.port))
+    except RuntimeError:
+        print ("Can't connect to Naoqi at ip \"" + args.ip + "\" on port " +
+               str(args.port) + ".\n"
+               "Please check your script arguments. Run with -h option for \
+help.")
+        sys.exit(1)
+
+    main(session)
+
+###################################################################
+
+
+raise an exception
+
+<jusss> how to raise an exception with specific message?
+<melissa666> jusss, raise YourError("this is the message")	        [17:28]
+<melissa666> jusss, You can raise any defined exception type - either one of
+	     the builtin exceptions, or a custom one		        [17:30]
+<melissa666>
+	     jusss,https://stackoverflow.com/questions/1319615/proper-way-to-declare-custom-exceptions-in-modern-python
+
+raise ValueError('A very specific bad thing happened.')
+
+https://stackoverflow.com/questions/1319615/proper-way-to-declare-custom-exceptions-in-modern-python
+class MyException(Exception):
+    pass
+raise MyException("My hovercraft is full of eels")
+
+
+#########################################################
+
+python enhance pictures, Pillow is a fork of pil
+https://www.blog.pythonlibrary.org/2017/10/24/enhancing-photos-with-python/
+
+pip install Pillow
+<hnsz> jusss: NB eventhough the package is called pillow. You still have to
+       write import PIL
+#Changing the Brightness
+from PIL import Image
+from PIL import ImageEnhance
+ 
+ 
+def adjust_brightness(input_image, output_image, factor):
+    image = Image.open(input_image)
+    enhancer_object = ImageEnhance.Brightness(image)
+    out = enhancer_object.enhance(factor)
+    out.save(output_image)
+ 
+if __name__ == '__main__':
+    adjust_brightness('lighthouse.jpg',
+                      'output/lighthouse_darkened.jpg',
+                      1.7)
+
+
+
+################################################################
+
+
+
+An Elm file is called a module. To access code in other files, you need to import it!
+
+module keyword define a module, like A.elm and write `module A exposing (..)` in A.elm
+
+outgoing port
+port doSomethingInJsWithAString : String -> Cmd msg
+
+incoming port
+port stringsComingFromJs : (List String -> msg) -> Sub msg
+
+########################################
+
+Your Elm projects should all have a root directory, like project/ that all of your Elm related stuff is going to live in. Lets imagine having the following directory structure.
+
+project/
+    Main.elm
+    SearchBox.elm
+    SearchResults.elm
+    Theme.elm
+We have a couple Elm modules, maybe they depend on each other in some way. To turn this into JavaScript, you can run the following command:
+
+elm make project/Main.elm --output=main.html    or main.js
+
+elm make Desktop\Basic.elm --output=first.elm.html
+
+
+##############################
+
+https://github.com/elm/compiler/blob/master/upgrade-docs/0.19.md
+elm-package.json becomes elm.json
+String.toInt : String -> Maybe Int (not Result anymore)
+Basics.toString becomes Debug.toString, String.fromInt, and String.fromFloat.
+Html.beginnerProgram becomes Browser.sandbox.
+Html.program becomes Browser.element and Browser.document.
+elm-lang/* moved to elm/*
+
+module Counter exposing (..)
+
+import Html exposing (Html, button, div, text)
+import Html.Events exposing (onClick)
+import Browser exposing (sandbox)
+type alias Model = Int
+
+type Msg
+  = Inc
+  | Dec
+
+model : Model
+model = 0
+
+update : Msg -> Model -> Model
+update msg model2 =
+  case msg of
+    Inc ->
+      model2 + 1
+    Dec ->
+      model2 - 1
+
+
+view : Model -> Html Msg
+view model1 =
+  div []
+    [ button [ onClick Inc] [ text "Inc" ]
+    , text (String.fromInt model1)
+    , button [ onClick Dec ] [ text "Dec" ]
+    ]
+
+main : Program () Model Msg
+main =  Browser.sandbox
+       { init = model
+       , view = view
+        , update = update}
+
+#######################################
+
+1. wrote you .elm file
+2. run elm reactor
+3. visit localhost:8000 then click your .elm file
+
+##########################################
+
+https://medium.com/javascript-inside/introduction-into-elm-77512c6c0baf
+
+elm-package install elm-lang/html
+
+module Basic exposing (..)
+import Html exposing (Html, text)
+main =
+  text "Introduction Into Elm"
+
+############################################
+
+### run shell in js ###############
+xtermjs.org
+js's websocket + python's pty should do this too
+
+####################################
+
+https://medium.com/@benoitvallon/a-mobile-desktop-and-website-app-with-the-same-code-dc84ef7677ee
+
+React-native, NW, Electron and React, all in one
+A mobile, desktop and website App with the same code
+
+###################################################
+
+windows 7 bluetooth setting icon missing
+
+打开网络和共享中心-更改适配器设置-选Bluetooth网络连接-右击属性-点蓝牙标签-Bluetooth设置-在通知区域显示Bluetooth图标
+
+##########################################
+
+#curl to requests
+
+https://curl.trillworks.com/
+
+#########################################################
+
+#take pictures  #update picture in div #show image with js
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">	
+	<!-- <meta http-equiv="refresh" content="10"> -->
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script src="js/jquery-3.3.1.min.js"></script>
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/custom.css">
+	<script src="js/bootstrap.min.js"></script>
+   <script src="/libs/qi/2/qi.js"></script>
+	<title>index</title>
+  </head>
+	<body>
+	<div id="bg" onclick="qr()"> </div>
+	<div id="bg2" ></div>
+	<script type="text/javascript">
+	$(window).on("load",function(){
+		$('#bg2').hide();
+		$('#bg').show();
+		qr = function() { 
+			$('#bg').hide();
+			$("#bg2").html("<img src=img/qr.jpg>");
+			//document.getElementById("bg2").backgroundImage = "img/qr.jpg";
+			$('#bg2').show();
+		};
+		})
+	</script>	
+</body>
+</html>
+
+##############################################
+import requests
+files = {
+            'c': ('d:/image1.jpg', open('d:/image1.jpg', 'rb')),
+        }
+r = requests.post('https://ptpb.pw/', files=files, verify=False)
+print(r.content.split("url: ")[1])
+
+
+>>> import qrcode
+>>> qr=qrcode.QRCode(version=1,error_correction=qrcode.constants.ERROR_CORRECT_H, box_size=10, border=4,)
+>>> data="https://www.baidu.com"
+>>> qr.add_data(data)
+>>> qr.make(fit=True)
+>>> img=qr.make_image()
+>>> img.save("image1.jpg")
+>>>
+https://ourcodeworld.com/articles/read/554/how-to-create-a-qr-code-image-or-svg-in-python
+
+######################################
+
+work:
+   pip install --user qrcode
+   pip install -t /home/nao/pip/  qrcode
+
+not work:
+  <cdunklau> jusss: pip install --user virtualenv
+  <cdunklau> jusss: then python -m virtualenv /home/nao/testenv
+<cdunklau> jusss: then /home/nao/testenv/bin/pip install --upgrade pip setuptools
+<cdunklau> then /home/nao/testenv/bin/pip install whatever	        [16:39]
+<cdunklau> then just run /home/nao/testenv/bin/python
+
+finally:
+https://stackoverflow.com/questions/48387823/install-things-on-pepper
+pip install --user --upgrade pip
+/home/nao/.local/bin/pip install --user whatever-package-you-need
+
+or:
+http://www.about-robots.com/how-to-import-python-files-in-your-pepper-apps.html
+import python files on the left bar in Choregraphe, in python box, import that python file
+name without .py
+
+/home/nao/.local/bin/pip install --user CFFI
+
+#####################################
+
+<jusss> yunfan: 还是期待能生成css的工具出现			        [15:28]
+<yunfan> jusss: scss						        [15:29]
+<eiGHttt> less、sass。
+
+###################################################
+
 <jusss> yunfan: generator可能做coroutine, Continuation可以做coroutine, future
 	可以做coroutine,但是这三个并不是完全一样的，future还可以做Promise,
 	double barrelled continuation也可以做Promise, 但generator好像就不行
@@ -7,7 +2174,9 @@
 <jusss> yunfan: 我知道这些是不是还是很没用，我还是不会django flask aiohttp,
 	postgresql, mysql, 					        [17:25
 <jusss> 我以前也抵触OOP,我现在也会OOP了，我还知道OOP还分based on Prototype和
-	Class两种，还知道有个东西叫constructor 有啥用。。。	
+	Class两种，还知道有个东西叫constructor 有啥用。。。
+<yunfan> jusss: 你只是缺乏两三年的现场工作经验而已 你懂那些底层对你做这些事是
+	 很有帮助的	
 
 #####################################
 
@@ -1247,6 +3416,7 @@ await self.ttt()会等待self.ttt()的退出，但是如果self.ttt如果是个w
 用await 会卡在这, 可以用 spawn_callback，不等待结果
 
 或者不把self.ttt写出while-loop, 然后tornado.ioloop.PeriodicCallback(self.ttt,1800).start()来循环
+对应的asyncio.wait_for()
 
 在tornado里可以用await执行另一个coroutine-object,在asyncio里也可以，
 比如在A里await B,然后asyncio.run(A)这样也会执行B
