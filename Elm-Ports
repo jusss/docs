@@ -1,5 +1,144 @@
 
 
+There are three ways in which Elm and JavaScript (JS below) interact: Port, Native module and programWithFlags. (Finally about the differences.)
+Port is a mechanism to communicate with JS provided in Elm.
+Prepare a function with only a name and type as follows in Elm, and execute it as Cmd / Sub.
+port hello : String -> Cmd msg
+port jsHello : (String -> msg) -> Sub msg
+
+Then you can use it as follows on JS side.
+const elm = document.getElementById('elm');
+const app = Elm.Test.embed(elm);  // Launch the Elm application
+// Subscribe from Elm to JS
+app.ports.hello.subscribe(function(fromElm) {
+
+  console.log(fromElm);
+  // Send from JS to Elm
+  app.ports.jsHello.send("Hi!");
+
+});
+
+// JS to Elm send
+app.ports.jsHello.send("Elm! hellooooo");
+
+It's pretty easy.
+It is a correspondence table of the type of Elm and JS.
+Elm 	Javascript
+Bool 	Bool
+String 	String
+Int Float 	Number
+List 	array
+Arrays 	array
+Tuples 	array(固定長、複数の型)
+Records 	object
+Maybe (Nothing) 	null
+Maybe (Just 42) 	42
+Json.Encode.Value 	JSON
+
+First change the top line from module to port module. (I forget about it and get angry with the compiler.)
+port module Test exposing (..)
+Note: Packages using the port module can not be published in Elm Package. You also need to install JS at the same time.
+
+Publish Cmd from Elm to JS
+Call out JS from Elm.
+
+Elm side
+port function_name: send_type-> Cmd msg
+port hello : String -> Cmd msg
+
+Write port to define the function name and type. At this time, type is send type-> Cmd msg. (The msg must be written in lower case.)
+And this function is used by init function and update function.
+init = "" ! [hello "Hello!JS!"]
+If you write to init, the value will be sent to JS immediately after Elm initialization.
+
+JS side
+JS side registers and receives functions as ports.defined function name.subscribe. (I often forget the "s" in ports)
+var elm = document.getElementById('elm');
+var app = Elm.Test.embed(elm);
+// Receive from Elm!
+app.ports.hello.subscribe(function(str) {
+  console.log(str);
+});
+Now I can call the JS code from Elm at my favorite timing.
+
+Send from JS to Elm
+
+Next, Elm passes the value from JS to Elm, and Elm receives it.
+
+Elm side
+port function_name: (type_ coming_ from_ JS-> msg)-> Sub msg
+port jsHello : (String -> msg) -> Sub msg
+
+Write and define the function (msg is lowercase).
+The value coming from JS is Msg in Elm. So we define Msg type.
+And use the function defined by port as follows.
+
+type Msg = GetHello String  --Msg definition
+port jsHello : (String -> msg) -> Sub msg     --JS-> Elm's port
+main = program {... , subscriptions = subscriptions}  Used for the --subscriptions function.
+subscriptions : Model -> Sub Msg
+subscriptions model = jsHello GetHello         --例。
+update msg model =
+  case msg of
+    GetHello str -> ...         The value from --JS is Msg.
+
+JS side
+JS side sends to Elm with app name.ports.function name.send (value to send).
+app.ports.jsHello.send("hellooooo");  // Send to Elm
+
+For example, call JQuery.
+Finally, let's call JQuery from Elm.
+I just wanted to have the ability to automatically scroll to the bottom like this on the chat screen. When I search Google, I get the JQuery code.
+$ (Selector to scroll) .animate ({"scrollTop": $ (selector to scroll) [0] .scrollHeight}, scroll time);
+JQuery is useful to be able to specify the scroll time and animation in a single line.
+I will call it by port.
+Elm
+port scrollDown : () -> Cmd msg
+
+update msg model =
+    ...  -> ... ! [scrollDown ()]
+
+consoleView =
+    div [id "console"] [ ...]
+
+js
+const app = Elm.Main.embed(...);
+
+app.ports.scrollDown.subscribe((_) => {
+
+    $("#console").animate({"scrollTop": $("#console")[0].scrollHeight}, 5);
+
+});
+Now it scrolls as each letter is added to the screen.
+In this way, if you use Port with Elm, you can use JS assets immediately.
+
+trouble shooting
+It seems to be a trade-off with Elm's scheduler, but once I wrote the process to extract the DOM after calling Elm, I could not extract it.
+const App = Elm.Main.embed(document.getElementById("main"));
+
+document.getElementById('hoge').addEventListener("pointerdown" , (event) => {
+        console.log(event);
+    });
+
+It works by enclosing it with setTimeout.
+setTimeout(function () {
+    document.getElementById('hoge').addEventListener("pointerdown" , (event) => {
+        console.log(event);
+    });
+
+}, 0);
+
+Port and Native modules
+programWithFlags is a mechanism to pass an initial value to Elm, about Port and Native modules.
+I think that the Native module is used for wrapping api, and also for publishing it as an Elm package. And since the main web api is released as a library, if you want to use the JS code, you should be able to use a port.
+The Native module is not supported (does not disclose how to use, api changes without announcement), and it is a policy provided only from the official side. Also, packages using Native are currently not available from Elm packages.
+The reason for this (as summarized in my own interpretation) is that the Native module directly expands the JS code into the Elm runtime, so the runtime becomes more fragile as the library is expanded to the user. Elm also looks at things other than JS (web assembly), so I want to minimize JS so that various libraries don't seem to use code wrapped separately. It is around.
+However, there are also cases where Native is more convenient, such as Test code, and sometimes it is redundant with Port. The following links will be helpful.
+https://qiita.com/ento/items/10401fb27ca604491c10
+https://qiita.com/k-motoyan/items/24f8b5f27ab828efb024
+https://qiita.com/jooex/items/5ff2d3b86563cf5dbd84
+
+
 #Elm #elm #ports #port #Port #Ports
 ###############
 https://qiita.com/jooex/items/5ff2d3b86563cf5dbd84
