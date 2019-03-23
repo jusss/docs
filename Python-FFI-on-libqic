@@ -75,3 +75,17 @@ fut2=cur.qi_object_call(obj,"say",message)
         fut2=cur.qi_object_call(obj,"say",message)                      [19:32]
 <jusss> reference
         https://github.com/aldebaran/libqi-capi/blob/master/bin/qiclient-c/qimain.c
+
+<jusss> alkino: hi, I know how to do that
+<blastrock> Hi
+<jusss> blastrock: thank you
+<alkino> cool !                                                         [17:03]
+<blastrock> You're welcome :)                                           [17:04]
+<jusss> blastrock: but how to pass a Integer?                           [17:08]
+<jusss> an
+<jusss> message=cur.qi_value_create("(s)") str = cur.qi_value_create("s")
+                                                                        [17:09]
+<blastrock> qi_value_create("i") I guess                                [17:10]
+<blastrock> then qi_value_set_integer
+<blastrock> and qi_value_tuple_set(message, idx, the_int_value)
+<jusss> ok                                                              [17:36]
