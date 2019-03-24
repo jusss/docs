@@ -1,3 +1,105 @@
+
+Type Constructor and Value Constructor
+
+data T a = V a   
+w = V 3 则 w :: T Int
+x::T String 则 V "whatever"的type是x, (T String)是一个type,而(V "whatever")是一个value
+
+data A = B
+A是Type Constructor, B是Value Constructor
+
+data T a = V a 就定义了T和V
+
+Elm里的Type相当于Haskell的data
+而在haskell里type相当于elm的Type alias
+type X = Int  X就可以代表Int
+
+newtype相当于一个优化的data
+
+newtype = 只允许有一个值的data
+
+newtype X = X Int 定义了一个新的X类型和对应的俩构造器
+
+data X = X Int 表示X这个值构造器接受一个Int返回一个X
+X::Int -> X
+haskell GADT
+
+data X = Int 是没有这种写法的，只有 type X = Int 定义类型构造器的别名
+
+data Y = Y
+x = Y 这样是可以的
+
+值构造器不是类型
+
+Int是个类型构造器
+data Int = 0|1|2|...|4294967295
+
+Value Constructor可以当作一类特殊的函数，可以在模式匹配里用,match pattern,
+但普通函数不能在模式匹配里用， 值构造器可以作为函数使用，也可以模式匹配
+所以Haskell有类型构造器 值构造器 和函数,  其它语言里的Constructor一般是指Value Constructor
+data E = X | Y
+:type X
+X :: E
+:type Y
+Y :: E
+:type 1
+1 :: Num p => p
+:type 1 :: Int
+1 :: Int :: Int
+所以:1也是值构造器还是多态的
+
+类型构造器和值构造器都可以没有参数
+data Bool = True | False   Bool是个无参数的类型构造器, True和False是无参数的值构造器
+data Maybe a = Nothing | Just a    Maybe是类型构造器，a是在等号左边是类型变量,a在等号右边是值变量，Just是值构造器
+
+Haskell除了值，类型之外还有Kind
+Int是Int::*
+Maybe是*->*
+Kind就是Type的Type,  Idris可以无限层级堆叠类型
+Haskell最高只有两阶类型，所以没法表达所有集合的集合, 是data和typeclass之别，好像没问题，Elm 0.19还没有typeclass
+https://diogocastro.com/blog/2018/10/17/haskells-kind-system-a-primer/
+C++好像也是两阶的
+Kind就是描述类型构造器的类型的,
+先用Type描述数字，data Nat这样用Nat Succ这样去描述数字
+https://hackage.haskell.org/package/data-nat
+data-nat: data Nat = Zero | Succ Nat
+
+data T a = V a
+x :: T Int 怎么把V 3里的3通过操作x提取出来？
+得把x写成函数
+x :: T Int -> Int
+x (V boom) = boom
+或者
+x biu = case biu of
+        (V boom) -> boom
+
+Elm没有data,只有Type和Type alias, Elm的Type和Haskell的data功能一样, Elm的Type alias和Haskell的type功能一样或者newtype?
+Haskell开LambdaCase之后可以这样写
+:set -XLambdaCase
+y = \case (V boom) -> boom
+:type x
+x :: T a -> a
+:type y
+y :: T a -> a
+
+Module X where 这个where就是定义了一个块状区域，类似c系语言里的大括号把后面缩进的内容都包含进去了
+
+t = map f  这个是curring柯里化也是pointfree写法
+括号里有逗号就是tuple,没有逗号就是优先求值
+x :: (Int, String, Int) -> Int 和 y :: Int->String->Int-> Int 后者是柯里化的
+
+haskell没有一元tuple 但是有0元tuple,0元tuple就是()
+
+module X where 就是指这个文件的名字是X.hs或X.elm, where类似C的大括号,这个文件可以作为模块给其它文件使用
+也可以 module Main where, module Test where, module Whatever where, module就是把这个文件声明成了模块给其它文件使用
+而在python里一个文件默认就是模块，test.py可以在同目录的其它python文件里直接import test去掉文件名后缀.py导入，但是为了防止在导入
+test.py时求值里面的函数，所以一般就在test.py里把求值的函数都写在if __name__ == '__main__':里，这样在其它文件导入test.py时，
+因为主文件的__name__才等于__main__,导入时test.py里的__name__不等于__main__这样test.py里的求值函数就不会求值，
+因为python的执行顺序是从top到bottom,所以python的程序入口点entry point就是第一行，
+而C的程序入口点是main(),  Elm和Haskell的程序入口点是main = 
+
+#######################################
+
 https://zhuanlan.zhihu.com/p/21338799
 update : Msg -> Model -> (Model, Cmd Msg)
 
