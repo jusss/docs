@@ -1,7 +1,15 @@
+
+1.改22为22222
+2. 禁止密码登录，改密钥
+3. iptables设置只允许本地访问22222,映射22223到22222
+4. 22223开stunnel
+5. fail2ban
+-------------------------
 1. 密钥登录并禁止密码登录
 2. 端口更改为非22
 3. fail2ban
 4. stunnel重定向并加上iptables禁止直连端口，只允许stunnel重定向的
+5. what else?
 
 iptables -A INPUT -p tcp -s localhost --dport 22 -j ACCEPT
 iptables -A INPUT -p tcp --dport 22 -j DROP
