@@ -1,3 +1,330 @@
+
+
+
+https://bartoszmilewski.com/2011/01/09/monads-for-the-curious-programmer-part-1/
+http://learnyouahaskell.com/functors-applicative-functors-and-monoids
+
+a type is just a set of values. For instance, the type Char is a set {‘a’, ‘b’, ‘c’, … }.
+types are objects and functions are morphisms. Indeed, a function maps one type into another
+
+A functor, F, is a map from one category to another: it maps objects into objects and morphisms into morphisms.
+
+type constructors are instances of Functor, like [], Maybe, Either a and a Tree type that we made on our own
+
+
+
+<lyxia> jusss: https://en.wikibooks.org/wiki/Haskell/The_Functor_class  [23:16]
+<dmwit> jusss: You might like: Typeclassopedia, You Could Have Invented Monads
+        (And Maybe You Already Have)
+
+<lambdabot> http://www.haskell.org/haskellwiki/Typeclassopedia
+http://blog.sigfpe.com/2006/08/you-could-have-invented-monads-and.html
+<lambdabot> http://www.haskell.org/haskellwiki/All_About_Monads
+<jusss> dmwit: type constructor is functor, and now I even don't know what is
+        functor
+<dmwit> Functors are parameterized types that offer a way to modify all the
+        contained values of the parameter type.  [23:37]
+<dmwit> :t fmap
+<lambdabot> Functor f => (a -> b) -> f a -> f b
+<dmwit> They make a few promises: if you pass it a function that doesn't
+        change anything, then the whole transformation doesn't change
+        anything.
+
+<dmwit> (Formally, `fmap id = id`.)
+<dmwit> The second promise is that if you do two transformations in a row,
+        that's the same as doing one big transformation that combines the two
+        steps.
+<dmwit> (Formally, `fmap f . fmap g = fmap (f . g)`.)
+<dmwit> In terms of "what they are", that is all there is to it.  [23:38]
+<dmwit> But to get a feeling for them, you'll need to play with a couple
+        instances.
+
+<dmwit> The resources I linked do that, and it is why I linked them, so
+        definitely take a look.
+<jusss> I know function composition
+
+<jusss> but those type things, did fmap have a function definition?  [23:39]
+
+<dmwit> fmap has many function definitions; a different one for each Functor.
+<dmwit> Check here:
+        https://hackage.haskell.org/package/base-4.12.0.0/docs/Prelude.html#t:Functor
+                                                                        [23:40]
+<dmwit> You can click the "Source" links in the list of instances to see
+        implementations of fmap for a bunch of different types.
+
+<jusss> a list is a container for values, I can understand, but functions? no
+                                                                        [23:42]
+<dmwit> Would you like me to convince you that a function is a container? =)
+<jusss> is it?
+
+<jusss> http://learnyouahaskell.com/functors-applicative-functors-and-monoids
+                                                                        [23:43]
+<roland> is there a name for the operator „$“?
+<dmwit> roland: Not really. "function application" if you need to refer to it,
+        or "applied to" if you are reading it alound as part of a code snippet
+<jusss> those articles always use wrappers to descripe that functor monad
+        things, but what are that wrappers  [23:44]
+<dmwit> jusss: Well, if you define what you mean by container, then we can
+        answer for sure whether functions are containers. But I have a pretty
+        good track record of giving people a "container-like" way of intuiting
+        functions' Functor instance.
+<roland> ok thx  [23:45]
+<dmwit> This last question "what are that wrappers?" I find too vague to
+        meaningfully answer.
+
+<rfold> I prefer to think of "fmap" not as mapping a to b using given
+        function, but as mapping functions (a -> b) into functions (f a -> f
+        b).  [23:46]
+
+<rfold> This completely does away with the confusion surrounding the container
+        metaphore when considering things that "aren't really containers".
+<jusss> dmwit: a list is a container, I can get the value from it and the
+        value won't change before and after
+
+<dmwit> Which value?  [23:48]
+<dmwit> Surely you admit there may be more than one.
+<jusss> dmwit: those values in the list
+<dmwit> Okay. So, rephrasing slightly: a list is a container, I can get the
+        value at a particular index and the value won't change before and
+        after.
+<dmwit> You are okay with this modification?  [23:49]
+<jusss> yeah
+
+<dmwit> A function is a container, I can get the value at a particular input
+        and the value won't change before and after.
+<dmwit> (This isn't my preferred usual route to giving this intuition, but you
+        sound like you prefer an argument to an exposition, so let's go! =)
+
+<jusss> I don't think so
+<dmwit> Which part don't you believe?  [23:50]
+<jusss> how you can get the value at a particular input?
+<dmwit> Apply the function to the input.
+<dmwit> Compare:
+
+<dmwit> > "abcde" !! 2
+<lambdabot>  'c'
+<dmwit> > chr $ 98  [23:51]
+<lambdabot>  'b'
+<dmwit> So we call the indexing operator ($) instead of (!!), but that's not
+        *so* different.
+<jusss> ok
+<jusss> get the value at a particular input, ok,  [23:52]
+<jusss> and your input is a list
+<dmwit> Nope.
+
+<dmwit> My input is a number.
+<dmwit> Just like with lists, the index is a number.
+<dmwit> (Picking `chr` as my function of interest for now, to give something
+        concrete to talk about.)
+<jusss> ok  [23:53]
+
+<dmwit> Now if I wanted to muck about with all the letters in a list, making
+        them uppercase or something, I could use map to do it.  [23:54]
+<dmwit> > map toUpper "abcde"
+<lambdabot>  "ABCDE"
+<dmwit> I can do something similar with functions.
+
+<jusss> like?
+<dmwit> I can take a function that returns characters, and create a new
+        function that does almost the same thing except it returns upper-case
+        versions if the original returned a lower-case one.
+<dmwit> But instead of map, we use (.) for that transformation.
+<dmwit> > (.) toUpper chr $ 98  [23:55]
+<lambdabot>  'B'
+<dmwit> This is something like "mucking about with all the letters in the
+        function chr", see?
+
+<dmwit> Imagine we have a bunch of boxes with characters in them.  [23:56]
+
+<dmwit> Maybe some of the boxes have the same character, maybe not. No
+        promises.
+<dmwit> And now I'm going to label each box somehow; say, with a number.
+
+<dmwit> The interface to this collection of boxes is that if you give me a
+        label, I'll give you the character inside the box with that label.
+<dmwit> This is a bit like a container that contains characters, right?
+<jusss> ok
+
+<dmwit> But this is exactly what functions (of type `Int -> Char`) are: they
+        are a bunch of `Char`s in boxes, each labeled with an `Int`.
+
+<dmwit> If you give me an `Int`, I can look up the `Char` in the box with that
+        label.
+
+<jusss> "a type is just a set of values."
+<dmwit> And you can easily imagine taking that big collection of boxes,
+        together with a transformation on their contents, and making up a new
+        collection of boxes where each labeled box in the new collection
+        corresponds to applying the given transformation to the contents of
+        the labeled box in the old container.  [23:59]
+[Mon Apr  8 2019]
+<dmwit> We name that operation (.): you give it a transformation on contained
+        values, and a container (function), and it produces a new container
+        (function) with all the same labels and the transformation applied to
+        each labeled value.  [00:00]
+<dmwit> :t (.)
+<lambdabot> (b -> c) -> (a -> b) -> a -> c
+<dmwit> (An aside: "a type is just a set of values" is an okay first
+        approximation to the truth, but it turns out set theory isn't enough
+        for the rich universe of types that Haskell offers.)
+<dmwit> (...but I'm happy to run with the "a type is a set of values"
+        intuition for now. It takes you a pretty good long way.)  [00:05]
+<monochrom> Actually you will need that richness for function types for every
+            non-total language.
+<srnty> What should I read to get started with Haskell?
+<dmwit> monochrom: Really? If it's merely bottoms you're thinking of, sets are
+        enough to capture bottoms -- just add an extra element. It's
+        polymorphism that kills the set theory approach.
+<monochrom> Oh, that.  [00:06]
+<monochrom> I thought you were going for "set plus partial order".
+<jusss> dmwit: I can catch up with your "If you give me an `Int`, I can look
+        up the `Char` in the box with that label." but I don't know what those
+        boxes are related with functor? sorry I'm not every smart 
+<dmwit> ?wiki tutorial
+<lambdabot> https://wiki.haskell.org/tutorial
+<dmwit> ?wiki tutorials  [00:07]
+<lambdabot> https://wiki.haskell.org/tutorials
+<dmwit> srnty: ^
+<srnty> thank you
+<dmwit> jusss: Mmm, the boxes analogy is to give you a way of conceptualizing
+        functions that feels "container"-like.
+<dmwit> jusss: It's easy to imagine applying some function to the value inside
+        each box, right?  [00:08]
+<dmwit> That is the fundamental operation of Functor: it gives you a way to
+        apply a function to each contained value.
+<jusss> dmwit: ok
+<dmwit> (*If* you want to understand functors as containers. I don't, really;
+        it was you that brought that analogy up.)  [00:09]
+* rfold wonders if Functor would be easier to explain if it was a newtype
+  rather than a class
+<jusss> they all have they own version story about those functor monad stuff
+        on the internet  [00:10]
+<jusss> their
+<dmwit> newtype Functor f = Functor (forall a b. (a -> b) -> f a -> f b) -- ?
+        doesn't seem easier to explain to me
+<dmwit> It's all the same concepts, plus now you have to understand/explain
+        `forall` in more detail.  [00:11]
+<dmwit> And maybe also have to explain some other tangential oddities (like
+        why is this a newtype instead of a simple type alias).  [00:12]
+<jusss> so the functor is the box or a function?
+<jusss> or neither?
+<dmwit> A functor is a parameterized data type plus the fmap operation.
+<dmwit> So, e.g., `[]` and `map` make a functor.
+<dmwit> But it would be wrong to say "`"abcde"` is a functor".
+<jusss> aha  [00:13]
+<jusss> list and function are not functor, but they make functor?
+<dmwit> Yes. Although most people are sloppy about the distinction, and just
+        say "lists are functors" as a shorthand.  [00:14]
+<dmwit> (Because it's so obvious what the operation must be.)
+<dmwit> On functions, people are sloppy in a different way, actually, that MJD
+        brought to my attention. =)  [00:15]
+<dmwit> But anyway the careful phrasing is something like this: for any type
+        X, (->) X and (.) is a functor.
+<jusss> fmap (+1) is a functor?  [00:17]
+
+###############################################################
+
+module Test where
+data Struct val =
+                Empty
+                | NonEmpty StructType val
+data StructType =
+                Exec1
+                | Exec2
+apply::Struct a -> String
+apply (Empty) = "empty"
+apply (NonEmpty exec struct) = "exec1 or exec2"                
+
+                               
+--apply Empty
+--apply (NonEmpty Exec1 undefined)
+--apply (NonEmpty Exec1 "aha")
+--apply (NonEmpty Exec2 3)
+--apply (NonEmpty Exec2 (\x -> 3 +x))
+--apply (NonEmpty Exec2 ())
+                
+apply2::(Show a)=> Struct a -> String
+apply2 (NonEmpty exec struct) = "exec1 or exec2"
+
+--apply2 (NonEmpty Exec1 "a")                                
+                                
+apply3::(Show a)=> Struct a -> String
+apply3 (NonEmpty exec _) = "exec1 or exec2"
+
+
+<jusss> data Struct val = Empty | NonEmpty StrucType val;   data SturctType =
+        Exec1 | Exec2;   apply::Struct a-> String;    apply (NonEmpty exec
+        struct) ="exec1 or exec2"
+<jusss> how I can use an expression to call it?  [13:35]
+<jusss> apply NonEmpty ? ?   will get "exec1 or exec2"/
+<jusss> apply NonEmpty Exec1 ?
+ <slack1256> jusss: Can you use a paste service for that code?  [13:43]
+<slack1256> jusss: apply (NonEmpty Exec1 undefined) should work  [13:44]
+<jusss> slack1256 https://paste.ubuntu.com/p/RS7FtkHfFG/
+<slack1256> jusss: I don't understand what you want to do
+<jusss> slack1256 just an example from stackoverflow help me understand Value
+        Constructor
+<dmwit> jusss: Here are two examples of calls: `apply Empty` or `apply
+        (NonEmpty Exec1 ())`  [14:09]
+<dmwit> Just for fun, here's a third that may look a bit weirder to initiates
+        of other languages: `apply (NonEmpty Exec2 (\x -> 3 + x))`  [14:10]
+<jusss> dmwit: the question is how to handle that undefined type variable when
+        it is called
+<jusss> https://paste.ubuntu.com/p/s84KjsTtjH/
+<dmwit> The caller of `apply` may choose any specific type they like to
+        substitute for `a`.  [14:11]
+<jusss> dmwit: wait a second, but function don't have a type I think,   [14:12]
+<dmwit> In my three examples above, I left it unspecified (`Empty`), chose the
+        unit type `()` (`NonEmpty Exec1 ()`), and chose a function type
+        `Integer -> Integer` (`\x -> 3 + x`).
+<jusss> dmwit: normal function has a type?
+<dmwit> Certainly.
+<dmwit> :t \x -> 3 + x  [14:13]
+<lambdabot> Num a => a -> a
+<dmwit> :t \name -> "Hello, " ++ name ++ "!"
+<lambdabot> [Char] -> [Char]
+<jusss> dmwit: so normal function can be used in pattern match?
+<jusss> dmwit: value constructor is totally same with normal functions?
+<dmwit> There are no interesting patterns which match functions.  [14:14]
+<ggole> Variable patterns!
+<dmwit> Yes, data constructors may be applied to functions.
+<dmwit> ggole: Right. Variables and underscore. I consider these not
+        interesting, because they can be used for *any* type.
+<dmwit> There are no patterns which match functions but do not match every
+        type.  [14:15]
+<dmwit> (Hm. Maybe some view patterns, hey? Anyway that's an advanced topic
+        for another time...)
+<c_wraith> yeah, view patterns could, but that's a totally different thing,
+           really  [14:16]
+<ggole> Hmm, isn't there a pattern ascription extension?  [14:17]
+<ggole> It might be better to think of functions not having any constructors
+        with which to destructure function values, rather than talking about
+        types.
+<dmwit> You're right. I hereby steal that much better phrasing as my new
+        definition of "interesting".  [14:20]
+<jusss> this is really make me confused! so functions do have types? and they
+        have types but can not be used in patter match?  [14:21]
+<jusss> value constructor and normal function are same thing or not?  [14:22]
+<jusss> can I call value constructor as function?
+<slack1256> jusss: yep in the sense that they have types, but they are not of
+            the same "kind"
+<jusss> (Num a => a -> a) is one function's type? right?  [14:24]
+<slack1256> % :t Just
+<yahb> slack1256: a -> Maybe a
+<c_wraith> jusss: functions don't actually have constructors.  But that's not
+           conceptually any different from any other type that has
+           constructors, but keeps them hidden someplace you can't import.
+<slack1256> Just is a value constructor for Maybe and also a function that
+            returns a Maybe  [14:25]                              
+
+##################################################################
+f n = f' n (0,1)
+  where
+    f' 0 (x, _) = x
+    f' n (x, y) = f' (n-1) (y, x+y)
+
+递归时f' n (x, y) = f' (n-1) (y, x+y)不算重赋值，是重调用，可以理解为替换当前栈帧
+-------------------------------------------------------------------
 Type Constructor and Value Constructor
 
 data T a = V a   
