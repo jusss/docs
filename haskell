@@ -1,4 +1,328 @@
 
+
+adit.io/posts/2013-04-17-functors,_applicatives,_and_monads_in_pictures.html
+
+2 -> (+3) 2 -> 5
+
+Functor: apply a function to a wrapped value and get a wrapped value
+fmap    (+3)   (Just 2) -> Just 5
+fmap ::(a->b)-> f    a  ->  f   b
+
+<$> is the infix version of fmap
+
+(+3) <$> Just 2  is same to fmap (+3) Just 2
+
+Applicatives: apply a wrapped function to a wrapped value and get a wrapped value
+Just (+3)  <*>  Just 2  == Just 5
+
+[(*2), (+3)] <*> [1,2,3]   ==    [2,4,6,4,5,6]
+
+(*) <$> Just 5 <*> Just 3 == Just 15
+liftA2 (*) (Just 5) (Just 3)  ==  Just 15        liftA2 does the same thing
+
+Monad: apply a function to a wrapped value, but that function take unwrapped value and return a wrapped value, the function is >>=  and it's pronounced bind.
+
+half x = if even x
+         then Just (x `div` 2)
+         else Nothing
+
+Just 3 >>= half     == Nothing        use >>= to shove the wrapped value to the function
+
+>>= :: m a -> (a-> m b) -> m b
+      Just 3     half      Nothing
+      Just 6     half     Just 3
+
+Just 6 >>= half     == Just 3
+
+λ> Just 20 >>= half >>= half >>= half
+Just 5
+λ> Just 20 >>= half >>= half >>= half
+Nothing
+
+IO Monad
+getLine >>= readFile >>= putStrLn
+
+λ> getLine >>= readFile >>= putStrLn
+test.hs
+module X where
+half x = if even x
+         then Just (x `div` 2)
+         else Nothing
+              
+
+λ> 
+
+
+######################################################
+
+Either a b   use typeclass create a Int|String
+
+f::Int -> Maybe Int
+
+module module-name-for-other-files (export-function-name) where      where like {} after int main()
+
+#!/usr/bin/runhaskell   in archlinux
+
+or $runhaskell Main.hs
+
+cabal package manager like pip in python
+
+if ... then ... else ...
+case ... of ...
+let ... in ...
+
+data Position = MakePosition Double Double
+PointA :: Position
+PointA = MakePosition 0 0
+
+PointB :: Position
+PointB = MakePosition 3 4
+
+distance:: Position -> Position -> Double
+distance p1 p2 =
+         case p1 of
+              MakePosition x1 y1 ->
+                     case p2 of
+                          MakePosition x2 y2 -> sqrt ((x1-x2)^2 + (y1-y2)^2)
+
+use case...of... get value from a value create by value constructor
+case x of
+     pattern1 -> expression1
+     pattern2 -> expression2
+
+use let ... in ... can get the value
+getX :: Position -> Double
+getX p = let MakePosition x _ = p
+         in x
+pointFoo :: Position
+pointFoo = MakePosition 3 4
+getX pointFoo  will get 3
+
+or just define a function
+
+f::Position -> Double
+f MakePosition x y = x
+
+data Position = MakePosition a a 是错的，=右侧出现的type variable必须在=左侧出现过
+但=左侧出现的type variable可以不出现在=右侧
+
+data Position a = MakePosition Int Int
+MakePosition 2 2 :: Position a
+MakePosition 2 2 :: Position Char
+MakePosition 2 2 :: Position Double
+MakePosition 2 2 :: Position String     因为这个a是未知类型，没有明确指出类型或进行类型约束
+
+data Maybe a = Just a | Nothing
+Nothing :: Maybe a
+Nothing :: Maybe Int
+Nothing :: Maybe Char
+
+module X where
+import Text.Read
+parseInt :: String -> Maybe Int
+parseInt = readMaybe
+
+λ> parseInt "3"
+Just 3
+λ> parseInt "abc"
+Nothing
+
+
+Either a b    a type can be Int or String
+
+parseInt :: Maybe String -> Maybe Int    how to define this function?
+
+################################################################
+
+haskell的函数类型是什么? 返回值的类型? 为什么函数无法用于模式匹配?
+codeHZ: 可以认为是 -> 类型构造器没有对应的值构造器,属于编译器特殊支持
+
+module Test where
+data Struct val =
+                Empty
+                | NonEmpty StructType val
+data StructType =
+                Exec1
+                | Exec2
+apply::Struct a -> String
+apply (Empty) = "empty"
+apply (NonEmpty exec struct) = "exec1 or exec2"                
+
+                               
+--apply Empty
+--apply (NonEmpty Exec1 undefined)
+--apply (NonEmpty Exec1 "aha")
+--apply (NonEmpty Exec2 3)
+--apply (NonEmpty Exec2 (\x -> 3 +x))
+--apply (NonEmpty Exec2 ())
+                
+apply2::(Show a)=> Struct a -> String
+apply2 (NonEmpty exec struct) = "exec1 or exec2"
+
+--apply2 (NonEmpty Exec1 "a")                                
+                                
+apply3::(Show a)=> Struct a -> String
+apply3 (NonEmpty exec _) = "exec1 or exec2"
+
+
+<jusss> data Struct val = Empty | NonEmpty StrucType val;   data SturctType =
+        Exec1 | Exec2;   apply::Struct a-> String;    apply (NonEmpty exec
+        struct) ="exec1 or exec2"
+<jusss> how I can use an expression to call it?  [13:35]
+<jusss> apply NonEmpty ? ?   will get "exec1 or exec2"/
+<jusss> apply NonEmpty Exec1 ?
+ <slack1256> jusss: Can you use a paste service for that code?  [13:43]
+<slack1256> jusss: apply (NonEmpty Exec1 undefined) should work  [13:44]
+<jusss> slack1256 https://paste.ubuntu.com/p/RS7FtkHfFG/
+<slack1256> jusss: I don't understand what you want to do
+<jusss> slack1256 just an example from stackoverflow help me understand Value
+        Constructor
+<dmwit> jusss: Here are two examples of calls: `apply Empty` or `apply
+        (NonEmpty Exec1 ())`  [14:09]
+<dmwit> Just for fun, here's a third that may look a bit weirder to initiates
+        of other languages: `apply (NonEmpty Exec2 (\x -> 3 + x))`  [14:10]
+<jusss> dmwit: the question is how to handle that undefined type variable when
+        it is called
+<jusss> https://paste.ubuntu.com/p/s84KjsTtjH/
+<dmwit> The caller of `apply` may choose any specific type they like to
+        substitute for `a`.  [14:11]
+<jusss> dmwit: wait a second, but function don't have a type I think,   [14:12]
+<dmwit> In my three examples above, I left it unspecified (`Empty`), chose the
+        unit type `()` (`NonEmpty Exec1 ()`), and chose a function type
+        `Integer -> Integer` (`\x -> 3 + x`).
+<jusss> dmwit: normal function has a type?
+<dmwit> Certainly.
+<dmwit> :t \x -> 3 + x  [14:13]
+<lambdabot> Num a => a -> a
+<dmwit> :t \name -> "Hello, " ++ name ++ "!"
+<lambdabot> [Char] -> [Char]
+<jusss> dmwit: so normal function can be used in pattern match?
+<jusss> dmwit: value constructor is totally same with normal functions?
+<dmwit> There are no interesting patterns which match functions.  [14:14]
+<ggole> Variable patterns!
+<dmwit> Yes, data constructors may be applied to functions.
+<dmwit> ggole: Right. Variables and underscore. I consider these not
+        interesting, because they can be used for *any* type.
+<dmwit> There are no patterns which match functions but do not match every
+        type.  [14:15]
+<dmwit> (Hm. Maybe some view patterns, hey? Anyway that's an advanced topic
+        for another time...)
+<c_wraith> yeah, view patterns could, but that's a totally different thing,
+           really  [14:16]
+<ggole> Hmm, isn't there a pattern ascription extension?  [14:17]
+<ggole> It might be better to think of functions not having any constructors
+        with which to destructure function values, rather than talking about
+        types.
+<dmwit> You're right. I hereby steal that much better phrasing as my new
+        definition of "interesting".  [14:20]
+<jusss> this is really make me confused! so functions do have types? and they
+        have types but can not be used in patter match?  [14:21]
+<jusss> value constructor and normal function are same thing or not?  [14:22]
+<jusss> can I call value constructor as function?
+<slack1256> jusss: yep in the sense that they have types, but they are not of
+            the same "kind"
+<jusss> (Num a => a -> a) is one function's type? right?  [14:24]
+<slack1256> % :t Just
+<yahb> slack1256: a -> Maybe a
+<c_wraith> jusss: functions don't actually have constructors.  But that's not
+           conceptually any different from any other type that has
+           constructors, but keeps them hidden someplace you can't import.
+<slack1256> Just is a value constructor for Maybe and also a function that
+            returns a Maybe  [14:25]
+            
+######################################
+
+https://stackoverflow.com/questions/10893747/
+
+data T a = V a
+
+Value Constructor can be used to pattern match as parameter before '=' , but function can't
+
+data Struct val = Empty | NonEmpty StructType val
+data StructType = Exec1 | Exec2
+
+apply :: Struct -> String
+apply (Empty) =  "matched Empty"
+apply (NoEmpty a _) = "matched Exec1 or Exec2"        a is Exec1 | Exec2, _ is val 
+
+apply2 :: Struct val -> String
+apply2 (Empty) = "matched Empty"
+apply2 (NonEmpty Exec1 _) = "matched Exec1"
+apply2 (NonEmpty Exec2 _) = "matched Exec2"
+
+#######################################333
+
+in repl
+:t :type
+let x=1
+:t x
+x::Num a => a     x的类型为Num类型类的实例,可以为Int或Integer Float Double
+
+类型类 typeclass
+Num 是个typeclass，它的实例类型有 Int Integer Float 和 Double
+Eq 的 有== 和 /==
+Ord 有 < > <= >=这些类型
+Show 有 show类型,转换为字符串
+=> 类型约束
+typeclass => type variable
+Num a => a      则a的类型只能是Int 或 Integer Flaot Double
+
+max' :: (Ord a) => a -> a-> a     max'有两个参数，参数的类型为Ord的实例,返回也是同样的类型
+max' a b
+     | a < b = b
+     | otherwise = a
+
+:i x 显示identifier的信息
+x::Num a => a
+
+:l :load .hs file
+:r :reload
+
+1+1=3    pattern match
+1+1 will return 3
+
+in repl, there're three ways to run code
+
+1.   :{ xxx
+        xxx
+     :}
+
+2.  :l file.hs
+
+3.  let x=y
+
+add :: Int -> Int -> Int
+add x y = x+y   这样的add 1.0 2.0会出错，因为1.0不是Int
+
+add :: Num a => a -> a -> a   
+add x y = x+y  这样可以add 1.0 2.0或 add 1 2
+
+a->a->a 表示第二个参数的类型和第一个参数类型形同，结果类型也一样
+
+中缀表达式  1 `add` 2     parameter `function` parameter
+
+https://zhuanlan.zhihu.com/p/21338799
+
+---------------------------------------------------------------
+
+main = do
+    putStrLn "Hello, what's your name?"
+    name <- getLine
+    putStrLn ("hey" ++ name ++ ",you rock!")
+
+do将这些I/O操作合为一体，成为一个I/O操作，类型为IO(), putStrLn I/O操作的返回类型为()即空元组unit
+getLine的返回类型为String,所以name的类型为String
+只有通过<-才能打开I/O的返回值
+
+ghc --make file-name 可以把file-name.hs编译成native code
+
+if there's error, try re-install ghc and ghc-libs first.
+
+let _FirstName = map toUpper firstName
+let用于函数返回值的绑定, <- 用于I/O返回值的绑定
+
+------------------------------------------------------------------------------
+
 Type Constructor and Value Constructor
 
 data T a = V a   
