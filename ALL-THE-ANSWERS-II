@@ -1,104 +1,1005 @@
+<jusss> List a -> (a->b) -> List b, so List is a Functor, but why function is
+        Functor?
 
-Type Constructor and Value Constructor
+<jusss> (a->b) -> (b->c) -> (a->c)?                                     [13:15]
 
-data T a = V a   
-w = V 3 则 w :: T Int
-x::T String 则 V "whatever"的type是x, (T String)是一个type,而(V "whatever")是一个value
+<jackdk> r -> a is the same as (->) r a, so it has the right kind (with f ~
+         (->) r)                                                        [13:16]
+<jackdk> then you have fmap :: (a -> b) -> ((->) r a) -> ((->) r b)
+<jackdk> i.e. fmap :: (a -> b) -> (r -> a) -> (r -> b)
 
-data A = B
-A是Type Constructor, B是Value Constructor
+<jusss> I wonder is there a type called Function? so Function a -> (a->b) ->
+        Function b                                                      [13:17]
 
-data T a = V a 就定义了T和V
+<jusss> fmap :: (a -> b) -> (r -> a) -> (r -> b)    a and r is the same type?
+<jackdk> no
+<jusss> but (a->b) and (r->b) is the same type?
+<jackdk> no
+<jackdk> a, b, r are all potentially different types
+<jusss> but List a and List b are both List type                        [13:19]
 
-Elm里的Type相当于Haskell的data
-而在haskell里type相当于elm的Type alias
-type X = Int  X就可以代表Int
+<jackdk> List a and List b are different types
 
-newtype相当于一个优化的data
+<jackdk> because a is not necessarily the same as b
 
-newtype = 只允许有一个值的data
+<jle`> jackdk: you can make something like your Function
+<jle`> type Function r = (->) r
+<jackdk> true.                                                          [13:21]
+<jle`> ah sorry, that was meant to pinging to jusss 
+<jackdk> no worries mate
+<jle`> so you get something like (Function r) a -> (a -> b) -> (Function r) b
+<jusss> List a and List b both are derived by List?
+<jle`> 'List a' is a list of a's
+<jusss> and (a->b)?                                                     [13:22]
 
-newtype X = X Int 定义了一个新的X类型和对应的俩构造器
+<jle`> an (a -> b) is a function from 'a' to 'b'                        [13:23]
+<jusss> (a->b) is (->) a b       and (r->b)  is  (->) r b?
+<jle`> yes
+<jle`> just like:
+<jle`> > (+) 1 3
+<lambdabot>  4
 
-data X = X Int 表示X这个值构造器接受一个Int返回一个X
-X::Int -> X
-haskell GADT
+<jackdk> % :k (->) Int Char
+<yahb> jackdk: (->) Int Char :: *
 
-data X = Int 是没有这种写法的，只有 type X = Int 定义类型构造器的别名
+<jusss> how I to see (->) a b?     ((->) a) b  or (->) (a b)  ?
+<jle`> both ways have advantages in different situations                [13:25]
+<jle`> ah, but (->) (a b) is wrong
 
-data Y = Y
-x = Y 这样是可以的
+<jusss> (a b) just mean a and b is one thing, not tuple stuff           [13:26]
+<jle`> (a b) is a "applied" to b
+<jle`> like (List b)
+<jle`> `((->) a) b` is not the same as a -> b                           [13:27]
+<jusss> that's kind like lisp
 
-值构造器不是类型
+<jle`> yeah, if you're asking about haskel syntax, then it's not the same
+       thing
+<jle`> it's just liek how `((+) 1) 3` is not the same as (+) (1 3)
+<jle`> in haskell                                                       [13:28]
 
-Int是个类型构造器
-data Int = 0|1|2|...|4294967295
+<jusss> let's go back to that Function r
+<jusss> type Function r = (->) r       so Function r a is (->) r a  and is r
+        -> a?
+<jle`> yes
+<jle`> or also ((->) r) a, if we add extra redunant parentheses         [13:30]
+<jle`> in haskell, `f a b` is parsed as `(f a) b`
+<jusss> so can we know  (r->a ) -> (a -> b) -> what?
 
-Value Constructor可以当作一类特殊的函数，可以在模式匹配里用,match pattern,
-但普通函数不能在模式匹配里用， 值构造器可以作为函数使用，也可以模式匹配
-所以Haskell有类型构造器 值构造器 和函数,  其它语言里的Constructor一般是指Value Constructor
-data E = X | Y
-:type X
-X :: E
-:type Y
-Y :: E
-:type 1
-1 :: Num p => p
-:type 1 :: Int
-1 :: Int :: Int
-所以:1也是值构造器还是多态的
+<jle`> if you're drawing the analogy to List a -> (a -> b) -> List b    [13:31]
+<jusss> yeah
+<jle`> we have ((->) r) a -> (a -> b) -> ((->) r) b
+<jle`> or (r -> a) -> (a -> b) -> (r -> b)                              [13:32]
+<jusss> and that's true?
+<jle`> by true, do you mean it exists as a possible function?
 
-类型构造器和值构造器都可以没有参数
-data Bool = True | False   Bool是个无参数的类型构造器, True和False是无参数的值构造器
-data Maybe a = Nothing | Just a    Maybe是类型构造器，a是在等号左边是类型变量,a在等号右边是值变量，Just是值构造器
+<jusss> that's no need
 
-Haskell除了值，类型之外还有Kind
-Int是Int::*
-Maybe是*->*
-Kind就是Type的Type,  Idris可以无限层级堆叠类型
-Haskell最高只有两阶类型，所以没法表达所有集合的集合, 是data和typeclass之别，好像没问题，Elm 0.19还没有typeclass
-https://diogocastro.com/blog/2018/10/17/haskells-kind-system-a-primer/
-C++好像也是两阶的
-Kind就是描述类型构造器的类型的,
-先用Type描述数字，data Nat这样用Nat Succ这样去描述数字
-https://hackage.haskell.org/package/data-nat
-data-nat: data Nat = Zero | Succ Nat
+<jusss> so I wonder what's the term function?    -> is function or (->) r is
+        function?
 
-data T a = V a
-x :: T Int 怎么把V 3里的3通过操作x提取出来？
-得把x写成函数
-x :: T Int -> Int
-x (V boom) = boom
-或者
-x biu = case biu of
-        (V boom) -> boom
+<jusss> or (->) r a is function
+<jle`> (r -> a) is the type of a function
+<jle`> (->) is the function type constructor, used to create function types
+<jle`> 'create' as in, specify                                          [13:34]
 
-Elm没有data,只有Type和Type alias, Elm的Type和Haskell的data功能一样, Elm的Type alias和Haskell的type功能一样或者newtype?
-Haskell开LambdaCase之后可以这样写
-:set -XLambdaCase
-y = \case (V boom) -> boom
-:type x
-x :: T a -> a
-:type y
-y :: T a -> a
+<jle`> and `(->) r` is the Functor
 
-Module X where 这个where就是定义了一个块状区域，类似c系语言里的大括号把后面缩进的内容都包含进去了
+<jusss> what's r here?                                                  [13:35]
+<jusss> what's r in `(->) r` ?
+<eiGHttt> % :k (->)
+<yahb> eiGHttt: (->) :: * -> * -> *
+<jle`> it's a type variable here                                        [13:36]
+<geekosaur> the type of the parameter the function takes.
+<jle`> in this discussion, it means that what we are saying is valid for any
+       type
+<jle`> so it's true for (->) Int, true for (->) Bool, etc.
+<jle`> and a function of type (r -> a) is a function that takes an 'r' and
+       returns an 'a'                                                   [13:37]
+<jle`> so a function of type (Int -> String) is a function that takes an Int
+       and returns a String
+<jusss> the thing is (->) must have two type variables?                 [13:38]
+<jusss> (->) is a type constructor, ok, I can understand,  r is a type
+        variable, ok, that's fine, but why need another type variable a?
+                                                                        [13:39]
+<geekosaur> when fully applied
 
-t = map f  这个是curring柯里化也是pointfree写法
-括号里有逗号就是tuple,没有逗号就是优先求值
-x :: (Int, String, Int) -> Int 和 y :: Int->String->Int-> Int 后者是柯里化的
+<geekosaur> note that the Functor typeclass wants something that is *not*
+            fully applied, since it supplies an additional type
+<geekosaur> so a Functor instance would be for ((->) r), because it will add
+            the a itself
+<geekosaur> but the type constructor is (->) r a
 
-haskell没有一元tuple 但是有0元tuple,0元tuple就是()
+<jusss> the type constructor should only be (->) ?
+<geekosaur> I'm not sure what you're asking
+<jle`> jusss: the type of a function is a -> b
+<jusss> (->) r a is a type, a function type, and (->) is the Functor, and r
+        and a both are type variables?                                  [13:43]
+<jle`> (->) r is the Functor
 
-module X where 就是指这个文件的名字是X.hs或X.elm, where类似C的大括号,这个文件可以作为模块给其它文件使用
-也可以 module Main where, module Test where, module Whatever where, module就是把这个文件声明成了模块给其它文件使用
-而在python里一个文件默认就是模块，test.py可以在同目录的其它python文件里直接import test去掉文件名后缀.py导入，但是为了防止在导入
-test.py时求值里面的函数，所以一般就在test.py里把求值的函数都写在if __name__ == '__main__':里，这样在其它文件导入test.py时，
-因为主文件的__name__才等于__main__,导入时test.py里的__name__不等于__main__这样test.py里的求值函数就不会求值，
-因为python的执行顺序是从top到bottom,所以python的程序入口点entry point就是第一行，
-而C的程序入口点是main(),  Elm和Haskell的程序入口点是main = 
+<geekosaur> the type constructor is (->). being a symbol, it is normally
+            infix, although the parentheses around it make it act as
+            prefix. it takes two parameters, each a type (or type variable)
+
+<jusss> so (->) is the type constructor, and (->) r is the Functor?
+<jusss> and (->) r a is the type ?                                      [13:45]
+<jusss> I even don't know what I'm talking about...
+
+<jle`> they are all "types", but only r -> a is the type of functions
+
+<jle`> for some r and a
+<jusss> for example, data T a -> V a, I know that T is the type constructor
+        and that a is type variable, V is the value constructor , and T a is
+        the type of the value (V a)                                     [13:47]
+
+[周一 4月 15 2019]
+<jle`> do you mean data T a = V a
+<jusss> "<jusss> for example, data T a -> V a, I know that T is the type
+        constructor  and that a is type variable, V is the value constructor ,
+        and T a is   the type of the value (V a)"  
+
+<jusss> jle`: yeah                                                      [13:49]
+<jusss> my network just broken
+<jusss> let's be clear something, function do have a type, right? like r->a is
+        a type of function
+<jusss> and (->) is a type constructor, just like T in data T a = V a?  [13:52]
+
+<jle`> right, a function (like even :: Int -> Bool) has something of type ??
+       -> ??                                                            [13:53]
+<jle`> and (->) is the type constructor, the syntactical thing that allows us
+       to specify function types
+
+<jusss> and （->) r  is Functor, (->) r a -> (a -> b) -> (->) r b like List a
+        ->(a->) -> List b,right?
+<jusss> even::Int -> Bool , the type is Int -> Bool , right?            [13:54]
+
+<jusss> and even is also a function                                     [13:55]
+<jle`> (->) r a -> (a -> b) -> (->) r b is analogous to List a -> (a -> b) ->
+       List b, yes
+<jusss> jle`: but?
+<jle`> no but :)
+<jusss> jle`: as you said, it's not need for the same, so?
+<jle`> although it might be more accurate to say that `(->) r` is "a" Functor.
+<jle`> jusss: oh, i was mentioning that in case you had a typo in what you
+       said                                                             [13:56]
+<jle`> you wrote List a -> (a ->) -> List b, missing the 'b' in the middle
+<jusss> do I?
+<jle`> `(->) r` is just r "applied" to (->), like `f x` is x applied to f
+<jle`> but, it happens to also have a Functor instance
+<jle`> just like how Int happens to also have an Eq instance
+
+<jusss> now, the term function , what it is?  (-> r a) is the function's type?
+        and it is function?
+<jle`> (->) r a, not (-> r a)                                           [14:00]
+<jusss> oh, my typo
+
+<jusss> yeah, what's the term function?                                 [14:01]
+<jusss> r->a is a type, r-> is Functor, -> is type constructor
+<jusss> and what is function now?
+<jle`> here we're shifting from the discussion of general syntax to specific
+       types
+<glguy> Functions are values you can apply to arguments                 [14:02]
+<jle`> a function in haskell is something that, given a value, returns a new
+       value.  it'll give the same output for the same value input
+<jle`> you apply them using syntax like `f x`, or:
+<jle`> > even 7
+<lambdabot>  False
+<glguy> Or similarly they can be types you can apply, depends on the level
+        you're asking about
+<jle`> these types of functions are values in haskell, like 1, True, "hello",
+       7.8, 'a', etc.                                                   [14:03]
+<jle`> and like all values, they have types.  the types are of the form ??? ->
+       ???
+<jle`> or 'a -> b', where a represents the type of the input they expect, and
+       b represents the type of the values they return
+
+<jusss> and we can not represent function with r->a ?                   [14:04]
+
+<glguy> (->) r , happens to be an instance of Functor, (->) is a type, a type
+        constructor, an instance of some type classes, a function at the type
+        level
+<jle`> functions have type r -> a, for some r and some a
+
+<jle`> all functions have a type of the form __ -> __
+<jle`> so 'r -> a' can't be a function, but it is the *type* of a function
+       from r to a                                                      [14:05]
+<jusss> and we can not describe that functions with their type?
+<jle`> we can :)
+<jle`> if r is Int, and a is Bool, then `even` is a function of type Int ->
+       Bool
+<jle`> remember, r and a here are just placeholders for actual types we want
+       to use them with                                                 [14:06]
+<jusss> yeah, 
+<jle`> so `even` is Int -> Bool, or r -> a, where r is Int and a is Bool
+<MasseR> totally unrelated to anything, but jle` thank you for your blog, it's
+         really entertaining
+<jle`> er, even has type Int -> Bool
+<jle`> MasseR: hah, thank you, i really appreciate it :) hopefully it is
+       helpful as well, haha
+<jusss> jle`: and Int->Bool is the type of function even, 
+<jle`> yes. or well, to be specific, it's one possible type, since 'even' in
+       haskell is polymorphic
+<jle`> maybe a better example is `ord :: Char -> Int`
+<jusss> I still have a little confused about Int ->  is the Functor     [14:09]
+<jle`> "a" Functor :)
+<jusss> whatever, my English is not good
+<jle`> not trying to correct your english
+
+<jle`> just saying that the two things have different implications :)
+
+                                                                        [14:10]
+<MasseR> (one of the many functors vs the one and only functor)
+<jusss> Int -> Bool, can I think a Functor need a type variable to constrct a
+        type?
+<jle`> jusss: when we say something is 'a' Functor, the implication is that
+       it's just a regular old type that we have the opportunity to write a
+       Functor instance for                                             [14:11]
+
+<jle`> jusss: right, a Functor is a parameterized type
+<jusss> and all the Functor are type constructors?
+<jle`> so (Int ->) is parameterized on the 'result'
+<glguy> no
+
+<glguy> Type constructor is a category of names, it doesn't tell us about the
+        kinds                                                           [14:12]
+<glguy> Int is a type constructor and not an instance of Functor
+<glguy> (Either Int) is an instance of Functor and not a type constructor
+
+<jusss> err..  (->) r is a Functor,   (->) r is a type constructor?
+<glguy> There are constructors and variables
+<jle`> (->) is the type constructor in this situation
+<glguy> No, (->) r is neither not a constructor or a variable
+
+<jle`> `(->) r` is r applied to the type constructor (->)               [14:14]
+<jle`> like how `even 5` is 5 applied to the function `even`
+<glguy> No, (->) r is neither a constructor nor a variable*
+
+<jle`> or maybe to make a stronger analogy, how `V True` is True applied to
+       the data constructor V, from your example earlier                [14:15]
+<glguy> V True is "V applied to True"
+<jle`> ah thanks. oh man i mixed this up the entire time
+
+<MarcelineVQ> it is pretty late at night for you flesh and blood's      [14:16]
+
+<glguy> Look at the bot showing off :-p
+
+<MarcelineVQ> @botsnack
+<lambdabot> :)
+
+<jusss> fine, maybe I should just take r-> is a Functor and no more questions
+<jusss> jle`: glguy really thanks                                       [14:18]
+
+<glguy> jusss: The definition of functor is (simplified): class Functor (f ::
+        * -> *) where fmap :: (a -> b) -> (f a -> f b)
+<glguy> Because the 'f' parameter has kind * -> * we know we'll be able to
+        apply it to a type with kind *                                  [14:19]
+<glguy> when you were asking about functors being type constructors what you
+        were really getting at was that instances of the Functor class will
+        always have kind * -> *
+
+<eiGHttt> why is (Either Int) not a type constructor? it has kinds * -> *.
+<glguy> The reason that this class expect a type with kind * -> * is that the
+        type of fmap needs to use f applied to some types
+<Cale> Because it's a type application, not a constructor
+
+<glguy> eiGHttt: type constructor is a kind of name
+
+<glguy> the capitalized ones
+<jusss> glguy: and "function is a Functor" is wrong? 
+<Cale> Either is a type constructor, and Int is a type constructor, but Either
+       Int is an application (of one type constructor to another)       [14:21]
+
+<jle`> jusss: it's more of a synecdoche. it's "wrong", but most people will
+       know what you mean
+<jle`> `(->) r` is a Functor, and it's the functor people often talk about
+       when referring to functions
+
+<eiGHttt> thanks.
+<glguy> ?wn synecdoche
+<lambdabot> *** "synecdoche" wn "WordNet (r) 3.0 (2006)"
+<lambdabot> synecdoche
+<lambdabot>     n 1: substituting a more inclusive term for a less inclusive
+            one
+<lambdabot>          or vice versa
+
+<jusss> jle`: they describe List for helping people to understand what functor
+        is, so I think a function is a container?                       [14:23]
+<jusss> or wrapper  box whatever
+<jle`> do you mean, a functor is a container?
+<jle`> i think it's safe to say that *some* functors represent containers. but
+       not all.
+
+<jle`> List being a Functor makes it convenient to manipulate values inside it
+<jusss> "A functor is a container of type a that, when subjected to a function
+        that maps from a→b, yields a container of type b." from
+        https://stackoverflow.com/questions/2030863/in-functional-programming-what-is-a-functor
+<jusss>
+        http://adit.io/posts/2013-04-17-functors,_applicatives,_and_monads_in_pictures.html
+<jle`> i don't think that is strictly always true, but it's an intuition
+       people often start with
+<jle`> not all functors are containers.
+
+<jle`> er, not all functors correspond to containers, i mean            [14:25]
+<jle`> but a lot of containers correspond to functors
+<Cale> It's also a bit imprecise to say that any functor is a container. It
+       might produce types of containers.
+<Cale> [1,2,3] isn't a functor
+<Cale> But the type constructor for lists is a functor
+
+<jusss> List a, List is a Functor
+<jle`> right, i think 'functors are containers' is pretty misleading, it lead
+       to a lot of headache for me when i started
+<jle`> but, i understand the sentiment
+<Cale> But there is a sense in which all the functors we talk about in Haskell
+       can be thought of as containers, it just gets really weird for some of
+       them
+<jle`> it does break down for things like (->) r
+
+<Cale> It doesn't really
+<jle`> it breaks down in the sense that it doesn't add anything to the
+       conversation                                                     [14:27]
+<Cale> A function r -> a is like a container indexed by all the values of type
+       r, containing values of type a
+<kadoban> Don't you end up defining "container" as pretty much exactly
+          Functor, leading to the intution helping basically not at all?
+<jle`> "r -> a is a container, in the sense that exactly matches what an r ->
+       a is"
+
+<Cale> You can imagine functions in this way, as sort of "arrays"
+<Cale> (or arrays as functions, for that matter)
+<Cale> It can be useful to have that perspective                        [14:28]
+<wolfman154> xmonad —recompile is throwing an error, could you guys help me
+             out:   https://hastebin.com/zelizutubi.coffeescript
+<jusss> what that functor is used for?
+<Cale> Well, that's basically asking "what does fmap do for that functor?"
+                                                                        [14:29]
+<Cale> and if we write down its type, it will become clear what it must be
+<Cale> fmap :: (a -> b) -> (e -> a) -> (e -> b)
+
+<Cale> That has to be function composition
+
+<jusss> Cale: the middle (e->a) , why it must return a?
+<Cale> Well, let's look again at the general type of fmap
+<Cale> fmap :: (Functor f) => (a -> b) -> f a -> f b
+<Cale> In this case, f a = e -> a
+<wolfman154> I have no idea what I’m doing wrong?
+<Cale> wolfman154: You didn't paste the error                           [14:31]
+<jle`> jusss: all functor instances are useful in their own sense.  List is
+       useful, for example, to...well, make a list of things :)
+<jle`> jusss: but functor, as an abstraction, is useful for uniting a bunch of
+       these under a common, clean interface
+<jle`> and it also lets you do some nice program rewriting
+
+<jle`> for example, fmap f (fmap g x) is always the same as fmap (f . g) x
+<Cale> In the container analogy from before, we see function composition as
+       taking some function (a -> b) (which you can think of however you
+       like), and some function of type (e -> a), which we think of as a
+       container containing many values of type a, one for each value of type
+       e
+<Cale> and applying the function (a -> b) to each of the values of type a,
+       ending up with a container indexed by values of type e, containing
+       values of type b                                                 [14:33]
+<jusss> jle`: and there's no fmap in other languages, unless g and x is lists,
+        so map it is
+<Cale> But of course, the code for it doesn't require so many words :)
+<jle`> well, a lot of other languages have fmap's *specific* for each type
+<Cale> (g . f) x = g (f x)
+<jle`> but most other language ecosystems don't have a single unifying fmap
+       for all functors
+
+<Cale> wolfman154: ?
+<jusss> I wonder what is (a->b) -> (b->c) -> (a->c) ? and does it exists?
+<jusss> or just my illusion                                             [14:35]
+<Cale> That exists, that's the same thing with the other argument order.
+<wolfman154> https://hastebin.com/upatuyofip.sql
+
+<Cale> wolfman154: ahhh
+<jle`> jusss: it's function composition :)
+<jle`> it's (>>>), as well                                              [14:36]
+
+<Cale> wolfman154: Your error is not for the same code as you pasted
+<jle`> > ((+1) >>> (*2)) 10
+<lambdabot>  22
+<eiGHttt> wolfman154: main = xmonad $ defaultConfig {...}
+
+<Cale> Yeah, the code he pasted had the $
+<jle`> jusss: in all honesty, the FUnctor instance of (->) is not very useful
+       on its own.  you will never directly use fmap for (->) in everyday code
+<jusss> jle`: ok
+<Cale> The $ should fix things
+<jle`> sorry, i mean, for (->) r
+<jle`> we talk about it here in the sense "just because we can"         [14:37]
+<jle`> "(->) r "can" be a Functor, so let's talk about it" :)
+<Cale> It can certainly be useful for code golf
+<Cale> haha
+<jle`> but, `(->) r` having a Functor instance is useful when we use
+       functor-polymorphic abstractions
+<wolfman154> One second 
+<MasseR> jle`: I occasionally use it with lenses and applicatives.
+<jle`> that is, programs that are written to work for "all" functors
+<jle`> Haskell has a lot of code that is written to work for 'all' Functor
+       instances                                                        [14:38]
+<jle`> so because we give (->) r an instance, all of that code is now usable
+       by us
+<jusss> jle`: I wonder what it's like ? the instance of (->) r 
+<jusss> for example? any concret stuff
+<wolfman154> Cale: I pasted and saved the new code but for some reason xmonad
+             is trying to recompile the code from before? Maybe I need to do a
+             rebuild switch instead in nixos?
+<jle`> jusss: we can just peek at the implementation :)
+<Cale> wolfman154: no idea
+<jle`> fmap :: (a -> b) -> (r -> a) -> (r -> b)                         [14:41]
+<wolfman154> Strange 
+<jle`> fmap f g = \x -> f (g x)
+<Cale> wolfman154: But that seems likely? Maybe it's getting the compiled code
+       from the nix store
+* hackage rio 0.1.9.2 - A standard library for Haskell
+  https://hackage.haskell.org/package/rio-0.1.9.2 (MichaelSnoyman)
+<Cale> Well, except that also doesn't make sense
+<Cale> because you have a compile error                                 [14:42]
+<Cale> So maybe it stashed source code into the nix store and is trying to
+       build that?
+<jusss> jle`: wait a second, f is (a->b) and g is (r->a) right?         [14:43]
+<jusss> how we can get that lambda from (r->b)?
+<Cale> x :: r
+<jle`> check the types :)
+<Cale> g x :: a
+<Cale> f (g x) :: b                                                     [14:44]
+<Cale> \x -> f (g x) :: r -> b
+<wolfman154> Cale: my guess is that I’m not supposed to do xmonad —recompile,
+             instead nixos-rebuild switch (to have nixos compile it for me) ? 
+                                                                        [14:45]
+<Cale> No idea, I don't use nixos
+<Cale> (nor xmonad, for that matter)
+<wolfman154> Cale: it works
+<wolfman154> :)
+<Cale> cool
+<Cale> jusss: Here's an example of the (->) e monad in use              [14:47]
+<jusss> Cale: from \x -> f(g x) :: r->b to know x is r and f(g x) is b, that's
+        ok, but how to get there b to f(g x)
+<Cale> > (do x <- id; y <- reverse; z <- map toUpper; return (x,y,z)) "hello"
+<lambdabot>  ("hello","olleh","HELLO")
+<Cale> I don't understand that last question
+<Cale> "how to get there b to f (g x)"                                  [14:48]
+<Cale> what?
+<jusss> how to get the b from fmap :: (a -> b) -> (r -> a)
+<Cale> That's not fmap's type
+<Cale> fmap :: (a -> b) -> (r -> a) -> (r -> b)                         [14:49]
+<Cale> or
+<Cale> fmap :: (a -> b) -> (r -> a) -> r -> b
+<jusss> to b is fmap(g r)
+<Cale> If you prefer to remove the redundant paren
+<Cale> So if we define
+<Cale> fmap f g x = ...
+<Cale> then f :: (a -> b)
+<Cale> and g :: (r -> a)
+<Cale> and x :: r                                                       [14:50]
+<Cale> and the ... on the right must have type b
+<jusss> and that's ok, the b
+* hackage fedora-img-dl 0.2 - Fedora image download tool
+  https://hackage.haskell.org/package/fedora-img-dl-0.2 (JensPetersen)
+<Cale> and there's only one way to get a value of type b using the things we
+       have
+<jusss> \ r ?
+<Cale> which is to use f
+<Cale> So
+<Cale> fmap f g x = f (...)
+<Cale> where now the ... has type a
+<Cale> and there's only one way to get something of type a, which is to use g
+                                                                        [14:51]
+<Cale> fmap f g x = f (g ...)
+<Cale> and now the ... has type r
+<Cale> and we have something of type r, namely x
+<Cale> fmap f g x = f (g x)
+<Cale> done
+<Cale> and there were no real choices to be made
+<Cale> We can move the parameter to the other side of the equation if we like:
+                                                                        [14:52]
+<Cale> fmap f g = \x -> f (g x)
+<Cale> it means the same thing
+<jusss> err...
+<jusss> fmap :: (a->b) -> (r->a) -> (r->b)       so  fmap (a->b) (r->a) =
+        (r->b)                                                          [14:56]
+<Cale> Try not to mix the notation for types and terms
+<Cale> But yeah
+<jusss> f::a->b  g::r->a  we got fmap f g = (r->b)
+<Cale> fmap (f :: a -> b) (g :: r -> a) :: r -> b                       [14:57]
+<Cale> yeah
+<jusss> what I don't understand is how through (r->b) to get \x -> f (g x) or
+        say how from b to (a->b) (r->a  r)
+<jusss> aha,
+<jusss> I can think (a->b) (r->a) a is b,    but reverse it, I can not  [15:01]
+<Cale> The rule for lambda is that if from assuming that x has type a, we can
+       derive some expression e of type b, then \x -> e will have type a -> b
+                                                                        [15:02]
+* hackage haiji 0.2.3.0 - A typed template engine, subset of jinja2
+  https://hackage.haskell.org/package/haiji-0.2.3.0 (NoriyukiOhkawa)
+<jusss> yeah, I know that, the direction, expand b to f (g x) , not easy for
+        me, but f (g x) to b is easy
+<jusss> it's kind like 1 + 1 = 2, but 2 = 1 + 1 is not easy
+<wolfman154> Do any of you guys know the link to change xmonad key bindings, I
+             can’t find find the link geekasaur sent me earlier 
+<wolfman154> Never mind I found it   :)                                 [15:12]
+<Cale> jusss: Did you follow my explanation of how to write it?
+<Cale> jusss: In general, this way of making types line up is not *always*
+       going to result in the program you want, but it's fairly effective at
+       restricting your options.                                        [15:14]
+<Cale> In this case, there was only one program we could have written.
+<jusss> Cale: you remove fmap on the right of = and move x from right of = to
+        left, that's what I don't understand 
+<jusss> yeah, I did follow you example, 
+<Cale> You mean when I went from                                        [15:15]
+<Cale> fmap f g x = f (g x)
+<Cale> to
+<jusss> <Cale> fmap f g x = f (...)
+<Cale> fmap f g = \x -> f (g x)
+<Cale> jusss: That step there                                           [15:17]
+<Cale> was the result of looking at the types of things we had, and the type
+       of thing we wanted
+<Cale> (as were most of the steps, to be honest)
+<jusss> it's kind like math stuff
+<Cale> It's exactly like logic                                          [15:18]
+<jusss> if fmap (a->b)  (r->a) =  (r->b)  and f = a->b ,   g= r->a
+<Cale> In logic, if you want to prove A -> B (that is, "if A then B" or "A
+       implies B"), you may start by assuming A, and trying to obtain B.
+<jusss> so what b is ?                                                  [15:19]
+<Cale> In lambda calculus (or Haskell), if you want to construct a function of
+       type A -> B, you may start by introducing a variable x of type A, and
+       trying to obtain an expression e of type B
+<Cale> and then \x -> e has type A -> B
+<Cale> In logic, if you know A and you know A -> B, then you may conclude B
+<Cale> In lambda calculus (or Haskell) if you have x :: A, and f :: A -> B,
+       you may apply the function to obtain  f x :: B
+<jusss> if fmap (a->b)  (r->a) =  (r->b)  and f = a->b ,   g= r->a, then how
+        to express b with f and g                                       [15:21]
+<Cale> Well, you're trying to construct a function of type r -> b
+<Cale> so it might as well be a lambda
+<Cale> \x -> ...
+<Cale> now you have x :: r                                              [15:22]
+<Cale> and you need to construct something of type b
+<Cale> The only way to construct something of type b is to apply f
+<Cale> \x -> f ...
+<Cale> and now you need something of type a
+<Cale> and the only way to construct something of type a is to apply g  [15:23]
+<Cale> \x -> f (g ...)
+<Cale> and now you need something of type r, which you have, it's x
+<Cale> \x -> f (g x)
+<Cale> Make sense?                                                      [15:24]
+<jusss> g -> f will get (r->a) -> (a->b)  so (r-> b)?  and (r->b) = g -> f and
+        b is?
+<Cale> That doesn't quite make sense to me
+<Cale> What did you mean to indicate by g -> f there?
+<jusss> 'cause g = (r->a)                                               [15:26]
+<Cale> f and g were terms
+<Cale> a, b, r, are types
+<Cale> they live in different namespaces
+<jusss> yeah, I mixed them,    and -> =
+<Cale> g :: r -> a
+<Cale> not g = r -> a
+<jusss> whey they don't use the same symbols?                           [15:27]
+<Cale> Types and terms?
+<jusss> yeah
+<Cale> Because it doesn't take you very far
+<Cale> We're already more punny with it than we ought to be
+<Cale> Using (Int, Char) for the type of pairs of an Int and Char, for example
+<Cale> rather than for a pair of types                                  [15:28]
+<jusss> I mean -> and =
+<Cale> Which -> is that?                                                [15:29]
+<Cale> There's an arrow at the type level, which constructs the type of
+       functions
+<jusss> use ->  in type and use = in function
+<Cale> and there's an arrow at the term level which is part of the syntax of a
+       lambda expression
+<Cale> and we can also use equations in order to define functions and other
+       values
+<jusss> ok,                                                             [15:31]
+<jusss> it's really interesting we can get the right part of '=' from the left
+        part of '=' through the type signature                          [15:32]
+<Cale> Well, when two expressions are equal, they must have the same type
+<Cale> So if the left side of our equation is fmap f g, whatever its type is
+       must be the type of the right hand side of our equation.         [15:36]
+
+######################################################################
+
+#Prototype #prototype #constructor #js
+
+Array.prototype.add =
+    function(x) {
+        var results = [];
+        for (var i=0; i < this.length; i++) {
+            results.push(this[i] + x)
+        }
+        return results;
+    }
+
+[1,2,3].add(5)
+Array [ 6, 7, 8 ]
+
+//change the prototype, and it has affect all the linked object, OO based on prototype
+//change the super-class, it won't change the created object, OO based on class
+
+// in python, constructor is __new__
+//in js, constructor is
+
+class Whatever {
+    constructor(init_value) {
+        this.value = init_value
+    }
+    add(x){
+        return this.value + x
+    }
+}
+
+n = new Whatever(9);
+n.add(3)
+
+//before ES6, same as
+var Whatever = function(init_value) {
+    this.value = init_value;
+    this.add = function(x) {
+        return this.value + x
+    }
+ }
+
+n = new Whatever(9);
+n.add(3)
+
+//https://www.w3schools.com/js/js_object_constructors.asp
+//https://www.quora.com/What-is-a-constructor-in-JavaScript
+
+################################################################
+
+https://en.wikibooks.org/wiki/Haskell/Alternative_and_MonadPlus
+https://qfpl.io/posts/fp-cheat-sheet/#sequence-on-maybe-with-list
+
+class Employee:
+    def get_boss(self):
+        """Retrun the employee's boss"""
+
+    def get_wage(self):
+        """Compute the wage"""
+
+result = None
+if john is not None:
+    boss = john.get_boss()
+    if boss is not None:
+        wage = boss.get_wage()
+        if wage is not None:
+            result = wage
+print(result)
+
+def unit(e):
+    return e
+
+def bind(e, f):
+    return None if e is None, else f(e)
+
+print(bind(bind(unit(john), Employee.get_boss), Employee.get_wage))
+https://zhuanlan.zhihu.com/p/58514370
+#####################################################
+Monad:
+bind >>=  flatMap   (>>=) :: m a -> (a -> m b) -> m b
+return unit pure    return :: a -> m a
+join :: [[a]] -> [a]    k >>= x = join (fmap k x)    bind(k,x)=join(fmap k x)
+functor : map fmap <$>
+applicative: ap <*>
+
+########################################################
+
+f= x => y => x+y
+function f()
+f(3)(4)
+7
+[3].map(f)
+Array [ f() ]
+var wrappedPlus3 = [3].map(f)
+undefined
+wra
+ReferenceError: wra is not defined[Learn More] debugger eval code:1:1
+wrappedPlus3
+Array [ f() ]
+[2].map(wrappedPlus3[0])
+Array [ 5 ]
+
+############################################################
+Download video from v.qq.com
+1. firefox install video downloader professional by startpage24 from
+https://addons.mozilla.org/en-US/firefox/addon/video-downloader-profession/?src=search
+2. visit that v.qq.com and click that download icon on the toolbar, click that "Play video",
+it will pop up a new window and play the video, wait for the video's play is done,right click on it and choose "save video as" to save to mp4 file on local.
+
+############################################################
+
+http://adit.io/posts/2013-04-17-functors,_applicatives,_and_monads_in_pictures.html
+https://zhuanlan.zhihu.com/p/58514370
+https://wiki.haskell.org/Typeclassopedia
+https://stackoverflow.com/questions/44965/what-is-a-monad
+https://bartoszmilewski.com/2011/01/09/monads-for-the-curious-programmer-part-1/
 
 #######################################
+
+Promise Future Continuation Monad
+Promise Future Continuation都是Monad，但Monad却不一定是Continuation
+
+##############################################################
+
+
+https://stackoverflow.com/questions/44965/what-is-a-monad
+
+What is a monad? The short answer: It's a specific way of chaining operations together.
+
+
+A monad is a datatype that has two operations: >>= (aka bind) and return (aka unit). return takes an arbitrary value and creates an instance of the monad with it. >>= takes an instance of the monad and maps a function over it.
+
+A monad is essentially just a functor T with two extra methods, join, of type T (T a) -> T a, and unit (sometimes called return, fork, or pure) of type a -> T a. For lists in Haskell:
+
+join :: [[a]] -> [a]
+pure :: a -> [a]
+
+You can write a function that does map, then join. This function is called bind, or flatMap, or (>>=), or (=<<). This is normally how a monad instance is given in Haskell.
+
+<jusss> LdBeth: 如何理解functor monad?
+<LdBeth> jusss: 就是个 type class                                       [09:45]
+<LdBeth> 就是个 parametric polymorphism
+<LdBeth> 就是个模版
+<LdBeth> 大家喜欢复用代码
+<LdBeth> 刚好数学有差不多的东西，就用了同个名字                         [09:46]
+<jusss> LdBeth: 我看了好几个文章，他们总能从不同方向理解monad, 有unit/bind
+        unit/join  还有从范畴论来讲的                                   [09:58]
+<jusss> 一脸懵逼
+<jusss> https://zhuanlan.zhihu.com/p/58514370                           [09:59]
+<anotitlebot> 15 分钟了解 Monad - 知乎
+<jusss>
+        https://bartoszmilewski.com/2011/01/09/monads-for-the-curious-programmer-part-1/
+<anotitlebot> Monads for the Curious Programmer, Part 1 |   Bartosz Milewski's
+              Programming Cafe
+<jusss> 这俩讲的不是一个玩意呀
+<LdBeth> 所以感情您连模版都不知道                                       [10:02]
+<LdBeth> 至少第二篇总比较好懂                                           [10:03]
+<LdBeth> 连 “Monad 是一个自函子范畴上的幺半群”都不能懂的人写出来的解释是没法
+         看的                                                           [10:04]
+<LdBeth> 就是有个 class 叫 functor，有个 class 叫 semigroup，monad 是他们两的
+         subclass                                                       [10:05]
+<LdBeth> functor 定义了个方法叫 fmap，semegroup 有两个方法叫 mempty 和 mconcat
+                                                                        [10:07]
+<LdBeth> 所以 monad 继承了这三个方法
+<LdBeth> 所以只要是 monad 这个类的实例都可以调用这三个方法
+<LdBeth> 然后作为 monad 的实例可以是任何东西，包括函数，状态，进程
+
+
+#######################################################
+
+fmap in python
+because python is call by value, and haskell is call by name
+fmap = (a->b) -> f a-> f b   is fmap=(a->b) -> f(a) -> f(b)
+so turn f to a class, f(a) is a instance of class 
+class Functor (ABC)
+  @abstractmethod
+  def fmap(self, f)
+
+class XX(Functor)
+
+def fmap(f,x)
+  return x.fmap(f)
+
+#############################################
+
+#gif
+https://gifmaker.me/
+
+#############################################################
+
+#fullscreen #css #img 
+
+#dw_haituo {
+    width: 1280px;
+    height: 800px;
+}
+
+<div id="dw_haituo" onclick="f2()"> 
+            <img src="img/show/dw/yudu-01.png" height="800px" width="1280px" />
+</div>
+
+
+########################################
+map is used for a list,  fmap is used for a function
+
+map :: (a -> b) -> [a] -> [b]
+map _ []     = []
+map f (x:xs) = f x : map f xs
+
+class Functor (f :: * -> *) where
+  fmap :: (a -> b) -> f a -> f b
+
+foldl or foldr is like reduce
+
+####################################################
+
+Elm MVC
+
+Event -> trigger ->Update function -> update Model -> create View
+
+Event will trigger a message and send it to Update function,
+in the Update function, it will check what message it is and make a choice
+to change the Model,  Update function take Msg and current Model as parameter
+and return a new Model, the new Model will cause View's change
+
+message -> update -> model -> view
+
+Model: status the things show on the front and will change
+Message: event, button click, mouse swip
+
+view create Msg -> update take Msg and change Model -> view take new Model
+
+module Hide exposing (..)
+import Html exposing (..)
+import Html.Attributes exposing (..)
+import Html.Events exposing (onClick)
+import Browser
+
+type Msg = Hide | Show
+type alias Model = String
+
+--model : Model
+--model = "block"
+initModel:Model
+initModel="block"
+    
+view : Model -> Html Msg
+view model = div [ ]
+             [ button [ onClick Hide] [ text "Hide" ]
+              , h1 [ style "display" model ] [ text "hi" ]
+              , button [ onClick Show ] [ text "Show"]
+              ]
+
+update : Msg -> Model -> Model
+update msg model =
+     case msg of
+         Hide -> "none"
+         Show -> "block"
+
+main = Browser.sandbox {
+          init = initModel
+         ,update = update
+         ,view = view
+          }
+
+
+###############################################
+
+f::Int->Int
+f(0)=0
+f(1)=1
+f(n)=f(n-1)+f(n-2)
+
+f(42) just stuck
+
+https://wiki.haskell.org/The_Fibonacci_sequence
+
+f(5) = f(4) + f(3)
+f(4)=f(3)+f(2)
+f(2)=f(1)+f(0)
+f(5)= f(1)+f(0)+f(1)+f(0)+f(1)+f(0)...+f(0)+f(1)
+f(42)=f(1)+f(0)+(f1).... 会展开成千上万的0和1
+这个是O(f(n))的复杂度,会卡，
+f = 0:1:zipWith (+) f (tail f)
+
+
+#tail #recursive #haskell
+Prelude> :{
+Prelude| l :: Int -> Int -> Int -> Int
+Prelude| l 0 a b =a
+Prelude| l 1 a b =b
+Prelude| l n a b= l (n-1) b (a+b)
+Prelude| :}
+Prelude> l 22 0 1
+17711
+Prelude> l 1 0 1
+1
+Prelude> l 3 0 1
+2
+Prelude> l 5 0 1
+5
+Prelude> 
+
+
+Prelude> :{
+Prelude| t :: Int -> Int
+Prelude| t 0 =0 
+Prelude| t 1=1
+Prelude| t n=n+t(n-1)
+Prelude| :}
+
+<Ariakenom> jusss: function application binds with "higher priority" than
+            operators                                                   [16:25]
+<Ariakenom> so if you want to read, you can start with function applications
+            and put parenthesis around it
+<jusss> ok                                                              [16:27]
+<Ariakenom> f a b+1 = (f a) b+1 = ((f a) b)+1
+<Ariakenom> jusss: using more parenthesis than necessary isn't a problem. if
+            it's confusing just use parenthesis :)                      [16:29]
+<jusss> Ariakenom: I see                                                [16:30]
+
+##########################################################
+position: absolute, sometime it won't hide element,  change it to fixed or relative or other something else,
+the default position is static, you can set 'position: relative' as the default with ` * { position: relative; } `
+https://stackoverflow.com/questions/4555982/absolute-positioned-div-not-hidden
+Adding position absolute to an element will remove that element from the normal flow. It will position itself absolute to the closest parent that is relatively positioned.
+
+position: static(default) fixed relative absolute sticky
+static doesn't have top bottom left right, 
+fixed has top bottom.. and it always keeps static
+relative left bottom are relative to other element
+the element below another element, it is negtive px
+move top to down, it's negtive number px
+move left to right, it's positive number px
+float margin follows position:relative
+
+https://www.cnblogs.com/zhuzhenwei918/p/6112034.html
+
+#########################################################
+
+HTML elements are positioned static by default.
+
+Static positioned elements are not affected by the top, bottom, left, and right properties.
+
+######################################
+
+https://elmprogramming.com/model-view-update-part-2.html
+https://github.com/elm/compiler/blob/master/upgrade-docs/0.19.md
+
+Our sign-up form looks a bit ugly. Let’s add some style. There are multiple ways to style a page in Elm:
+
+    Using inline styles
+    Using the elm-css package
+    Using an external CSS file
+    Using a CSS framework
+
+##########################################################
+
+https://elmprogramming.com/model-view-update-part-1.html
+
+msg model update view
+
+model changed -> view send message -> update -> model
+
+in 0.16
+main =
+    beginnerProgram
+        { model = initialModel
+        , view = view
+        , update = update
+        }
+
+in 0.19
+main =
+    Browser.sandbox
+        { init = initialModel
+        , view = view
+        , update = update
+        }
+
+that model can be a record,
+type alias User =
+    { name : String
+    , email : String
+    , password : String
+    , loggedIn : Bool
+    }
+
+type alias Model
+    = User
+
+initialModel : User
+initialModel =
+    { name = ""
+    , email = ""
+    , password = ""
+    , loggedIn = False
+    }
+
+#npm install elm@0.16.0  you can install 0.16 elm
+
+##############################################################
 
 There are three ways in which Elm and JavaScript (JS below) interact: Port, Native module and programWithFlags. (Finally about the differences.)
 Port is a mechanism to communicate with JS provided in Elm.
