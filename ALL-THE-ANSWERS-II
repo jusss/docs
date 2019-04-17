@@ -1,3 +1,358 @@
+#js #promise #loop #pic #pics
+
+window.onload=function(){
+
+ id=['id1','id2','id3'];
+ elementList = id.map(function(x){ return document.getElementById(x)});
+ stopButton=false;
+
+ forLoop = function (alist, n) {
+     return new Promise(function(r,e) {
+
+         alist[n].style.display="block";
+         //console.log(alist[n]);
+         setTimeout( function(){r(n)}, 3000)})
+         .then( function(_) {
+             alist[_].style.display="none" ;
+             //   console.log(alist[_]);
+             if ( _+1 >= alist.length) {return 0}
+             return (_+1)
+        })
+        .then(
+            function(_) {
+                if (stopButton) { stopButton = false; return 0}
+                else { forLoop(alist, _)}
+            })
+ }
+    
+//    g=forLoop(elementList,0)
+}
+
+//forLoop(elementList, 0)
+
+###########################################################
+
+<jusss> Promise( (r,e) => {}).then()  could that (r,e) in then() ?
+no
+但是可以在Promise()里return一个新的Promise()传给.then(),但是又不会影响到当前的Promise()还是没用
+所以resolved()还是只能在Promise()里搞，而不能在then()里搞
+所以用setTimeout(r,3000) in Promise() 里 而不能在then()
+it means this promise will be resolved after 3 seconds, and then the functionin  in .then() will run,
+new Promise((r,e) => {})       r() will resolve,  and setTimeout(here-need-a-function, time)
+r() will return a value, 'cause call-by-value, so setTimeout(r(),3000) will cause r() run immedely without waiting for 3000, so setTimeout(r, 3000) or setTimeout( _=>{doSomething; r()}, 3000)
+
+//image that f(0) is retrun a new Promise(), that new Promise() will run when it's been created, and then in the last of Promise(), it return a new Promise(), just image Promise() like a snake or whatever else, when it runs to its tail, it will create a new snake, and the old one will disappear,
+
+alist=[1,2,3]
+stopButton=false
+
+f = function (n) {
+    return new Promise((r,e) => {
+        console.log(alist[n])
+        setTimeout( _ => {r(n+1)}, 3000)})
+        .then( _ => {
+            if ( _+1 > alist.length) { return 0}
+            else { console.log(alist[_]) ; return (_+1)}
+        })
+        .then(
+            _ => { if (stopButton) { stopButton = false; return 0}
+                   else {
+                       new Promise((r,e) => {
+                           setTimeout(r, 3000)})
+                       .then(
+                           whatever=>{f(_)})}})
+}
+
+f(0)
+
+##############################################
+
+Prelude> :{
+Prelude| w :: Maybe a -> Maybe a
+Prelude| w (Just x) = (Just x)
+Prelude| :}
+
+Prelude> w (Just 3)
+Just 3
+Prelude> w (Just "aha")
+Just "aha"
+
+###########################################
+post upload data
+<eiGHttt> <form action="/你的接口地址" method="post"><input type="file" name="
+          数据"><button>提交</button></form> 简单的表单。
+<eiGHttt> 服务地址，例如你起了一个服务，入口地址为“/my/api”，那么action也要
+          填这个地址。                                                  [14:20]
+<eiGHttt> 一个网络服务可能有多个API，表单需要知道对应哪一个。
+########################################################
+fmap f g = \x -> f (g x)
+
+Prelude> :t (.)
+(.) :: (b -> c) -> (a -> b) -> a -> c
+Prelude> :t fmap
+fmap :: Functor f => (a -> b) -> f a -> f b
+
+<Solonarv> jusss: the function composition operator
+<Solonarv> (.) is a function, but Functor instances have to be types!   [10:18]
+<Solonarv> however, ((->) e) has a Functor instance, and the definition of
+           'fmap' in that instance is identical to (.)
+
+<jusss> Solonarv: sorry to being late reply, I just check :t(.) and :t fmap,
+        and I find that when the Functor is (->) a, then fmap is (.),   so
+        fmap f g = f . g ???  when f and g are functions                [11:55]
+<Solonarv> jusss: exactly!
+<jusss> Solonarv: ok, but I really don't know what is eta reduce and expand,
+<Solonarv> eta expanding/reducing means adding/removing an argument in an
+           equality or a definition
+<Solonarv> for example, if we have 'foo x = negate x' we can rewrite that to
+           'foo = negate' (eta reduce); the opposite transformation is called
+           eta expanding                                                [12:02]
+<jusss> Solonarv: that pintless style use tis eta reduce?               [12:03]
+<Solonarv> well, eta reduction/expansion is only when you have something of
+           the form 'f x = g x', where neither f nor g mention x        [12:05]
+<jusss> Solonarv: now, I know that when a Functor is a List, fmap is same as
+        map in other languages, and when a Functor is (->) e, fmap is (.), but
+        what this (.) is used for?                                      [12:08]
+<Solonarv> function composition
+<Solonarv> it lets you create functions by putting together smaller functions
+<kadoban> jusss: Doing a string of operations on an input. Like perhaps you
+          want to parse a string into a list of numbers, then remove
+          duplicates and then sum them up.
+<Solonarv> this could be written as:
+<Solonarv> @let doStuff = sum . nub . map read . words
+<lambdabot>  Defined.
+<Solonarv> :t doStuff                                                   [12:13]
+<lambdabot> (Num c, Eq c, Read c) => String -> c
+<jusss> but this is same as that a bunch of code which is not use (.)
+<jusss> it just makes a good look                                       [12:14]
+<kadoban> jusss: Much of programming is just things that are easier to work
+          with than other things.
+
+<jusss> [] is a instance of Functor List ？
+<kadoban> [] is an instance of Functor, yes.                            [12:20]
+<monochrom> We just say "[] is an instance of Functor".
+<monochrom> Or "instance Functor []".
+
+<jusss> f = const id,   and f's type is (a->a) -> b -> (a->a)  right?
+<eiGHttt> % :t (const id)                                               [13:01]
+<yahb> eiGHttt: b -> a -> a
+
+[] 是Functor List的实例
+Functor只接受一个参数，所以Either a b，Either a c, 中Either a才是Functor,
+而Either不是Functor
+
+Maybe is not a typeclass,   (->) a is not a typeclass
+
+const :: a->b->a
+id :: a->a
+<MarcelineVQ> You were on the right track earlier with your type for "const
+              id" but const has been applied to id, so the first argument has
+              been filled in, which is why it's b -> a -> a and not (a -> a)
+              -> b -> a -> a                                            [13:53]
+<jusss> MarcelineVQ: what 'filled in' means?                            [13:56]
+<MarcelineVQ> hehe I'm finding it surprisingly difficult to word that
+              differently
+<MarcelineVQ> jusss: the type of const is, const :: a -> b -> a, what this
+              means is that the function const takes two arguments, a value of
+              some type 'a', a value of some type 'b', and results in a value
+              of the same type 'a'. Does this make sense?               [14:06]
+<jusss> MarcelineVQ: yeah
+<MarcelineVQ> Let's call the type of id, id :: c -> c, since it doesn't matter
+              what letter we use as long as it's consistent when we use it.
+<MarcelineVQ> when we say "const id" it means we're applying const to id,
+              we're making the first argument of const be id. That means the
+              'a' of const must become (c -> c) since it's the type of
+              id. Since both of const's 'a' are the same 'a', const's type
+              must then be const :: (c -> c) -> b -> (c -> c)
+<MarcelineVQ> When we say "const id", we've given const its first argument, so
+              it only needs one more argument. This means that (c -> c) -> b
+              -> (c -> c) is no longer the correct type, that's the type of
+              something that takes two arguments, but const has already been
+              given one.
+<MarcelineVQ> The type of const when we want to apply to id is const :: (c ->
+              c) -> b -> (c -> c), but "const id" b -> (c -> c)
+<MarcelineVQ> Hopefully that's not too much more confusing, but if you
+              understand that const :: a -> b -> a describes a function named
+              const that takes two arguments, and you understand that "const
+              id" is const that has already been given its first argument, the
+              types should make sense if you take your time to piece it
+              together                                                  [14:18]
+<jusss> MarcelineVQ: I see,
+<jusss> MarcelineVQ: thanks
+
+<jusss> MarcelineVQ: const :: a-> b -> a,   can I say const a :: b -> a ?
+<jusss> so if id :: a -> a, then const id :: b -> (a -> a) ?
+<jusss> can I move the right part of :: to the left part ?              [14:29]
+<jusss> and remove ( ) at anywhere in type signature?
+<dmwit> jusss: No, those are not moves you can make.
+<dmwit> jusss: The type language and computation language are completely
+        separate.                                                       [14:32]
+<jusss> dmwit: and remove ( ) at anywhere?
+<MarcelineVQ> Not in actual code no, types and values are separate. No, -> is
+              right associative so you can only remove ( ) when they would
+              associate right. -> being right associative means that a -> b ->
+              c -> d is a -> (b -> (c -> d))
+<dmwit> jusss: For the purposes of removing parentheses: (->) is
+        right-associative.                                              [14:33]
+<jusss> I don't understand what is "types and values are separate"
+<jusss> MarcelineVQ: but that's I do const a :: b -> a
+<jusss> or const a b :: a                                               [14:36]
+
+<jusss> MarcelineVQ: but that's I do const a :: b -> a
+<dmwit> What is the `a` in `const a`? It doesn't exist.
+<MarcelineVQ> It means that Int and 3 live in different namespaces, Int is a type and 3 is a value. 3 doesn't belong to the right of :: and Int doesn't belong to the left.
+<dmwit> (It doesn't exist. It's not in scope. There's nothing with that
+        name. These are all just different ways of saying the same thing, but
+        maybe one of them will be more understandable to you.)
+<MarcelineVQ> It's unclear what you mean when you say "const a :: b -> a"
+              because we're not sure if you think the 'a' of "const a" is a
+              name for some value or is a type variable.
+<MarcelineVQ> id is a value, that happens to bea function, with the type (a ->
+              a)
+<jusss``> MarcelineVQ: what if we have knew that const :: a->b->a,  and can we
+          use const a:: b->a ?
+<jusss``> and the left part of :: is type language and the right part is
+          computation language?
+<MarcelineVQ> jusss``: If you mean the 'a' to all be the same then no, 'a' is
+              a type variable, which means it's standing in for some
+              type. functions (like const) aren't applied to types, they're
+              applied to values. 'a' there isn't a value.
+<dmwit> jusss``: Other way. Left is computation, right is type.
+<dmwit> Void -> a is just as lousy a type as b -> a. Change my mind.    [14:51]
+<dmwit> In `const a :: b -> a`, the `a` on the left is just another variable
+        name, exactly like `const`. Except that the Prelude defines a variable
+        named `const` and doesn't define a variable named `a`.
+<dmwit> The `a` on the right is a type variable -- a placeholder that says
+        that users of the expression on the left may choose any type they like
+        to put in that spot.
+<MarcelineVQ> Consider that const id :: b -> (a -> a) and it is not const id
+              :: b -> id, does this show you a problem in your thinking?
+<dmwit> (Yes, Haskell distinguishes between variables and type
+        variables. There is a resemblance in their names, but they are not the
+        same thing despite that.)
+<dmwit> (Just like a dog and a doghouse have names that resemble each other
+        but are very different.)
+<jusss``> MarcelineVQ: the left part is variabe, and the right part is type
+<jusss``> so const id :: b->(a->a) is ok, and const id :: b -> id is not?
+          because id is a varaible and the right part need type
+<MarcelineVQ> id is a 'value' not a variable, but you're starting to get it
+<jusss``> MarcelineVQ: dmwit  so a function's name is a variable or a value?
+<jusss``> or called a function?
+<MarcelineVQ> A function's name is an identifier. A function is a value.
+                                                                        [15:05]
+<jusss``> I never know a function is equal to its name, or not
+<dmwit> If you want to be very, very careful, then no, a function and its name
+        are not the same thing. But most people are sloppy about this because
+        it's way too much work to be that careful all the time, and doesn't
+        really buy you very much.                                       [15:06]
+<MarcelineVQ> dmwit: Now I should probably recheck but afaik haskell has
+              variables in one place, types, things that look (and seem to
+              act) like variables elsewhere are bindings
+<jusss``> id :: a -> a,  this id is a identifier or a value?
+<dmwit> Yes, id is both things there.
+<MarcelineVQ> dmwit: I'm totally willing to admit that's some pedantic
+              nonsense though because I'm not sure where forall k . k ->
+              ... fits into what counts as a binder or not
+<jle`> syntactically, it is an identifier. the identifier represents a value
+<jle`> jusss``: a lot of things can represent values
+<jle`> (3 + 1), for example, is a value
+<jle`> using a variable identifier like `id` is one way to specify a value
+<jusss``> identifier, value, variable,  what they are?
+<jle`> jusss``: have you looked at the Haskell Report?
+<jle`> it defines all of these things pretty well
+<jle`> it's very readable, too :)
+<jle`> https://www.haskell.org/onlinereport/haskell2010/
+<yushyin> MarcelineVQ: of a valid example of 'funcname ? :: a -> b; funcname =
+          ...'                                                          [15:11]
+<dmwit> > (const 3 :: Int -> Int) 4 -- yushyin
+<lambdabot>  3
+<jle`> jusss``: the big picture of it is that "values" represent semantic
+       meaning.  and in a Haskell source code, we use *expressions* to notate
+       and describe values                                              [15:12]
+<jle`> expressions can be thought of like trees -- they are constructed by
+       using different expression pieces.  the haskell report describes all of
+       the pieces that make up an expression
+<yushyin> MarcelineVQ: dmwit: ah yes ...  I thought of something different.
+<jle`> in the end an expression is what we type into haskell source file, it's
+       the syntactic 'tokens'.                                          [15:13]
+<jle`> an expression like `1 + 3` can be thought of as `Op "+" (NumericLit 1)
+       (NumericLit 3)`, to use a pseudo-AST
+<jle`> one of the possible "pieces" of an expression is a *variable
+       identifier*
+<yushyin> I was only thinking of type signatures alone
+<jle`> so an expression like `id 5 + 2` can be thought of as `Op "+" (Apply
+       (VarId "id") (NumLit 5)) (NumLit 2)`                             [15:14]
+
+<jle`> 'id' here, syntactically, is a *variable identifier*. it plays that
+       role, just like how '5' plays the role of a numeric literal
+<jle`> now, the "point" of an expression is to represent a value.  that's the
+       actual semantic meaning that you are using expression syntax to
+       describe                                                         [15:15]
+<MarcelineVQ> yushyin: I'm not sure what you're wanting to see, but in the
+              case of const x :: b ->​ a, we must have some x = ... for this to
+              be valid, we are informed by const that x must have type a, and
+              that's all we can know about a since it must work for any a at
+              all. There's very limited things that can fit into any a at all,
+              two that come to mind are error "foo" and undefined.
+
+<jle`> to show a contrast, the expression `id 5 + 2` and the expression `7`
+       and the expression `const 7 2` are all *different expressions*
+<jle`> but, they represent the "same" value                             [15:16]
+                                                                        [15:17]
+<jle`> the full rules of what are allowed in an expression, and what name each
+       part has, is described in the Haskell Report in a pretty clear way
+
+<jusss``> jle`: const id, what this id 
+<jle`> on the expression level, that a "function application" expression
+<jle`> Apply (VarId "const") (VarId "id")
+
+<jle`> (if you're familiar with how ADT's and constructors work in Haskell)
+<jusss``> f = const id,   and const id :: b -> (a ->a)     the id are same?
+                                                                        [15:19]
+<yushyin> MarcelineVQ: no I was just dumb not realising that this is of course
+          valid haskell syntax, I am just not entirely awake :D
+
+<jusss``> in f = const id, id is a value I can undertand, that left-value
+          right-value things in C or other language,                    [15:20]
+
+<wolfman154> dmwit: ok, I think this paste bin link is correct, now where,
+             how, and what key binding do I need to add to gracefulExit?
+             https://hastebin.com/uratufurez.rb
+<jle`> "f = const id" is actually a different type of syntactic construct:
+       it's *declaration* syntax
+<jle`> again, this is all described in the report
+
+<jle`> declaration syntax goes like: <name> <pattern> = <expression>    [15:21]
+
+<jle`> (zero or more patterns allowed)
+<jle`> so the right hand side of the = is expression syntax.  the left hand
+       side is name and zero or more patterns
+
+<jle`> so in this case, f is the name, there are zero patterns, and the
+       expression on the right hand side is (in psuedo-ADT) Apply (VarId
+       "const") (VarId "id")                                            [15:22]
+<jle`> both 'const' and 'id' are "variable identifier" expressions
+
+<jle`> and 'const id' is an 'application' expression, which takes two
+       expressions (here, VarId "const" and VarId "id") and returns a new
+       expression                                                       [15:23]
+
+<jle`> if you're familiar with ADTs, it's kind of like data Expr = VarId
+       String | NumLit Integer | Apply Expr Expr | ... many other constructs,
+       all defined in the report
+
+<jle`> and we have something like data Declaration = Dec { decName :: String,
+       decPatterns :: [Pattern], decExpr :: Expr }. in a simplified form :)
+
+<jle`> so `f = const id` would be Dec { decName = "f", decPaterns = [],
+       decExpr = Apply (VarId "const") (VarId "id") }, to make the link clear
+<jle`> note that all of this is just *syntax*. it doesn't have anything to do
+       with the meaning of any of these expressions or declarations
+
+
+
+############################################################
+
 <jusss> List a -> (a->b) -> List b, so List is a Functor, but why function is
         Functor?
 
