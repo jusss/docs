@@ -1,6 +1,154 @@
 
 
 
+已知函数A和函数B的类型，就能通过类型推导得出(B A)的类型，通过换元法的代入和消除，haskell的类型推导就像在做中学的数学题，通过函数的类型签名还可以写出函数的定义，#神奇
+
+通过函数的类型签名然后再用eta expand构造出在其它语言里的表达方式
+map . map
+= \f -> map (map f)
+=\f -> map (\xs->map f xs)
+=\f xss -> map (\xs->map f xs) xss
+=(\f xss (map (\xs (map f xs) xss)))
+=(lambda (f xss) (map (lambda (xs) (map f xs)) xss))
+
+(map . map) (+1) [[1,2,5], [7,8]]会得到[[2,3,6], [8,9]] 绑定刚才那个scheme的lambda表达式为g (g (lambda (x) (+ x 1)) ‘((1 2 5) (7 8)))得到((2 3 6) (8 9)) #eta-expand和类型推导真是神奇！
+
+通过已知的两个函数类型可以推导出组合之后的函数类型，然后根据这个函数类型还可以推出函数的定义，
+甚至可以根据已知的两个函数类型,在组合之后进行eta-expand变成符合那两个类型的form, 就可以变成在其它语言里的表达方式 #mark
+
+function's type is not same with the function's return value type!
+
+id :: a->a
+function id's type is a->a
+and function's return value type is a
+
+##################################################################################
+
+<jusss> how to express map . map in other languages? like python or scheme
+<Solonarv> or ugly, ugly lambdas, e.g. python: map(lambda xs: map(f, xs), xss)
+<ski> jusss : i was about to say `(compose map map)', but that doesn't do what
+      you wanted, try `(lambda (f lis) (map (lambda (lis) (map f lis)) lis))'
+      instead ?
+<ski> jusss : if you `(define ((curried-map) f) lis) (map f lis))', then you
+      can say `(compose curried-map curried-map)' (adjust in the obvious way
+      if you want to work on more than one list)
+<ski> (the definition of `curried-map' may also need to be adjusted, if your
+      Scheme doesn't support "curried" `define's)
+<jusss> can I through the type signature to get the function's definition?
+<Solonarv> jusss: sometimes
+<ski> jusss : "through" ?
+<Solonarv> roughly speaking, the more general the type signature is the more
+           you can deduce about the implementation
+<Solonarv> for the type of (map . map) there are many possible implementations
+                                                                        [23:21]
+<jusss> ski: const::a->b->a, id::a->a, so const id::b->a->a
+<jusss> f:: const id,   f x y = y
+<Solonarv> roughly speaking, the type of map.map is enough to figure out that
+           elements in the result must come from the function argument being
+           applied to elements in the input list
+<ski> @djinn b -> a -> a
+<lambdabot> f _ a = a
+<ski> jusss : like that ^ ?  [23:23]
+<Solonarv> but the type doesn't say anything about how the elements are
+           arranged - they could be duplicated, or reshuffled in some
+           arbitrary way, or stuff like that
+<jusss> ski: yeah
+<jusss> Solonarv: ski, how you think about map .map to express in other
+        languages? I mean the transformation, is there a rule or something?
+                                                                        [23:29]
+<ski> what do you mean with "the transformation" or "rule" ?  [23:30]
+<jusss> map . map == (map (lambda (lis) (map f lis)) lis)
+<jusss> the procedure do that transform
+<jusss> sorry for my Bad English
+<Solonarv> basically just inline the definition of (.) and eta-expand
+           everything until there are no partial applications left
+<ski> jusss : `map' in Scheme is more like a `tupledMap' satisfying `tupledMap
+      (f,xs) = map f xs' in Haskell
+<ski> (well, `map' in Scheme also has the functionality of `zipWith',&c. ..)
+<ski> (so there's some slight impedance mismatch you need to account for)
+<jusss> Solonarv: that eta-expand apply on type signature or function's
+        definition?  [23:40]
+<Solonarv> definition
+<Solonarv> so we go like this:  [23:43]
+<Solonarv>             map . map
+<Solonarv> = \f     -> map (map f)               -- 1. definition of (.)
+<Solonarv> = \f     -> map (\xs -> map f xs)     -- 2. eta expand the inner
+           'map' call
+<Solonarv> = \f xss -> map (\xs -> map f xs) xss -- 3. eta expand outer 'map'
+           call
+<jusss> Solonarv: eta-expand is wonderful!
+<ski> jusss : yea, it might be a good idea to practice it until it becomes
+      second nature :)
+<jusss> ski: through map's type signature we can know it takes two parameter,
+        and through eta-expand, we can consturct (map . map) = \f -> map (map
+        f) to a form that map with two parameter, and then we can get the
+        expression in other language who support lambda, wonderful!
+<ski> jusss : yep :)        
+
+#######################################################
+
+
+fmap :: (a->b) -> f a -> f b
+when Functor is List, then fmap is map
+fmap :: (a->b) -> List a -> List b
+map :: (a->b) -> [a] -> [b]
+
+when Functor is (->) e, then fmap is (.)
+fmap :: (a->b) -> ((->) e a) -> ((->) e b)
+
+and (->) e a == e->a
+fmap :: (a->b) -> (e->a) -> (e->b)
+(.) :: (a->b) -> (e->a) -> (e->b)
+and Functor is (->) e
+
+
+if 
+(.) :: (a->b) -> (e->a) -> (e->b)
+map :: (a->b) -> [a] -> [b]
+
+so map . map :: ?
+
+rule I. -> and . is infix expression, so ((->) e a) == (e->a) and map . map == (.) map map
+rule II. -> is right associate
+rule III. f g a == (f g) a
+rule IIII. take function A's parameter type and return type as function B's parameter types in B's type signature, get function B's type signature with function A's type
+rule V. (B A) A will take the first parameter position in B, so remove the type of the first parameter in B, it will get (B A)'s type
+
+map . map == (.) map map
+map1 :: (x1->y1) -> ([x1] -> [y1])
+map2 :: (x2->y2) -> ([x2] -> [y2])
+
+let (x1->y1) as a, and ([x1] -> [y1]) as b in (.)
+so (.) :: ((x1->y1) -> ([x1]->[y1])) -> (e->(x1->y1)) -> (e->([x1]->[y1]))
+and (.) map1, that map1 take the first parameter's position,
+so (.) map1 :: (e->(x1->y1)) -> (e->([x1]->[y1]))
+
+let (x2->y2) as e and ([x2]->[y2]) as (x1->y1) in (.) map1
+so [x2] as x1, and [y2] as y1
+so (.) map1 :: ((x2->y2) -> ([x2]->[y2]))  ->  ((x2->y2) -> ([[x2]] -> [[y2]]))
+and (.) map1 map2, that map2 take the first parameter's position.
+so (.) map1 map2 :: ((x2->y2) -> ([[x2]]->[[y2]]))
+
+(.) map map :: (x2->y2) -> ([[x2]]->[[y2]])
+map . map :: (x2->y2) -> [[x2]] -> [[y2]]
+
+
+####################################################
+
+const :: a->b->a
+id :: a -> a
+
+id :: x -> x
+const :: (x->x) -> b -> (x->x)
+const id :: b->(x->x)
+const id :: b->a->a
+
+f = const id
+f :: b-> a -> a
+f x y = y
+
+
+####################################################################
 
 use SVG or Canvas in html to replace pictures!
 
