@@ -1,5 +1,100 @@
 
 
+rule I. the return type in the type signature, it must be appeared befor the last one, otherwise it will be undefined, Eg :: a->b->c->a is ok, and Eg :: a->b->c is not ok, 'cause c is undefined.
+
+rule II. in the data declaration, the variable in the right part of '=', it must be appeared in the left part of '=',  data T a = V a is ok, and data T = V a is not,
+
+
+there're a set of function definition and type signature in the typeclass,
+those function definitions describe the relationship among them, like how Function A change to
+Function B, but not really Function A's definition.
+in the instance definition, define the functions which type signatures defined in the typeclass's definition,
+multiple instance with the one typeclass, and define the same function, it will make the function can take multiple type.
+
+like isEqual True True = True
+     isEqual Red Red = True
+in two instances.
+
+data Bool = True | False
+data Color = Red | Green | Blue
+
+class BasicEq a where
+      isEqual :: a -> a -> Bool
+      isEqual x y = not (isNotEqual x y)
+
+      isNotEqual :: a -> a -> Bool
+      isNotEqual x y = not (isEqual x y)
+
+instance BasicEq Bool where
+         isEqual True True = True
+         isEqual False False = True
+         isEqual _ _ = False
+
+instance BasicEq Color where
+         isEqual Red Red = True
+         isEqual Green Green = True
+         isEqual Blue Blue = True
+         isEqual _ _ = False
+
+t :: (BasicEq a)=> a -> a -> Bool
+t x y = isEqual x y
+
+λ> isEqual Red Red
+True
+λ> isEqual True True
+True
+λ> t Red Red
+True
+λ> t True True
+True
+
+typeclass is used to make the one function take multiple type signatures,
+and use the typeclass constraint in other type signature, it makes the type concret and you can use the function defined in the typeclass.
+like (BasicEq a) => a, so a can only be Bool or Color, and you can use isEqual apply on a.
+
+
+https://rwh.readthedocs.io/en/latest/chp/6.html
+
+{-# language MultiParamTypeClasses, FunctionalDependencies #-}
+{-# language FlexibleInstances #-}
+module X where
+
+data T a = V a
+
+class MyT a b | a -> b where
+    value :: a -> b
+
+instance MyT (T a) a where
+    value (V a) = a
+
+λ> value (V 3)
+3
+
+
+
+###################################################################w
+
+Typeclass
+use a type as a typeclass's instance and use it in the function of typeclass
+like pass a type into typeclass's function
+
+data Bool = True | False
+class BasicEq a where
+      isEqual :: a -> a -> Bool
+      
+
+a is instance of BasicEq, and BasicEq is a typeclass
+
+instance BasicEq Bool where
+         isEqual True True = True
+         isEqual False False = True
+         isEqual _ _ =False
+
+use type Bool as a instance of typeclass BasicEq
+so use the function's signature in typeclass as the signature of function in instance
+
+######################################################################################
+
 
 已知函数A和函数B的类型，就能通过类型推导得出(B A)的类型，通过换元法的代入和消除，haskell的类型推导就像在做中学的数学题，通过函数的类型签名还可以写出函数的定义，#神奇
 
