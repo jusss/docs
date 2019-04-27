@@ -1,3 +1,466 @@
+
+
+#######################################################
+
+Prelude> :{
+Prelude| addr :: [a] -> [a] -> [a] -> ([a]->b) -> (b->c) -> c
+Prelude| addr x y g z f = f (z ( x ++ y ++ g))
+Prelude| :}
+Prelude> addr "a" "b" "c" (\x -> x) (\x->x)
+"abc"
+Prelude> addr [1] [2] [3] (\x->x) (\x->x)
+[1,2,3]
+
+##################################################
+
+_ in haskell
+Prelude> :{
+Prelude| addr :: [a] ->[a]->[a]->([a]->b)->(b->c)->c
+Prelude| addr x y _ z f = f ( z ( x ++ y ++ _))
+Prelude| :}
+<cocreature> jusss: what do you mean by “wrong”? This is not an error as
+             such, you just need to fill something in for the underscore at
+             the end of the line                                        [13:33]
+<cocreature> if you use _ in a pattern match, the value will not be bound to
+             an underscore. It won’t be bound at all
+<tdammers> _ is special in pattern matches
+<jle`> _ acts like an identifier in pattern syntax, but it cannot be bound and
+       any bindings are ignored
+<jle`> so it's the same role syntactically in both cases, but different
+       semantically                                                     [13:44]
+<jusss> jle`: so '_' in the left of '=‘ match all, on the right, just a
+        normal variable, right?                                         [13:46]
+<tdammers> on the right, it's a hole
+<jusss> what is a 'hole'?
+<jle`> so to clarify the mess of what i said, syntactically they fit anywere a
+       normal variable or identifier would go
+<jle`> but semantically they mean different things                      [13:47]
+<jle`> jusss: to the right of =, it essentially is a normal variable that is
+       always unbound (since you can't bind _), *but* ghc gives it special
+       treatment when doing error reporting
+<tdammers> https://wiki.haskell.org/GHC/Typed_holes <- jusss 
+<tdammers> before the Typed Holes feature in GHC, _ was just a regular
+           variable (and it still is if you disable Typed Holes)        [13:48]
+<tdammers> but because it's special in pattern matches, it cannot ever be
+           bound to anything
+<jle`> > True || blahblah
+<dminuoso> jusss: Both x and _ `f x _ = ...` are so-called irrefutable pattern
+           matches, the difference being that for the first pattern the result
+           is bound to a variable named `x`, and for the _ pattern you cannot
+           refer to it anymore.
+<lambdabot>  error: Variable not in scope: blahblah :: Bool
+<jle`> > True || _
+<lambdabot>  error:
+<lambdabot>      • Found hole: _ :: Bool
+<lambdabot>      • In the second argument of ‘(||)’, namely ‘_’
+<jusss> tdammers: so '_' shouldn't show on the right of ' =' ?
+<jle`> the only difference effectively in expressions is that the error
+       message is different                                             [13:49]
+<tdammers> jusss: not if you want the code to compile without errors
+<jle`> jusss: _ is useful for debugging, but shouldn't be there in 'completed'
+       code
+<dminuoso> jusss: Even more special are identifiers starting with an
+           underscore. Say `_foo` is doubly special. :)
+<jle`> jusss: note how in both cases, it's the same error essentially, but the
+       error reported is different
+<jle`> the error for _ is more useful for debugging and helping interactive
+       programming
+<dminuoso> jusss: That is, if _foo is not defined you get the error for a
+           typed hole, but if it is defined then _foo becomes a regular
+           variable.
+<tdammers> and of course this all holds only at the term level. type-level, _
+           is also special, but in a slightly different (but related) way
+<dminuoso> (Identifiers starting with underscore are particularly common when
+           you deal with lenses for conventional reasons)
+
+####################################################
+
+import cv2, dlib, face_recognition, numpy
+
+face recognition within live stream!
+https://github.com/ageitgey/face_recognition/blob/master/examples/facerec_from_webcam_faster.py
+https://github.com/ageitgey/face_recognition/blob/master/README_Simplified_Chinese.md
+
+####################################################
+
+let's assume there's a function f
+
+f g [] = X
+f g (x:xs) = f (g x) xs
+
+what g and X would be to make this f exist?
+<ski> you could have `data Consumer i o = MkCons {done :: o,consume :: i ->
+      Consumer i o}', and then your `X' would involve using the `done' field,
+      while the recursive call, passing `x' to `g', would use the `consume'
+      field                                                             [10:38]
+<ski> jusss : and then the signature of your `f' would be `f :: Consumer i o
+      -> [i] -> o'                                                      [10:39]
+<ski> you may think of a value of type `Consumer i o' as an object, which
+      accepts two kinds of messages (has two methods), one being `done', which
+      generates a result output of type `o', and the other being `consume',
+      which, when given an argument input of type `i', will produce a new
+      state/version of the object, which you can then go on calling `done' ior
+      `consume' on                                                      [10:46]
+<ski> (no mutation, so instead of `consume' changing some internal mutable
+      state, it just returns a "clone" of the state of the object, adapted to
+      the new information in the newly accepted input of type `i')      [10:47]
+<ski> to create a consumer "object", you just have to tell how it should
+      "respond" to the two messages `done' and `consume' .. iow, you don't
+      have classes here, you just describe the behaviour of the object
+      directly                                                          [10:48]
+<ski> (if you want to, you can describe common behaviour that you want to
+      reuse in a function, which constructs new objects for you. an "object
+      factory", i suppose ..)                                           [10:49]
+<ski> e.g. if you wanted to define an accumulating object, which accumulated a
+      sum, starting at zero, you could say
+<ski>   accumulator :: Consumer Int Int
+<ski>   accumulator = MkCons
+<ski> actually
+<ski>   accumulator = self 0
+<ski>     where
+<ski>     self sumSoFar = MkCons
+<ski>       { done = sumSoFar                                           [10:51]
+<ski>       , consume = \n -> self (sumSoFar + n)
+<ski>       }
+<ski> so `sumSoFar' is the (private) local state (still immutable, but you can
+      swap it out for another state, if you call the "constructor" `self' with
+      a different initializer value, like inside `consume' there) of your
+      object
+<jusss> ski: sorry to being late replay, I need a little time to understand
+        this                                                            [10:53]
+<ski> jusss : i'm mostly trying to get across a broad idea of what one could
+      do with something like this data type. getting the details can wait for
+      later      
+
+###########################################
+
+g x = g
+(define (g x) (whatever x) g)
+g = _ => g
+
+f = x => y => x+y
+f(f(1))  =  \y -> (\g->1+g) + y    so plus a function on a Int, will get a type error
+
+f = \x -> (\y -> x+y)
+f 1 = \g -> (1 + g)
+f (f 1) = \ ( \g -> 1+g ) -> ( \y -> ( \g -> (1 + g)) + y)
+          = \y -> (( \g -> (1 + g)) + y)
+so plus a function \g -> (1 + g) on y will get a type error          
+
+################################################
+take a picture with camera
+pygame, opencv, simplecv, pil
+
+<predator500> rekognition by AWS amazon
+<predator500> have same service
+<predator500> its called REKOGNITION with K :)                          [13:48]
+<jusss> yeah, and Microsoft Azure
+<jusss> it's free ?                                                     [13:49]
+<predator500> Because if we needed to write the A.I and ML , it would take a
+              lot more time.
+<predator500> Yes for 12 months
+<predator500> i think 5000 recongs per month
+<jusss> that's good!
+<predator500> But after that it is like 1$ on 1000 recons
+<predator500> face++ ? free?
+<jusss> sort of, I just tried it yesterday                              [13:50]
+<jusss> and it provides off-line SDKs
+<jusss> this is the document from face++, https://console.faceplusplus.com.cn
+                                                                        [13:54]
+<predator500>
+              https://github.com/shantnu/Webcam-Face-Detect/blob/master/webcam.py
+<predator500> flags=cv2.CASCADE_SCALE_IMAGE
+<predator500> python3 yourproject.py cascade.xml
+<jusss>  I put this cv2.imwrite('02.png',frame) into that if cv2.waitKey line,
+        and when I press 'q' it will generate a photo                   [14:27]
+<predator500> nice                                                      [14:51]
+##################################################
+
+https://console.faceplusplus.com.cn/app/apikey/view/97441
+API Key: M5VCIKHZFXbM0HitDlLS8ifh4SIfnhHB
+API Secret: J4k9QjjJu5DX97aUmPm-wxawJubLxgQo
+
+
+curl -X POST "https://api-cn.faceplusplus.com/facepp/v3/compare" -F "api_key=M5VCIKHZFXbM0HitDlLS8ifh4SIfnhHB" -F "api_secret=J4k9QjjJu5DX97aUmPm-wxawJubLxgQo" -F "image_file1=@test1.jpg" -F "image_file2=@test2.jpg" 
+
+#############################################
+
+curl for windows
+Assuming you got it from https://curl.haxx.se/download.html, just unzip it wherever you want. No need to install. If you are going to use SSL, you need to download the OpenSSL DLLs, available from curl's website.
+
+or powershell
+
+##########################################
+
+pip3 install opencv-python  dlib face_recognition
+
+import cv2
+
+
+##########################################################
+
+data Color = Red | Green | Blue
+
+colorEq :: Color -> Color -> Bool
+colorEq Red   Red   = True
+colorEq Green Green = True
+colorEq Blue  Blue  = True
+colorEq _     _     = False
+
+Typeclasses define a set of functions that can have different implementations depending on the type of data they are given.
+
+the one function, different type and different data?
+
+We want a function that takes two parameters, both the same type, and returns a Bool indicating whether or not they are equal. We don't care what that type is, but we just want two items of that type.
+
+class BasicEq a where
+    isEqual :: a -> a -> Bool
+
+This says that we are declaring a typeclass named BasicEq, and we'll refer to instance types with the letter a.
+ An instance type of this typeclass is any type that implements the functions defined in the typeclass.
+ This typeclass defines one function.That function takes two parameters—both corresponding to instance types—and returns a Bool
+ 
+
+
+################################################
+
+Prelude> :{
+Prelude| nw :: a-> (a->b) ->b
+Prelude| nw x y = y x
+Prelude| :}
+Prelude> nw 1 (+1)
+2
+
+Prelude> :{
+Prelude| nw2 :: (Num a)=> a -> a
+Prelude| nw2 x = x + 1
+Prelude| :}
+Prelude> nw2 33
+34
+Prelude>
+
+Prelude> :{
+Prelude| nw3 :: (Num a) => a -> a->a
+Prelude| nw3 x y = x + y
+Prelude| :}
+Prelude> nw3 3 2
+5
+Prelude>
+
+Prelude> :t (+1)
+(+1) :: Num a => a -> a
+Prelude>
+
+rule I. don't use function's name as variable in patter match for another function's definition in the left part of '='
+rule II. the variable's type in the signatur must be the type of variable in the function definition
+
+(+1)'s type is (Num a)=> a -> a
+so if you want (+1) in function's definition, it only can be the right part of = , can not be the left part of =, so the type in signature, it must be (Num a)=> a,  'cause (+1) work on that type,
+w :: (Num a)=> a -> a
+w x = (+1) x
+
+##############################################
+
+#beta-reduction
+A beta reduction (also written β reduction) is the process of calculating a result from the application of a function to an expression.
+For example, suppose we apply the function
+(\x -> 2*x*x + y)
+to the value 7. To calculate the result, we substitute 7 for every occurrence of x, and so the application of the function
+(\x -> 2*x*x + y)(7)
+is reduced to the result
+2*7*7 + y
+This is a beta reduction. 
+
+#typeclass #beta-reduce
+<jusss> w6 :: (Num a)=> a -> (a->a) ->a          w6 x (+1) = (+1) x    which
+        part is wrong?
+<sssilver> wolfman154: you can't start learning Haskell unless you can do beta
+           reduction with close eyes on a parchment
+<Solonarv> jusss: the (+1) part is wrong, you can't pattern match on functions
+<jusss> Solonarv: how I can express like f(x,y) = y(x) ?
+<jusss> f = function(x,y) {return y(x)}
+<Solonarv> jusss: you've almost got it, just pick a normal variable name
+           instead of something silly like (+1)
+<Cale> jusss: f x y = y x
+<jusss> Solonarv: I can not use function's name in pattern match for
+        function's definition, use a variable to instead of that function's
+        name, right?
+<Solonarv> jusss: well, you can use whatever variable name you want
+<Solonarv> if the name is already bound to something "outside" the local
+           binding will simply shadow the outer one
+<jusss> Solonarv: and (+1) can not be a variable?
+<Solonarv> correct, (+1) is not a variable
+<Solonarv> that's the only thing you did wrong!
+<jusss> Solonarv: what if I want express f x = x+1, what the type would be?
+                                                                        [10:05]
+<jusss> w::a->a?
+<Solonarv> almost
+<Solonarv> let's ask the compiler!
+<Solonarv> :t let w x = x + 1 in w
+<lambdabot> Num a => a -> a
+<monochrom> The "+" and the "1" incur a Num constraint.
+<ion> :t let w x = x + (1 :: Integer) in w
+<lambdabot> Integer -> Integer
+<jusss> Solonarv: so, if it's concret type's instance in the function, and the
+        type must be concret in type signature?                         [10:07]
+<jusss> in the function's definition
+<jusss> w::(Num a)=> a->a      w x= (+1) x                              [10:08]
+###############################################################
+
+已知函数A和函数B的类型，就能通过类型推导得出(B A)的类型，通过换元法的代入和消除，haskell的类型推导就像在做中学的数学题，通过函数的类型签名还可以写出函数的定义，#神奇
+
+通过函数的类型签名然后再用eta expand构造出在其它语言里的表达方式
+map . map
+= \f -> map (map f)
+=\f -> map (\xs->map f xs)
+=\f xss -> map (\xs->map f xs) xss
+=(\f xss (map (\xs (map f xs) xss)))
+=(lambda (f xss) (map (lambda (xs) (map f xs)) xss))
+
+(map . map) (+1) [[1,2,5], [7,8]]会得到[[2,3,6], [8,9]] 绑定刚才那个scheme的lambda表达式为g (g (lambda (x) (+ x 1)) ‘((1 2 5) (7 8)))得到((2 3 6) (8 9)) #eta-expand和类型推导真是神奇！
+
+通过已知的两个函数类型可以推导出组合之后的函数类型，然后根据这个函数类型还可以推出函数的定义，
+甚至可以根据已知的两个函数类型,在组合之后进行eta-expand变成符合那两个类型的form, 就可以变成在其它语言里的表达方式 #mark
+
+function's type is not same with the function's return value type!
+
+id :: a->a
+function id's type is a->a
+and function's return value type is a
+
+##################################################################################
+
+<jusss> how to express map . map in other languages? like python or scheme
+<Solonarv> or ugly, ugly lambdas, e.g. python: map(lambda xs: map(f, xs), xss)
+<ski> jusss : i was about to say `(compose map map)', but that doesn't do what
+      you wanted, try `(lambda (f lis) (map (lambda (lis) (map f lis)) lis))'
+      instead ?
+<ski> jusss : if you `(define ((curried-map) f) lis) (map f lis))', then you
+      can say `(compose curried-map curried-map)' (adjust in the obvious way
+      if you want to work on more than one list)
+<ski> (the definition of `curried-map' may also need to be adjusted, if your
+      Scheme doesn't support "curried" `define's)
+<jusss> can I through the type signature to get the function's definition?
+<Solonarv> jusss: sometimes
+<ski> jusss : "through" ?
+<Solonarv> roughly speaking, the more general the type signature is the more
+           you can deduce about the implementation
+<Solonarv> for the type of (map . map) there are many possible implementations
+                                                                        [23:21]
+<jusss> ski: const::a->b->a, id::a->a, so const id::b->a->a
+<jusss> f:: const id,   f x y = y
+<Solonarv> roughly speaking, the type of map.map is enough to figure out that
+           elements in the result must come from the function argument being
+           applied to elements in the input list
+<ski> @djinn b -> a -> a
+<lambdabot> f _ a = a
+<ski> jusss : like that ^ ?  [23:23]
+<Solonarv> but the type doesn't say anything about how the elements are
+           arranged - they could be duplicated, or reshuffled in some
+           arbitrary way, or stuff like that
+<jusss> ski: yeah
+<jusss> Solonarv: ski, how you think about map .map to express in other
+        languages? I mean the transformation, is there a rule or something?
+                                                                        [23:29]
+<ski> what do you mean with "the transformation" or "rule" ?  [23:30]
+<jusss> map . map == (map (lambda (lis) (map f lis)) lis)
+<jusss> the procedure do that transform
+<jusss> sorry for my Bad English
+<Solonarv> basically just inline the definition of (.) and eta-expand
+           everything until there are no partial applications left
+<ski> jusss : `map' in Scheme is more like a `tupledMap' satisfying `tupledMap
+      (f,xs) = map f xs' in Haskell
+<ski> (well, `map' in Scheme also has the functionality of `zipWith',&c. ..)
+<ski> (so there's some slight impedance mismatch you need to account for)
+<jusss> Solonarv: that eta-expand apply on type signature or function's
+        definition?  [23:40]
+<Solonarv> definition
+<Solonarv> so we go like this:  [23:43]
+<Solonarv>             map . map
+<Solonarv> = \f     -> map (map f)               -- 1. definition of (.)
+<Solonarv> = \f     -> map (\xs -> map f xs)     -- 2. eta expand the inner
+           'map' call
+<Solonarv> = \f xss -> map (\xs -> map f xs) xss -- 3. eta expand outer 'map'
+           call
+<jusss> Solonarv: eta-expand is wonderful!
+<ski> jusss : yea, it might be a good idea to practice it until it becomes
+      second nature :)
+<jusss> ski: through map's type signature we can know it takes two parameter,
+        and through eta-expand, we can consturct (map . map) = \f -> map (map
+        f) to a form that map with two parameter, and then we can get the
+        expression in other language who support lambda, wonderful!
+<ski> jusss : yep :)        
+
+#######################################################
+
+
+fmap :: (a->b) -> f a -> f b
+when Functor is List, then fmap is map
+fmap :: (a->b) -> List a -> List b
+map :: (a->b) -> [a] -> [b]
+
+when Functor is (->) e, then fmap is (.)
+fmap :: (a->b) -> ((->) e a) -> ((->) e b)
+
+and (->) e a == e->a
+fmap :: (a->b) -> (e->a) -> (e->b)
+(.) :: (a->b) -> (e->a) -> (e->b)
+and Functor is (->) e
+
+
+if 
+(.) :: (a->b) -> (e->a) -> (e->b)
+map :: (a->b) -> [a] -> [b]
+
+so map . map :: ?
+
+rule I. -> and . is infix expression, so ((->) e a) == (e->a) and map . map == (.) map map
+rule II. -> is right associate
+rule III. f g a == (f g) a
+rule IIII. take function A's parameter type and return type as function B's parameter types in B's type signature, get function B's type signature with function A's type
+rule V. (B A) A will take the first parameter position in B, so remove the type of the first parameter in B, it will get (B A)'s type
+
+map . map == (.) map map
+map1 :: (x1->y1) -> ([x1] -> [y1])
+map2 :: (x2->y2) -> ([x2] -> [y2])
+
+let (x1->y1) as a, and ([x1] -> [y1]) as b in (.)
+so (.) :: ((x1->y1) -> ([x1]->[y1])) -> (e->(x1->y1)) -> (e->([x1]->[y1]))
+and (.) map1, that map1 take the first parameter's position,
+so (.) map1 :: (e->(x1->y1)) -> (e->([x1]->[y1]))
+
+let (x2->y2) as e and ([x2]->[y2]) as (x1->y1) in (.) map1
+so [x2] as x1, and [y2] as y1
+so (.) map1 :: ((x2->y2) -> ([x2]->[y2]))  ->  ((x2->y2) -> ([[x2]] -> [[y2]]))
+and (.) map1 map2, that map2 take the first parameter's position.
+so (.) map1 map2 :: ((x2->y2) -> ([[x2]]->[[y2]]))
+
+(.) map map :: (x2->y2) -> ([[x2]]->[[y2]])
+map . map :: (x2->y2) -> [[x2]] -> [[y2]]
+
+
+####################################################
+
+const :: a->b->a
+id :: a -> a
+
+id :: x -> x
+const :: (x->x) -> b -> (x->x)
+const id :: b->(x->x)
+const id :: b->a->a
+
+f = const id
+f :: b-> a -> a
+f x y = y
+
+##########################################################
+
+<link rel="stylesheet" type="text/css" href="loop.css"/> is ok
+and <link href="loop.css" /> is not,
+but  <script src="loop.js"></script>  is ok
+  
+####################################################
+
 #js #promise #loop #pic #pics
 
 window.onload=function(){
