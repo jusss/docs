@@ -1,3 +1,24 @@
+
+
+
+
+_name_ means current module's name, one file is one module,
+if you import file a in file b, and run file b then the __name__ point
+to file b, and a will be evaluated when it's imported, but if you put
+that function call code in if __name__ == '__main__' in a, when a is imported
+in b, a will not be evalated,
+
+this if __name__=='__main__' only work for preventing the module you import to
+be evaluted,
+
+python's entry point is the first line
+
+https://www.zhihu.com/question/49136398
+
+
+
+
+
 >>> f= lambda x: lambda y: x+y
 >>> f
 <function <lambda> at 0x7fca971f5f28>

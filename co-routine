@@ -26,3 +26,9 @@ co-routine, 单线程里依次执行多个函数里的片段，避免I/O阻塞
 
 http://es6.ruanyifeng.com/#docs/promise
 
+co-routine, 在js里ES6之前都是用callback回调函数做的，在函数里调用另一个函数来做异步,另一个函数返回后，接着执行当前函数
+
+python 2.7有promise的实现，future库
+3.6有asyncio来实现
+
+

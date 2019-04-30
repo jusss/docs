@@ -1,0 +1,23 @@
+django-admin
+
+Model - View - Process
+
+it's kind like Model View Update in Elm
+
+django-admin startproject HelloWorld     # create the project
+cd HelloWorld
+python manage.py runserver 0.0.0.0:8000
+
+visit localhost:8000 on browser
+
+touch view.py
+from django.http import HttpResponse
+def hello(request):
+    return HttpResponse("hello world")
+
+vim urls.py
+from django.conf urls import url
+from . import view
+urlpatterns = [
+    url(r'^$',view.hello)
+]

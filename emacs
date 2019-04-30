@@ -1,4 +1,12 @@
-
+<jusss> C-x o I can jump another filed, how I can reverse?
+<jusss> jump back?
+<str1ngs> jusss: C-u -1 C-x o IIRC  [23:55]
+<str1ngs> jusss: I use the switch-window package instead. there is also
+          ace-window. switch-window works better with frame
+<str1ngs> err frames  [00:05]
+<str1ngs> jusss: switch-window will label the windows then you just press
+          label for the window you want
+############################################
 ;;; python-mode will not eval python buffer if there is threading code
 (defun my-python-compile ()
   (interactive)

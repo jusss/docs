@@ -10,6 +10,8 @@ c() :6
 每次执行f()()都会执行let a=3给a重新赋值，但c=f()之后，c的代码只有()=>{a=a+1; return a}
 而没有let a=3，所以c()会每次都返回不同的值。
 
+closure主要是封装了a,最后返回一个可以访问封装的变量或函数的identifier,
+
 count = ()=>{let a=3; return n => {a=a+n; return a}}
 c = count()
 c(1) :4
