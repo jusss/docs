@@ -1,4 +1,24 @@
 
+Elm Architecture
+
+view pass Msg -> update Msg currentModel newModel -> view newModel
+
+Model is the states
+Msg is button click, mouse move, whatever else
+
+https://zhuanlan.zhihu.com/p/21338799
+
+----------------------------------------------------
+put all selectors and styles into one list
+
+[[id1,style]
+,[id2,style]
+,[id3,style]
+]
+
+just show one of them and hide the rest
+-------------------------------------------------------------
+
 Type Constructor and Value Constructor
 
 data T a = V a   

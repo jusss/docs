@@ -1,0 +1,3 @@
+run `designer` for the gui layout, save as .ui file
+then convert ui file to py file
+pyuic5 qt-test.ui -o qt-test.py

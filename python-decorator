@@ -1,3 +1,4 @@
+"I think decorator only can do something before the origin code's running or after it, decorator can not change what is in the origin code,it can not change origin code"
 Now, what are decorators really? They “decorate” or “wrap” another function and let you execute code before and after the wrapped function runs.
 
 def null_decorator(func):

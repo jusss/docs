@@ -1,0 +1,17 @@
+https://wiki.archlinux.org/index.php/Core_dump
+
+To generate a core dump of an arbitrary process, first install the gdb package. Then find the PID of the running process, for example with pgrep:
+
+$ pgrep -f firefox
+2071 firefox
+Attach to the process:
+
+$ gdb -p 2071
+Then at the (gdb) prompt:
+
+(gdb) generate-core-file
+Saved corefile core.2071
+(gdb) quit
+Now you have a coredump file called core.2071.
+
+
