@@ -1,5 +1,118 @@
 
 
+#GADTs
+{-#LANGUAGE GADTs #-}
+
+--ADT
+data Maybe a =  
+    Nothing |   
+    Just a
+--GADT
+data Maybe a where
+   Nothing  :: Maybe a
+   Just :: a -> Maybe a
+
+data T = I Int | B Bool
+data T where
+     I :: Int -> T
+     B :: Bool -> T
+
+#ADT #Algebraic Data Types
+
+<jusss> how to make a type that can have Int or Bool, nothing else,  data T =
+        Int | Bool  ???   (here Int is value constructor, has nothing with that type constructor Int, so it's not what you want here)                                              [09:32]
+<jusss> dyl: data T = Either Int Bool? (this is not what you want too)
+Prelude> :t (Either 3)
+(Either 3) :: Bool -> T
+<dyl> Yup. 
+<dyl> Either A B is the dual of (A, B) [or Tuple A B if you prefer]
+<dyl> Tuple is one of both (a product), Either is one or the other (a
+      coproduct).
+<jusss> dyl: and when I want to use this value, I should use Either 3 or I
+        need Either 3 True?                                             [09:34]
+<dyl> data Either A B = Left A | Right B.
+<dyl> a b*
+<jackdk> `data T = I Int | B Bool` or `type T = Either Int Bool`, depending on
+         whether you want T to be a new type or an alias
+<dyl> ^ 
+<dyl> Tbh I would just use Either unless there’s a need to do otherwise as
+      you get a lot of stuff for free.                                  [09:35]
+<jusss> what is this Left and Right  ,  I and B here?
+<jusss> just a Value Constructor? and meaningless?
+<dyl> data Either a b = Left a | Right b
+<dyl> They’re just the constructor for each case. 
+<dyl> Pull up google on Data.Either.                                    [09:36]
+<dyl> Hoogle*
+<jusss> then I see, Int and Bool both are type constructor, so if they want to
+        be a value , they need a value constructor, right?
+<dlyang> use GADTs extension  data T a = where I :: a ->Int B:: a ->Bool
+<JappleAck> data T a = where I :: a -> Int ; B :: a -> Bool
+<JappleAck> but it still incorrect and supposed to be something like this:
+            data T a where I :: a -> T Int ; B :: a -> T Bool           [09:43]
+<jusss> data T a = I a | B a,   
+<JappleAck> jusss: in your case you could have `I True' and `B 123'     [09:44]
+<JappleAck> even this: data T a where I :: Int -> T Int ; B :: Bool -> T Bool
+                                                                        [09:47]
+<jusss> data T = Either a b
+<jusss> data T = Either Int Bool                                        [10:14]
+<jusss> Either 3 is ok , but Either True is not, so it must be Either 3 True?
+in this case Either a value constructor, has nothing with that Either type constructor,
+so it has to be (Either Int Bool), and (Either Int) is a partial form
+<jusss> % :t Either 3
+<yahb> jusss: Bool -> T
+<geekosaur> % :t Either 3
+<yahb> geekosaur: Bool -> T
+<geekosaur> incomplete
+<geekosaur> because it's partially applied                              [10:31]
+
+<jusss> geekosaur: aha, so this 'Either' in 'data T = Either Int Bool' has no
+        relationship with 'Either a b = Left a | Right b'?
+<mniip> perhaps they wanted data T = C (Either Bool Int)
+<geekosaur> here, you called it Either, which will be unrelated to the
+            exxisting type Either
+<geekosaur> % data T1 = MkT1 Int Bool -- same thing, different constructor
+            name
+<yahb> geekosaur: 
+<mniip> jusss, correct, they live in different namespaces
+<mniip> data A = B C                                                    [10:33]
+<jusss> mniip: data T = C (Either Bool Int),  what this C construct?
+<geekosaur> a value of this type T looks like C (Left True) or C (Right 4)
+<geekosaur> the parentheses are required here, `C Left True` would attempt to
+            apply a value (C Left) (which is a type error) as a function to
+            the value True                                              [10:38]
+<jusss> geekosaur: if the type constrctor to do a value, I should put a value
+        constructor on it?                                              [10:48]
+<jusss> do as
+<geekosaur> ...what?
+<jusss> data T = Maybe Int, this Maybe is nothing with type constructor Maybe
+<jusss> this Maybe is value constructor here
+<geekosaur> right, it's defining a data constructor, not a type constructor
+                                                                        [10:49]
+<jusss> but I can use data T = C (Maybe Int)
+<jusss> and this Maybe is still that Maybe type constructor
+<jle`> you can use both, but they mean two different things
+<jle`> `data T = Maybe Int`, you're declaring a new data type T, with a value
+       constructor Maybe
+<jle`> that contains an Int
+<geekosaur> data ATypeConstructor {- possibly some type parameters -} =
+            ADataConstructor {- possibly some types for "contained'/associated
+            values here -}
+<jle`> with `data T = C (Maybe Int)`, you're declaring a new data type T, with
+       value constructor C, that contains a (Maybe Int)
+<jusss> ok                                                              [10:52]
+<jle`> it's admittedly a little inconsistent because you flip back and forth
+       between two levels of things                                     [10:53]
+<jle`> that's one reason why a lot of people think GADT syntax is more
+       consistent/easier to undersatnd in this regard                   [10:54]
+<jle`> it's an alternative syntax to declaring new data types and constructors
+
+(type constructor can not be a value constructor, otherwise, that same identifier is just 
+a value constructor, nothing to do with type constructor, but you can make another identifier as value constructor, and use the type constructor as a value of it, that's ok)
+data T = Maybe Int     not ok
+data T = V (Maybe Int)      ok
+
+#############################################
+
 rule I. the return type in the type signature, it must be appeared befor the last one, otherwise it will be undefined, Eg :: a->b->c->a is ok, and Eg :: a->b->c is not ok, 'cause c is undefined.
 
 rule II. in the data declaration, the variable in the right part of '=', it must be appeared in the left part of '=',  data T a = V a is ok, and data T = V a is not,
