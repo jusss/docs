@@ -1,3 +1,13 @@
+
+
+# create system account sarah, sarah is like nobody, no password, no home, no shell
+useradd -r -s /usr/sbin/nologin sarah
+chown sarah:sarah /var/brook/*
+# set uid
+chmod +s /var/brook/*
+/var/brook/brook.sh    以sarah运行brook
+
+---------------------------------------------------
 https://github.com/txthinking/brook#brook-server
 
 shadowsocks and openvpn have been compromised,
