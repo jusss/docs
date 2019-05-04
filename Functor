@@ -1,0 +1,114 @@
+
+Function is Functor! List is Functor!
+f is Functor, but f(3) is not Functor,
+[] is Functor, but [3] is not Functor,
+
+fmap :: (a->b) -> (e->a) -> (e->b)
+let's assume a->b is function f1,     (f1 is an unary function)
+e-> is function functor f2,
+a->b want work on a in e->a
+fmap (+1) ((+1) x) = (+1 ((+1) x)) 
+through right associal
+fmap (+1) (+1) x = (+1) (+1) x
+                 = (+2) x
+through eta-reduce
+fmap (+1) (+1) = (+2)
+
+fmap (+1) (+1) is a currying form, through eta-reduce
+fmap (+1) (+1) == (+2)
+in this case (a->b) is (+1)
+functor e-> is (+1) 
+
++1 is just a name of function, nothing else, it doesn't mean (+ 1 x)
+I don't know function functor is an binary function or unary function
+
+in other languages:
+    fmap = \fn fc a -> fn (fc a)
+    fmap f1 f2  = \x -> f1 (f2 x)
+
+    t = fmap (+1) (+2)
+    t 3 == 6
+    t :: Num t2=> t2 -> t2
+and now functor is function, so fmap is (.), is compose function
+
+f.g is (.) f g, is fmap f g, is \x -> f (g x)
+
+
+currying and partial (curry is an unary function, partial is a binary function)
+
+f(x,y)
+curry f = \x -> \y -> (f x y)
+
+partial f x = \y -> (f x y)
+
+
+Prelude> curry f = \x -> \y -> (f x y)
+Prelude> t = curry (+)
+Prelude> t 1 2
+3
+Prelude> t2 = t 1
+Prelude> t3 = t2 2
+Prelude> t3
+3
+
+
+------------------------------------------
+when Functor is (->) e, then fmap is (.)
+fmap :: (a->b) -> ((->) e a) -> ((->) e b)
+
+a1 x=x+1
+c=fmap a1 a1
+
+:t c
+c::Num b=>b->b
+
+c 1 == 3
+
+--------------------------------------------------------
+
+fmap :: Functor f => (a -> b) -> f a -> f b
+
+>>= :: Monad m => m a -> (a -> m b) -> m b
+
+<*> :: Applicative f => f (a -> b) -> f a -> f b
+
+Maybe Monad, m a is Maybe a, is Just 3, m is Just, a is 3
+and there is function \x -> Just ((+2) x)
+
+>>= (Just 3) (\x -> Just ((+2) x))
+
+(Just 3) >>= (\x -> Just ((+2) x)) == Just 5
+
+
+Maybe Functor, f a is Maybe a, is Just 3, f is Just, a is 3
+fmap (+2) (Just 3) == Just 5
+
+Maybe Applicative, f a is Maybe a, is Jut 3, f is Just, a is 3
+(Just (+2)) <*> (Just 3) == Just 5
+
+Just is a value constructor, so all that value constructor can be Monad?
+of course not, because Monad is also a typeclass,
+Maybe Monad is an instance of the typeclass Monad,
+it means >>= <*> and fmap, functions is defined in Maybe
+you can do it if you make your type as an instance of Monad
+
+data T a = V a
+instance Monad (T a) where
+    (>>=) = ...
+    (<*>) = ...
+    fmap  = ...
+
+
+Prelude> [1] >>= \x -> (Just x)
+
+<interactive>:7:16: error:
+    • Couldn't match type ‘Maybe’ with ‘[]’
+      Expected type: [b]
+        Actual type: Maybe b
+    • In the expression: (Just x)
+      In the second argument of ‘(>>=)’, namely ‘\ x -> (Just x)’
+      In the expression: [1] >>= \ x -> (Just x)
+Prelude> [1] >>= \x -> [x+1]
+[2]
+
+it means the type must be the same that befor >>= and after
