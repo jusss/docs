@@ -1,3 +1,112 @@
+
+
+https://github.com/v2ray/v2ray-core click 'release' tag and download v2ray-linux.zip on server and client both
+
+unzip it, and chmod +x v2ray and v2ctl, mkdir /var/log/v2ray and touch /var/log/v2ray/access.log
+
+server:
+
+{
+  "port": 11111,
+  "log" : {
+    "access": "/var/log/v2ray/access.log", 
+    "error": "/var/log/v2ray/error.log",  
+    "loglevel": "warning"                  
+  },
+  "inbound": {
+    "protocol": "vmess",    
+    "settings": {
+      "clients": [
+        {
+          "id": "your-unique-id",
+          "alterId": 55,
+          "level": 1
+        }
+      ]
+    },
+    "streamSettings": {
+      "network": "kcp",
+      "security": "none"
+      }
+  },
+  "outbound": {
+    "protocol": "freedom",  
+    "settings": {}
+  },
+  "outboundDetour": [
+    {
+      "protocol": "blackhole",  
+      "settings": {},
+      "tag": "blocked"
+    }
+  ],
+  "routing": {
+    "strategy": "rules",
+    "settings": {
+      "rules": [
+        {
+          "type": "field",  
+          "ip": [
+            "0.0.0.0/8",
+            "::1/128"
+          ],
+          "outboundTag": "blocked"
+        }
+      ]
+    }
+  }
+}
+
+
+local:
+{
+  "port": 1080,
+  "log": {
+    "access": ""
+  },
+  "inbound": {
+    "protocol": "socks",
+    "settings": {
+      "auth": "noauth",
+      "udp": false,
+      "ip": "127.0.0.1"
+    }
+  },
+  "outbound": {
+    "protocol": "vmess",
+    "settings": {
+      "vnext": [
+        {
+          "address": "your-v2ray-server-address",
+          "port": 11111,
+          "users": [
+            {
+              "id": "your-unique-id",
+              "alterId": 55 
+            }
+          ]
+        }
+      ]
+    },
+    "streamSettings": {
+      "network": "kcp",
+      "security": "none"
+     }
+  },
+  "outboundDetour": [
+    {
+      "protocol": "freedom",
+      "settings": {},
+      "tag": "direct"
+    }
+  ]
+}
+
+you can try ./v2ray --test --config config.json to test this config file
+on sever: ./v2ray --config config.json server is listen on 11111
+on local: ./v2ray --config config.json  local is listen on 1080
+
+------------------------------------------------------
 https://github.com/v2ray/v2ray-core
 https://www.v2ray.com/
 https://toutyrater.github.io/prep/install.html
