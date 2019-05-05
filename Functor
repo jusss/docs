@@ -1,12 +1,6 @@
 
-Function is Functor! List is Functor!
-f is Functor, but f(3) is not Functor,
-[] is Functor, but [3] is not Functor,
-
 fmap :: (a->b) -> (e->a) -> (e->b)
 let's assume a->b is function f1,     (f1 is an unary function)
-e-> is function functor f2,
-a->b want work on a in e->a
 fmap (+1) ((+1) x) = (+1 ((+1) x)) 
 through right associal
 fmap (+1) (+1) x = (+1) (+1) x
@@ -17,10 +11,8 @@ fmap (+1) (+1) = (+2)
 fmap (+1) (+1) is a currying form, through eta-reduce
 fmap (+1) (+1) == (+2)
 in this case (a->b) is (+1)
-functor e-> is (+1) 
 
 +1 is just a name of function, nothing else, it doesn't mean (+ 1 x)
-I don't know function functor is an binary function or unary function
 
 in other languages:
     fmap = \fn fc a -> fn (fc a)
@@ -29,7 +21,6 @@ in other languages:
     t = fmap (+1) (+2)
     t 3 == 6
     t :: Num t2=> t2 -> t2
-and now functor is function, so fmap is (.), is compose function
 
 f.g is (.) f g, is fmap f g, is \x -> f (g x)
 
