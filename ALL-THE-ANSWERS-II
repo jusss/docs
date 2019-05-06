@@ -1,3 +1,702 @@
+(e->) doesn't "contain" anything, but (e->a) "contain" a value 'a'
+[] doesn't "contain" anything, but [a] "contain" a value 'a'
+####################################
+
+<[exa]> like, Maybe , [], Either l, (e->), IO all "contain" 'a' and can be
+        converted using '(a->b)' to contain 'b'
+<[exa]> jusss: the point about functors is that you can change what type they
+        "contain" by fmapping a simple function (a->b)
+<jusss> what about to see a container that 'contain' a value, a function that
+        'contain' a output, a list that 'contain' its value             [17:47]
+<jusss> (e->a) is a container (e->) 'contain' its output value 'a'
+<jusss> [a] is a container [] 'contain' its value 'a'
+<jusss> fmap apply a function on that value which is in the container, and get
+        a same container with a new value                               [17:50]
+
+###########################################
+<jusss> jle`: fmap::(a->b) -> (e->a) -> (e->b), that (a->b) do changes (e->)'s
+        output from a to b,                                             [16:23]
+<jle`> it changes the (e -> a) into an (e -> b)
+<Solonarv> jusss: you've been stuck on this for a few days, try a different
+           perspective: fmap doesn't modify anything
+<jle`> so it takes a function with input e and output a, and returns a
+       function with input e and output b
+<Solonarv> fmap constructs an entirely new function (e -> b) out of (a -> b)
+           and (e -> a)                                                 [16:24]
+<Solonarv> none of the inputs are modified
+<jle`> that's a nice website :)                                         [16:31]
+<jusss> Solonarv: ok, no modify, in this view, I can understand why (->) e is
+        similar with []
+<jusss> think about input and ouput, fmap apply function A on another function
+        B, it return a new function C,  C has the same input with B, but
+        different output                                                [16:36]
+<jusss> so we can say fmap "change" a function's output with return a new
+        function way                                                    [16:38]
+<jusss> right？                                                         [16:40
+<[exa]> jusss: a useful point of view on (-> e) is to see functions as
+        'containers for the results'                                    [16:45]
+<jusss> [exa]: what about to see functions as containers that not throw its
+        return value yet                                                [16:48]
+<[exa]> jusss: yeah, you need to supply 'e' to get it "opened"
+<[exa]> it's a childish explanation but probably the best intuition for (->e)
+        functor I have                                                  [16:49]
+<Solonarv> [exa]: if you want to use sections, write it (e ->)
+<Solonarv> otherwise write ((->) e)
+<[exa]> Solonarv: oh noes, sorry.
+<[exa]> yeah its ((->) e) :]
+<Solonarv> (-> e) is also meaningful (if interpreted as an operator section,
+           which GHC doesn't allow), and doesn't mean the same thing as ((->)
+           e)
+<jusss> [exa]: throw a 'e' to the container, and when the container doesn't
+        throw a 'a' out, the container is a Functor                     [16:51]
+<[exa]> well, same intuition kindof holds even for the profunctor, but that's
+        not what we were heading :]
+<[exa]> jusss: you have a container that receives 'e' and gives 'a'. You can
+        turn it to a container that from 'e' gives 'b' using a function of
+        type (a->b).
+<[exa]> jusss: and that ^ is the function functor.                      [16:53]
+<jusss> [exa]: and what about list functor? now I don't understand list
+        functor any more                                                [16:54]
+<jusss> throw a 'a
+<jusss> throw a 'a' to a [] and it turns [a]
+<jusss> it won't throw something out right?
+<jusss> or it throw itself out? [a]?
+<[exa]> jusss: list already contains the result (multiple results) that you
+        can get without any 'e' throwing
+<[exa]> jusss: the similarity is that if you have list that contains 'a' and
+        function (a->b), you can get list that contains 'b'
+<jusss> [exa]: wait a sec, but [] is Functor, [a] is not, e->a will return a,
+        but List a will return?
+<[exa]> jusss: (e->a) is also not a functor, (e->) is                   [17:26]
+
+<[exa]> jusss: the point about functors is that you can change what type they
+        "contain" by fmapping a simple function (a->b)
+
+<jusss> [exa]: yeah, so the problem is that a in [a] is an input or an output
+<jusss> it seems I'm getting another puzzle
+<Solonarv> jusss: it's an output, if you want to think of it that way
+<Solonarv> definitely not an input
+<[exa]> like, Maybe , [], Either l, (e->), IO all "contain" 'a' and can be
+        converted using '(a->b)' to contain 'b'
+* kuribas doesn't get why the container analogy is so popular           [17:31]
+<kuribas> it's undescriptive and mostly wrong
+<Solonarv> kuribas: it's reasonably intuitive and works for many common
+           functors, is probably why
+<Rembane> kuribas: You can look at it and it works for a while
+<kuribas> Solonarv: it's used for monads as well
+<kuribas> maybe container = set
+<Solonarv> it even works for (e ->) if you view functions as containers with
+           an item for every possible input
+<kuribas> so a function is a set, sounds right
+<Solonarv> kuribas: yeah, I don't think it works quite as well for explaining
+           monads anymore
+<Solonarv> well, if you work within set theory everything is a set, that's
+           kind of the point                                            [17:33]
+<jusss> [exa]: (e->) is functor, ok, it 'contain' 'e', but [a] isn't functor,
+        [] 
+<Solonarv> (unless it's too large to be a set, but functions aren't)
+<jusss> [] 'contain' a
+<Solonarv> jusss: no, (e ->) doesn't contain anything
+<Solonarv> you can think of (e -> a) as containing a separate 'a' for every
+           possible 'e' you might apply it to                           [17:34]
+<jusss> Solonarv: but (e->) return something like 'a'
+<kuribas> functor is a structure preserving mapping
+<Rembane> What does the word structure mean here?
+<dminuoso> [exa]: Imagine a functor having a sort of hole in the type. `(e ->
+           _)` is a functor for every choice of a type e.
+<dminuoso> Uhh I meant jusss.
+<dminuoso> Of course.
+<kuribas> or better a type and it's structure preserving mapping
+<[exa]> we need better functor analogy
+<[exa]> wo sind meine pfannkuchen
+<Rembane> Ganz weg! 
+<Solonarv> kuribas: btw, this post convinced me to not dislike the
+           functor~container analogy as much:
+           https://bartoszmilewski.com/2014/01/14/functors-are-containers/
+<kuribas> the analogy would be you have something in a shape, and you change
+          while preserving the shape.
+<dminuoso> kuribas: The container analogy is surprisingly good actually.
+<dminuoso> The reason the container analogy works so well, is because the hask
+           specific functors all tend to model containers really well, for
+           some notion of container.
+<jusss> dminuoso: but it conflict between list functor with function functor
+<dminuoso> jusss: a function can be thought of as a generalized container,
+           indexed by its domain                                        [17:37]
+<kuribas> Const () is a functor, it doesn't contain anything
+<dminuoso> jusss: `Natural -> Char` can be thought of as isomorphic to [Char]
+<maerwald> kuribas: no, it contains nothing :)
+<dminuoso> So `Natural -> Char` contains many characters, and you select one
+           by feeding the function some input.
+<dminuoso> (We need to squint a bit and not focus on things like length)
+                                                                        [17:38]
+<dminuoso> kuribas: Thats not a problem, we can map over empty lists too, cant
+           we?                                                          [17:39]
+<kuribas> dminuoso: yes, but it isn't a container
+<maerwald> you're thinking of collections                               [17:40]
+<dminuoso> kuribas: Why not? Its just the most trivial container you could
+           think of: an empty container.
+<maerwald> container is a very abstract term
+<dminuoso> Its always empty.
+<maerwald> it can be used to describe functors
+<kuribas> container is a poor man's set
+<maerwald> I'm confused why people try to reduce it to collections      [17:41]
+<jusss> dminuoso: so we can image that a function is a container, there're
+        lots of results in it, we can get the result with give it a index
+        value, and we can image that list is a container, there're lots of
+        results in it, we can get the result with give it a index value, ???
+<dminuoso> jusss: There's many ways to think of them as a container. I tend to
+           think of lists not as an ordered set of elements, but rather as a
+           non-determinstic value.                                      [17:43]
+<Solonarv> false equivalence: not all containers have a way to "take out" a
+           value
+<dminuoso> (It depends on situation though)
+<dminuoso> jusss: So [1,2,3] for me models as "not sure whether 1, 2 or 3"
+<dminuoso> Its a kind of "fuzzy container"                              [17:44]
+<dminuoso> (This notion can help a lot when thinking about the Applicative or
+           Monad instance for []
+<dminuoso> For some.
+<jusss> what about to see a container that 'contain' a value, a function that
+        'contain' a output, a list that 'contain' its value             [17:47]
+<jusss> (e->a) is a container (e->) 'contain' its output value 'a'
+<jusss> [a] is a container [] 'contain' its value 'a'
+<jusss> fmap apply a function on that value which is in the container, and get
+        a same container with a new value                               [17:50]
+<dminuoso> Its things like STM, IO or Async where the container notion is
+           stretched to some degree.
+
+###############################################################
+
+fmap::(a->b)->[a]->[b]
+(a->b) apply on a in[a]
+fmap::(a->b)->(e->a)->(e->b)
+I don’t think (a->b) can apply on a in (e->a)
+7:53 PM - 5 May 2019
+
+
+What if I said it can and that's what (.) does.
+
+If your trip ends at the coach station
+
+  trip :: Begin -> CoachSt
+
+you may need a taxi to get home
+
+  taxi :: CoachSt -> Home
+
+(Begin ->) is a Functor
+
+  fmap :: (CoachSt -> Home) -> ((Begin -> CoachSt) -> (Begin -> Home))
+
+So fmap @(Begin ->) transforms a trip ending at CoachSt into one ending at Home. As functions; we instead think f :: Input -> Output and we want to change the output of f, we view (Input ->) as a Functor f :: (Input ->) Output
+
+We pass fmap the output transformer outputTransformer :: Output -> Output' so using fmap @(Input ->) allows us to change the output of (Input -> Output) to (Input -> Output') fmap outputTransformer :: (Input -> Output) -> (Input -> Output')
+
+> Is there a way to change the input
+
+Yes. But instead of requiring
+
+  Input -> Input'
+
+we need to give
+
+  Input' -> Input
+
+This is due to (->) being contravariant in its Input and covariant in its Output
+
+Thinking of trips again, we have
+
+  Begin -trip> End
+
+If we want to add to the end of it, we post-compose with
+
+  post :: End -> End'
+
+  Begin -trip> End -post> End'
+
+but to add to the beginning we pre-compose
+
+  pre :: Begin' -> Begin
+
+  Begin' -pre> Begin -trip> End -post> End'
+
+wow, it seems fmap do apply (CoachSt->Home) on CoachSt in (Begin->CoachSt), it changes (Begin->)’s output CoachSt to Home, fmap apply function A on another function B and it changes that B’s output, right?
+
+########################################################
+
+<jusss> eiGHttt 上次我们推导了map . map 那你推导过 fmap fmap fmap的类型没?
+<eiGHttt> ghci。                                                        [18:00]
+<jusss>  :: (Functor f1, Functor f2) => (a -> b) -> f1 (f2 a) -> f1 (f2 b)
+<jusss> callback 应该叫 call-back, 因为call 完后还得back                [18:03]
+*** eiGHttt (~eiGHttt@m85-64.yeah.net) has quit: Ping timeout: 252 seconds
+#########################################################
+
+https://en.wikipedia.org/wiki/Sales_taxes_in_the_United_States
+As of 2017, 5 states (Alaska, Delaware, Montana, New Hampshire and Oregon) do not levy a statewide sales tax. California has the highest base sales tax rate, 7.25%. Including county and city sales taxes, the highest total sales tax is in Atlantic City, New Jersey, 12.875%.
+
+#######################################################
+
+<ManariaFriends> 你们别闹，google play和app store都能免税的
+<ManariaFriends> 东部的特拉华Delaware、新罕布什尔New Hampshire。
+<ManariaFriends> 西部的蒙大拿Montana、俄勒冈Oregon
+<ManariaFriends> 4个免税州
+<jusss> ManariaFriends: 我用paypal在app store上买的， paypal账单地址是NY ,
+<ManariaFriends> 。。。
+<ManariaFriends> 纽约税最重
+<ManariaFriends> 这玩意又没人查
+<ManariaFriends> 你选个免税州谁管你啊                                   [11:51]
+<jusss> ManariaFriends: 当时没想那么多。。。
+<jusss> ManariaFriends: CA是免税吗
+<ManariaFriends> 怎么可能                                               [11:52]
+<ManariaFriends> 有钱的地方不会免税
+<jusss> ManariaFriends: 那我改个paypal账单地址成免税州，应该没事吧？
+<ManariaFriends> 建议注册个新号
+<jusss> ManariaFriends: Tokyo是不是也有税？                             [11:54]
+<ManariaFriends> 废话
+<ManariaFriends> 日本消费税8%
+<jusss> ManariaFriends: 我在日区google play上用jcb买，也被收了税
+<ManariaFriends> 。。。
+<ManariaFriends> 注册两个google play账号，一个日区一个美区免税州，下载用日区账
+                 号，付费把日区的登出来用美区账号
+
+##############################################
+<jusss> fmap :: a -> (b->e) -> (a->e) -> b   this is available?         [11:04]
+<jle`> @djinn a -> (b -> e) -> (a -> e) -> b                            [11:05]
+<lambdabot> -- f cannot be realized.
+<geekosaur> I don't see where you got that question
+<geekosaur> :t fmap
+<lambdabot> Functor f => (a -> b) -> f a -> f b
+<jusss> a-> (b -> f a) -> f b                                           [11:11]
+
+<jusss> jle`: a->b is an unary function, (+1) is an instance of a->b, but I
+        don't know what (->) a is                                       [11:12]
+<jusss> a->
+<geekosaur> it's artially applied, like (+1) is partially applied       [11:13]
+<jusss> I thought that (+1) is just an identifier for \x -> x+1         [11:14]
+
+<geekosaur> it is. and (a->) would be a partially applied type lambda, but
+            Haskell doesn't support type level lambdas                  [11:15]
+<jusss> \x -> x+1 , its type is a->b
+<jusss> geekosaur: what \x -> x+1 looks like after partial applied?     [11:16]
+<jusss> it just has one parameter
+<jle`> jusss: (\x -> x + 1) applied to, say, y, is:
+<jle`>  (\x -> x + 1) y
+<jle`>  = y + 1
+<geekosaur> that is not itself partially appliable
+<geekosaur> (+) takes two parameters.. (+1) provides one of them, and is
+            therefore a partial application
+<jle`> you apply it to get y + 1, so it's not really "partial
+       application". it's "full application"
+
+                                                                        [11:17]
+<jusss> jle`: so \x -> x+1 can not be partial applied?
+<jle`> it can be applied                                                [11:18]
+<jusss> and it would be (+ x ) or (+ 1) ?
+<jle`> jusss: "partial application" is just what we call application when it
+       returns a different function; it hasn't "resolved" to a full
+       non-function value yet
+<jle`> jusss: the application of (\x -> x + 1) to 7 is 8                [11:19]
+<jle`> > (\x -> x + 1) 7
+<lambdabot>  8
+
+<geekosaur> jusss, you are confusing action and result. (+1) is the result of
+            a partial application, not the cause of one
+
+<jusss> jle`: geekosaur fmap (+1) (+1),  is there a functor in (+1) ? or (+1)
+        is the functor?                                                 [11:24]
+
+<jle`> (+1) is not a functor
+
+<jusss> those e->a doesn't have the same behavior with []
+<jle`> `e -> a` is comparable to [a]                                    [11:25]
+
+<[Leary]> This whole conversation would be simpler if all operator use (and
+          special list syntax) were desugared to prefix.
+<geekosaur> but you're probably comparing on value level, and (->) doesn't
+            have value level but [] has both type and value level.
+<jusss> jle`: but fmap can apply a->b on a in [a], but fmap can't apply a->b
+        on a in e->a
+<geekosaur> the comparison to [] here is that you can write [Int] as ([] Int)
+<Cale> jusss: The functor in that case is (->) Integer                  [11:26]
+<jusss> geekosaur: fmap can apply a->b on Int in [Int] right?
+<jle`> jusss: also note something -- 'f a' doesn't necessarily have an a "in"
+       it
+
+<geekosaur> you have type and value level confuse, I think
+<Cale> jusss: Supposing that a is Int, yes?                             [11:27]
+<jle`> so "applying a -> b to the a's in [a]" is something that is accurate to
+       lists in particular
+<jle`> but not all Functor instances
+<Cale> In some sense, even in the function case, we have that fmap f g applies
+       f to all the possible results of g
+<jle`> 'f a' doesn't necessarily have an 'a' "in" it.  `[] a` does.  `((->) e)
+       a` does not.
+<geekosaur> note this ^ carefully                                       [11:28]
+<Cale> which if you like, you can think of as the "elements contained in g"
+<jusss> jle`: so "<jusss> those e->a doesn't have the same behavior with []"
+<geekosaur> the functor is ((->) a)
+<Cale> though the sense in which they're "contained" is a little more abstract
+       now
+<jle`> jusss: right, the behavior of fmap is different for every single
+       Functor
+<jle`> the behavior of fmap for lists is different than the behavior of fmap
+       for `(->) e`, etc.
+<Cale> Sometimes it can be helpful to think of a function of type e -> a as
+       being like a giant array indexed by values of type e, having values of
+       type a at each position
+
+<jle`> there's one potential confusion here as well, it's that we're using
+       "function" to mean a few things at a few different levels        [11:29]
+<jusss> Cale: but function is not a container
+<jle`> so it might be useful to not think about `(->) r`, but rather `Reader
+       r`, if you understand the semantics of `Reader r a`
+<jusss> and list is a container
+<Cale> jusss: I'm telling you the sense in which you can think of functions as
+       a sort of container                                              [11:30]
+<jle`> a value of type `Reader r a` "contains" an 'a', that must be given an
+       'r' to access
+<Cale> jusss: Did you read the array analogy?
+<jle`> so you cannot access the 'a' without an 'r', so to speak.  and giving
+       different r's will give you different a's
+<jusss> Cale: list is a container, because I can change the value in the list,
+        but I don't think we can change the value in the function,
+<jle`> so fmap :: (a -> b) -> Reader r a -> Reader r b
+<Cale> jusss: Sure we can
+<Cale> jusss: In any sense in which you could change the elements of a list
+                                                                        [11:31]
+<jle`> it takes something that "produces" an a, and turns it into something
+       that "produces" a b
+<jusss> Cale: for example, \x->x+1, how to change that 1 to 2?
+<geekosaur> you'r thinking wrong                                        [11:32]
+<geekosaur> a function, includin g a lambda, is a single non-decomposable
+            thing
+<Cale> jusss: Which 1? The 1 that results when you apply that function to 0?
+<geekosaur> nothing can see the 1 there
+<geekosaur> or change it
+<geekosaur> the only access you have is to apply it to some parameter
+<jusss> geekosaur: but if it's list, we can
+
+<Cale> > (\f x -> if x == 0 then 2 else f x) (\x -> x + 1) 0
+<lambdabot>  2
+<Cale> > (\f x -> if x == 0 then 2 else f x) (\x -> x + 1) 1
+<lambdabot>  2
+<Cale> > (\f x -> if x == 0 then 2 else f x) (\x -> x + 1) 2
+<lambdabot>  3
+<geekosaur> yes, and?                                                   [11:33]
+
+<Cale> There, I changed it.
+<geekosaur> is it somehow not possible that different types are different?
+
+<jle`> i think jusss's point is that functions in general are not inspectable
+       in the same way that lists are, which is a part of the concept of
+       container-ness in their experience                               [11:34]
+<[Leary]> (\x -> x + 1) is not a container holding x, + and 1, it's a
+          "container" holding the value (x + 1) at the index x.         [11:35]
+<geekosaur> if there were a formulaic way to define what fmap does, fmap would
+            be a function, not a typeclass method. but the notion of functor
+            is more abstract. it applies in one way to lists. a different way
+            to functions. a still different way to State, etc.
+
+<Cale> jusss: You can think of the function (\x -> x + 1) as being the set of
+       pairs (0,1), (1,2), (-1,0), (2,3), (-2,-1), ...
+<Cale> The second components of those pairs are the "elements" which we're
+       modifying by way of fmap                                         [11:36]
+<geekosaur> similarly, *if* you insist on thinking in terms of "container",
+            there is an abstract way to recognize a function as a
+            "container". but only that abstract way; it does not become a
+            funny looking list
+<Cale> i.e. a function is a thing which pairs up inputs and outputs in a
+       particular way
+<geekosaur> frankly, I find it better to not think in terms of "container"
+            because it will mislead you
+<Cale> and fmap applies a function to all the outputs of another function
+<Cale> Abstractly, there's no requirement that we recognise the type as a
+       container type in order to make an instance of Functor           [11:37]
+<Cale> All that is required is that we have a type F of kind * -> * and a
+       function fmap :: (a -> b) -> F a -> F b for which it's the case that
+       fmap id = id, and fmap f . fmap g = fmap (f . g)                 [11:38]
+<Cale> and as it happens, if fmap id = id, then in Haskell, it's impossible
+       for the second law not to hold.
+<monochrom> Hey, I once had fun exemplifying to a student the corresponding
+            between (Int, Int) and Bool->Int.                           [11:40]
+<monochrom> s/corresponding/correspondence/
+<jusss> Cale: think function like (0,1) and (e->) in fmap, would be (0,) ?
+<jusss> that "container" or "wrapper" stuff in every Functor article    [11:41]
+<jusss> or Monad
+<jusss> geekosaur: what it's used for like (e->) ?                      [11:42]
+<jusss> in fmap, of course
+<jusss> what this abstract stuff is used to?
+<Cale> jusss: Let's use monochrom's example and consider functions of type
+       Bool -> Int
+<Cale> jusss: You can fully characterise such a function by what it gives when
+       applied to False and True                                        [11:43]
+<monochrom> Yes, I did this to my student precisely because they were learning
+            functor-applicative-monad and they still drew a pretty clear line
+            between "container" and "function".
+<Cale> So, Bool -> Int is similar in nature to (Int, Int)
+<Cale> Given a function f :: Bool -> Int, we can turn it into a pair (f False,
+       f True)
+<Cale> and given such a pair (x,y), we can turn it into the function (\b ->
+       case b of False -> x; True -> y)                                 [11:44]
+<jusss> a partial applied function may be a functor?                    [11:48]
+
+<monochrom> No. A type of kind *->*
+<nisstyre> Cale: would it be more like a 2 element set?
+<nisstyre> 2 elements of pairs that is
+<nisstyre> (if you're defining functions as sets)
+<monochrom> (->)Bool is a type of kind *->*. This is not a partially applied
+            function. This is not even at the term level.
+<jusss> monochrom: (->) Bool is not * -> ?                              [11:49]
+<jusss> it lacks a type
+<monochrom> Set loses the sequential structure.
+<monochrom> {1,2} /= (1,2).                                             [11:50]
+<monochrom> Because {2,1} = {1,2} but (2,1) /= (1,2)
+
+<monochrom> Set also loses the multiplicity structure. {1,1}={1} but (1,1) /=
+            (1)
+
+<monochrom> Set loses so much, why would anyone use sets at all?        [11:51]
+
+<monochrom> The kind of (->) Bool is * -> *  there is no typo in this
+            sentence. This is non-negotiable.
+<monochrom> Oh it lacks a type? Sure, that's why the kind is not simply *
+                                                                        [11:52]
+
+<monochrom> And yes all confusions are caused by wrong assumptions. Erase all
+            assumptions and start again.                                [11:53]
+<Cale> jusss: A partially applied type-level function can be a Functor, yes.
+
+<Cale> (if you just say "function" most people will think you mean a
+       value-level function)
+
+<jusss> Cale: what is "type level lambdas" ?                            [11:55]
+
+<jusss> or type-level function                                          [11:56]
+<geekosaur> I think you just hit the root of the problem                [11:57]
+<geekosaur> [] is a type level function: it takes a type such as Int, and
+            produces a type such as [Int] (which can also be written: [] Int)
+<geekosaur> Maybe is a type level function: it takes a type such as Int, and
+            produces a type such as Maybe Int, whose values are Nothing or
+            (Just some_Int_goes_here)                                   [11:59]
+
+<jusss> what's the type-level function related with functor?            [12:01]
+<geekosaur> Functor itself, which is defined as a typeclass. each type with a
+            Functor instance specifies what that means.                 [12:03]
+<geekosaur> however, it's not quite a type level function; it's a
+            constraint. type level functions can't say "I accept only certain
+            types", it has to accept any type with the correct kind; so we
+            have constraints that can say that.                         [12:04]
+<geekosaur> that is, Maybe can't say (Maybe Int) is valid but (Maybe Integer)
+            isn't. Constraints can.                                     [12:05]
+
+<jusss> geekosaur: oh, Maybe and e-> both need a type to complete       [12:06]
+<geekosaur> yes, because both have the kind * -> *
+<geekosaur> in the case of Functor, one of the types is supplied by and
+            controlled by Functor, so you have to omit that type when defining
+            instances of it.                                            [12:07]
+<geekosaur> so there is Instance Functor Maybe where ... -- this instance
+            doesn't get to say "Maybe _what?_"
+<geekosaur> and there is instance Functor ((->) e) where ... -- this instance
+            doesn't get to say "function produces _what?_"              [12:09]
+<jusss> geekosaur: those Functors they don't have the same behavior, right?
+
+<geekosaur> they have conceptually similar behavior. not identical behavior
+<jusss> like list and function in fmap
+
+<jusss> geekosaur: that conceptually similar behavior is just they all need a
+        type to complete                                                [12:16]
+<geekosaur> no
+<jusss> fmap :: (a->b) -> (e->a) -> (e->b)    fmap (*100) (+3)  that return
+        type would be ?                                                 [12:18]
+<geekosaur> "adding two numbers together" and "adding two strings together"
+            (concat) are conceptually similar, but different. in this case,
+            the concept behind Functor is a bit trickier than that: given
+            Thing a for unknown a, and a function (a -> b), produce Thing b
+<geekosaur> in your case, a and b happen to be the same type, so fmap :: (a ->
+            a) -> (a -> a) -> (a -> a)
+<jusss> geekosaur: what I express is the return type would be the same with
+        (*100)
+<geekosaur> because (*) and (+) both require the same types everywhere
+<[Leary]> The conceptual behaviour is that for any Functor `f`, whenever `x ::
+          f a` would produce a `y :: a`, `fmap g x :: f b` would instead
+          produce `g y :: b`.
+<[Leary]> fmap intercepts and augments the production of values, whether that
+          production is by indexing a list, pattern matching on Just, or
+          applying a function.                                          [12:23]
+<[Leary]> etc
+<Cale> jusss: It's important to notice that the values that fmap is modifying
+       in the case of lists might not all be in memory at the time as well
+
+<Cale> > fmap (*10) [1..]
+<lambdabot>
+            [10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,210,...
+<Cale> ^^ you can fmap over an infinite list :)
+<Cale> > [fmap (*10) (\x -> x+1) n | n <- [0..]]                        [12:25]
+<lambdabot>
+            [10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200,210,...
+<geekosaur> "but they're not the same kind of things" that is why it's a
+            typeclass, so each type can specify what fmap means for that
+            type. for functions, it means function composition. for lists, it
+            means applying a transform to every member of one list, producing
+            a new list.
+<jusss> geekosaur: and they all have the same type signature, that's wonderful
+                                                                        [12:26]
+<jusss> magic?
+<geekosaur> not magic, that's the point of typeclasses. the Functor constraint
+            basically *means* that.
+<Cale> Well, that's what type classes are for: classifying types for which
+       similar functionality can be provided
+<geekosaur> similarly there is a Monoid constraint that captures the idea that
+            addition, multiplication, list concatenation, etc. all do
+            "something similar"                                         [12:27]
+<jusss> find the similar and use it to do what?
+<geekosaur> whatever you need to do. people find lots of uses for fmap. people
+            find a number of uses for mappend (the combining operation of
+            Monoid). Monad captures the idea of combining "actions" of some
+            variety, which is fairly useful.                            [12:32]
+<geekosaur> Num captures the idea of "number" that you can do addition,
+            subtraction, etc. with, so we don't have to have separate add_Int,
+            add_Integer, add_Double, etc..                              [12:33]
+<geekosaur> Enum captures the idea of "preceding / following value"     [12:34]
+<Cale> jusss: Here's a cool example with Monoid. There is a Monoid instance
+       for Ordering, the type of result that "compare" gives, consisting of
+       EQ, LT, GT for "equal", "less than" and "greater than"
+<Cale> What that Monoid instance does is as follows:                    [12:37]
+<Cale> EQ <> y = y
+
+<Cale> x <> _ = x
+<Cale> So, if the first comparison gives EQ, use the second, otherwise, use
+       the first.
+<Cale> Also, there is an instance (Monoid a) => Monoid (e -> a) where (f <> g)
+       x = f x <> g x
+<Cale> Putting these things together, we automatically have Monoid (e ->
+       Ordering), and then Monoid (e -> e -> Ordering), i.e. we're allowed to
+       combine functions which make comparisons                         [12:39]
+<Cale> > sortBy (comparing length <> compare) (words "here is a bunch of words
+       to sort by length and then alphabetically")
+<lambdabot>
+            ["a","by","is","of","to","and","here","sort","then","bunch","words","length"...
+<Cale> Monoids show up everywhere. Combining configurations, combining queries
+       for data, combining summary information about subtrees of a tree (the
+       associativity of the combination is what lets us rebalance the tree
+       efficiently without recomputing everything)                      [12:41]
+
+<Cale> Nearly every tree-based algorithm in computer science is exploiting
+       trees that are annotated with some monoid at the branch nodes which
+       summarizes the data at the leaves.
+
+#####################################################
+
+fmap :: (a->b) -> (e->a) ->(e->b)
+fmap (a->b)  (e->a)  = (e->b)
+fmap (a->b) (e->a) e = b
+
+fmap take two parameters and it returns a function
+fmap take three parameter and it return a value
+
+fmap (+1) (+1) = (+2)
+fmap (+1) (+1) 100 = 102
+fmap f g x = f (g x)
+fmap f g = \x -> f (g x)
+
+fmap :: a -> (b->e) -> (a->e) -> b     not available
+#############################################################3
+
+[周日 5月  5 2019]
+<Cale> Sorry about fen, perhaps I should explain here                   [09:26]
+<jusss> ok                                                              [09:27]
+<Cale> Okay, so...
+<Cale> Let's I guess explain a bit about kinds
+<Cale> Just as values have types, types have kinds
+<Cale> Ordinary types which have values in them have kind *             [09:28]
+<Cale> For example,  Integer :: *
+<Cale> String :: *
+<Cale> String -> Integer :: *
+<Cale> We also have type level functions which take an argument of kind * and
+       produce a result of kind *
+<Cale> Like [], the type constructor for lists
+<Cale> and Maybe :: * -> *                                              [09:29]
+<Cale> (->) :: * -> * -> *
+<Cale> because it takes two types, the types of the domain and codomain
+<Cale> and produces the type of functions between them
+<Cale> If we apply (->) to a single type
+<Cale> (->) Integer :: * -> *                                           [09:30]
+<jusss> ok
+<Cale> then we get a type level function waiting for another type before it
+       will produce a type of values
+<Cale> (->) Integer Bool :: *
+<Cale> and we usually write it infix at that point:
+<Cale> Integer -> Bool :: *
+<Cale> cool?
+<jusss> ok
+<Cale> So things which are instances of Functor always have kind * -> *
+                                                                        [09:31]
+<Cale> fmap :: Functor f => (a -> b) -> f a -> f b
+<jusss> wait
+<Cale> We can see that a and b have kind * because (->) is being applied to
+       them
+<jusss> functor have *->* ?                                             [09:32]
+<Cale> Yeah
+<Cale> always
+<jusss> it need another * to complete *->* ?
+<Cale> For example, there's an instance Functor Maybe
+<jusss> no
+<Cale> Maybe :: * -> *
+<jusss> I was wrong, 
+<Cale> Functors are always type-level functions                         [09:33]
+<jusss> ok
+<Cale> But not just any type level function will do, there must be an
+       implementation of fmap
+<Cale> So, now let's do what I wanted to do before and look at implementing
+       fmap for (->) e                                                  [09:34]
+<jusss> yeah
+<Cale> fmap :: (a -> b) -> ((->) e a) -> ((->) e b)
+<Cale> which is the same as
+<Cale> fmap :: (a -> b) -> (e -> a) -> (e -> b)
+<Cale> which is the same as
+<Cale> fmap :: (a -> b) -> (e -> a) -> e -> b
+<Cale> yeah?                                                            [09:35]
+<jusss> ok
+<Cale> fmap f g x = ...
+<Cale> f :: a -> b
+<Cale> g :: e -> a
+<Cale> x :: e
+<Cale> and we want to produce a result of type b
+<Cale> The only way we could possibly produce a result of type b is by using f
+<Cale> fmap f g x = f ...
+<Cale> and now in order to use f, we need to provide an argument of type a
+                                                                        [09:36]
+<Cale> the only way to get something of type a is to apply g
+<Cale> fmap f g x = f (g ...)
+<Cale> and now g requires an argument of type e
+<Cale> and thankfully we have one, namely x
+<Cale> fmap f g x = f (g x)
+<Cale> So fmap f g is the function which, given some x, will result in f (g x)
+                                                                        [09:37]
+<Cale> That is, it's the composite of f and g
+<Cale> We could also have simply written
+<Cale> fmap = (.)
+<jusss> but through eta-reduce we can get fmap f g = f g, that's ?      [09:38]
+<Cale> nope
+<Cale> can't eta reduce here                                            [09:39]
+<Cale> Well, we could say...
+<Cale> fmap f g x = (f . g) x
+<Cale> and then eta reduce
+<Cale> But since the x is inside the parens on the right hand side of  fmap f
+       g x = f (g x)
+<Cale> we can't eta-reduce yet                                          [09:40]
+<jusss> ok
+
+
+###################################################################
+they all want 16000 Hz, but some devices output 48000 Hz
+microsoft azure, wav and ogg both need 16k Hz samplerate, 16 bit resolution
+but microsoft take 48k Hz wav also
+qi 2.1.4 and qi 2.5 wav with 48k Hz, and ogg with 16k Hz
+
+微软 讯飞 百度的ASR，都要16k Hz的wav，但是现在的设备全是48k Hz的，不明白为什么，
+倒是微软提供16k Hz的ogg，而且48k Hz的wav微软也是接收的但参数还是16k Hz，奇怪
+
+########################################################
 
 #GADTs
 {-#LANGUAGE GADTs #-}

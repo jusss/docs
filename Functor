@@ -1,4 +1,20 @@
 
+(e->) doesn't "contain" anything, but (e->a) "contain" a value 'a'
+[] doesn't "contain" anything, but [a] "contain" a value 'a'
+####################################
+
+<[exa]> like, Maybe , [], Either l, (e->), IO all "contain" 'a' and can be
+        converted using '(a->b)' to contain 'b'
+<[exa]> jusss: the point about functors is that you can change what type they
+        "contain" by fmapping a simple function (a->b)
+<jusss> what about to see a container that 'contain' a value, a function that
+        'contain' a output, a list that 'contain' its value             [17:47]
+<jusss> (e->a) is a container (e->) 'contain' its output value 'a'
+<jusss> [a] is a container [] 'contain' its value 'a'
+<jusss> fmap apply a function on that value which is in the container, and get
+        a same container with a new value                               [17:50]
+###################################################
+
 fmap :: (a->b) -> (e->a) -> (e->b)
 let's assume a->b is function f1,     (f1 is an unary function)
 fmap (+1) ((+1) x) = (+1 ((+1) x)) 
