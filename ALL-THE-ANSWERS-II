@@ -1,7 +1,1081 @@
-(e->) doesn't "contain" anything, but (e->a) "contain" a value 'a'
-[] doesn't "contain" anything, but [a] "contain" a value 'a'
-####################################
+<jusss> dminuoso: oh, I think I understand what you mean, fmap turn (a->b)
+        into (e->a) -> (e->b)
+<jusss> now we can say fmap transform (a->b) to ( (e->a) -> (e->b) ), so I
+        wonder how to express about <*> and >>=                         [16:11]
+<dminuoso> jusss: Applicative too transforms functions.
+<jusss> in functor, a->b,  in applicative, a or a->b or a->b->c
+<dminuoso> Except Functor limits you to functions taking one argument.
+<dminuoso> Applicative lets you do this with functions taking *any* number of
+           arguments
+<jusss> dminuoso: but <*> :: f (a->b) -> f a -> fb,  <*> transform that
+        function in Applicative to another function(f a -> f b) right?
+<dminuoso> jusss: Right. So the diagram I showed you is basically what you can
+           do with pure and (<*>)
 
+<dminuoso> mango :: (Int -> (a -> b)) -> (Int -> a) -> (Int -> b)       [16:55]
+<jusss> Prelude> mango f g x = (f x) (g x)                              [17:14]
+<jusss> mango :: (t1 -> t2 -> t3) -> (t1 -> t2) -> t1 -> t3
+<dminuoso> jusss: Looks great.
+
+<jusss> dminuoso: yeah, functor and applicative both need a type to complete
+        themself?
+<dminuoso> jusss: Exactly. They work on types missing one type argument.
+<dminuoso> jusss: cocoa :: (a -> Int -> b) -> (Int -> a) -> (Int -> b)
+<jusss> dminuoso: cocoa f g x = f (g x) x
+<jusss> dminuoso: that (->) e can be monad?
+<dminuoso> jusss: Yes. You just wrote the (>>=) implementation for it.  [18:04]
+<dminuoso> (>>=) is your cocoa
+<dminuoso> (<*>) is your mango
+<jusss> dminuoso: what?
+<dminuoso> and pure/return is your coconut
+<dminuoso> And banana is fmap                                           [18:05]
+<jusss> dminuoso: cocoa and >>=
+<dminuoso> jusss: cocoa = flip (>>=)
+<jusss> dminuoso: about the a-> m b, I don't understand what it's used for
+                                                                        [18:09]
+<jusss> it's not like functor and applicative
+<jusss> this a->m b
+<dminuoso> jusss: Yeah its not.
+<jusss> dminuoso: and what it is
+<dminuoso> jusss: Well what is (<>)
+<dminuoso> jusss: Its not for anything.
+<Bish> dminuoso: o/
+<jusss> <>:: s->s->s?                                                   [18:10]
+<arianvp> % :t  (>>=) @((->) r)
+<yahb> arianvp: ; <interactive>:1:14: error: Not in scope: type variable `r'
+<dminuoso> Right
+<arianvp> :/
+<dminuoso> jusss: It exists because many things happen to have this shape, for
+           some reason.
+<Taneb> % :t (>>=) @((->) _)
+<yahb> Taneb: (w -> a) -> (a -> w -> b) -> w -> b
+<arianvp> Taneb: thanks
+<arianvp> % :t (=<<) @((->) _)
+<yahb> arianvp: (a -> w -> b) -> (w -> a) -> w -> b
+<dminuoso> jusss: It doesnt have any intrinstic meaning.
+<Bish> there is a flipped version of bind, but not a prefix bind?
+<dminuoso> Bish: You can put (>>=) in parens                            [18:11]
+<dminuoso> And then use it in prefix notation.
+<Bish> yeah great :D i am just sometimes confused about the logic
+<Bish> people would flip it, but never use it prefix
+<jusss> dminuoso: use <> to shape for what
+<dminuoso> jusss: I wouldnt focus on Monad really, ask what the ((->) e)
+           instance does                                                [18:12]
+##############################################
+
+deduce a function definition from its type signature, and this one function is just an instance of its type signature, this type can have different function definition,
+id :: a->a
+id :: (a->b) -> a -> b
+<dminuoso> jusss: cocoa :: (a -> Int -> b) -> (Int -> a) -> (Int -> b)
+<jusss> dminuoso: cocoa f g x = f (g x) x
+let's assume
+f::a->Int->b
+g::Int->a
+x::Int
+cocoa f g x = b
+f a:: Int->b
+f a x :: b
+g Int :: a
+g x :: a
+f (g x) x :: b
+cocoa f g x = f (g x) x
+######################################################
+
+Functor can do:
+
+
+  a -> b
+    |
+    |
+    v
+f a -> f b
+
+Applicative can do:
+
+ a        a -> b          a -> b -> c             a -> b -> c -> d                .... and so on ....
+ |          |                  |                          |
+ |          |                  |                          |
+ v          v                  v                          v
+f a f a -> f b f a -> f b -> f c f a -> f b -> f c -> f d .... and so on ....
+
+and when Functor and Applicative are e->
+<jusss> dminuoso: if f is (e->),   so <*> :: (e->) (a->b) -> (e->a) -> (e->b)
+######################################################
+
+fmap  ::   (a -> b) -> f a -> f b
+(<*>) :: f (a -> b) -> f a -> f b
+(=<<) :: (a -> f b) -> f a -> f b
+
+
+####################################################
+
+<jusss> dminuoso: then fmap id = id, this id shoud change its name like id2 or
+        idf
+<jusss> 'cause that new id :: f b -> f b, not id :: a -> a,   the new id is a
+        subset of the old id
+##################################
+<jusss> is there something it's a Functor but not a Monad?              [14:48]
+<dminuoso> jusss: Yes.                                                  [14:49]
+<dminuoso> jusss: In fact there's many things that are Functor but not Monad.
+<Rembane> Are functions Functor but not Monad?
+<jusss> dminuoso: for example?
+<dminuoso> jusss: `Const a` is an example from base
+<dminuoso> jusss: ZipList is another
+<jusss> (>>=) :: m a -> (a -> m b) -> m b
+<jusss> dminuoso: those 'm' should be same type?
+<dminuoso> jusss: Yes, this fact is denoted by them all having the same name.
+                                                                        [14:53]
+<dminuoso> jusss: If they differ they *can* be the same though, but they can
+           also differ.
+<dminuoso> That is, (>>=) does not demand that `a` and `b` be different, but
+           they can be.
+<jusss> dminuoso: like List and Maybe both are Monads,  can I give a List
+        Monad to >>= and get a Maybe Monad?                             [14:54]
+<dminuoso> jusss: No
+<dminuoso> jusss: So the way you use >>= is the following
+<dminuoso> Pick a type for `m` and replace `m` with that type in the entire
+           signature                                                    [14:55]
+<dminuoso> (The type must have a valid instance Monad of course)
+<dminuoso> So if we fix m ~ Maybe, then (>>=) :: Maybe a -> (a -> Maybe b) ->
+           Maybe b
+<dminuoso> And equivalently if we fix a ~ Int, then (>>=) :: Maybe Int -> (Int
+           -> Maybe b) -> Maybe b
+<jusss>  (<*>) :: f (a -> b) -> f a -> f b                              [14:56]
+<dminuoso> And if we fix b ~ Char, then you'd get: (>>=) :: Maybe Int -> (Int
+           -> Maybe Char) -> Maybe Char
+<jusss> it seems that Applicative do same thing like that
+<dminuoso> jusss: Its similar, but different.
+<jusss> <*> apply a function on f a and get  f b                        [14:57]
+<jusss> >>= apply a->m b on m a and get m b                             [14:58]
+<jusss> what's the different
+<dminuoso> jusss:
+           https://gist.github.com/dminuoso/1b7925f8a04f9740757d79266d724792
+<dminuoso> Here (=<<) is just the flipped version of (>>=)
+<dminuoso> (I did a bit of pseudo code, leaving away the constraints)
+<jusss> dminuoso: those type signatures, it's interesting
+<dminuoso> jusss: In some sense (<*>) can be thought of generalizing fmap to
+           functions with arbitrary arguments.
+<jusss> dminuoso: fmap :: (a -> b) -> f a -> f b,  can I say fmap apply (a->b)
+        on a in f a and get f (a->b) , it's f b                         [15:01]
+<jusss> dminuoso: or I should say apply (a->b) on f a?
+<dminuoso> jusss: That is, fmap lets you lift a 1-arity function `a -> b` to
+           `f a -> f b`, but with pure/(<*>) you can lift `a` to `f a` and `a
+           -> b -> c` to `f a -> f b -> f c`
+<dminuoso> Or `a -> b -> c -> d` to `f a -> f b -> f c -> f d`
+<dminuoso> jusss: It's rather: `a -> b` is lifted to `f a -> f b`
+<dminuoso> fmap is a way to take a function `Int -> Char` and build a `Maybe
+           Int -> Maybe Char` from it.
+<dminuoso> Or lift a `Char -> Bool` into `[Char] -> [Bool]`
+<dminuoso> Applicative generalizes this to values and functions of arbitrary
+           length
+<jusss> dminuoso: about the type inference, how I should understand about that
+        fmap apply (a->b) on (f a) or a in (f a) ?
+<dminuoso> jusss: Neither. Type inference is just the act of figuring out what
+           parts of your program have what type, without needing type
+           annotations.
+<dminuoso> % :t fmap
+<yahb> dminuoso: Functor f => (a -> b) -> f a -> f b
+<dminuoso> This is really:
+<dminuoso> fmap :: Functor f => (a -> b) -> (f a -> f b)                [15:06]
+<jusss> dminuoso: about this fmap :: (a -> b) -> f a -> f b,    is there a
+        type like (a->b) -> f a -> a?
+<dminuoso> If you squint for a moment you will see that fmap takes one
+           argument and it returns a function.
+<jusss> or (a->b) -> f a -> b
+<dminuoso> jusss: Not that I know. There's other things though like `(f a ->
+           b) -> f a -> f b`
+<dminuoso> Where there is a special constraint on `f` too.              [15:08]
+<jusss> dminuoso: ok, so the final type is what we write not we calculate
+<dminuoso> jusss: What do you mean?
+<jusss> dminuoso: I thought that we can calculate (f b) from (a->b) -> f a
+                                                                        [15:09]
+<dminuoso> I do not follow.
+<jusss> dminuoso: if there's a type (a->b) -> f a,  and I thought we can get
+        the final return type is f b through (a->b) -> f a -> f b       [15:10]
+<jusss> it seems I was wrong
+<dminuoso> jusss: Can you perhaps rephrase the question?                [15:11]
+<dminuoso> Or explain in differnet terms?
+<jusss> dminuoso: sorry for my English
+<dminuoso> jusss: Are you asking whether the return type of `fmap` can be
+           deduced from its arguments
+<dminuoso> ?
+<jusss> dminuoso: let's assume there's a type like T::(a->b) -> f a,   so we
+        can get T :: f b
+<jusss> dminuoso: yeah, that's what I mean
+<dminuoso> jusss: Yes, that's what type inference gives us. It's a logic
+           system, basically.
+<dminuoso> jusss: For example: If we know a function has type `f :: Char ->
+           Int`, and we know that `x :: Char`, then we can deduce that `f x ::
+           Int`                                                         [15:13]
+<jusss> dminuoso: so, look at this fmap :: (a->b) -> f a -> f b, so how should
+        I think about fmap apply (a->b) on (f a) or just a in (f a) and we get
+        (f b)?
+<dminuoso> jusss: Neither, like I said.
+<dminuoso> jusss: Think that fmap takes *one* argument.
+<jusss> dminuoso: ok, no appy, it's just type inference , right?
+<jusss> dminuoso: let's just focus on the type inference
+<jusss> dminuoso: (a->b) -> f a, we can get f b, right?
+<dminuoso> jusss: The language you are using does not make sense to me.
+<dminuoso> By language I mean the way you are using what looks like type
+           signatures.
+<dminuoso> jusss: fmap is more than just type inference.                [15:17]
+<dminuoso> jusss: You can use fmap without any type inference in fact.
+<dminuoso> % listMap :: (a -> b) -> [a] -> [b]; listMap = fmap
+<yahb> dminuoso: 
+<dminuoso> % addOneToEachElem :: [Int] -> [Int]; addOneToEachElem = listMap
+           (+1)
+<yahb> dminuoso: 
+<dminuoso> % addOneToEachElem [1,2,3,4]
+<yahb> dminuoso: [2,3,4,5]
+<jusss> dminuoso: (<*>) :: f (a -> b) -> f a -> f b,     I think  it's should
+        be f (a->b) -> f a -> f (f b)
+<dminuoso> jusss: Let's ignore (<*>) for a moment, okay?                [15:19]
+<jusss> dminuoso: ok
+<dminuoso> jusss: Do you see how `fmap` turns a function `Int -> Char` into
+           say `[Int] -> [Char]`?
+<dminuoso> `fmap` is a function transformer, if you want.
+<dminuoso> It takes a function, and builds a new function (in some way that is
+           related to the original function)                            [15:20]
+<jusss> dminuoso: yeah, new function with the same input 
+<dminuoso> Not the same input.
+<jusss> same input type?                                                [15:21]
+<dminuoso> Nope.
+<dminuoso> jusss: Whats the input type of `f :: Int -> Char`
+<jusss> dminuoso: Int                                                   [15:22]
+<jusss> dminuoso: but your `fmap` turns a function `Int -> Char` into `[Int]
+        -> [Char]`  is not a function, it's a list                      [15:23]
+<dminuoso> jusss: Are you sure?
+<dminuoso> `[Int] -> [Char]` is not a function? :-)
+<jusss> dminuoso: [Char] is a function?
+<dminuoso> jusss: No, but `[Int] -> [Char]` is.                         [15:24]
+<jusss> dminuoso: oh, just fmap (a->b)
+<jusss> (e->a) -> (e->b)
+<jusss> dminuoso: yeah, that (e->a) -> (e->b) is a funtion, with a function
+        input and with a function output
+<jusss> the function's input type is (e->a)
+<dminuoso> jusss:
+           https://gist.github.com/dminuoso/787f98e07af511d3a17908a6c6ba043b
+<dminuoso> jusss: fmap transforms a function, it doesnt apply to it.    [15:26]
+<dminuoso> jusss: The thing that happens here is that functions are curried.
+<dminuoso> `fmap (+1) [1,2,3]` is two applications, in a sense.
+<jusss> dminuoso: but how to describe that fmap with (a->b)
+<jusss> dminuoso: how fmap use (a->b) to transform (e->a) to (e->b)?    [15:28]
+<dminuoso> jusss: That is specified in the instance declaration of the Functor
+           instance for each respective type.
+<dminuoso> For example: The way to lift `a -> b` into `Maybe a -> Maybe b` is
+           defined in the instance Functor Maybe.
+<jusss> dminuoso: the word to express the relation, "use" is proper?    [15:29]
+<dminuoso> jusss: Honestly I do not know what you mean by `e -> a` and `e ->
+           b`
+<merijn> dminuoso: tbh, I've never found the "functions are curried" (or
+         really any mention of currying/uncurrying) to be particularly helpful
+         for confused people, because it's mostly orthogonal to the real
+         problem people have (i.e. all functions only ever have one argument)
+<jusss> obvious, "apply" is not proper                                  [15:30]
+<dminuoso> jusss: Right. It uses it to create a new function rather.
+<dminuoso> (Or in some special cases it may be disregarded)
+<jusss> dminuoso: (e->a) is a function, (e->b) same too
+<dminuoso> jusss: Ohh I think I just understood your question then.     [15:31]
+<dminuoso> jusss: Take it as a challenge.
+<dminuoso> jusss: Fix `e` to some type, because the choice does not matter.
+                                                                        [15:32]
+<dminuoso> jusss: So try to write a function: banana :: (a -> b) -> (Int -> a)
+           -> (Int -> b)
+
+<jusss> dminuoso: but Int is a specific type, it's ok to use  with that type
+        variables?                                                      [15:34]
+<dminuoso> jusss: Yes.
+<dminuoso> jusss: The details of why this is okay are really not important.
+<jusss> dminuoso: banana::(Int->Int) -> (Int->Int) -> (Int->Int)        [15:35]
+<dminuoso> jusss: You may not change the other type variables.
+<dminuoso> banana :: (a -> b) -> (Int -> a) -> (Int -> b)
+<dminuoso> This is what you should implement.
+<jusss> dminuoso: yeah, I just use Int as the instance of a, that's not ok?
+<jusss> banana (+1) (+2)                                                [15:37]
+<dminuoso> jusss: For using it, that's fine. But I want you to write the
+           function `banana` yourself, and it should have the exact type
+           signature I specified.
+<jusss> banana x y z = x (y z)                                          [15:38]
+<dminuoso> jusss: That looks good. Are you familiar with the (.) operator
+           already?                                                     [15:39]
+<jusss> banana x y = \x x( y x)
+<jusss> banana  x y = \z x( y z)
+<jusss> dminuoso: (.) is fmap when Functor is (e->)                     [15:40]
+<dminuoso> jusss: Right.
+<jusss> and map is fmap when Functor is List []
+<dminuoso> jusss: Also right.
+<jusss> and what's wrong?
+<dminuoso> jusss: Nothing. :)
+<jusss> dminuoso: I always think that there's a consume in that type    [15:41]
+<jusss> so we can consume a 'a' in (a->b) -> f a, 
+<jusss> consume a 'a' so we can get f b
+<jusss> obvious, I was wrong
+<jusss> I found that I really like those type variables, not specific type
+                                                                        [15:42]
+<dminuoso> jusss: Now do you see how `fmap` lets you transform functions of
+           shape `a -> b` into `f a -> f b` for some choice of f?
+<merijn> jusss: That'd be because you're slowly getting an intuition for free
+         theorems ;)
+<dminuoso> :)
+<jusss> dminuoso: wait a sec, what fmap x = ?                           [15:46]
+<dminuoso> jusss: Any, really.
+<dminuoso> for [], fmap lets you turn `a -> b` into `[a] -> [b]`, for Maybe
+           fmap lets you turn `a -> b` into `Maybe a -> Maybe b`, for IO fmap
+           lets you turn `a -> b` into `IO a -> IO b`                   [15:47]
+<dminuoso> And so forth
+<dminuoso> jusss:
+           https://gist.github.com/dminuoso/daedae39ed76577d81d1a5984bf45b5e
+<dminuoso> So Applicative generalizes this pattern to not just work with `a ->
+           b`, but also just `a` or `a -> b -> c`, or `a -> b -> c -> d`, or
+           any such function                                            [15:48]
+<jusss> dminuoso: oh, I think I understand what you mean, fmap turn (a->b)
+        into (e->a) -> (e->b)
+<dminuoso> jusss: Right.
+<jusss> dminuoso: not fmap use (a->b) turn (e->a) to (e->b)?
+<dminuoso> jusss: Well the function is usually used, somehow.           [15:49]
+<dminuoso> But its not specified how its used, its different for each type.
+<dminuoso> We just have 2 laws you need to satisfy.
+<jusss> dminuoso: and what's it?
+<dminuoso> jusss: Well it can be condensed into one law really:         [15:50]
+<dminuoso> fmap id = id
+<dminuoso> Which says if you use `fmap` to transform id, the resulting
+           function must act as the identity function.
+<jusss> and ?
+<dminuoso> jusss: Forget the other law, I shouldnt have mentioned it. We have
+           only one law.
+<jusss> dminuoso: so fmap (\x->x) = \x -> x
+<jusss> ?
+<dminuoso> jusss: You cant actually write thta.                         [15:52]
+<jusss> dminuoso: I wonder if I give a function to \x and I get a function?
+<dminuoso> jusss: When I say `fmap id = id` its not meant as Haskell code, its
+           a statement of a law.
+<dminuoso> Basically:
+<dminuoso> fmap id [1,2,3] *must* produce [1,2,3]
+<dminuoso> `fmap id (Just 7)` *must* produce `Just 7`
+<jusss> dminuoso: fmap id id?
+<dminuoso> jusss: that gives you `id` back, trivially                   [15:54]
+<dminuoso> id x = x
+<dminuoso> If you take `fmap id = id`, then you can substitute in your code:
+           id id, and the result of that is just id
+<jusss> dminuoso: about fmap :: (a->b) -> ( (e->a) -> (e->b) ),  if id is
+        (a->b) so fmap id = id, the id right after '=' is (e->a)->(e->b)
+        right?                                                          [15:55]
+<dminuoso> jusss: `fmap id = id` is not Haskell code.                   [15:56]
+<jusss> dminuoso: what do you mean is not Haskell code?
+<dminuoso> jusss: Perhaps its less confusing if I state it using words: if you
+           fmap over something using id, it must give you that something back
+           unchanged.
+<dminuoso> that's the single law of functor
+<dminuoso> % fmap id [1,2,3]                                            [15:57]
+<yahb> dminuoso: ; <interactive>:55:1: error:; * Ambiguous type variables
+       `f0', `b0' arising from a use of `print'; prevents the constraint
+       `(Show (f0 b0))' from being solved.; Probable fix: use a type
+       annotation to specify what `f0', `b0' should be.; These potential
+       instances exist:; instance Show a => Show (ZipList a) -- Defined in
+       `Control.Applicative'; instance Show a => Show (Co
+<dminuoso> % fmap id "foobar"
+<yahb> dminuoso: "foobar"
+<dminuoso> % fmap id (Just 'c')
+<yahb> dminuoso: Just 'c'
+<dminuoso> % fmap id Nothing
+<yahb> dminuoso: Nothing
+<dminuoso> so `fmap id` is a no-op. It produces the id function.        [15:58]
+<jusss> dminuoso: but that type in fmap, the produced id function's type is?
+<merijn> :t fmap id
+<lambdabot> Functor f => f b -> f b
+<jusss> merijn: but the produced id can't be f b -> f b,    id :: a -> a
+<dminuoso> jusss: Good catch.
+<dminuoso> jusss: Turns out, that `id :: a -> a` is the most general type.
+                                                                        [16:02]
+<dminuoso> idInt :: Int -> Int; idInd x = x
+<dminuoso> jusss: ^- would you agree that this, too, is an identity function?
+<jusss> dminuoso: you want to express a can be f b?
+<dminuoso> jusss: Exactly.                                              [16:03]
+<merijn> :t id `asAppliedTo` Nothing
+<lambdabot> Maybe a -> Maybe a
+<merijn> :t id `asAppliedTo` 'c'
+<lambdabot> Char -> Char
+<dminuoso> % :t id
+<yahb> dminuoso: a -> a
+<dminuoso> jusss: There's a cool trick:                                 [16:04]
+<delYsid`> merijn: Thanks for that storable vector hint, its working now.
+<dminuoso> % (+1) `id` 5
+<yahb> dminuoso: 6
+<merijn> delYsid`: \o/
+<jusss> dminuoso: wait a sec, % fmap id 3
+<merijn> delYsid`: Now you too can program C in Haskell! ;)
+<jusss> id 3 is 3, but fmap id 3 is wrong
+<dminuoso> jusss: Right!
+<dminuoso> jusss: Its a slightly more specialized id.                   [16:05]
+<dminuoso> jusss: So when I say `fmap id = id` its not meant as "fmap id"
+           gives you the "most general id function back"
+<delYsid`> merijn: Yeah, after getting over the initial shock, its actually
+           quite nice.
+<dminuoso> But rather "fmap id" gives you a "slightly less general id function
+           back"
+<jusss> dminuoso: then fmap id = id, this id shoud change its name like id2 or
+        idf
+<dminuoso> jusss: If you prefer, sure.
+<dminuoso> If that helps.
+<dminuoso> fmap id = id'
+<jusss> dminuoso: then the first and only law in Functor is really confusing
+        people
+<dminuoso> jusss: Sadly we do not have a precise language to formulate the
+           laws in a way that would be understandable by most beginners.
+                                                                        [16:07]
+<merijn> delYsid`: Yes, the application is rather limited, but where
+         applicable (like your problem) it does give you massive performance
+         benefits with the minimum required memory :)
+<jusss> 'cause that new id :: f b -> f b, not id :: a -> a,   the new id is a
+        subset of the old id
+<dminuoso> jusss: `fmap id = id` seemed like the best effort, do you have a
+           better alternative?                                          [16:08]
+<merijn> delYsid`: You can actually do even more advanced things based on
+         this. You can use mmap to map a file into memory and rely on the OS
+         to page data from disk to memory "on-demand" :)
+<dminuoso> jusss: And you are absolutely right.
+<dminuoso> jusss: But you are slowly getting a hang for type unification,
+           which I think is great.
+<jusss> dminuoso: what about <*> and >>= , they're same with fmap?
+<dminuoso> jusss: no, they are more powerful actually.
+<jusss> now we can say fmap transform (a->b) to ( (e->a) -> (e->b) ), so I
+        wonder how to express about <*> and >>=                         [16:11]
+<dminuoso> jusss:
+           https://gist.github.com/dminuoso/daedae39ed76577d81d1a5984bf45b5e
+<dminuoso> jusss: This tells you what Applicative (this is the typeclass that
+           <*> is in) is, in relation to Functor.                       [16:12]
+<dminuoso> (>>=) is... different.
+<Solonarv> % :t (<*>) @((->) _) -- here's what <*> looks like for functions
+<yahb> Solonarv: (w -> a -> b) -> (w -> a) -> w -> b
+<dminuoso> jusss: You can do this yourself very mechanically.           [16:13]
+<dminuoso> Replace every instance of `f` with ((->) e)
+<Solonarv> % :t (=<<) @((->) _) -- and here's =<< (which is just >>= flipped)
+<yahb> Solonarv: (a -> w -> b) -> (w -> a) -> w -> b
+<dminuoso> jusss: So Applicative lets you do: `a -> (e -> b)`, `(a -> b) -> (e
+           -> a) -> (e -> b)`, `(a -> b -> c) -> (e -> a) -> (e -> b) -> (e ->
+           c)`, etc...                                                  [16:14]
+<dminuoso> jusss: Though it should be said that the `e` here is special.
+<Solonarv> dminuoso: your first one is wrong, it should be 'a -> (e -> a)'
+<dminuoso> Oh, good catch.                                              [16:15]
+<jusss> dminuoso: Applicative transform (w->a->b) to ((w->a) -> (w->b)) ?
+<dminuoso> jusss: take my diagram, and copy some snippet off a type signature
+<dminuoso> jusss: And mechanically replace `f` with ((->) e)`, and by
+           mechanically I mean use search-and-replace with your editor  [16:16]
+<jusss> dminuoso: in you diagram, Functor only have two element, but
+        Applicative have any element
+<dminuoso> jusss: Exactly!
+<dminuoso> Applicative is more general than Functor, which is why less
+           instances exist.
+<dminuoso> (Since not all type constructors support this "works for any number
+           of components in a function")
+<jusss> dminuoso: <*> transform any element to a form that I don't know how to
+        express                                                         [16:19]
+<jusss> elements are "contained" by functor
+<jusss> dminuoso: wait a sec, those element, they 're function          [16:20]
+<dminuoso> jusss: Yup!
+<dminuoso> jusss: Applicative too transforms functions.
+<jusss> in functor, a->b,  in applicative, a or a->b or a->b->c
+<dminuoso> Except Functor limits you to functions taking one argument.
+<dminuoso> Applicative lets you do this with functions taking *any* number of
+           arguments
+<dminuoso> jusss: Spot on.
+<jusss> dminuoso: that arguments are not important I think, 'cause currying
+<dminuoso> jusss: They are here.
+<dminuoso> jusss: For me, finding good intuition requires frequently changing
+           perspectives. So I constantly jump between "functions have only one
+           argument" and "functions can have many arguments", depending on
+           which perspective gives better intuition.                    [16:23]
+<dminuoso> jusss: Relatedly, starting from Applicative you stop thinking of
+           that `f` as "container"                                      [16:25]
+<dminuoso> jusss: Usually we start thinking of `f` as being a kind of effect.
+<dminuoso> jusss: but that may not be helpful to you, if it confuses you just
+           disregard it.                                                [16:27]
+<talqu>
+        https://www.stackage.org/haddock/lts-7.14/lucid-2.9.7/Lucid-Html5.html#v:script_
+        I can't write `script_ [src_ "main.js"]`, neither prepending the
+        expression with `with`. How is this element different in the first
+        place and can't be written following what docs say. div_, table_,
+        .. work well. How do i write a script_ with a source attribute?
+                                                                        [16:38]
+<Solonarv> talqu: it looks like you always need to give children
+<Solonarv> so this should work: script_ [src_ "main.js"] ""
+<talqu> Solonarv: 
+<Solonarv> hm? did you hit enter too early?                             [16:43]
+<talqu> sorry hit enter too early :), it compiles when written this way:
+        `script_ [src_ "main.js"] ("" :: Text)`. Now, when I inspect the type
+        I get: `script_ :: [Attribute] -> Text -> HtmlT m ()`, however, in
+        docs the type of the expression is `script_ :: TermRaw arg result =>
+        arg -> result` and I don't see how to derive/understan this type to
+        `script_ :: [Attribute] -> Text -> HtmlT m ()`                  [16:47]
+<jusss> dminuoso: but <*> :: f (a->b) -> f a -> fb,  <*> transform that
+        function in Applicative to another function(f a -> f b) right?
+<jusss> it's kind of like (1+2)*3 == 1*3 + 2*3                          [16:48]
+<dminuoso> jusss: Right. So the diagram I showed you is basically what you can
+           do with pure and (<*>)
+<Solonarv> talqu: what I did is to go look at the docs for TermRaw
+<dminuoso> jusss: Nope.
+<Solonarv> specifically, the instances section
+                                                                        [16:49]
+<dminuoso> % liftA0 = pure
+<yahb> dminuoso: 
+<Solonarv> we know that script_ :: TermRaw arg result => arg -> result
+<Solonarv> the instances tell us that this must be 'Text -> Attribute', or
+           'Text -> HtmlT m ()', or '[Attribute] -> f -> HtmlT m ()' with
+           ToHtml f
+<jusss> dminuoso: if f is (e->),   so <*> :: (e->) (a->b) -> (e->a) -> (e->b)
+                                                                        [16:52]
+<jusss> I don't know if I can write that (e->) (a->b) to (e->a->b)      [16:53]
+<dminuoso> jusss: You must, actually.
+<dminuoso> jusss: Alternatively, you can write it as:
+<dminuoso> ((->) e (a -> b)) -> ((->) e a) -> ((->) e b)                [16:54]
+<dminuoso> So by wrapping the arrow with parens you can write it in prefix
+           notation.
+<jusss> dminuoso: and function can be Applicative too?
+<dminuoso> Just like you would with operators.
+<dminuoso> jusss: Try implementing the following two functions:
+<dminuoso> coconut :: a -> (Int -> a)
+<dminuoso> mango :: (Int -> (a -> b)) -> (Int -> a) -> (Int -> b)       [16:55]
+<jusss> coconut x = \y -> x
+<talqu> Solonarv: thank you, i see it now. Also this class use {-# LANGUAGE
+        MultiParamTypeClasses #-} right? You couldn't write `class TermRaw arg
+        result` without that extension?
+<Solonarv> talqu: yes, and also FunctionalDependencies                  [16:56]
+<dminuoso> And FlexibleContexts
+<dminuoso> Oh well all those things.
+<Solonarv> FlexibleInstances too I think
+<dminuoso> MPTC almost always goes hand-in-hand with FlexibleContexts and
+           FlexibleInstances.                                           [16:57]
+<Solonarv> basically a handful of generally-recognised-as-unproblematic
+           extensions to the typeclass machinery
+<dminuoso> Its almost suprising why it doesn't include those.
+<Solonarv> dminuoso: also with FunctionalDependencies, if you want type
+           inference to work nicely
+<dminuoso> Solonarv: Im willing to argue that no.                       [16:58]
+<Solonarv> Hm. Not always, but certainly often
+<jusss> mango \x -> \y -> z = \ICantWrite (\x -> y) -> (\x->z)
+<dminuoso> jusss: Use your editor, and use GHC to typecheck and subsequently
+           test your code.
+<jusss> dminuoso: let's g :: a->b,  f:: Int -> a ,  g( f Int) = b       [17:05]
+<jusss> wrong                                                           [17:06]
+<jusss> dminuoso: f::Int->(a->b)   g::Int->a   mango f g Int = (f Int) (g Int)
+<jusss> dminuoso: right?
+<dminuoso> jusss: You should practice writing this in correct Haskell code.
+                                                                        [17:12]
+<dminuoso> This helps you as well as others trying to understand you.   [17:13]
+<jusss> Prelude> mango f g x = (f x) (g x)                              [17:14]
+<jusss> mango :: (t1 -> t2 -> t3) -> (t1 -> t2) -> t1 -> t3
+<dminuoso> jusss: Looks great.
+<dminuoso> jusss: Now it should be said that Alternative too has some laws,
+           but they are far more elaborate than the simple Functor law.
+<dminuoso> jusss: In general you should test whether your instance satisfies
+           the necessary laws.
+<Solonarv> dminuoso: did you mean s/Alternative/Applicative/ ?
+<merijn> ugh...why do we have catches with a list of handlers, but not handles
+         with a list of handlers? >.>                                   [17:16]
+<dminuoso> Solonarv: Funny, I was just about to write somethig in -ot about
+           Alternative, my mind must have played a trick on me.
+<jusss> deduce a function's definition from its type signature is so amazing!
+        of course this one function is just an instance of the type, like a
+        subset
+<dminuoso> jusss: The more general a type is, the better this works.
+<dminuoso> Also it frequently leads to situations where it's very hard to
+           write something that still type checks but is wrong.         [17:19]
+<Solonarv> sometimes (when the type signature is general enough) there really
+           is only one possible non-bottom value for it
+<Solonarv> examples: id :: a -> a; (.) :: (b -> c) -> (a -> b) -> (a -> c)
+<dminuoso> jusss: Consider `id :: a -> a`, how many different implementations
+           can you think of?
+<jusss> dminuoso: what are those laws about Applicative                 [17:20]
+<jusss> dminuoso: id x = x
+<jusss> dminuoso: x can be function or string or int or whatelse
+<dminuoso> jusss: You can review them here
+           https://hackage.haskell.org/package/base-4.12.0.0/docs/Prelude.html#t:Applicative
+<dminuoso> jusss: Okay. Can you write it differently?
+<dminuoso> Perhaps in such a way that it changes its input
+<jusss> dminuoso: that sounds like a typeclass stuff                    [17:21]
+<jusss> one type signature but with different instances
+<Solonarv> ah, but there's no typeclass in 'id :: a -> a'
+<dminuoso> I think I understand what jusss is getting at though
+<jusss> yeah, I'm wrong
+<dminuoso> jusss: `id :: a -> a` means it must work for *any* possible choice
+           of a.
+<jusss> dminuoso: yeah,                                                 [17:23]
+<jusss> dminuoso: anything, functor, function, list, string , number, anything
+<dminuoso> Exactly.
+<jusss> 'cause a can be any type I think
+<jusss> like fmap id is a subset of id
+<dminuoso> jusss: And that means you cant know anything about its argument. If
+           you dont know anything about it, the only thing you can do is give
+           it back or disregard it.
+<dminuoso> But you have to return something of `a`. Since you cant just make
+           up arbitrary values of *any* type, the only thing you can actually
+           do, is return the one thing of type `a` that you have.
+<dminuoso> so the type system in its generality has you constrained in such a
+           way, that you can reason about what a function can do and what it
+           cant do                                                      [17:25]
+<jusss> dminuoso: so its type has to be defined in the function
+<jusss> a specific type
+<dminuoso> jusss: The *user* picks the type.
+<dminuoso> jusss: The user of your function/value
+<dminuoso> User/caller/consumer                                         [17:26]
+<dminuoso> Its not the implementor. The implementor cant know in advance what
+           type or even types (!) the consumer/user/caller will pick.
+<dminuoso> `class Functor f where fmap :: (a -> b) -> f a -> f b` here for
+           example an instance implementor cannot know what `a` and `b` are in
+           advance.                                                     [17:27]
+<dminuoso> The implementation has to be able to work with *all* choices of `a`
+           and `b`
+<jusss> dminuoso: it gives me a feel that type signature is amazing, and
+        function definition isn't
+<dminuoso> fmap is by very simple type mechanics prohibited to ever know
+           details about the content. it cant know in advance what `a` or `b`
+           will be                                                      [17:28]
+<dminuoso> the implementation must work for all choices, so it knows nothing
+           about it
+<dminuoso> except what it has been given, namely that functoin
+<dminuoso> % :t ($)
+<yahb> dminuoso: (a -> b) -> a -> b
+<dminuoso> jusss: ^- try implementing that function.                    [17:29]
+<jusss> dminuoso: f::a->b     $ f a = b                                 [17:30]
+<dminuoso> So there too, you dont know what `a` or `b` are, the only things
+           you have are your arguments. If you play this game long enough you
+           can solve pretty fancy type puzzles and very often end up with the
+           only but correct solution.
+<jusss> $ f x  = f x
+<dminuoso> jusss: Notice how both sides are the same? This is a special case
+           of another function you have seen.                           [17:33]
+<dminuoso> Can you guess which?
+<merijn> prettyprinter seems to only split Text on linebreaks for
+         linewrapping, how do I get it to split on words for softwrapping?
+<jusss> Prelude> mango f x = f x
+<jusss> mango :: (t1 -> t2) -> t1 -> t2
+<dminuoso> jusss: Not quite.                                            [17:34]
+<dminuoso> % :t ($)
+<yahb> dminuoso: (a -> b) -> a -> b
+<dminuoso> jusss: If I write the implicit parens here:
+<dminuoso> ($) :: (a -> b) -> (a -> b)
+<jusss> dminuoso: id
+<dminuoso> jusss: But that means we can use `id` to apply to functions!
+                                                                        [17:35]
+<dminuoso> % (+1) `id` 5
+<yahb> dminuoso: 6
+<dminuoso> jusss: merijn mentioned it earlier. This whole business of "the
+           only possible implementation", "judging what a function can do by
+           just looking at the type signature" is called parametricity.
+                                                                        [17:36]
+<jusss> dminuoso: (id (+1)) 5 I perfer
+<jusss> id (+1) == (+1)
+<dminuoso> jusss: So a shorter implementation of ($) is this:
+<dminuoso> ($) = id
+<jusss> dminuoso: one signature, it can be other signatures,    a->a can be
+        (a->b) -> (a->b) ?                                              [17:38]
+<dminuoso> jusss: So lets rerwite one type signature
+<dminuoso> id :: r -> r
+<reactormonk> '<>' is not a (visible) member of class Semigroup - what? I'm
+              using ghc 8.2, so it should be there
+<dminuoso> If we set: r ~ (a -> b)
+<dminuoso> Then it should be obvious
+<dminuoso> jusss: Remmeber: `id :: r -> r` means for *any* choice of type `r`
+<dminuoso> that choice includes functions.
+<jusss> dminuoso: and wehn r is (a->b)        r->(a->b) can be (a->b)->(a->b)
+        ?                                                               [17:40]
+<jusss> when
+<dminuoso> jusss: So things get complicated at this point.
+<jusss> dminuoso: and it's more general
+<jusss> dminuoso: a can be any type
+<dminuoso> jusss: The short answer is, there's different kinds of letters.
+<dminuoso> jusss: This act of "setting type variables equal to another" is a
+           business called type unification
+<merijn> reactormonk: Did you import it from Data.Semigroup ?           [17:43]
+<jusss> dminuoso: and Applicative laws?
+<dminuoso> jusss: They too are probably a bit overwhelming for now.
+<dminuoso> jusss: Just know there exist laws, but you need not know them for
+           now.
+<jusss> dminuoso: I just know that List and Function are Functor and
+        Applicative                                                     [17:44]
+<dminuoso> jusss: Strictly speaking its not function.
+<jusss> dminuoso: a partial function?
+<jusss> dminuoso: I don't know how to express properly, the name        [17:45]
+<dminuoso> jusss: If we think of a function as `A -> B`
+<dminuoso> Then we take that type signature and punch a hole in it, turn it
+           into `A -> _`
+<dminuoso> That would be a valid functor and applicative.
+<jusss> dminuoso: A-> _ isn't a function right?                         [17:46]
+<dminuoso> jusss: Its a type that's still missing one argument.
+<dminuoso> jusss: Now the interesting part is, the choice of `A` is completely
+           free. That is, it doesn't matter whether it's `A -> _`, `D ->
+           _`. It works for *any* choice of a type there.               [17:47]
+<jusss> dminuoso: so what's the porperly to express? 
+<dminuoso> Which is why the instance is written:
+<dminuoso> instance Functor ((->) e)
+<dminuoso> So using that previous notation, you could think of `e -> _` being
+           a Functor for every choice of a type e.
+<dminuoso> Equivalently [_] is a functor with a hole inside.
+<dminuoso> We just write it as []
+<dminuoso> But `[]` is basically too missing that type parameter
+<jusss> dminuoso: yeah, functor and applicative both need a type to complete
+        themself?
+<dminuoso> jusss: Exactly. They work on types missing one type argument.
+<dminuoso> Int cant be Functor
+<dminuoso> [Int] cant be Functor
+<dminuoso> But (Int ->) can                                             [17:50]
+<dminuoso> [] can
+<jusss> dminuoso: and about the m-word?
+<dminuoso> jusss: Same story.
+<dminuoso> jusss: Functor/Applicative/Monad are all interfaces for types that
+           are "missing one type argument for completion"               [17:51]
+<dminuoso> jusss: You can in fact observe this in the type signatures
+<dminuoso> % :t fmap
+<yahb> dminuoso: Functor f => (a -> b) -> f a -> f b
+<jusss> dminuoso: what's the wonders in Monad
+<jusss> about
+<dminuoso> jusss: Its just a very abstract interface, nothing special.
+<jgt> with Yesod's type-safe routing; is there a way to change the protocol?
+<dminuoso> jusss: Let me give you an analogy in terms of "just to show you
+           that some ideas are simple in principle, but too broad to recognize
+           instantly"
+<jgt> for example, change the rendered url from https:// to ws://
+<jusss> dminuoso: ok
+<dminuoso> jusss: There's a common typeclass called Semigroup which consists
+           of a single method `(<>) :: s -> s -> s`
+<dminuoso> jusss: It doesnt have any special purpose. It just generalizes the
+           idea of "smashing/combining things together" in some meaningful
+           way.                                                         [17:53]
+<Logio> with certain properties assumed from the operation, generally   [17:54]
+<jusss> dminuoso: that (->) e can be monad?
+<dminuoso> jusss: Try implementing this function:
+<dminuoso> jusss: cocoa :: (a -> Int -> b) -> (Int -> a) -> (Int -> b)
+<jusss> similar with  mango :: (Int -> (a -> b)) -> (Int -> a) -> (Int -> b) 
+                                                                        [17:56]
+<dminuoso> jusss: Yup. Its related in some manner, but its still different.
+<jusss> dminuoso: cocoa f g x = f (g x) x
+<jusss> cocoa :: (t1 -> t2 -> t3) -> (t2 -> t1) -> t2 -> t3             [17:59]
+<dminuoso> jusss: Great.
+<dminuoso> jusss: This Applicative/Monad instance is usually called Reader and
+           it models threading an implicit parameter through your program.
+<dminuoso> A common usecase might be some kind of Config parameter that every
+           part of your program needs, and you get tired of manually passing
+           it everywhere even though only a handful of spots actually use it.
+<dminuoso> If you look at cocoa and mango you will see that all it does is
+           applying a parameter everywhere.                             [18:01]
+<dminuoso> And its the same parameter, so its a kind of shared
+           environment/config                                           [18:02]
+<jusss> dminuoso: that (->) e can be monad?
+<dminuoso> jusss: Yes. You just wrote the (>>=) implementation for it.  [18:04]
+<dminuoso> (>>=) is your cocoa
+<dminuoso> (<*>) is your mango
+<jusss> dminuoso: what?
+<dminuoso> and pure/return is your coconut
+<dminuoso> And banana is fmap                                           [18:05]
+<jgt> …
+<jgt> {-# LANGUAGE FruitySynonyms #-} ???
+<dminuoso> jgt: Its a private GHC branch
+<jgt> ah                                                                [18:06]
+<dminuoso> Heh.
+<jusss> dminuoso: the position is not right
+<jusss> dminuoso: cocoa and >>=
+<dminuoso> jusss: cocoa = flip (>>=)
+<dminuoso> % :t flip (>>=)                                              [18:07]
+<yahb> dminuoso: Monad m => (a -> m b) -> m a -> m b
+<dminuoso> % :t (=<<)
+<yahb> dminuoso: Monad m => (a -> m b) -> m a -> m b
+<dminuoso> =<< is just >>= with the arguments flipped
+<arianvp> % :t flip @((-> r)) (>>=)                                     [18:08]
+<yahb> arianvp: ; <interactive>:1:12: error: parse error on input `r'
+<jusss> dminuoso: about the a-> m b, I don't understand what it's used for
+                                                                        [18:09]
+<jusss> it's not like functor and applicative
+<jusss> this a->m b
+<dminuoso> jusss: Yeah its not.
+<jusss> dminuoso: and what it is
+<dminuoso> jusss: Well what is (<>)
+<dminuoso> jusss: Its not for anything.
+<Bish> dminuoso: o/
+<jusss> <>:: s->s->s?                                                   [18:10]
+<arianvp> % :t  (>>=) @((->) r)
+<yahb> arianvp: ; <interactive>:1:14: error: Not in scope: type variable `r'
+<dminuoso> Right
+<arianvp> :/
+<dminuoso> jusss: It exists because many things happen to have this shape, for
+           some reason.
+<Taneb> % :t (>>=) @((->) _)
+<yahb> Taneb: (w -> a) -> (a -> w -> b) -> w -> b
+<arianvp> Taneb: thanks
+<arianvp> % :t (=<<) @((->) _)
+<yahb> arianvp: (a -> w -> b) -> (w -> a) -> w -> b
+<dminuoso> jusss: It doesnt have any intrinstic meaning.
+<Bish> there is a flipped version of bind, but not a prefix bind?
+<dminuoso> Bish: You can put (>>=) in parens                            [18:11]
+<dminuoso> And then use it in prefix notation.
+<Bish> yeah great :D i am just sometimes confused about the logic
+<Bish> people would flip it, but never use it prefix
+<jusss> dminuoso: use <> to shape for what
+<dminuoso> jusss: I wouldnt focus on Monad really, ask what the ((->) e)
+           instance does                                                [18:12]
+<Bish> bind [1] pure
+<Bish> i don't think that looks so ugly
+<dminuoso> jusss: Ask what the [] instance does. Ask what the IO instance
+           does.
+<dminuoso> Each is very simple to understand and use.
+<dminuoso> Worry about that m word later.
+<jusss> dminuoso: those instance throw something out?                   [18:13]
+<dminuoso> jusss: Lets go to the (<>) example
+<dminuoso> jusss: Adding numbers is simple.
+<dminuoso> Multiplying number too is a way to combine numbers.
+                                                                        [18:14]
+<dminuoso> Selecting the better number is a more abstract notion of
+           combinining them.
+<dminuoso> Or perhaps concatenating their digits.
+<Bish> "don't worry about the m thing" :> best advice
+<dminuoso> each individual example is trivial and simple
+<dminuoso> you dont need more.
+<jusss> dminuoso: use that old stuff, when e-> is Monad, >>= transform a
+        function to another complicate function?                        [18:16]
+<dminuoso> jusss: For (>>=) I would, personally, not think of it as a function
+           transformer anymore.
+<phadej> % :t (>>=) @((->) Int)
+<yahb> phadej: (Int -> a) -> (a -> Int -> b) -> Int -> b
+<dminuoso> jusss: Though you should look at (=<<) rather, if you want that
+           perspective.                                                 [18:18]
+<phadej> % :t (=<<) @((->) Int)
+<yahb> phadej: (a -> Int -> b) -> (Int -> a) -> Int -> b
+* Bish as a noob he would explain >>= as the function that passes the inner
+  value to a function that has to wrap it again
+<jusss> dminuoso: what you thought >>= as?
+<dminuoso> jusss: Me personally?                                        [18:19]
+<jusss> dminuoso: yeah
+<phadej> I think about it as substitution operator
+<phadej> take all `a`s and replace them by `m b`
+<phadej> inside the structure
+<dminuoso> jusss: I like to think of it as a kind of syntactic sugar to make
+           (>=>) pleasant.
+<dminuoso> jusss: But I do not think this will help you much.
+<Bish> phadej: well, thats what happens all the time in lambda-calc, bit to
+       abstract don't u think?
+<phadej> Bish: monad is quite abstract interface                        [18:20]
+<arianvp> % :t (<=<) @((->) Int)
+<yahb> arianvp: (b -> Int -> c) -> (a -> Int -> b) -> a -> Int -> c
+<Bish> yeah, but if you say "it substitutes things" you explain nothing which
+       is specific to monads
+<jusss> dminuoso: ok, I should just thought =<<
+<phadej> Bish: ¯\_(ツ)_/¯
+<jusss> as function
+<dminuoso> Bish: Pretty sure phadej meant it as `fmap then join`
+<dminuoso> Bish: So it boils down to "what does join actually mean"
+<phadej> % :t join @((->) Int)
+<yahb> phadej: (Int -> Int -> a) -> Int -> a
+<dminuoso> Bish: Though Ive started to develop a really cool intuition that
+           jle` and Solonarv helped me with, which is how Applicative and
+           Monad are related.                                           [18:22]
+<jusss> dminuoso: what's the related?
+<dminuoso> jusss: Nothing that would help you for sure. :-)
+<Bish> dminuoso: well, what did they do to make you get that?
+<Bish> read 10 books about cat-theory?
+<dminuoso> Bish: You know that "a monad is just a monoid..." joke?
+<Bish> no
+<dminuoso> Good. Dont google it.
+* Bish googles it
+<jusss> dminuoso: ok, is there anything else I could learn today? :)    [18:25]
+<Bish> dminuoso: well, how is that a joke?                              [18:26]
+<dminuoso> Bish: Its not helpful at all to learn what it is, how to use it or
+           anything about it.                                           [18:27]
+<dminuoso> Its just utterly complicated and mathy.
+<dminuoso> For people not already familiar with the subject anyway.
+<Bish> well, i struggled hard, as you know, understanding monadic instances
+<Bish> so i started reading about category theory, and i think it's
+       interesting atleast and fascinating
+<Bish> but it doesn't help at all to understand relation like applicative and
+       monad                                                            [18:28]
+<tdammers> it is interesting and fascinating alright, but it won't help much
+           with understanding the Monad typeclass in Haskell
+<Bish> atleast as long as you didn't read allthebooks.png
+<Bish> tdammers: not a bit, yes
+<dminuoso> Bish: not entirely true.
+<tdammers> @where eightfold
+<lambdabot> http://dev.stephendiehl.com/hask/#eightfold-path-to-monad-satori
+<dminuoso> it can help some for some.                                   [18:29]
+<tdammers> ^ I recommend this
+<dminuoso> but emphasis on "can" and both "some".
+<Bish> well, it was timewaste in my case
+<dminuoso> Bish: I do the CT stuff because its lovely.
+<tdammers> it's not a waste of time; it does help understand some of the
+           deeper theory behind it, but that's only going to be useful after
+           you have a bit of a practical grasp on the Monad typeclass and its
+           instances and usage
+<Bish> dminuoso: hard to wrap my head around that, i love it too, but i am
+       guess my intelligence is not enoughf or that :D                  [18:30]
+<dminuoso> So the CT perspective can help you refine your
+           knowledge/perspective if you are already familiar with it.
+<dminuoso> But its not a good means to actually learn it, just to study
+           something you already know well deeper for personal interest.
+<Bish> to understand monadic instances i just used intesive staring at
+       replicateM
+<jusss> dminuoso: thanks for your teaching, :) 
+
+<Bish> because i loved what it does
+<jgt> yeah I really didn't think the "monad is just a monoid…" joke was all
+      that crazy
+<tdammers> getting to the point where you can do useful stuff with do notation
+           on lists, and actually grok how that works, is fun
+<jgt> I mean, you just learn what the words mean
+
+<jgt> "monad is a monoid" ok… so they are composable
+
+<jgt> "…in the category of endofunctors" ok so the "thing" it represents
+      won't change into a different thing
+<arianvp> composable itself is a very ambigious word though :P
+<arianvp> especially when you combine it with the slogan "Monads don't
+          compose" :P
+<dminuoso> And the composition is hard to spot unless you tell the joke not as
+           a joke but correctly
+<jgt> for the purposes of understanding what is meant, I think it makes it
+      tangible enough
+<dminuoso> A monad is a monoid in *a* category of endofunctors equipped with
+           functor composition as its tensor.
+<dminuoso> *in a monoidal category*                                     [18:34]
+<dminuoso> suddenly you need to talk about monoidal categories, monoids,
+           endofnuctors, tensors..
+<dminuoso> categories
+<jgt> do you though?
+<jgt> it seems like the common problem with functor                     [18:35]
+
+<dminuoso> jgt: What if I told you that Applicative too is a monoid in a
+           monoidal category of endofunctors?
+<jgt> just about anybody can grasp that it's a mappy thing
+<arianvp> https://www.youtube.com/watch?time_continue=3&v=SLAmSo0Gd4U
+<jgt> which isn't really the whole story
+<arianvp> oh wrong link I think
+<jgt> but for the purposes of getting someone productive in Haskell, it
+      doesn't matter
+
+<dminuoso> jgt: So if both Applicative and Monad are monoids in the category
+           of endofunctors, whats the difference?                       [18:36]
+<Solonarv> of course, but it seems the discussion was about the "a monad is
+           just a monoid in the category of endofunctors, what's the problem?"
+<jgt> the difference is not relevant to someone stumbling through their first
+      "build a blog in Haskell" tutorial
+<Solonarv> (I jumped in halfway through, so might be missing some context)
+<dminuoso> Solonarv: I named you as one of the responsible people already. :-P
+                                                                        [18:37]
+
+* Solonarv *scared*
+<Solonarv> responsible for what?
+<dminuoso> Solonarv: Oh remember that discussion with jle` the other day?
+<tdammers> leave it to Haskellers to take a joke seriously and accidentally
+           end up with a productive discussion
+<dminuoso> About Day and (:.:)?
+<arianvp> which I never seen happen before lol                          [18:38]
+<Solonarv> dminuoso: oh, I remember
+
+<dminuoso> Solonarv: Ive been trying to build a foundation of intuition of
+           that.
+<dminuoso> *on that.
+<arianvp> Only time I grasped the whole monad is monoid thing was in a lecture
+          about string diagrams
+<arianvp> and forgot again the day after, as always happens with me and
+          category theory                                               [18:39]
+
+<dminuoso> arianvp: for me cool thing is how it explains the laws in a
+           do-notation perspective better
+<Solonarv> after your head gets dunked into category theory deeply enough you
+           start to see it everywhere :P                                [18:41]
+<Solonarv> and specifically monoids/categories crop up all over the place
+                                                                        [18:42]
+<arianvp> http://www.stephendiehl.com/posts/monads.html 
+<dminuoso> Solonarv: Its absolutely amazing how category seems to be the
+           fundamental building block for everything.                   [18:43]
+<dminuoso> Solonarv: Do you read Bartosz's twitter?
+<arianvp> wait until you discover higher category theory =)
+<Solonarv> I don't, I rarely check twitter at all
+<dminuoso> Solonarv:
+           https://www.quora.com/Why-is-a-mathematical-function-allowed-to-have-multiple-outputs-for-single-input-but-not-multiple-inputs-for-same-output-Is-it-just-a-convention-or-it-has-a-logical-reason/answer/Bartosz-Milewski?share=0ce9415c
+                                                                        [18:44]
+<dminuoso> I highly enjoyed this answer on: Why is a mathematical function
+           allowed to have "multiple outputs for single input" but not
+           "multiple inputs for same output"? Is it just a convention or it
+           has a logical reason?
+<Bish> > just about anybody can grasp that it's a mappy thing
+<lambdabot>  error:
+<lambdabot>      • Variable not in scope:
+<lambdabot>          just :: t0 -> t1 -> t2 -> t3 -> t4 -> t5 -> Expr -> t6 ->
+            t7 -> t
+<Bish> fav sentence of the day :D
+* jgt blushes on the inside                                             [18:47]
+<t7> what?
+
+<jgt> t7: what what?
+<dTal> Hi Haskellers. I have a question that's not specifically about Haskell,
+       but someone suggested maybe you might know the answer to.        [19:02]
+<dTal> Is there a word for the operation that takes a function that combines
+       two values, and returns a function that combines two functions that
+       return those values?
+
+<dTal> (or any number of values I suppose)                              [19:03]
+<dminuoso> dTal: Semigroup
+
+<dminuoso> dTal: Its fully captured by: instance Semigroup b => Semigroup (a
+           -> b)
+<jgt> "semigroup" is a category, not an operation, no?
+<Solonarv> well, if by "combine" you are talking about <> specifically
+<dminuoso> I somehow assumed they were trying to name a thing that already
+           existed.
+<Solonarv> oh yes, that thing is called 'on' in Haskell's standard library
+                                                                        [19:05]
+<Solonarv> er, wait, liftA2
+<dTal> in Scheme it looks like (define (meta fun) (lambda instances (lambda
+       (argtype) (apply fun (map (lambda (instanc
+<dTal> e) (instance argtype)) instances)))))
+<dminuoso> Solonarv: No pretty sure its the semigroup operation
+<dTal> oops sorry
+<Solonarv> % :t liftA2 @((->) _)
+<yahb> Solonarv: (a -> b -> c) -> (w -> a) -> (w -> b) -> w -> c
+<dminuoso> Or?
+<dminuoso> Mmm                                                          [19:06]
+<dminuoso> Oh you are right Solonarv.
+
+* jgt can't wait to be at that level of wizardry some day
+<Solonarv> dTal: or liftA3, liftA4 etc for higher arity                 [19:07]
+<Solonarv> I don't remember how many of them are defined
+<Solonarv> but also: liftAn f x1 ... xn = f <$> x1 <*> ... <*> xn
+<dTal> well the thing I just pasted should work for arbitrary arity
+                                                                        [19:08]
+<Solonarv> we don't have arbitrary-arity functions in Haskell - at least, not
+           conveniently - so that doesn't translate straightforwardly
+<Solonarv> but as I showed you can build "arbitrary-arity liftA*" using
+           repeated applications of <*>                                 [19:09]
+<dTal> That does like it
+<dTal> wow, thanks a lot guys
+
+<dTal> it's such a pleasure to "discover" something like that
+<Solonarv> > liftA2 (++) tail reverse "hello"                           [19:10]
+<lambdabot>  "elloolleh"
+<Solonarv> or:
+<Solonarv> > ((++) <$> tail <*> reverse) "hello"
+<lambdabot>  "elloolleh"
+
+<dTal> so this? (map ((liftA2 +) (lambda (x) (+ 1 x)) (lambda (x) (+ x 1)))
+       (iota 10)) => (2 4 6 8 10 12 14 16 18 20)                        [19:12]
+<dTal> sorry for persistently pasting Scheme, but I figured you probably know
+       more Scheme than I know Haskell
+
+<Solonarv> well, liftA2/3/... is a name for that function in Haskell
+
+<dTal> actually, hold that thought, I'm actually expecting (2 3 4 ...) - the
+       heck
+<Solonarv> and it's actually more general than lifting functons
+<Solonarv> > map (liftA2 (+) (+1) (1+)) [1..10]
+<lambdabot>  [4,6,8,10,12,14,16,18,20,22]
+<Solonarv> oh, iota isn't quite what I thought it was - close enough though
+                                                                        [19:16]
+
+<dTal> oh no that is correct, of course you're adding x to itself - just a
+       math brain fart
+<Solonarv> I'm not aware of a specific name for this kind of combinator, tbh
+
+<dTal> I guess I'll just call it 'lift' in my program then
+<Solonarv> I'd pick something like 'liftFunc'                           [19:18]
+
+##########################################################
 <[exa]> like, Maybe , [], Either l, (e->), IO all "contain" 'a' and can be
         converted using '(a->b)' to contain 'b'
 <[exa]> jusss: the point about functors is that you can change what type they

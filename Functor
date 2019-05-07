@@ -1,4 +1,120 @@
 
+<jusss> dminuoso: oh, I think I understand what you mean, fmap turn (a->b)
+        into (e->a) -> (e->b)
+<jusss> now we can say fmap transform (a->b) to ( (e->a) -> (e->b) ), so I
+        wonder how to express about <*> and >>=                         [16:11]
+<dminuoso> jusss: Applicative too transforms functions.
+<jusss> in functor, a->b,  in applicative, a or a->b or a->b->c
+<dminuoso> Except Functor limits you to functions taking one argument.
+<dminuoso> Applicative lets you do this with functions taking *any* number of
+           arguments
+<jusss> dminuoso: but <*> :: f (a->b) -> f a -> fb,  <*> transform that
+        function in Applicative to another function(f a -> f b) right?
+<dminuoso> jusss: Right. So the diagram I showed you is basically what you can
+           do with pure and (<*>)
+
+<dminuoso> mango :: (Int -> (a -> b)) -> (Int -> a) -> (Int -> b)       [16:55]
+<jusss> Prelude> mango f g x = (f x) (g x)                              [17:14]
+<jusss> mango :: (t1 -> t2 -> t3) -> (t1 -> t2) -> t1 -> t3
+<dminuoso> jusss: Looks great.
+
+<jusss> dminuoso: yeah, functor and applicative both need a type to complete
+        themself?
+<dminuoso> jusss: Exactly. They work on types missing one type argument.
+<dminuoso> jusss: cocoa :: (a -> Int -> b) -> (Int -> a) -> (Int -> b)
+<jusss> dminuoso: cocoa f g x = f (g x) x
+<jusss> dminuoso: that (->) e can be monad?
+<dminuoso> jusss: Yes. You just wrote the (>>=) implementation for it.  [18:04]
+<dminuoso> (>>=) is your cocoa
+<dminuoso> (<*>) is your mango
+<jusss> dminuoso: what?
+<dminuoso> and pure/return is your coconut
+<dminuoso> And banana is fmap                                           [18:05]
+<jusss> dminuoso: cocoa and >>=
+<dminuoso> jusss: cocoa = flip (>>=)
+<jusss> dminuoso: about the a-> m b, I don't understand what it's used for
+                                                                        [18:09]
+<jusss> it's not like functor and applicative
+<jusss> this a->m b
+<dminuoso> jusss: Yeah its not.
+<jusss> dminuoso: and what it is
+<dminuoso> jusss: Well what is (<>)
+<dminuoso> jusss: Its not for anything.
+<Bish> dminuoso: o/
+<jusss> <>:: s->s->s?                                                   [18:10]
+<arianvp> % :t  (>>=) @((->) r)
+<yahb> arianvp: ; <interactive>:1:14: error: Not in scope: type variable `r'
+<dminuoso> Right
+<arianvp> :/
+<dminuoso> jusss: It exists because many things happen to have this shape, for
+           some reason.
+<Taneb> % :t (>>=) @((->) _)
+<yahb> Taneb: (w -> a) -> (a -> w -> b) -> w -> b
+<arianvp> Taneb: thanks
+<arianvp> % :t (=<<) @((->) _)
+<yahb> arianvp: (a -> w -> b) -> (w -> a) -> w -> b
+<dminuoso> jusss: It doesnt have any intrinstic meaning.
+<Bish> there is a flipped version of bind, but not a prefix bind?
+<dminuoso> Bish: You can put (>>=) in parens                            [18:11]
+<dminuoso> And then use it in prefix notation.
+<Bish> yeah great :D i am just sometimes confused about the logic
+<Bish> people would flip it, but never use it prefix
+<jusss> dminuoso: use <> to shape for what
+<dminuoso> jusss: I wouldnt focus on Monad really, ask what the ((->) e)
+           instance does                                                [18:12]
+##############################################
+
+deduce a function definition from its type signature, and this one function is just an instance of its type signature, this type can have different function definition,
+id :: a->a
+id :: (a->b) -> a -> b
+<dminuoso> jusss: cocoa :: (a -> Int -> b) -> (Int -> a) -> (Int -> b)
+<jusss> dminuoso: cocoa f g x = f (g x) x
+let's assume
+f::a->Int->b
+g::Int->a
+x::Int
+cocoa f g x = b
+f a:: Int->b
+f a x :: b
+g Int :: a
+g x :: a
+f (g x) x :: b
+cocoa f g x = f (g x) x
+######################################################
+
+Functor can do:
+
+
+  a -> b
+    |
+    |
+    v
+f a -> f b
+
+Applicative can do:
+
+ a        a -> b          a -> b -> c             a -> b -> c -> d                .... and so on ....
+ |          |                  |                          |
+ |          |                  |                          |
+ v          v                  v                          v
+f a f a -> f b f a -> f b -> f c f a -> f b -> f c -> f d .... and so on ....
+
+and when Functor and Applicative are e->
+<jusss> dminuoso: if f is (e->),   so <*> :: (e->) (a->b) -> (e->a) -> (e->b)
+######################################################
+
+fmap  ::   (a -> b) -> f a -> f b
+(<*>) :: f (a -> b) -> f a -> f b
+(=<<) :: (a -> f b) -> f a -> f b
+
+
+####################################################
+
+<jusss> dminuoso: then fmap id = id, this id shoud change its name like id2 or
+        idf
+<jusss> 'cause that new id :: f b -> f b, not id :: a -> a,   the new id is a
+        subset of the old id
+##################################
 (e->) doesn't "contain" anything, but (e->a) "contain" a value 'a'
 [] doesn't "contain" anything, but [a] "contain" a value 'a'
 ####################################
