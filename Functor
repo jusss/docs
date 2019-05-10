@@ -1,3 +1,23 @@
+>>= :: m a -> (a -> m b) -> m b
+if m is (e->)
+>>= :: e->a -> (a-> (e->b)) -> (e->b)
+f::e->a
+g::a->(e->b)
+x::e
+>>= f g x = g (f x) x 
+
+f :: Int->String
+f x = show x
+
+g :: String->(Int->[String])
+g x = \y ->[show y ++ x ]
+
+Prelude> z=(>>=) f g
+Prelude> :t z
+z :: Show a => a -> [[Char]]
+
+
+######################################################
 
 <jusss> dminuoso: oh, I think I understand what you mean, fmap turn (a->b)
         into (e->a) -> (e->b)
