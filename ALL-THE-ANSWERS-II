@@ -1,3 +1,545 @@
+
+record syntax
+    data Person = Person String String Int Float String String deriving (Show)
+    firstName :: Person -> String  
+    firstName (Person firstname _ _ _ _ _) = firstname
+    ghci> let guy = Person "Buddy" "Finklestein" 43 184.2 "526-2928" "Chocolate"  
+    ghci> firstName guy  
+    "Buddy"
+        data Person = Person { firstName :: String  
+                         , lastName :: String  
+                         , age :: Int  
+                         , height :: Float  
+                         , phoneNumber :: String  
+                         , flavor :: String  
+                         } deriving (Show)
+
+it means firstName Person will get a String that in the Person data type
+
+data Any = Any { getAny :: Bool }
+this is data Any = Any Bool
+and    getAny:: Any -> Bool
+
+newtype Pair b a = Pair { getPair :: (a, b) }
+
+  
+
+#######################################################
+
+<jusss> eiGHttt (>>=) (Just 3) f?
+<jusss> >>= (Just 3) 已经确定了f的类型                                  [14:04]
+<jusss> (>>=) (Just 3) :: Num a => (a -> Maybe b) -> Maybe b
+<jusss> eiGHttt LdBeth  既然monoid和monad在haskell里就没关系，为什么书里总是要
+        讲monoid再讲monad
+<LdBeth> jusss: 因为特么的在数学上有关系
+<LdBeth> 就是 Applicative 同时支持 Functor 和 Monoid 操作罢了           [14:18]
+<eiGHttt> Monad更抽象，Applicative只能f (a -> b)，做不到(a -> f b)。
+<LdBeth> jusss: Applicative is monoidal functor
+<LdBeth> 连 ADT 都没有哪来的 Maybe
+<eiGHttt> https://github.com/fantasyland/fantasy-land
+<eiGHttt> 这玩意并不好用。
+<LdBeth> jusss: Monad 用宏用闭包都可以，没有 ADT 没有 Maybe             [14:27]
+<LdBeth> 类型只是 type class 用来实现多太的一种办法
+<LdBeth> 和 monad 又没关系                                              [14:37]
+<LdBeth> *多态
+<LdBeth> 只要有类型就可以有多态
+<LdBeth> 不管动态静态                
+#######################################
+
+<jusss> dminuoso: how to solve that problem cause by threads changing one
+        global vairbale?
+<dminuoso> jusss: Its very situational really. Perhaps the architecture can be
+           redesigned to not rely on shared global state
+<jusss> dminuoso: I heard that stuff call STM Act-Model Async what ever
+<dminuoso> jusss: Right, STM is a great toolbox that we use.            [16:24]
+<Solonarv> jusss: yes, usually if we want to mutate shared state from multipe
+           threads we create an MVar, TVar, or similar and pass that to the
+           various threads that need to modify it
+<dminuoso> Or, alternatively to what Solonarv said, it can be beneficial to
+           rely on message passing styles rather.
+<dminuoso> Shared global state can be extremely difficult to reason about
+<dminuoso> And depending on the performance characteristics it can scale very
+           poorly           
+
+#########################################
+<LdBeth> 一个符号能有多个类型，就是多态
+<jusss> LdBeth: id :: a->a,   那 (a->b)->a -> b还是不是id呢?
+<LdBeth> 这就是多态啊
+def f(a):
+    if isinstance(a,int):
+       return a+1
+    if isinstance(a,str):
+       return a+"1"
+
+<LdBeth> jusss: Monad 用宏用闭包都可以，没有 ADT 没有 Maybe             [14:27]
+<LdBeth>
+         https://common-lisp.net/project/cl-monad-macros/monad-macros.htm#_Toc251846352
+<LdBeth> 类型没有实例                                                   [14:55]
+<LdBeth> 类型类有
+<LdBeth> 类型类 Typeclass
+<LdBeth> 类型类的实例是类型                                             [14:56]
+<LdBeth> 一个实例包括了具体的实现                                       [14:57]
+<jusss> 那Functor这个typeclass的实例是什么?
+<LdBeth> 函数是从一个类型到另一个类型的映射                             [14:58]
+<eiGHttt> 很多啊，:i Functor上面都是。
+<LdBeth> jusss: 你自己去定义啊
+<LdBeth> 觉得哪个顺眼就写一个实例啊
+<LdBeth> Haskell 2010 report 只定义了 [] IO Maybe Functor (Array i)     [15:00]
+<LdBeth> 然而用户和语言实现完全可以自己加进去                           [15:01]         
+###############################################################
+
+<jusss> now I have five terms I don't understand, they're Group, Semigroup,
+        Monoid, Endofunctor, Monad                                      [10:33]
+<geekosaur> semigroup: a type and an operation which combines two values with
+            that type to produce another value with that type
+<jusss> and monoid?
+<geekosaur> monoid: a semigroup with an identity value, such that you can get
+            the same value out that you put in by applying the operation to it
+            and the identity value
+<jusss> then monad?                                                     [10:35]
+<geekosaur> a type which has an operation to lift any arbitrary value into the
+            type, and an operation to apply / "execute" some kind of action on
+            a value of that type                                        [10:36]
+<geekosaur> endofunctor we don't use much in Haskell, because all Functors are
+            endofunctors.
+#########################################################
+<jusss> about this <>, what it's used for                               [09:47]
+<jusss> or how it get a -> m b
+<JappleAck> jusss: in which cases it gets a -> m b?                     [09:53]
+<jusss> JappleAck: >>=                                                  [09:54]
+<JappleAck> jusss: it's from Semigroup or Monoid, usually for concatenation
+<JappleAck> > "foo" <> "bar"
+<lambdabot>  "foobar"
+<JappleAck> while ++ is only works with lists <> works with everything which
+            implements Semigroup/Monoid
+<JappleAck> also with wrapped Monoids/Semigroups:                       [09:58]
+<JappleAck> > Just "foo" <> Just "bar"
+<lambdabot>  Just "foobar"
+<JappleAck> jusss: could you show some example of "how it get a -> m b"?
+                                                                        [09:59]
+* geekosaur guesses they've been confused by that CT joke
+<geekosaur> which isn't talking about this Monoid
+<jusss> what is a endofunctor?
+<geekosaur> a functor whose domain and range are the same type
+<geekosaur> er.
+<geekosaur> actually, if this is a continuation of yesterday's confusion, you
+            may be talking about CT endofunctors and they have to be in the
+            same category                                               [10:31]
+<geekosaur> lots of terminology means different things in different contexts,
+            sadly. All Haskell Functor-s are endofunctors in this sense, since
+            they necessarily apply to Haskell types, which form a category
+<jusss> now I have five terms I don't understand, they're Group, Semigroup,
+        Monoid, Endofunctor, Monad                                      [10:33]
+<geekosaur> semigroup: a type and an operation which combines two values with
+            that type to produce another value with that type
+<jusss> and monoid?
+<geekosaur> monoid: a semigroup with an identity value, such that you can get
+            the same value out that you put in by applying the operation to it
+            and the identity value
+<jusss> then monad?                                                     [10:35]
+
+<geekosaur> a type which has an operation to lift any arbitrary value into the
+            type, and an operation to apply / "execute" some kind of action on
+            a value of that type                                        [10:36]
+
+<geekosaur> endofunctor we don't use much in Haskell, because all Functors are
+            endofunctors.
+<jusss> geekosaur: semigroup is an operation combines two values and produce
+        another value, they all are the same type?                      [10:37]
+<geekosaur> and there's no useful way to have a non-endofunctor, since Haskell
+            can only talk about Haskell types
+
+<jusss> geekosaur: or use type to produce value?
+
+<geekosaur> all of the same type
+<geekosaur> (+) and (*) are semigroup operators on numbers. (++) is a
+            semigroup operator on lists                                 [10:38]
+<geekosaur> all three also happen to be monoid operators, each with its own
+            identity: 0, 1, "" respectively
+<jusss> geekosaur: and (+1) is not a semigroup, right?
+<geekosaur> it doesn't combine two arbitrary values, so it's not. but you're
+            getting a little fuzzy here.                                [10:39]
+<geekosaur> strictly we have a semigroup (Integer, (+)) and a monoid (Integer,
+            (+), 0)                                                     [10:40]
+<geekosaur> and similar semigroups and monoids for other numeric types
+<geekosaur> however note that we don't actally define those, because of a
+            limitation of Haskell: you can only have one instance of a
+            typeclass instance per type                                 [10:41]
+<geekosaur> so we can't directly say both (+) and (*) are monoids in Haskell
+<geekosaur> we use newtypes instead: Sum has the (Integer, (+)) Semigroup
+            instance and Product has the (Integer, (*)) Semigroup instance,
+            and likewise Monoid instances with their identity elements
+
+<geekosaur> sometimes we can point to one semigroup / monoid which is more
+            important than the others, so while we use those newtypes for
+            Integer, lists have only the semigroup and monoid for (++).
+                                                                        [10:45]
+<bzm3r> so the signature of `*` makes sense from an S combinator point of
+        view, and i am trying to write an implementation for `*`.  recall the
+        signature `* :: (r -> (s -> t)) -> (r -> s) -> (r -> t)` and note that
+        Sxyz = xyzy; already, we are at an impasse, non? "S" doesn't really
+        have a signature that makes sense?
+<jusss> geekosaur: if an operation apply on two values and produce one value,
+        and they're all of the same type, this operation is an semigroup?  and
+        if an operation with an identity value apply on another value and
+        return the same input value, and they're all of the same type, this
+        operation is an monoid?
+<bzm3r> monoid = semigroup + identity element                           [10:46]
+<geekosaur> jusss, a monoid is a semigroup *plus* an identity
+<geekosaur> whoops
+<jusss> (+) and (*) are semigroup, and (+ 0 ) and (* 1 ) are monoid?
+<geekosaur> no
+<bzm3r> yes
+<bzm3r> oh
+<bzm3r> sorry
+<bzm3r> my mistake
+<bzm3r> i'll let geekosaur answer                                       [10:47]
+<geekosaur> well, depending on what you mean by that notation
+<geekosaur> a semigroup is a type and an operation. a monoid is a semigroup
+            with an additional identity element
+
+<geekosaur> so (Integer, (+)) is a semigroup and (Integer, (+), 0) is the
+            corresponding monoid
+<jusss> geekosaur: (+ 0 ) is \x -> x + 0                                [10:48]
+<metreo> I'm getting a nasty warning when I try to downgrade `base` and it
+         doesn't seem possible. Is this the case
+<geekosaur> then no, that's not what that means
+<geekosaur> metreo, base is wired into the compiler, you "downgrade" it by
+            installing an older version of ghc
+
+<metreo> Thanks                                                         [10:49]
+
+<bzm3r> geekosaur is it okay to re-paste a question i asked earlier, but
+        scrolled up?
+<jusss> geekosaur: that semigroup part is right?
+<geekosaur> it might be more correct to say the monoid is ((Integer, (+)), 0)
+            to show that it's based on the semigrou
+<geekosaur> bzm3r, I saw the question but got sidetracked.              [10:50]
+<bzm3r> (no problem, that's what i thought, not sure if it would be more
+        convenient for me to paste it again)
+<geekosaur> I think the difference between lambda calculus notation and
+            Haskell type notation is confusing you                      [10:51]
+
+<jusss> geekosaur: a monoid is an operation with a value A , then give it a
+        value B , and it produces the same value B, right?
+<bzm3r> yeah, i think i see what you mean: "S is a substitution operator. It
+        takes three arguments and then returns the first argument applied to
+        the third, which is then applied to the result of the second argument
+        applied to the third."
+
+<geekosaur> and similarly values. xyzy would in Haskell be x y (z y)
+<geekosaur> jusss, it's still a semigroup                               [10:52]
+<geekosaur> you have to be able to do the semigroup thing. the difference is
+            that there is a special value you can use to make it a no-op: an
+            identity
+<jusss> geekosaur: no-op is short for?
+<geekosaur> no-operation (does nothing)                                 [10:53]
+<geekosaur> so we have (+) as a semigroup operator, but we can make it do
+            nothing by using 0 as one of its arguments
+<geekosaur> thus does not mean (+0) is a monoid, it means (+) is a monoid
+            where 0 can be used to make it do nothing
+<geekosaur> monoid operation
+<jusss> geekosaur: when one value is 0, (+) is a monoid operator, right?
+                                                                        [10:54]
+<geekosaur> "a monoid is a semigroup that lets us get back out what we put in"
+<jusss> geekosaur: and (+） is a semigroup
+
+<bzm3r> geekosaur may i try explaining it to jusss in "my way"?         [10:55]
+<geekosaur> (+) is still a monoid even if we don't happen to apply it to the
+            identity
+<bzm3r> i think i see what is confusing him
+<geekosaur> sure
+<geekosaur> the fact that there is an identity is what matters, not that we
+            specifically used it
+<geekosaur> (String,(\x y -> x ++ "," ++ y)) is a semigroup, but not a monoid
+            because there's no way to stop it from adding that ","      [10:56]
+
+<geekosaur> (String, (++)) is a semigroup, and is a monoid with identity ""
+            because if we pass "" as one of the parameters we get the other
+            parameter back                                              [10:57]
+<bzm3r> jusss imagine you have a type `a`, and an operator `*`, such that `*
+        :: a -> a -> a` and if `x` and `y` are of type `a`, then `* x (* y z)
+        = * x y z`; then `* ` is a semigroup
+<bzm3r> sorry, `(*, a)` is a semigroup
+<bzm3r> now imagine that we had a type `b` and an operator `^`, such that `(^,
+        b)` is a semigroup                                              [10:58]
+<jusss> wait a sec, this (*,a) for mean?
+<jusss> this form (String, (++)) mean?
+<bzm3r> um, maybe i should just write (`a`, `*`)
+
+<bzm3r> like, i am just saying, `*: a -> a -> a` is a semigroup (no need to
+        list the type, because the type is specified in the signature)
+<geekosaur> they're using a different notation from the one I was; I stuck
+            closer to Haskell
+
+<bzm3r> yeah, that's probably it
+<geekosaur> but it's not the same notation used in mathematics          [11:00]
+
+<bzm3r> right, ok, nvm
+<bzm3r> i don't know how to write it in the haskell way
+<jusss> what this notation ('a','*') mean?
+<metreo> How "fixable/updatable" is a dependency for an older version of
+         `base` likely to be? 
+<geekosaur> in mathy notation, * is often used to mean some unspecified
+            operator and a is a variable representing some type. 
+<jusss> "" ++ "a"   get "a"
+<jusss> ++ is a monoid?                                                 [11:03]
+<bzm3r> jusss (ignore everything i said)
+<bzm3r> (will help you more)
+<geekosaur> jusss, yes (++) is a monoid on strings because it is a semigroup
+            on lists and you can use "" to make it do nothing           [11:04]
+<jusss> bzm3r: sorry about your notation I don't understand
+<bzm3r> its totally okay! my bad for introducing more notation which only made
+        things confusing
+<[Leary]> A semigroup is an algebraic structure formed by a set or type S, and
+          a binary operation * on elements of S satisfying certain properties
+          (namely that for all x, y any z we have x * (y * z) = (x * y) *
+          z). (S, *) and (*, S) are just ways to specify both the set/type and
+          operation at the same time, since the operations and sets/types are
+          not uniquely determined by one another.
+<jusss> geekosaur: and now what about monad?                            [11:06]
+<jusss> "a" ++ "b" get "ab"   (++)is a semigroup,    "" ++ "a" get "a" , (++)
+        is a monoid                                                     [11:08]
+<jusss> "A monad is just a monoid in the category of endofunctors"      [11:09]
+
+<[Leary]> You can forget you ever read/heard that line, it won't help you.
+                                                                        [11:10]
+<Axman6> I wouldn't say (++) is a semigroupo, I would say [] is a semigroup
+         with (++) being the binary associative operation
+
+<Axman6> (well, [a] is a semigroup I guess)
+<geekosaur> jusss, that line is a statement in category theory. it's not
+            helpful or even meaningful in Haskell                       [11:13]
+<geekosaur> it's not talking about Haskell's Monoid, in particular, and all
+            Haskell Functors are necessarily endofunctors
+<jusss> geekosaur: ok, forget that, what's the relationship with monad, monoid
+                                                                        [11:14]
+<geekosaur> and this 9is what I was trying to tell you yesterday when I
+            recognized your questions wre coming from that
+<geekosaur> haskell does not relate them
+<geekosaur> the relationship is at a level haskell can't talk about
+<jusss> er...                                                           [11:15]
+<geekosaur> it;s a category theory joke, not a statement about haskell
+<jusss> geekosaur: and what is a Monad in haskell?
+<c_wraith> One specific way of expressing the CT idea in code           [11:16]
+<geekosaur> [09 02:36:22] <geekosaur> a type which has an operation to lift
+            any arbitrary value into the type, and an operation to apply /
+            "execute" some kind of action on a value of that type
+<geekosaur> (note how much this does *not* look like that "monoid in the
+            category" statement. this should tell you smething)         [11:18]
+<Axman6> metreo: usually it's not a big problem
+<c_wraith> If you squint hard enough, return+join looks like a monoid
+<metreo> Axman6: Is there documentation on the process involved? Or just
+         Google it?                                                     [11:19]
+<jusss> geekosaur: "a type which has an operation to lift  any arbitrary value
+        into the type" this operation, what it's?                       [11:20]
+<geekosaur> the release notes for every new ghc release point to an updates
+            page that usually provides tips on what needs to be changed
+<Axman6> metreo: have you run into something breaking by changing the version?
+<c_wraith> jusss: return
+<metreo> Ok I'll refer to the release notes! 
+<geekosaur> return, or pure                                             [11:21]
+<jusss> c_wraith: geekosaur and unit?
+<metreo> Axman6: I simply have a package requesting base <4.10
+<geekosaur> a more mathematical name for it, that haskell doesn't use
+<metreo> The package is quipper
+<Axman6> @hackage quipper                                               [11:22]
+<lambdabot> http://hackage.haskell.org/package/quipper
+<metreo> Yes, thanks!
+<metreo> I didn't know about that @
+<jusss> geekosaur: c_wraith so monad has nothing to do with monoid and
+        semigroup?
+<jusss> in haskell
+<Axman6> I'm sure that if you just force a newer base, it will just work
+         perfectly fine... ine some universe =)
+<geekosaur> not in Haskell
+<c_wraith> not in code
+<Axman6> metreo: would also be worth sending a PR if you can make it work with
+         newer bases                                                    [11:23]
+<Axman6> Of course Monads in Haskell are Monoids, we have (>>) and fail "oops"
+         :p
+<metreo> Yes I will do so. Just was interested if the idea of attempting such
+         an update as a user is sane. 
+<geekosaur> metreo,
+            https://gitlab.haskell.org/ghc/ghc/wikis/commentary/libraries/version-history
+            might be useful
+<metreo> Thank you.                                                     [11:25]
+<geekosaur> it's generally sane. it can't always be automated, and
+            occasionally you also run into e.g. that version has a bug and
+            nobody checked to see if a later version fixed it
+<jusss> I'm confused, (+) is a semigroup, because those two input values and
+        one output value are the same type,  ((+),0) is a monoid, because the
+        input one value and one output value are same, and those three values
+        are same type, now (+) connect to monad?
+<geekosaur> they don't connect
+<jusss> the unit/return/pure, that  (a-> m a), 
+<geekosaur> Monad is a different kind of thing, literally
+<jusss> but all the books that tell monoid first before monad
+<geekosaur> becuase it's a simpler concept                              [11:27]
+<c_wraith> jusss: Monads are one *very specific kind of monoid that has
+           nothing to do with Haskell's Monoid class*. 
+<metreo> geekosaur: Ok in that case I'll venture forward and look to have a PR
+         in when I'm done. Thanks again all you lovely people.
+<jusss> and trying to do some connect
+<geekosaur> npt because they're dependent
+<Axman6> jusss: that's likely to get you use to thinking about things
+         abstractly
+<Axman6> used*
+<c_wraith> jusss: the CT concepts are far more general than the classes named
+           after them.                                                  [11:28]
+<jusss> c_wraith: wait a sec, you mean monoid in haskell is not with monoid in
+        math?
+<c_wraith> jusss: Haskell's Monoid class is one *very narrow* form of CT
+           monoid
+<jusss> c_wraith: CT is short for?
+<geekosaur> monoid in haskell is a simpler version of monoid in math
+<jusss> Category theory?
+<c_wraith> yes
+<geekosaur> monad in haskell is a simpler thing than monad in math / category
+            theory                                                      [11:29]
+<geekosaur> programming languages have trouble being as general as math
+            usually is
+<geekosaur> in particular, math doesn't consider Integer and Double to be
+            different "types", they're overlapping sets. but in Haskell they
+            do not overlap                                              [11:30]
+<jusss> geekosaur: then I think why haskell don't give it another name
+<geekosaur> beause then everything has to have a new name different from the
+            conventional one because it's not 100% identical to the
+            conventional one
+<geekosaur> it;s not a monoid it's a notquitemathmonoid, it's not a number
+            it's a notquitemathnumber, it's not...
+<jusss> geekosaur: I wonder the type in haskell or computer science, is the
+        same stuff in Curry Haskell's theory?                           [11:31]
+<geekosaur> you mean the curry-howard isomorphism? it's talking about types in
+            general. haskell's types, ocaml                             [11:32]
+<geekosaur> s types, C's types ...
+<geekosaur> do all those languages now have to rename"type" because they're
+            not all as general as that?                                 [11:33]
+<geekosaur> (you can't win this one. come up with a way to be that general and
+            some mathematician will find a way to generalize what you created)
+<geekosaur> that's sort of where category theory came from              [11:34]
+<jusss> ok
+<jusss> I think maybe we can forget that math, let's focus on haskell
+<geekosaur> the mth will only give you a headache, yes
+<geekosaur> there are things to learn there, but a deep dive into number
+            theory is not the way to learn about Haskell's Semigroup and
+            Monoid and a deep dive into category theory is not the way to
+            learn about Haskell's Monad
+<jusss> the monad, I was confused, the return, is something with semigroup
+<geekosaur> you can look into them later to understand why the Haksell ones
+            work the way they do
+<geekosaur> if you ever care; there's little reason to, usually         [11:38]
+<jusss> and it seems return have nothing to do with semigroup
+<geekosaur> right, they're not related. I didn't need something liek "return"
+            to use a number with (+), it already works. I need to use return
+            to lift a value into a monad                                [11:39]
+<geekosaur> something like Integer can be a Semigroup or Monoid.
+<geekosaur> something like "list of..." or "Maybe ..." or "IO ..." can be a
+            Monad                                                       [11:40]
+<jusss> geekosaur: wait a sec, the operation is a Semigroup or Monoid, or the
+        value is a Semigroup or Monoid?
+<jusss> "<geekosaur> something like Integer can be a Semigroup or Monoid." for
+        you word, Integer is a value not a operation I think
+<geekosaur> as I said earlier, the actual Semigroup is a combination of a type
+            and an operation. only in Haskell we say it's just the type, which
+            is why we need a hack to have Semigroup and Monoid instances for
+            (+) and (*)                                                 [11:41]
+<jusss> or you say the operation with a type is a semigroup or monoid
+<geekosaur> so in terms of Haskell we say the type is a Semigroup
+<geekosaur> because Haskell can't speak in terms of a combination of a type
+            and an operator; we can have only one instance of Semigroup or
+            Monoid or ... for a type                                    [11:42]
+<geekosaur> in math it goes the other way, we speak of the operation because
+            math doesn't have types in that sense, it has sets          [11:43]
+<jusss> geekosaur: ((+),0) is a semigroup in math, and Integer is a semigroup
+        in haskell?
+<geekosaur> (as we usually formulate it)
+<geekosaur> neither of those is true
+<jusss> geekosaur: (+) is a semigroup in math?                          [11:44]
+<geekosaur> in math, (Integer, (+)) is a Semigroup. in Haskell, we can't say
+            which of (+) or (*) is the "more improtant" semigroup, so Integer
+            has neither
+<geekosaur> we have instead a newtype wrapper Sum which has the Semigroup and
+            Monoid instances for (+), and a newtype wrapper Product which has
+            the Semigroup and Monoid instances for (*)                  [11:45]
+<geekosaur> (both of those are somewhat inaccurate also, but closer)
+<geekosaur> (but to be more specific about either gets confusing quickly. math
+            has a more general notion of "number" than you think)       [11:47]
+<jusss> ok, I wonder this return lift value into something, and that something
+        how we can define?
+<jusss> monad
+<jusss> return 3 will get 3                                             [11:49]
+<jusss> not Just 3 or [3]
+<geekosaur> you cannot.
+<geekosaur> tjhe closest you get is Identity 3                          [11:50]
+<jusss> (>>=) :: Monad m => m a -> (a -> m b) -> m b                    [11:51]
+<geekosaur> yes. the "m" is always there
+<jusss> this (a->m b) is return function, right?
+<geekosaur> no
+<geekosaur> it's an action.
+<geekosaur> return :: a -> m a
+<jusss> still confused,                                                 [11:52]
+<[Leary]> You could give it return, it just wouldn't do anything.
+<[Leary]> > [0,1] >>= return
+<lambdabot>  [0,1]
+<[Leary]> > [0,1] >>= \x -> [x, -x]
+<lambdabot>  [0,0,1,-1]
+<geekosaur> note that return is a -> m a, not a -> m b. it's a simple example
+            of *an* action
+<jusss> >>= need one argument or two?                                   [11:54]
+<geekosaur> but as an action it doesn't do anything
+<geekosaur> two
+<jusss> >>= [0,1] a-function?
+<geekosaur> you saw [Leary]                                             [11:55]
+<geekosaur> ;s examples?
+<jusss> (>>=) [0] \x->x
+<[Leary]> `[0,1] >>= f` won't type check unless `(>>=) [0,1]` is a function.
+<jusss> wait a sec, (>>= return) is the second argument in >> [0,1] ?   [11:57]
+<jusss> >> [0,1] (>>= return) ?
+<jusss> oh, there's no = in >>[0,1], it's not a functionn               [11:59]
+<jusss> I thought [Leary] use the prefix notation                       [12:00]
+<jusss> (>>=) [0] return
+<jusss> that m in return which comes from (m a) ?
+<geekosaur> the m in this example is []
+<geekosaur> you can write the type [Int] as ([] Int)
+<geekosaur> :t [0] :: [] Int
+<lambdabot> [Int]
+<jusss> and what this >>= is used for?
+<jusss> if the middle part function is return
+<geekosaur> it *can be* return. it does not have to be                  [12:11]
+<jusss> for other function like?
+<geekosaur> you dont often see it used explicitly because of do notation.
+<jusss> if we do curry on >>=
+<geekosaur> the function is an action of some kind. return is a do-nothing
+            action (sort of like an identity, but "one level up" from the
+            identity of monoids)                                        [12:12]
+<jusss> and >>= :: m a -> ( (a->m b) -> m b)
+<jusss> (>>=) [0] will get ?
+<geekosaur> putStrLn is another action, a -> m b where a is String, m is IO,
+            and b is ()
+<geekosaur>
+            http://blog.sigfpe.com/2006/08/you-could-have-invented-monads-and.html
+<jusss> why (>>=) [0] will get error? why not a curried form?
+<geekosaur> :t (>>=) [0]
+<lambdabot> Num a => (a -> [b]) -> [b]
+<geekosaur> tbh I'm not quite sure what [Leary] meant by that comment, you
+            presented a prefix partial application that looked valid to me
+<jusss> the action and the notation , what's the related
+<geekosaur> nless they meant you had left off the function/action       [12:15]
+<geekosaur> and I'm not quite sure what you're asking
+<jusss> return :: a -> m a, and  a -> m b in >>=
+<jusss> and return can be used in >>=
+<geekosaur> the notion of "action" depends on the type. in IO, an action is
+            generally some I/O operation. for the list monad, it means
+            applying it to every element of the list to produce a new list,
+            which gives you a "nondeterminacy" (all possible results,
+            hypothetically "in parallel")                               [12:16]
+<geekosaur> but if you read the page I linked earlier, there are lots of
+            different concepts of "action"                              [12:17]
+<jusss> ok
+
+
+###########################################################
 <jusss> dminuoso: oh, I think I understand what you mean, fmap turn (a->b)
         into (e->a) -> (e->b)
 <jusss> now we can say fmap transform (a->b) to ( (e->a) -> (e->b) ), so I
