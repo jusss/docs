@@ -1,3 +1,170 @@
+<ski>   data Tree a = Nil
+<ski>               | Node a (Tree a) (Tree a)
+<ski> now, define a function                                            [10:33]
+<ski>   addToTree :: Num a => Tree a -> a -> Tree a
+<ski> that adds its second argument to all the elements of the tree, giving
+      back the corresponding new tree
+
+Tree a could be Nil, Node a Nil Nil, Node a Nil (Node a Nil Nil),
+Node a (Node a Nil Nil) Nil, etc... infinity?
+
+##############################################
+
+<jusss> ski: what it's used for? >>= f g x = g (f x ) x is weird function
+
+#############################################
+
+do-notation
+
+foo :: Maybe String
+foo = do
+    x <- Just 3
+    y <- Just "!"
+    Just (show x ++ y)
+
+and x is 3, y is "!",  (<-) can get  a in (m a)
+and the last line return a (m b)
+
+Prelude> :{
+Prelude| foo = do
+Prelude| x <- (*3)
+Prelude| y <- (+1)
+Prelude| return (x+y)
+Prelude| :}
+Prelude> foo 3
+13
+
+###########################################
+
+(->) is a abstract data type, not a algebraic data type,
+and (e->a) can only shows up on the right part of '=' in the data type definition
+and it need a value constructor like Int
+data Endo a = Endo (a -> a)
+
+<jusss> and we don't have the definition of (e->a)
+we don't have data (e->a) :: ?
+<jle`> the basic syntax is `data <TyCon> <var1> <var2> = <Con1> <field1a>
+       <field2a> | Con2 <field2a> ..., etc.
+<jle`> right, (->) isn't defined using ADT syntax anywhere
+<jle`> since it isn't an ADGT
+<jle`> * ADT
+
+
+(e->a) is a type, not a value, and \x->x is a value, not a type
+(->) e a is a type, like Int, or Maybe a,
+(->) is not a type constructor
+(->) is abstract data type, not algebraic data type,
+we cann't define (->) in algebraic data type
+but when when use it as a type like Int, that's normal with others
+and (e->a) only shows up on the right part of '=' in the data type definition, like a type
+, like Int, it need a value constructor  
+data Endo a = Endo (a -> a) is ok
+data Endo a =  (a -> a) is not
+
+<jle`> jusss: 'Reader' is a common synonym for (->), which helps emphasize
+       some conceptual aspects of how you use (->)
+<jle`> for Reader, (>>=) :: Reader e a -> (a -> Reader e b) -> Reader e b
+
+<ski> jusss : "this (e->a) is one type, and it needs two variables to
+      construct" -- it needs two components, two type parameters. in this
+      case, they were tyvars. in `Int -> Char', they're not tyvars      [14:43]
+
+
+
+##################################
+
+greeter :: Reader String String
+so greeter = Reader (String->String)
+runReader Reader f = f          f::String->String
+runReader greeter = f
+Reader r is the monad, not Reader, like Either a is the monad, 'cause m::*->*
+but in Reader e->a , Reader e-> is the monad
+############################################
+
+<jusss> data Reader r a = Reader {  runReader :: r -> a } , this means
+`data Reader r a = Reader r->a ` and `runReader Reader x = x` ?       [09:28]
+<jusss> and x is r->a ? this is possible?
+
+<jusss> a function's type signature show up in a data type definition?
+<geekosaur> and yes, function types are perfectly permissible types
+<geekosaur> that's kinda the point of a functional language, functions are
+            first class types and values
+<ski> functions are values, too
+<ski> (function types are first class types)
+
+Reader (\x->x) :: Reader r r
+Reader (\x->1) :: Reader r Int
+
+there's only unary function in haskell, not such thing like a function without any parameter in haskell
+
+<jusss> >>=:: Reader (e->a) -> ( (e->a) -> Reader (e->b) ) -> Reader (e->b) ,
+        right?
+<jusss> and Reader is monad, and a is e->a, b is e->b
+no
+<jusss>  >>=:: Reader r a -> (a -> Reader r b) -> Reader r b, right?
+<lambdabot>  the signature ought to be
+`(>>=) :: Reader e a -> (a -> Reader e b) -> Reader e b'
+, which, yes, would amounts to
+`(>>=) :: (e -> a) -> (a -> (e -> b)) -> (e -> b)'
+, if you unwrapped the `Reader'
+################################################
+
+#record syntax
+
+data Writer w a = Writer { runWriter :: (a, w) }
+it means
+data Writer w a = Writer (a, w)
+Writer :: (a,w) -> Writer w a
+runWriter :: Writer w a -> (a, w)
+runWriter (Writer x) = x
+
+and x in here is a tuple
+Value "Writer (True, "abc")" has type "Writer String Bool"
+
+Writer ("3", 3) :: Writer Int String
+
+#####################################################
+
+<eiGHttt> Reader就是依赖注入。
+<jusss`> 什么是依赖注入                                                 [14:52]
+<eiGHttt> jusss`: 就是解耦，A内部需要B，一开始B可能会在A中初始或生成。之后B频
+          繁变化或A                                                     [15:01]
+<eiGHttt> 需要不同的B，则由外部输入。
+<eiGHttt> 打印日志，log = msg => console.log(msg)，很简单，但不同环境方式可能
+          也不同，线上可能需要写入到文件，那么log可以改成log = (logger, msg)
+          => logger.log(msg)。                                          [15:02]
+<jusss`> 然后这个logger一直在变，然后呢                                 [15:03]
+<eiGHttt> 没然后。                                                      [15:04]
+<jusss`> eiGHttt 这个和reader monad有啥关系
+<eiGHttt> 原生log依赖于console.log，现在它们已经没关系了。
+<eiGHttt> log = Reader Logger ()                                        [15:05]
+<eiGHttt> logger <- ask; log logger $ something
+<jusss`> gg                                                             [15:06]
+<jusss`> 我是从 >>= :: (e->a) -> (a->e->b) -> (e->b)来看的              [15:07]
+<eiGHttt> Logger也可以理解成环境变量。
+<eiGHttt> 你看(e -> a)和(e -> b)，bind之后e依然是原来的e，这个环境变量一直存在，
+          不会随你多次bind而改变。                                      [15:08]
+<jusss`> yeah                                                           [15:09]
+<jusss`> and?
+<eiGHttt> 所以这个环境变量能一直存在Reader中。
+<eiGHttt> 如果没有Reader，环境变量需要一层层手动传递。                  [15:10]
+<jusss`> Reader::?
+<eiGHttt> 我现在没有例子可以说明。                                      [15:11]
+<eiGHttt> https://github.com/kalxd/Aono/blob/master/src/XG/Route.hs#L71 看这个
+          吧，读取环境变更，然后输出。                                  [15:13]
+
+<jusss`> eiGHttt 把Monad理解成（一个带有环境的值）里面的环境，[1,2,3] 的环境是
+         [],  (e->a)的环境是带有输入的e->     这样可以吗                [16:57]
+<eiGHttt> 你想怎么理解都成。                                            [16:58]
+<jusss`> eiGHttt 可是我的理解或许是错的                                 [17:14]
+<eiGHttt> 世间没有绝对的对错.jpg                                        [17:15]
+<quininer[m]> eiGHttt: 绝对没有吗？                                     [17:16]
+<eiGHttt> 某些领域有。                                                  [17:17]
+<jusss`> eiGHttt >>=::(e->a) -> (a->e->b) ->(e->b) 在我看来就是>>=把e->a变成了
+         e->b, 改变了函数的输出，但是函数的输入保持不变                 [17:19]
+<quininer[m]> eiGHttt: 那世界上还是有绝对的对错的（                     [17:20]
+<eiGHttt> jusss`: 差不多吧。                                            [17:21]
+##########################################################
 
 record syntax
     data Person = Person String String Int Float String String deriving (Show)
