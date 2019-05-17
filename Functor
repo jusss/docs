@@ -1,3 +1,96 @@
+
+after all, Monad is a typeclass, and typeclass is used for polymorphism,
+typeclass's instance is type, Monad's instance is Maybe type, List type
+its different type instances have differnet function definitions
+and return function is a specific function, and action is not
+
+>>= :: m a -> (a -> m b) -> m b
+this (a->m b) is an action, not a specific function like return
+
+so when Monad's instance is (e->)
+>>= :: (e->a) (a-> (e->b)) -> (e->b)
+
+and its instance is []
+>>= :: [a] -> (a->[b]) -> [b]
+
+and when its instance is Maybe
+>>= :: Maybe a -> (a-> Maybe b) -> Maybe b
+
+and that action (a-> m b) is using three different function definitions to implement
+
+in Monad typeclass,
+class Monad m where
+    >>= :: m a -> (a->m b) -> m b
+    return :: a-> m a
+
+in Maybe type, turn this Maybe type as an instance of Monad
+instance Monad Maybe where
+    return x = Just x
+    Nothing >>= f = Nothing
+    Just x >>= f = f x
+    (>>=) (Just x) f = f x
+
+write signature in typeclass, and write function definition in type instance
+and also you can write function definition in typeclass, and that function
+just describe the relationship between functions, not function's specific definition
+
+if we want turn a type to an instance of typeclass like Monad,
+we have to implement that functions which type signatures are in Monad
+like >>=, return, >>, functions
+
+about that return, return is implement in the instance,
+so Maybe has its return x = Just x, and List has its return x = [x]
+all that Monad instance have they return,
+and >>= work on Monad instance
+so   
+Just 3 >>= \x -> return (x + 1)
+return 3 >>= \x -> Just x
+Just 3>>=(\x -> Just (x+1))
+
+the return and >>= know which monad the parameter is
+'cause defferent >>= and return in every Monad instance
+in Maybe, return x = Just x, so >>= work on Just 3, its
+return will return Just x
+
+>>='s first Monad parameter, it makes sure the specific Monad it is,
+so it returns specific Monad 
+
+in Maybe Monad
+return x = Just x
+in List Monad
+return x = [x]
+
+
+and that Monad is *->*   so Either a is a Monad, and Either not
+
+ok then, time to write my own Monad instance 
+
+import Control.Applicative
+import Control.Monad
+data T a = V a deriving (Show)
+instance Functor T where
+ fmap f (V x) = V (f x)
+instance Applicative T where
+ pure = V
+ (V f) <*> (V x) = V (f x)
+instance Monad T where
+ return x = V x
+ (V x) >>= f = f x
+
+V 3 >>= return
+fmap (\x-> x + 1) (V 3)
+
+
+one symbol can represent multipy types, that's polymorphism
+
+id :: a -> a
+id :: (a->b) -> a -> b
+
+this is polymorphism, a can be (a->b), can be (a->b->c), can be Int, Char, any type
+
+
+############################################`
+
 >>= :: m a -> (a -> m b) -> m b
 if m is (e->)
 >>= :: e->a -> (a-> (e->b)) -> (e->b)
