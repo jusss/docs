@@ -1,4 +1,8 @@
-
+x=0, f() re-assign it, g() re-assign it, t() re-assign it
+the FP way: m x >>= f >>= g >>= t
+passing the values between functions, not re-assign them, 
+but the hard part is to connect those functions
+#############################################
 
 rule I. the return type in the type signature, it must be appeared befor the last one, otherwise it will be undefined, Eg :: a->b->c->a is ok, and Eg :: a->b->c is not ok, 'cause c is undefined.
 
