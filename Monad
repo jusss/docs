@@ -1,0 +1,282 @@
+
+
+
+#Maybe
+
+"the type of return value in js or python is not sure, the one function can return
+Int or None, the result type are not sure, polymorphic, but in those static languages like
+java or haskell, the result type must be specific, so haskell use Just wrap the value
+turn it to Maybe type, 'cause Nothing and Just 3 are both Maybe type"
+
+‘cause the result type is specific in static languages like Haskell, it can’t return 3 or None in one function, js or python those dynamic languages can, we have to construct values with Just so that they both have the same type, Just 3 and Nothing both have Maybe a, polymorphic
+
+<jusss> I don't know why there's Maybe type, what it's used for? why use Just
+        to combine that 3 or "3" to generate a new value Just 3? the purpose
+        is to describe Just 3 or Just "3" with the same Maybe a ?  [12:10]
+<jusss> use Maybe a to describe Just 3, Just "3", Nothing?  [12:12]
+<ski> the purpose is to allow for the possibility of `Nothing'  [12:13]
+<jusss> ski: suddenly, I know what this maybe is used for, like in python or
+        javascript, those dynamic type languages, one function can return Int
+        or None, the type of return value is not sure, but in static type
+        language, the type is specific type, it only has one type, right?
+<ski> basically yes
+<ski> "in python or javascript, those dynamic type languages, one function can
+      return Int or None" -- this is not a problem  [13:03]
+<ricky_clarkson> That's an informal Maybe.
+<jusss> ski: so we use Just to wrap value, turn it to a Mabye type, so Just 3
+        and Nothing both are Maybe, so we can return Nothing or Just 3 as
+        return value
+<jusss> ski: this is related we talked about something with Cale a few hours
+        ago,   [13:04]
+<jusss> 12 hours maybe
+<ski> jusss : yes. and importantly `Just Nothing' (of type `Maybe (Maybe T)'
+      is not the same as `Nothing' (of type `Maybe (Maybe T)')
+<jusss> ski: and can we say Nothing has multipy types?  [13:22]
+<ski> of course `Nothing' also has type `Maybe [(String,Integer)]' and type
+      `Maybe (Integer -> Bool)', and so on. you can put other things "in
+      there" than `Maybe (...)'
+<ski> yes
+<ski> we say that `Nothing' is a polymorphic value
+<jusss> ski: and now I think that Maybe type is just used for a polymorphic
+        value Nothing, in case some results are Nothing and we can retur that
+        like other values  [13:24]
+<jusss> ski: oh, I see, May (Maybe a) and Maybe a or Maybe (Maybe (Maybe a)),
+        they all can be Nothing, right?
+<ski> but `Maybe (Maybe a)' also has the value `Just Nothing'. and `Maybe
+      (Maybe (Maybe a))' also has the value `Just (Just Nothing)'  [13:14]
+<ski> (and these three values are distinct)
+<ski> jusss : do you know any C ?  [13:15]
+<ski> in `C', a value of type `int' can't be `NULL', it can just be an integer
+<ski> but a value of type `int *' can either be `NULL', or a pointer, that
+      (currently) points to some integer
+<ski> and a value of type `int **' can either be (a) `NULL'; or (b) a pointer
+      pointing to a `NULL'; or it can be (c) a pointer pointing to a pointer
+      pointing to an integer
+<ski> this case is a bit similar to how a `Maybe (Maybe Integer)' can either
+      be `Nothing', `Just Nothing', or `Just (Just n)' for an `Integer' `n'
+<jusss> it seems same like Maybe (Maybe a)
+<ski> `Just' corresponding here to "pointer pointing to"  [13:18]
+<ski> of course, in C, what a pointer points to can be changed over
+      timr. that's not happening with `Maybe' in Haskell
+<ski> jusss : for *all* types `a', `Nothing' has type `Maybe a'  [13:20]
+<jusss> ski: actually, I just ignore that Maybe a, I think (Maybe a) as a in
+        Maybe a, so of course there's a Nothing
+<ski> so `Nothing' has e.g. types `Maybe Integer',`Maybe (Maybe
+      Integer)',`Maybe (Maybe (Maybe Integer))',&c.
+<ski> so, if `b' is any type, then we can let `a', in `Maybe a', itself be
+      `Maybe b'. therefore `Nothing' also has type `Maybe (Maybe b)' for any
+      type `b'
+<ski> and then `Nothing' also has type `Maybe (Maybe (Maybe c))', for any type
+      `c'. and so on
+<jusss> ski: and can we say Nothing has multipy types?  [13:22]
+<ski> of course `Nothing' also has type `Maybe [(String,Integer)]' and type
+      `Maybe (Integer -> Bool)', and so on. you can put other things "in
+      there" than `Maybe (...)'
+<ski> yes
+<ski> we say that `Nothing' is a polymorphic value      
+<ski> "3 and Nothing are not same type" -- better say : `3' and `Nothing'
+      doesn't *have* the same type  [13:32]
+<jusss> ski: values have types is better than values are types or types have
+        values?
+<ski> similarly, `Just 3' and `Nothing' *have* (not "are") the same type
+<dminuoso> jusss: You would pronounce it as: Po-leeh-more-fic
+<ski> jusss : "polymorphic" means roughly "many shapes". the opposite is
+      "monomorphic", meaning "one shape"
+<ski> jusss : `Nothing' is polymorphic, since it has many shapes (types) :
+      `Maybe Integer',`Maybe (String,Integer)', `Maybe [Integer]',`Maybe
+      (Maybe Bool)',`Maybe (Integer -> Integer)', &c.  [14:18]
+<ski> jusss : `take' is polymorphic, since it has many shapes (types) : `Int
+      -> [Maybe Integer] -> [Maybe Integer]',`Int -> [Int] -> [Int]',`Int ->
+      [[String]] -> [[String]]',`Int -> [Int -> Int] -> [Int -> Int]',&c.
+                                                                        [14:19]
+<ski> jusss : `sum' is polymorhic, since it has many shapes (types) : `[Int]
+      -> Int',`[Rational] -> Rational',`[Double] -> Double',`[Complex Double]
+      -> Complex Double' .. but not e.g. `[String] -> String', since `String'
+      is not a numeric type (is not an instance of `Num')  [14:20]
+<ski> jusss : otoh, `not' is monomorphic, since it has just one shape (type) :
+      `Bool -> Bool'
+<jusss> ski: actually I read lots of articls about monad that they use js to
+        describe it, not haskell :)  [14:45]
+<ski> jusss : ok, so you know you can have multiple different implementations
+      of the same abstract queue interface. the abstract queue interface
+      corresponds to the general idea of a monad. the concrete/specific
+      implementations of queues correspond to specific monads
+<ski> jusss : so, you could implement a queue as a linked list. or you could
+      have an array (which might be dynamically resizable). or you could use a
+      "heap" (a kind of binary tree, perhaps stored in an array)
+<ski> jusss : similarly, `Reader r' is one "implementation" of `Monad',
+      `Writer w',`State s',`Either e',`Maybe',`[]',`Parser tok',`Cont
+      o',`IO',`ST s',`STM' are some other implementations of the abstract idea
+      of a monad
+<ski> jusss : anyway. e.g. `IO' is much more than being a monad. being a monad
+      is only a small (but still important) part of `IO'. in fact, before the
+      utility of using monads in programming was recognized, I/O in Haskell
+      was done in other ways (dialogue I/O, and then continuation-passing
+      style (CPS) I/O). so you don't necessarily *need* the "monad" part of
+      `IO' either. it just turns out to be (a bit) handy. but again `IO' is
+      much more than being a monad  [14:57]
+<ski> jusss : and being a monad isn't something that's magically supported by
+      the implementation. it's "just another abstract data type interface",
+      like queues. however, the implementation of the basic `IO' operations
+      (including, but not limited to, its monad implementation) *is* "magic"
+      in this sense  [14:58]
+
+
+
+##########################################################
+
+<Cale> The type of this function has two difficulties for many languages: one
+       is that it abstracts over a type-level function -- i.e. it has
+       higher-kinded polymorphism
+<Cale> The second is that it's picking an instance of Monad based on the
+       result type which is being requested in context  [00:24]
+<hyperisco> and then one needs accept the type system does not have
+            higher-kinded polymorphism, so you can never *really* talk about
+            m  as a Monad… dynamic languages make this less of an obvious
+            problem
+<Cale> In many other languages, polymorphism depends only on the argument
+       types, and not on the result type
+<Cale> and this tends to be what catches dynamically typed languages
+<Cale> (not having types at compile time at all makes that really difficult)
+                                                                        [00:25]
+<ski> jusss : overloading on result type (only) isn't something many languages
+      have
+<Cale> To make monads worth talking about at all, we need to be able to write
+       code once which will work in any monad
+<ski> (istr Ada has (ad-hoc) overloading of this sort ?)  [00:26]
+<hyperisco> my experience has been that no useful reincarnation of Monad
+            exists, but there are some useful reincarnations of Monad
+            instances
+<ski> Cale : "everything is just functions" -- what do you mean by that ?
+<Cale> I didn't say that
+<hyperisco> and the good news is that many programs only need an instance or
+            two of a particular class to work
+<jusss> ski: I don't get it, what is this result type special? 
+<hyperisco> and don't need the abstraction
+<jusss> special to parameter type  [00:27]
+<ski> jusss : try having `int foo(void);' and `String foo(void);' in the same
+      class, in Java
+<Cale> If we can't write functions like 'sequence' and 'forM' and more complex
+       things like the monad transformer library, the abstraction isn't
+       gaining us any real traction, we're just using additional words to
+       describe our programs when those distinctions don't really have any
+       impact on what we're doing
+<jusss> ski: I don't know java yet...  [00:28]
+<hyperisco> I never understood why you cannot overload on return types
+<jusss> ski: you mean same paramter type with different return types?
+<Cale> jusss: right, exactly
+<hyperisco> but dollars to donuts it is to do with compile time  [00:29]
+<Cale> jusss: The return function needs to be polymorphic in its result type
+       in a way that can't be determined by the types of its parameters
+<Cale> :t return
+<lambdabot> Monad m => a -> m a       
+<Cale> There's that 'm' in the result type which we can't determine from the
+       type 'a'       
+<jusss> Cale: but this return's type is your definition,
+<Cale> Well, it's part of the definition of what a monad is
+<jusss> Cale:  in instance, Maybe ,return Just, [], return [a]
+<Cale> jusss: Right, in each monad, we define return differently, and its
+       implementation is selected based on its type
+<Cale> jusss: In languages that are not Haskell, this tends to be difficult,
+       because which implementation to choose depends on the type of result,
+       and it depends on the choice of a parametric type.
+<Cale> The reason Monad is useful as an abstraction is that it saves us from
+       writing a lot of similar code all the time.
+<jusss> Cale: I think it can, if we implement Monad with class, and each class
+        has its each return 
+<Cale> jusss: The tricky part is that return doesn't get to have an object of
+       the appropriate type as an argument
+<jusss> type class is really not like a class
+<Cale> jusss: So how will it know which class to use?
+<Cale> jusss: it may be possible if we make the type parameter explicit --
+       Java after all has generics like the <T> things which show up
+<Cale> jusss: I'm not sure whether modern Java will let you parametrise over
+       things which themselves take other type arguments though  [00:37]
+<jusss> Cale: in >>=, return depends the type of first and second parameter I
+        think that can identify the class
+<Cale> jusss: Like, can we write...  public static <M> <A> M<A> pure (A val) ?
+<Cale> jusss: A lot of type systems don't have parametric polymorphism in
+       quite the same way that Haskell does.
+<Cale> i.e. type variables are not always a thing
+<Cale> and then even if you do have type variables, they might not be able to
+       stand for types that have parameters  [00:47]
+<jusss> Cale: java has generic
+<Cale> yes, it does
+<Cale> but I don't *think* its type variables can stand for generic things
+<Cale> i.e. Integer would be fine, but you can't parametrise over List, if my
+       old understanding of Java is still true  [00:48]
+<jusss> sorry, this ADTs has to do with type system?
+<Cale> The kind of any type which has ordinary values in it is called *
+<jusss> Cale: is this https://en.wikipedia.org/wiki/Higher-order_logic ?
+<ski> jusss : Java and C# does not have algebraic data types (or variant/sum
+      types in general)
+<Cale> jusss: Types which have a parameter which is an ordinary type have kind
+       * -> *
+<Cale> Every type which has values in it has kind *
+<Cale> jusss: Specifically, Haskell allows us to have type variables of any
+       kind
+<Cale> jusss: Not just kind *
+<Cale> But kind * -> * (and any other)
+<Cale> :t return
+<lambdabot> Monad m => a -> m a
+<Cale> Here, m :: * -> *
+<Cale> jusss: In Java, C#, etc. they let you have type variables of kind *
+<Cale> but not of kind * -> *
+<Cale> which makes Monad really hard
+<Cale> jusss: Not to mention the things we get on to a little way down the
+       road, which have quite fancy kinds:
+<Cale> :t lift
+<lambdabot> (Monad m, MonadTrans t) => m a -> t m a  [01:00]
+<Cale> Here, t :: (* -> *) -> * -> *
+<Cale> jusss: I mean that... you know how Java has things like List<A> where A
+       is a variable type?  [01:01]
+<jusss> Cale: sorry I don't 
+<Cale> jusss: ah, okay       
+
+
+<Axman6> What all monads do have is return, bind and join, and because of that
+         they also all have mapM, when, forever, etc.
+
+monad的三种描述办法：
+join, map
+flatMap，也就是>>=
+mcompose
+是等价的，高兴用哪个就用哪个呗。
+join m = flatMap(m)(id)
+map(ma)(f) = flatMap(ma)(unit compose f)
+或者写成Haskell
+join m = m >>= id
+map f ma = ma >>= (return . f)
+
+<Axman6> it's just map
+<Axman6> or, fmap
+<Axman6> it's map for all monads  [15:09]
+<Axman6> :t let map f ma = ma >>= (return . f) in map
+<lambdabot> Monad m => (a -> b) -> m a -> m b
+
+https://www.zybuluo.com/MiloXia/note/87772
+
+join, return, and >>=
+join :: m a -> a
+return :: a -> m a
+>>= :: m a -> a -> m b -> m b
+
+>>= = return . join?
+no
+
+f =<< m    =   join (fmap f m)
+<dminuoso> (=<<) = \f -> join . fmap f
+<dminuoso> Which illustrates the "first fmap, then join" part of it.
+(=<<) :: Monad m => (a -> m b) -> m a -> m b
+
+=<< is a flipped >>=
+<dminuoso> jusss: f >>= g  ===  g =<< f  [23:49]
+
+class Applicative m => Monad (m :: * -> *) where
+
+  (>>=) :: m a -> (a -> m b) -> m b
+  m >>= f = join $ fmap f m
+
+  join :: m (m a) -> m a
+  join m = m >>= id
+
