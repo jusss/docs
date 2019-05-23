@@ -1,5 +1,6 @@
 关闭fcitx预编辑?
 csslayer:退出之后,改~/.config/fcitx/profile PreeditStringInClientWindow=False
+vim /usr/share/fcitx/configdesc/profile.desc
 关闭fcitx组合键C-;功能,因为与emacs绑定键冲突
 /usr/share/fcitx/addon/fcitx-clipboard.conf添加Enabled=False
 或者~/.config/fcitx/conf/fcitx-clipboard.config
