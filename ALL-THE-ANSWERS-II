@@ -1,3 +1,25 @@
+
+
+pymonad,
+t=Just(3)
+t.getValue()
+
+dir(pymonad.Maybe) #check the identifiers that Maybe has
+help(pymonad.Maybe.unit) #check the identifier's definition
+
+z=Just(3)>>(lambda x: unit(Maybe,x+1))
+z.getValue()
+
+half = lambda x,y: Nothing if y==0 else unit(Maybe, x/y)
+half(3,0)==Nothing
+
+#########################
+
+lisp: lambda calculus, AST, CPS
+haskell: category theory, ADT, Monad
+
+####################################################
+
 <ski>   data Tree a = Nil
 <ski>               | Node a (Tree a) (Tree a)
 <ski> now, define a function                                            [10:33]
