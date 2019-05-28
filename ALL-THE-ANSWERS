@@ -1,3 +1,46 @@
+what is the monad, monad is related with three patterns
+bind, <*>, and fmap, 
+and make it follow the identity law and associativity law
+
+construct something to match that patterns
+
+then something is (m a), and monad is in it!
+
+like construct list and function to match that patterns
+
+so list type, [] a, [] is the monad
+function type, e->a, (e->) is the monad
+
+we construct something to monad, not something come with monad!
+
+##################################
+
+<ski>   data Tree a = Nil
+<ski>               | Node a (Tree a) (Tree a)
+<ski> now, define a function                                            [10:33]
+<ski>   addToTree :: Num a => Tree a -> a -> Tree a
+<ski> that adds its second argument to all the elements of the tree, giving
+      back the corresponding new tree
+
+Tree a could be Nil, Node a Nil Nil, Node a Nil (Node a Nil Nil),
+Node a (Node a Nil Nil) Nil, etc... infinity?
+
+data Tree a = Nil | Node a (Tree a) (Tree a) deriving Functor
+
+instance Functor Tree where
+fmap :: (a->b) -> (Tree a -> Tree b)
+fmap _ Nil = Nil
+fmap f (Node a left right) = Node (f a) (fmap f left) (fmap f right)
+
+addToTree :: Num a => Tree a -> a -> Tree a
+addToTree as a = fmap (+ a) as
+
+mapTree :: (a->b) -> (Tree a -> Tree b)
+mapTree _ Nil =Nil
+mapTree f (Node a left right) = Node (f a) (mapTree f left) (mapTree f right)
+
+##################################################
+
 x=0, f() re-assign it, g() re-assign it, t() re-assign it
 the FP way: m x >>= f >>= g >>= t
 passing the values between functions, not re-assign them, 

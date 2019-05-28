@@ -1,0 +1,183 @@
+f:: A->B
+Kleisli Arrow ->
+
+functioin is that arrow
+
+function's law
+associative:   (f . g) . h = f . (g .h)
+        compose(compose(f,g), h) == compose(f, compose(g,h))
+
+        function compose(f,g){
+            return function(x){
+                return f(g(x));
+            }
+        }
+
+    f(g(h(x))) is (f.g.h)(x)
+
+
+#Promise Monad
+
+combine two async to one async
+
+//String->Promise<User>
+async function getUserById(userId) {...}
+
+//User -> Promise<Dept>
+async function getDepByUser(user) {...}
+
+//getDeptByUserId: String->Promise<Dept>
+getDeptByUserId = composeM(getDeptByUser, getUserById);
+
+function composeM(f,g){
+    return function(x){
+        return g(x).then(f);
+    }
+}
+
+#List Monad
+Array.prototype.flatMap = function(f){
+    var ret = [];
+    for(var ary of this.map(f))
+        ret = Array.prototype.concat.call(ret,ary);
+    return ret;
+}
+
+function duplicate(x){ return [x,x]; }
+function positive(x) { return x>0 ? [x] : []; }
+
+function composeM(f,g){
+    return function(x){
+        return g(x).flatMap(f);
+    }
+}
+
+var p = composeM(duplicate, positive);
+
+[1,-1,2].flatMap(p)  output [1,1,2,2]
+
+composeM :: (a->m b) -> (x-> m a) -> (x -> m b)
+
+if m is Promise, it means asynchronous call function
+m is List, it means list transform function
+m is Identity, regular function
+Identity b == b, so a-> Identity b == a->b
+
+>>=:: m a-> (a -> m b) -> m b
+>>=:: a -> (a->b) -> b where m is Identity
+
+f composeM unit == unit composeM f == f
+this is monoid, 
+
+'cause composeM :: (a->m b)->(x->m a) ->(x->m b)
+so when composeM(f, unit) == f
+                   (a-> m b) -> ? -> (a-> m b)
+? is a-> m a
+
+so unit :: a-> m a
+
+remember this is type, not value, f's type don't change, but value may change
+
+* 1 x
++ 0 x
+composeM unit f
+compose id f
+
+to Promise, function unit(a) { return Promise.resolve(a); }
+to List, function unit(a) { return [a]; }
+
+bind:: m a -> (a->m b) -> m b
+function bind(ma, f){ return composeM(f, ignored => ma)(); }
+
+bind(ma,f) is ma.then(f) to Promise
+ma.flatMap(f) to List
+
+function composeM(f, g) {
+    return function(a){
+        return g(a).bind(f);
+    }
+}
+
+
+f composeM g = \x -> (g x) >>= f
+
+bind(unit(a), f) == f(a)
+bind(ma,unit) == ma
+bind(bind(ma,f),g) == bind(ma, a=>bind(f(a),g))
+
+m.then(f).then(g) == m.then(function(x){ return f(x).then(g)})
+
+m.flatMap(f).flatMap(g) == m.flatMap(function(x){return f(x).flatMap(g)})
+
+join::m (m a) -> ma
+function join(mma){
+    return bind(mma, x=>x);
+}
+
+join mma = mma >>= id  == ma
+
+f >>= g = \x -> f (g x) x
+
+
+map::(a->b) ->(m a-> m b)
+function map(f){
+    return function(ma){
+        return bind(ma, a=> unit(f(a));
+    }
+}
+
+
+ok, f::a->b, f(a) get b, and ma->mb is a function
+map::(a->b) ->(     m a->       m b)
+map  ( f  ) =  mb
+#map (f){return bind(ma, a=>unit(f(a)))}
+
+bind::ma->(a->mb)->mb
+mb = \ma -> bind(ma,a->mb)
+mb = \ma -> bind(ma, a=>unit(f(a)))
+
+map(f) = \ma -> bind(ma, a=>unit(f(a)))
+
+function bind(ma, f){
+    return join(map(f)(ma))
+}
+ma >>= f = join (map f ma)
+
+compose(map(f), map(g)) == map(compose(f,g))
+compose(join,map(join)) == compose(join,join)
+
+
+zhuanlan.zhihu.com/p/65449477
+
+
+map f =   unit a >>= \a -> unit(f a)
+
+fmap f (ma) = ma >>= g   == mb
+
+ma>>=f = join (fmap f ma)
+
+
+mb = fmap f ma
+   = ma >>= \x -> unit(f x)
+   = \m -> f <*> ma
+
+composeM is another version of bind
+
+put value into function context
+unit = a =>_=>a
+unit a >>= g  = g a
+
+function and Monad's laws
+
+associativity:  (f.g).h = f.(g.h)    ==\x -> f(g(h(x)))
+identity:       id.a = a.id = a
+
+id.f = f
+f.id = f
+(f.g).h = f.(g.h)
+
+
+[] ++ xs = xs
+xs ++ [] = xs
+(xs ++ys)++zs = xs++(ys++zs)
+
