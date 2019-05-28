@@ -36,6 +36,9 @@ gpg --encrypt-files -r 69D1049662BF2FB843A262B63588658D0ED6EA43 `find tmp/ ! -ty
 2.1 把./del下所有非目录的文件并且不以.gpg结尾的都删除 (删源文件)
 rm `find ./del/ ! -type d -and ! -iname "*.gpg"`
 
+2.2 re-write all the files that are not without .gpg
+for i in $(find . ! -type d -and ! -iname "*.gpg"); do echo "" >  $i; done
+
 3.把./del下所有非目录的文件并以.gpg结尾的都删除  (删加密文件)
 rm `find ./del/ ! -type d -and -iname "*.gpg"`
 
