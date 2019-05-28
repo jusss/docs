@@ -1,0 +1,7 @@
+squashfs
+
+sudo mount /dev/sdb1 /mnt
+sudo mount -o remount,ro /dev/sdb1 /mnt/
+
+sudo hdparm -r1 /dev/sdb  #readonly
+sudo hdparm -r0 /dev/sdb #read-write
