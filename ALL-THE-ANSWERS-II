@@ -1,5 +1,525 @@
+<jusss> ok, Maybe a is *,  Maybe a is a monoid
+<jusss> Maybe is *->* ,   Maybe is a monad
+that's why you need to implement Just class in python as Monoid instance
+'cause Maybe class is Monad instance
+<Solonarv> there is no Semigroup Int instance
+#####################################
+
+<Cale> For Monoid, you define mempty and mappend                        [15:30]
+<Cale> A simple monoid instance is the one for lists:
+<jusss> Cale: yeah, and how those two functions work?
+<Cale> instance Monoid [a] where
+<Cale>   mempty = []
+<Cale>   mappend = (++)
+<Cale> instance Num t => Monoid (Sum t) where -- the Sum type here is a
+       newtype wrapper                                                  [15:31]
+<Cale>   mempty = Sum 0
+<jusss> Cale: yeah, [] is instance of List Monad, but Maybe Monad hasn't
+        instance right?
+<Cale>   mappend (Sum x) (Sum y) = Sum (x + y)
+<Cale> The Monad is irrelevant here
+<Cale> We didn't use return or (>>=) or anything based on Monad
+<Cale> We only used [] and (++)                                         [15:32]
+<Cale> instance Semigroup a => Monoid (Maybe a) where                   [15:36]
+<Cale>   mempty = Nothing
+<Cale>   mappend Nothing y = y
+<Cale>   mappend x Nothing = x
+<Cale>   mappend (Just x) (Just y) = Just (x <> y)
+
+<bahamas> jusss: mempty is the identity element                         [15:45]
+<bahamas> jusss: like 0 is for addition and 1 for multiplication
+
+<Axman6> it's just a value
+<Axman6> @src Monoid
+<lambdabot> class Monoid a where
+<lambdabot>     mempty  :: a
+<lambdabot>     mappend :: a -> a -> a
+<lambdabot>     mconcat :: [a] -> a
+
+#####################################################
+Semigroup, <>,
+<> :: s -> s -> s
+x <> y,  if x and y are string then ++,  are list then ++,
+for int, raise CompileError or NotImplementError, 'cause Int is not instance of Semigroup
+<> definition, the last one line is raise CompileError
+others like pattern matching type, like String or Int do ++
+
+Just ("a" <> "b") == Just "ab"
+and Just (x <> y) is a value,  just like Just 3, but I think it's a un-complete computation
+so there's Just a <> Just b = Just (a<>b)
+
+#############################################################
+<jusss> monoid's mempty and mappend have to do with monad's identity law and
+        associativity law?
+<Cale> uhhh... in the case of the Writer monad that's true
+<jusss> Cale: if I want turn a type T to Monad, can I just make T be the
+        instance of Functor, Applicative and Monad?  does T need to be
+        instance of Monoid?
+<Cale> It wouldn't even make sense for T to be an instance of Monoid in that
+       case                                                             [15:15]
+<Cale> It's not the right kind
+<Cale> :k Monoid
+<lambdabot> * -> Constraint
+<jusss> Cale: but Monad is a Monoid
+<Cale> :k Monad
+<lambdabot> (* -> *) -> Constraint
+<Cale> hm?
+<jusss> not right?                                                      [15:16]
+<Cale> Monoid is for monoid objects in the category of sets (or Haskell types)
+<jusss> that famous joke!
+<Cale> Monads are monoid objects in the category of endofunctors on some
+       category
+<Cale> (in this case, the endofunctors on the category of Haskell types)
+<Cale> I can sketch the connection a little if you want
+<jusss> please
+<Cale> So recall that a monoid is a set M with some unit element e in M,
+       which, since we have our category theory hats on, we can regard as a
+       function 1 -> M, where 1 is some one element set                 [15:18]
+<Cale> and a multiplication M x M -> M
+<jusss> Cale: wait a sec, is Maybe a Monoid instance?
+<Cale> where x is Cartesian product
+<Cale> not directly                                                     [15:19]
+<Cale> jusss: However, there is an instance Semigroup a => Monoid (Maybe a)
+<Cale> So while there's no instance Monoid Maybe (nor does that kind-check)
+                                                                        [15:20]
+<Cale> there is an instance Monoid (Maybe a), whenever there's an instance
+       Semigroup a
+<jusss> Cale: actually I wonder what's the shape of monoid in haskell, like 1
+        + 0,  1 * 3,  id . f
+<jusss> what's the monid?
+<jusss> [] is monad in something, e-> is mond in something, what's the monoid
+        like?
+<Cale> Monads and monoids are only very abstractly similar              [15:23]
+<Cale> There won't be a monoid corresponding to any given monad
+<Cale> Well, I could come up with several, but there isn't a canonical choice
+       of one :)
+<Cale> (Monoids are very easy to come up with)                          [15:24]
+<jusss> come up with what form or shape?
+<Cale> For example, if M is a monad, we could turn M () into a monoid, where
+       mappend is (>>) and mempty is return ()                          [15:25]
+<Cale> Also, for any type t, we could turn functions a -> M a into a monoid,
+       where mappend is (<=<) and mempty is return                      [15:26]
+<Cale> er, for any type a
+<Cale> (I was going to use t, and then I didn't ;)
+<jusss> still don't get it                                              [15:27]
+<Cale> Also, for any monad M, we can define an instance Monoid a => Monoid (M
+       a) where mempty = return mempty; mappend = liftM2 mappend
+<Cale> There are a lot of monoids
+<Cale> jusss: I might not be understanding what you're trying to get    [15:28]
+<jusss> Cale: what it's like? now I can get Functor, Applicative and Monad,
+        like we can implement fmap, apply and bind also return to turn the
+        type be an instance of those three typeclass, but Monoid is like that? 
+<jusss> sorry, my English is not good
+<Cale> For Monoid, you define mempty and mappend                        [15:30]
+<Cale> A simple monoid instance is the one for lists:
+<jusss> Cale: yeah, and how those two functions work?
+<Cale> instance Monoid [a] where
+<Cale>   mempty = []
+<Cale>   mappend = (++)
+<Cale> instance Num t => Monoid (Sum t) where -- the Sum type here is a
+       newtype wrapper                                                  [15:31]
+<Cale>   mempty = Sum 0
+<jusss> Cale: yeah, [] is instance of List Monad, but Maybe Monad hasn't
+        instance right?
+<Cale>   mappend (Sum x) (Sum y) = Sum (x + y)
+<Cale> The Monad is irrelevant here
+<Cale> We didn't use return or (>>=) or anything based on Monad
+<Cale> We only used [] and (++)                                         [15:32]
+<jusss> Cale: what about Maybe
+<Cale> and it's a monoid because for any list xs, we have [] ++ xs = xs and xs
+       ++ [] = xs, and for any lists xs, ys, zs, we have xs ++ (ys ++ zs) =
+       (xs ++ ys) ++ zs
+<bahamas> jusss: Monad and Monoid are `type classes`. `List` and `Maybe a` are
+          `types`, in case the distinction is not clear                 [15:33]
+<Cale> jusss: I never got through explaining the connection between Monoid and
+       Monad, it's *very* abstract
+<Cale> Do you happen to know what a natural transformation is?
+<jusss> Cale: bahamas if we turn Maybe as an instance of Monoid, how we
+        impelemnt the mempty and mappend?
+<jusss> Cale: I don't know about natural transformation yet, I heard that name
+        before :)
+<Cale> jusss: We can use a Semigroup instance for a to obtain an instance of
+       Monoid for Maybe a
+<Cale> instance Semigroup a => Monoid (Maybe a) where                   [15:36]
+<Cale>   mempty = Nothing
+<Cale>   mappend Nothing y = y
+<Cale>   mappend x Nothing = x
+<Cale>   mappend (Just x) (Just y) = Just (x <> y)       
+<Cale> Where now <> is the Semigroup operation                          [15:37]
+<Cale> This is a way of adding an identity element to any semigroup
+<bahamas> jusss: are you trying to understand how monoids work or something
+          else?
+<Cale> jusss: So, natural transformations are the arrows in the category that
+       monads are monoid-objects in. For now, you can think of a natural
+       transformation f -> g as being a polymorphic function of type  forall
+       a. f a -> g a
+<jusss> bahamas: I'm trying to know how to turn a type as an instance of
+        monoid
+<Cale> jusss: A monad consists of some endofunctor M: C -> C, and then a
+       couple of natural transformations: return: 1 -> M, and join: M . M ->
+       M. Here, 1 is the identity functor, and the '.' is composition of
+       functors                                                         [15:40]
+<Cale> But since in one case, we were dealing with pairs of elements of a set,
+       and combining them, and now we're taking things of type M (M a), and
+       producing things of type M a
+<Cale> well, it's not *quite* the same thing as soon as you look at the
+       details
+<bahamas> jusss: you need to implement the two methods required by Monoid:
+          mempty and mappend. that means that your type needs to have a
+          meaningful mempty value. like 0 is in the case of addition, [] for
+          the list type, Nothing for the Maybe a type                   [15:42]
+<Cale> It's like, if you can blur your eyes enough, these become exactly the
+       same thing, and they even have the same laws.
+<Cale> But as soon as you unblur them, they're completely different concepts.
+<jusss> bahamas: Cale and those mempty and mappend are linked with identity
+        law and associativity law ?                                     [15:43]
+<Cale> jusss: mempty <-> return                                         [15:44]
+<Cale> mappend <-> join
+<Cale> The identity law and associativity law can be made to look the same for
+       monads and monoids, if you write them in a particular funny way
+<bahamas> jusss: mempty is the identity element                         [15:45]
+<bahamas> jusss: like 0 is for addition and 1 for multiplication
+<Cale> If we go back to our picture of monoids where we had some function e: 1
+       -> M picking out the identity element
+<Cale> and m: M x M -> M
+<Cale> the multiplication
+<Cale> then we could write the unit laws in a particular way... I fear the
+       notation won't make any sense, because I haven't introduced much of it
+<Cale> actually, I'd also have to introduce the left and right unitors and the
+       associator...                                                    [15:47]
+<Cale> hah
+<Cale> https://en.wikipedia.org/wiki/Monoid_(category_theory) -- maybe just
+       look here for a moment
+<Cale> In one case, we can replace the tensor product symbols (x) with
+       Cartesian product
+<Cale> and interpret I as some one-element set
+<Cale> and then alpha is a function which reassociates tuples alpha ((x,y),z)
+       = (x,(y,z))
+<jusss> Cale: wait a sec, "mempty = Nothing"  this mempty is a function
+        without arguments?
+<jusss> every function is an unary function                             [15:49]
+<Cale> jusss: It's not even a function as it's expressed in Haskell. In the
+       stuff I'm talking about, we're taking it to be a function from a
+       one-element set, but usually it makes more sense just to think of it as
+       an element of the monoid.
+<Axman6> it's just a value
+<Axman6> @src Monoid
+<lambdabot> class Monoid a where
+<lambdabot>     mempty  :: a
+<lambdabot>     mappend :: a -> a -> a
+<lambdabot>     mconcat :: [a] -> a
+<Cale> jusss: anyway, I think it's probably best to ignore the connection
+       between Monad and Monoid, since it's really abstract, and even once you
+       understand it, it won't do much for you unless you're interested in
+       many other areas of mathematics -- in which case, it leads to asking
+       about what the monoid objects of other categories might look like.
+                                                                        [15:51]
+<jusss> Cale: ok
+<Cale> For programming in Haskell, the connection isn't useful in any way
+<Cale> (at least, in any way that we've managed)                        [15:52]
+<jusss> Cale: so It doesn't need to be a monoid befor a monad, right?
+<Cale> yeah, these concepts don't even really discuss the same *kind* of
+       things
+<Cale> jusss: A monoid has to be a type of kind *                       [15:53]
+<Cale> A monad has to be a type of kind * -> *
+<jusss> Cale: forgive me, I forget how the (m a) is with * -> *         [15:54]
+<jusss> I remember that Either a is a mond, not Either
+<Cale> jusss: that's right
+<jusss> Maybe is a mond , Maybe a isn't                                 [15:55]
+<Cale> jusss: yep
+<jusss> and with the kind type *-> *  ,  I forget the connection
+<Cale> :k Maybe
+<lambdabot> * -> *
+<Cale> :k Maybe Int
+<lambdabot> *
+<Cale> :k Either
+<lambdabot> * -> * -> *
+<Cale> :k Either String
+<lambdabot> * -> *
+<Cale> :k Either String Int                                             [15:56]
+<lambdabot> *
+<Cale> Monads M are always things of kind * -> *
+<Cale> so that the types
+<Cale> return :: a -> M a
+<Cale> and
+<jusss> ok, Maybe a is *,  Maybe a is a monoid
+<Cale> (>>=) :: M a -> (a -> M b) -> M b
+<Cale> will make sense
+<jusss> Maybe is *->* ,   Maybe is a monad
+<Cale> jusss: Maybe a *could be* a monoid
+<Cale> jusss: Given a type of kind *, it might have a Monoid instance or might
+       not                                                              [15:57]
+<jusss> Cale: until we implement mempty and mappend, right?
+<Cale> right, it won't until we actually say what mempty and mappend should be
+<Cale> and write the instance
+<jusss> Cale: like Maybe may be a monad until we implement fmap, apply, bind
+        and return
+<jusss> Cale: "<Cale>   mappend (Just x) (Just y) = Just (x <> y)"  what this
+        semigroup <> do?
+<Cale> jusss: Depends on the type
+<jusss> Cale: String?
+<Cale> concatenation
+<jusss> Cale: Int?
+<Cale> nothing, there's no Semigroup instance                           [16:24]
+<Solonarv> there is no Semigroup Int instance
+<Solonarv> > 3 <> 5 :: Int
+<lambdabot>  error:
+<lambdabot>      • No instance for (Monoid Int) arising from a use of ‘<>’
+<lambdabot>      • In the expression: 3 <> 5 :: Int
+<jusss> Cale: Solonarv Maybe a?
+<Cale> jusss: If it's Maybe a, it'll use mappend again :)
+<Solonarv> jusss: why don't you look up the actual instance definition?
+<dminuoso> jusss: (<>) captures the notion of "smashing things together" in a
+           way that makes sense. So if you ever find yourself writing
+           something like `A -> A -> A`, then it's a possible candidate for
+           Semigroup.                                                   [16:25]
+<Solonarv> (<>) is part of Semigroup, which is from Data.Semigroup - link:
+           https://hackage.haskell.org/package/base-4.12.0.0/docs/Data-Semigroup.html#t:Semigroup
+<Solonarv> if you scroll down a bit you can see the list of instances, click
+           the Source link next to one of the instances to see that
+           instance's implementation
+<Solonarv> for example here is the instance for Maybe a:
+           https://hackage.haskell.org/package/base-4.12.0.0/docs/src/GHC.Base.html#line-403
+<Cale> The law is that x <> (y <> z) must be the same as (x <> y) <> z
+<Cale> so long as that's true, you can define a Semigroup instance
+<Cale> The reason that there's no instance for Int is that there are two
+       obvious ones: addition and multiplication
+<Cale> To pick one, use the Sum and Product newtypes                    [16:27]
+<Solonarv> (and a whole lot of less obvious ones)
+<dminuoso> Cale: There shouldn't be one for Int because you dont have closure.
+<Cale> You do though
+<dminuoso> Cale: Ah, is addition/multiplication defined as modulo arithmetic?
+<Cale> It's arithmetic modulo some unspecified power of 2 (which can be
+       determined by looking at maxBound and minBound)
+<Solonarv> > 2^31 + 2^31 :: Int32                                       [16:28]
+<lambdabot>  0
+<dminuoso> Oh yeah. :)
+<Solonarv> yup, modular arithmetic
+<Solonarv> closure is actually implicit in the type as long as <> is total
+<Cale> dminuoso was thinking that it wasn't total                       [16:30]
+<Solonarv> and there is *usually* an expectation of totality anyway -
+           especially for the less kludgy typeclasses - so that just isn't
+           mentioned in the docs
+<Solonarv> (Num is a big offender for "kludgy typeclass", and so is Enum)
+<Cale> (it would be somewhat reasonable to error out if there was overflow,
+       except we'd find that horribly inconvenient in Haskell)
+<Axman6> There's definitely more than two obvious Semigroup instances for
+         Int. xor is also a nice one                                    [16:31]
+<Axman6> (Also a monoid)
+<dminuoso> Cale: I guess my real mistake was thinking that you had to
+           implement it in terms of (*) and (+), but I realized that it doesnt
+           matter since you could implement (+ mod n) and (* mod n) for a
+           suitable n by hand anyway.
+<Solonarv> Axman6: also bitwise equality
+##########################################################
+
+从不同的shapes，找到相同的pattern然后抽象出来可以表达的form,,,   Category Theory
+
+python use class and js use object to do functor, monad
+or use closure to do functor
+
+haskell's typeclass
+python's @abstract
+java's interface
 
 
+我们构造Type T去符合Monad的pattern(通过实现函数定义)，我们让T变成了Monad，而不是Type T一定义出来就是Monad。 我们实例化class产生对象，这些对象都有相同的behavior，而不是通过相同behavior的对象去产生class 所以男人女人产生了人类，还是人类产生了男人女人？
+
+<jusss> 我发现人们都喜欢在不同的东西里找相同的东西，然后抽象成一样的东西
+<jusss> 比如class和object,  从一个class出来的object，都有相同的behavior
+<jusss> 应该是人们看到很多object有相同的behavior才抽象出来class这个概念
+                                                                        [15:15]
+<jusss> 多态
+<jusss> polymorphic
+<jusss> 人们都能从list和function里抽象出来context,
+<jusss> 还有个人们喜欢自指，函数的递归，metaclass,  return class in class
+<jusss> 从多个不同的shapes找到那个相同的pattern, 然后抽象出一个可以表达所有的
+        form                                                            [15:21]
+<jusss> yunfan: f = lambda x: lambda y: x  你感觉这种函数奇不奇怪
+<jusss> yunfan: 还有这种 id = lambda x: x
+<jusss> yunfan: 还有 compose = lambda x,y: lambda z: x(y(z))            [15:33]
+<jusss> 还有composeM(return1, return2)                                  [15:35]
+<jusss> yunfan: unit1 = x=> [x]        unit2 = x => _=>x                [15:55]
+<jusss> yunfan: unit3 = x=>Promise.resolve(x)
+<eiGHttt> unit4 = x => Just(x)? unit5 = ...?                            [15:57]
+<jusss> Maybe本来不是Monad，是我们把它变成了Monad                       [16:05]
+<eiGHttt> 能不能具体展开讲讲？                                          [16:07]
+<jusss> 让它成为Functor Applicative Monad的这三个typeclass的instance
+                                                                        [16:08]
+<jusss> 实现这几个typeclass所定义的function
+<jusss> return, fmap, <*>, and >>=
+<jusss> join, flip, 
+<jusss> etc
+<eiGHttt> 为什么说“Maybe本来不是Monad”？                              [16:09]
+<jusss> 让Maybe去符合Monad的pattern, 去构造让它成为Monad的shape
+                                                                        [16:10]
+<jusss> eiGHttt data T a = V a, 只是个type, 但是可以把T构造，让T去符合Monad的
+        那些pattern                                                     [16:11]
+<eiGHttt> 那岂不是可以说“所有类型（满足Monad）本来不是Monad，是我们让它变成
+          Monad”？不觉得是句废话吗？
+<jusss> data T a = V a, 我直接说T是Monad, 而不让T去成为Functor, Applicative,
+        Monad的实例，我能说T是Monad ?
+<jusss> 让T成为实例，实现那些pattern就是那些函数的定义，我能说T是Monad?
+                                                                        [16:13]
+<eiGHttt> Monad的提前必须是Functor和Applicative。你当然可以说T是个Monad，这个
+          默认前提T必须是Functor和Applicative。
+<eiGHttt> “他是个好人”，那个前提“他肯定是个人”，没毛病。
+<jusss> 我的意思是如果我不然T成为Functor的实例，我能说T是个Functor吗？
+<eiGHttt> 那当然不行，它可以满足Functor，但你并不一定要用到这个性质。
+<eiGHttt> 类型类就是层约束，又不是教义，非要遵守。
+<jusss> T怎么成为Functor的实例，当然是T通过实现满足Functor性质的那些函数，就是
+        把T构造成了符合Functor的shape, 所以T才能说是Functor, 如果我不实现这些
+        函数让T去符合Functor的那个pattern, 当然不能说T是Functor
+<eiGHttt> jusss: 你适合去搞哲学。
+<eiGHttt> Haskell本来就是行为和数据分类，跟面向对象不一样，数据都是单独定义。
+<eiGHttt> s/分类/分离
+<eiGHttt> 单独看data T v = V a是什么都有可能。
+<jusss> eiGHttt those Functor, Applicative, Monad概念，就是在不同的shapes里找
+        到相同的pattern,然后所有符合这些pattern的shapes都是Functor or others,
+        Category Theory也是这么做的吗？
+<jusss> 在不同的数学分支里找到相同点，或这把一个分支里的东西映射到另一个分支里，
+<eiGHttt> 不懂数学。                                                    [16:22]
+<jusss> "<eiGHttt> 单独看data T v = V a是什么都有可能。" 你这个 data T v = V a
+        好像是错的。。。                                                [16:24]
+<eiGHttt> jusss: 恭喜。
+<jusss> 等号右边的 a必须出现在等号左边呀，等号左边的可以不出现在等号右边
+<jusss> eiGHttt 我们是根据男人和女人抽象出了人类这个概念，还是根据人类实例化了
+        男人和女人？
+<eiGHttt> jusss: 哲学的问题自己去想。
+<jusss> eiGHttt 前边这个就是我们让类型去符合Monad的行为，把类型变成了Monad, 后
+        被这个就是我们用class去实例化对象，然后这些对象都有相同的behavior
+#####################################
+#metaclass #python
+https://stackoverflow.com/questions/100003/what-are-metaclasses-in-python
+<jusss> yunfan: 不是，是django的ORM就是用metaclass来实现的              [15:29]
+
+use decorator or metaclass both can put some attributes in class when it's been created
+
+like typeclass in python? and typeclass's instance is type, metaclass's instance is class
+in python2 use __metaclass__ = something,
+in python3 class Foo(object, metaclass=something)
+
+class MyMeta(type):
+    pass
+
+class MyClass(metaclass=MyMeta):
+      #python3
+
+class MyClass:
+      __metaclass__ =MyMeta
+      #python2
+
+class MetaOne(type):
+    def __new__(cls, name, bases, dict):
+        that-dict-is-attributes-dict-so-apped-it-to-this
+        return super().__new__(cls, name, bases, dict)
+        or
+        dict['add'] = lambda self, value: self.append(value)
+        return type.__new__(cls, name, bases, dict)
+
+class MetaTwo(type):
+    counter = 0
+    def __init__(self, name, bases, dict):
+        #this-is-like-super()
+         type.__init__(cls, name, bases, dic)
+         self._order = MyMeta.counter
+          MetaTwo.counter += 1
+
+#it seems that __new__ need be return, but __init__ doesn't
+# if you want append function use __new__, append variable use __init__
+
+class Meta(type):
+	counter=0
+	def __init__(self,name,bases,dict):
+		dict['add'] = lambda self,x,y: x+y
+		self.counter = Meta.counter
+
+class RegularClass(metaclass=Meta):
+	pass
+L=RegularClass()
+RegularClass.counter
+0
+dir(RegularClass)   there's no add method in it
+
+class Meta2(type):
+	def __new__(cls,name,bases,dict):
+		dict['add']=lambda self,x,y: x+y
+		return type.__new__(cls,name,bases,dict)
+class R2(metaclass=Meta2):
+	pass
+L2=R2()
+L2.add(3,5)
+8
+dir(R2) there's add
+
+__new__ is used when one wants to define dict or bases tuples before the class is created.
+The return value of __new__is usually an instance of cls. __new__ allows subclasses of immutable types to customize instance creation.
+It can be overridden in custom metaclasses to customize class creation.
+__init__ is usually called after the object has been created so as to initialize it.
+
+we can also override other class methods by defining a custom __call__() method in the metaclass that allows custom behavior when the class is called.
+
+Once the appropriate metaclass has been identified, then the class namespace is prepared. If the metaclass has a __prepare__ attribute, it is called as namespace = metaclass.__prepare__(name, bases, **kwds) (where the additional keyword arguments, if any, come from the class definition). If the metaclass has no __prepare__attribute, then the class namespace is initialized as an empty ordered mapping.
+
+https://www.datacamp.com/community/tutorials/python-metaclasses
+https://docs.python.org/3/reference/datamodel.html
+https://www.liaoxuefeng.com/wiki/897692888725344/923030550637312
+
+<jusss> all the class are instance of the type class?                   [09:24]
+<jusss> about metaclass
+<altendky> jusss: `type` is the metaclass of a 'regular' class defined like
+           `class X:`, yes.  not all classes have `type` as their metaclass
+           though.
+<jusss> altendky: when we need it?
+<jusss> altendky: 'cause python is oo based on class, not prototype, so what's
+        the metaclass is used for
+<altendky> jusss: when do you need custom metaclasses?  when you want to do
+           confusing magic that will make it hard for people to use your class
+           in another way.  i dunno.  i'm sure there are cases but mostly stay
+           away from them.
+<jusss> altendky: I heard that django ORM stuff use that metaclass
+<altendky> jusss: QObject has a custom metaclass.  i bet django and sqlalchemy
+           and other orms do.  etc.
+<altendky> jusss: but, for a counterpoint on declarative stuff like that
+           consider the attrs approach with a decorator.
+<jusss> altendky: yeah, use decorator or metaclass both can put some
+        attributes in class when it's been created, right?              [09:48]
+<altendky> jusss: yes           
+
+#############################################
+REST API, RESTful API, get post put
+
+about #decorator
+
+
+
+class Starship(object):
+      sound = 'Vrrrrrrrrrrrrrrrr'
+      @classmethod
+      def make_sound(cls):
+          print(cls.sound)
+
+       @staticmethod
+       def beep():
+           print("beep ")
+
+        @property
+        def engine_strain(self):
+            if not self.engines:
+               return 0
+             else:
+                ...
+
+Starship.make_sound()
+Starship.beep()
+a=Starship()
+a.engine_strain
+
+@property is same as getter and setter in java
+we can treat engine_strain as an instance variable of the object
+
+##################################
+python even has monad module, pip install monad
 pymonad,
 t=Just(3)
 t.getValue()
