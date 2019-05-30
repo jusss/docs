@@ -1,3 +1,40 @@
+@classmethod  is used for call method with class not instance
+@staticmethod is used for call method with class not instance
+
+@classmethod
+def foo(cls,v):
+    pass
+
+@staticmethod
+def foo(v):
+    pass
+
+@abstractmethod is usded for polymorphic, interface in java, typeclass in haskell
+from abc import ABCMeta, abstractmethod
+class A(metaclass=ABCMeta):
+    @abstractmethod
+    def foo(self,v):
+        raise NotImplementedError
+
+@property is used for turn a method to call like an attribute, 
+@property will make a special way to change attributes, like getter and setter in java
+class C:
+    def __init__(self):
+        self._x=None
+    @
+@property
+def x(self):
+    return self._x
+
+@x.setter
+def x(self,v):
+    self._x=v
+
+@x.deleter
+def x(self):
+    del self._x
+
+------------------------------------------
 "I think decorator only can do something before the origin code's running or after it, decorator can not change what is in the origin code,it can not change origin code"
 Now, what are decorators really? They “decorate” or “wrap” another function and let you execute code before and after the wrapped function runs.
 
