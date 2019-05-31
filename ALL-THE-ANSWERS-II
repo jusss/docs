@@ -1,3 +1,107 @@
+
+for easy to use higher-order function, js got arrow function, python got decorator
+
+f = lambda x: lambda y: x+y
+f = x=> y=> x+y
+
+def addX(f):
+    return lambda x: lambda y: f(x)+y
+        
+@addX
+def f (x):
+    return x
+
+#############################
+
+#metaclass
+https://stackoverflow.com/questions/100003/what-are-metaclasses-in-python
+#javascript #Maybe
+https://jrsinclair.com/articles/2016/marvellously-mysterious-javascript-maybe-monad/
+
+#########################################
+
+<jusss> LdBeth: eiGHttt 原来id law和identivity law不需要实现，只需要验证，只要
+        实现了monad，就可以用这个两个law去验证                          [11:08]
+<jusss> LdBeth:  eiGHttt https://paste.ubuntu.com/p/ZZHFq2BpYD/
+
+https://wiki.haskell.org/Monad_laws
+###################################
+
+<jusss> eiGHttt LdBeth Int 为什么不算 Semigroup的 instance?             [10:37]
+<jusss> mempty = 0
+<jusss> mappend x 0 = x
+<jusss> mappend 0 x = x
+<eiGHttt> 因为有两种，(1, *)和(0, +)。 2 <> 3 = ?                       [10:38]
+<jusss> 1 + 0 = 0,  1* 2 =2
+<jusss> eiGHttt 哦
+<LdBeth> jusss:
+<jusss> eiGHttt 除了 String 和 List 还有其它的常见的吗                  [10:40]
+<eiGHttt> :i Monoid
+
+#######################################
+
+#abstract attribute
+
+class Monoid(Semigroup, metaclass=ABCMeta):
+    mappend = Semigroup.mappend
+    @property
+    @abstractmethod
+    def mempty(self):
+        raise NotImplementedError
+
+class Just(Monoid, Maybe):
+    def __init__(self, value):
+        self.value = value
+    @property
+    def mempty(self):
+        return Nothing
+
+Just("a").mempty
+
+the trick part is that @abstractmethod only check function's name, not variables
+so we use @property turn to call the function like a variable,
+now we can use this instance.variable form
+
+##################################
+
+from abc import ABCMeta, abstractmethod
+class Foo(metaclass=ABCMeta):
+	@abstractmethod
+	def fun(self):
+		raise NotImplementedError
+
+you must set metaclass=ABCMeta for @abstractmethod
+
+class Coo(metaclass=ABCMeta):
+	@property
+	@abstractmethod
+	def fun(self):
+		pass
+
+class Yoo(Coo):
+	fun=1
+
+	
+>>> i=Yoo()
+
+#######################################################
+
+oh, I see, object to python, value to haskell, quote to lisp
+Nothing = _Nothing()
+Just 3
+'Nothing
+they all are values, eval values and get themself
+function is a value too
+function is a value that we can get other values from this values
+just pass the values, that can prevent call-by-value, 'cause eval value and get itself
+
+and we can use function to store value to prevent call-by-value
+f = lambda: the-value-you-want
+then you can pass f to anywhere, and eval f will get f, until you want to get the value,
+then f()
+
+##############################################
+
 <jusss> ok, Maybe a is *,  Maybe a is a monoid
 <jusss> Maybe is *->* ,   Maybe is a monad
 that's why you need to implement Just class in python as Monoid instance
