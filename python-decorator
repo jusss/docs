@@ -1,3 +1,426 @@
+
+
+@decorator == fmap f ?
+they both take a function and return a new function which has the same inputs, but different outputs
+
+decorator is a higher-order function,
+
+@f g == h == compose(f)(g)
+so @f == compose(f)
+
+@f @ g == compose(f) . compose(g)
+
+
+
+compose = lambda f,g: lambda x: f(g(x))
+curry = lambda f,x: lambda y: f(x,y)
+decorator_ = curry(compose, f)
+
+
+# decorator_(g) == @decorator_ g
+@decorator_
+def g(x):
+    pass
+
+will equal to decorator_(g) ?
+
+
+# @f @g h == compose(f,compose(g,h))
+@f
+@g
+def h(x):
+    pass
+will equal to compose(f, compose(g, h)) ?
+
+
+of course, decorator can have paramters,and decorator can be compose, not must be
+
+I wonder compose(f) can be a functor
+fmap :: (g->g') -> compose(f)(g) -> compose(f)(g')
+
+and (f.) can be a Monad?
+
+bind :: f.g -> (g->f.g') -> f.g'
+apply:: f.(g->g') -> f.g -> f.g'
+fmap:: (g->g') -> f.g -> f.g'
+return :: g-> f.g
+join:: f.(f.g) -> f.g
+
+
+<jusss> bjs: https://paste.ubuntu.com/p/BGkwMMywNm/
+<bjs> jusss: so the way you do this is expand the first: it’s equivalent to
+      writing g = curry(compose, f)(g)  [21:50]
+
+<jusss> bjs: I just want to know if @f == compose(f)  [21:51]
+<bjs> jusss: that’s not valid syntax
+<jusss> bjs: @f \n def h(x): pass   will equal  compose(f,h) ?
+<bjs> jusss: if you have "@g /n def f():..." then f(x) is g(f(x))  [21:52]
+<bjs> is that what you’re asking?
+<deniska> it's g(f)(x)
+<bjs> so did that, h = f(h)
+<altendky> I thought currying collected args until it had them all then called
+           the function. Do I have that wrong?
+
+<grym> altendky: currying "makes everything take one arg"
+
+<bjs> jusss: so if h = f(h), then h(x) is f(h)(x)
+<jusss> bjs: yes, compose(f)(g) = f(g(x)
+<altendky> grym: I'm not sure how to turn that into understanding :]  [21:54]
+<grym> altendky: https://toolz.readthedocs.io/en/latest/curry.html
+<bjs> jusss: but h(f(x)) is not the same as h(f)(x)
+
+<grym> altendky: it is _not_ function composition, and this still makes my
+       brain hurt a little because whenever my brother explains it to me he
+       uses words like 'arity' and my eyes glaze over
+
+<jusss> bjs: @g /n def f():...   will equal compose(g,f) will equal g(f(x)) ?
+<grym> altendky: "A curried function partially evaluates if it does not
+       receive enough arguments to compute a result."  maybe that clicks for
+       you?  [21:56]
+<bjs> jusss: there, f = g(f), so f(x) is g(f)(x)
+
+<grym> altendky: so like if you have f(a,b,c) and you only pass a, you get
+       back partial(f,b,c) which you can evaluate later when b and then c are
+       known
+
+
+<bjs> jusss: it’s easier to see what’s happening if you write these without
+      @-syntax
+<jusss> bjs: sorry about the syntax, I just wonder if decorator in python is
+        like (fmap f) in haskell, they both take a function and return a new
+        function which have the same paramters
+<jusss> they both change the function's result, but not paramter
+<bjs> jusss: it’s not, you understand that "@g \n def f(): ..." is the same
+      as "def f(): ..." and then going "f = g(f)"
+<jusss> it's like it take a function, then it return a function, the two
+        function have same inputs, but different outputs, it changes the
+        function's output
+
+<altendky> grym: that sounds like collecting until it has all of them
+
+<bjs> jusss: not necessarily
+
+<grym> altendky: i am assured that it isn't, but i can't help you suss out why
+       :-P  [22:01]
+
+<grym> altendky: because my answer is "the PL guy said so"
+
+
+<altendky> grym: I'm talking about external functionality not internal
+           implementation
+
+<altendky> grym: or taking one arg several times rather than several args at
+           one time  [22:02]
+
+<jusss> bjs: I did this two days ago,
+        https://github.com/jusss/code/blob/bla2/python/Maybe.py  I just wonder
+        if the FP will work in python
+<jusss> https://github.com/jusss/code/blob/bla2/python/Monad.py
+<bjs> jusss: decorators are higher order functions
+<jusss> bjs: yeah, that's right!
+<altendky> bjs: is the order of a function basically the number of times you
+           have to call the return value to get a non-function?  [22:05]
+<jusss> bjs: I just wonder if decorators equal compose(f)?   of course the
+        full code will like @de \n def g(): ...    equal compose(f)(g) ==
+        f(g(x))
+<altendky> And higher is relative to 0
+<altendky> jusss: if you write a decorator that composes then it will compose.
+           Otherwise it will do something else.
+<bjs> jusss: compose isn’t the only higher order function  [22:10]
+<jusss> altendky: same to the compose
+<jusss> bjs: yeah, right
+<altendky> As a
+
+<jusss> lets take a look at @f \n def g(): ... this will make a new function
+        g, that new g has the same input as the old g, but different outputs,
+        and look at that compose = lambda f: lambda g: lambda x: f(g(x)),
+        compose(f) will also take a old g and return a new g == compose(f)(g)
+        same input in g, and different outputs, compose(f) make g transform to
+        compose(f)(g)  [22:18]
+
+<jusss> that's I wonder if decorator is another compose
+<jusss> that decorator is a currying function compose(f)  [22:21]
+<altendky> jusss: a decorator could return 42.  Or anything else.
+<jusss> altendky: yeah, I just thought decorator can be compose, not must be,
+        42, the ultra anwser
+<altendky> jusss: as I said before I think you can make a decision that
+           composes, but no, decoration isn't exclusively composition I don't
+           think.  But admittedly I don't know my way around compose and Curry
+           etc
+                                                                        [22:59]
+<altendky> Make a decorator
+
+<jusss> bjs: fmap::(a->b) -> (e->a) -> (e->b) and that g::a->b  f::e->a
+        f'::e->b
+<jusss> bjs: @g :: fmap (a->b)
+<bjs> jusss: it doesn’t feel right to equate decorators with fmap
+<bjs> jusss: and that signature looks wrong for fmap anyway  [23:25]
+<jusss> bjs: fmap::(a->b) -> (e->a) -> (e->b) is not wrong, functor is (->)e
+<bjs> jusss: okay yeah sure, i misread that on my phone, but that particular
+      instance of fmap is still not what decorators are doing
+<jusss> bjs: fmap::(a->b) -> (e->a) -> (e->b) and that g::a->b  f::e->a
+        f'::e->b    so @g == fmap g :: (e->a) -> (e->b) , it means @g take a
+        function e->a and return a function e->b, same inputs, differents
+        outputs  [00:04]
+<bjs> jusss: i.e. `g = lambda _: 42` is a fine function,  and you can do `@g
+      def f(): ...`
+<bjs> jusss: yes but for the Nth time this isn't what decorators do, they're
+      simply a higher-order function application
+<jusss> bjs: decorator can be fmap f, but it's not must be
+
+<jusss> bjs: list and function can be functor, but they don't must be
+<bjs> jusss: you're missing the point, decorators aren't fmap
+<jusss> bjs: decorator can be (fmap f)
+<jusss> bjs: you miss the point
+
+<bjs> jusss: yes a decorator *can* be any higher order function, if you write
+      a `fmap` decorator  [00:06]
+<bjs> jusss: but a decorator really is just a function `g : (a -> b) -> c`,
+      and then you can take a `f : a -> b` and create a `f' : c`
+<bjs> using g
+<bjs> which isn't fmap-y or curry-y or compose-y
+<jusss> bjs: decorator can be (fmap f), and also it can not to be
+<bjs> jusss: yes
+
+<bjs> jusss: a decorator is any function that unifies with `(a -> b) -> c`
+                                                                        [00:07]
+<jusss> bjs: I just want to find the pattern
+<bjs> jusss: that is the pattern. it's a function that takes another function
+      and returns a thing
+
+<jusss> bjs: like all the functor, applicative, and monad do, they can be part
+        of it, and can not to be
+<bjs> jusss: yes, all higher order function things can be written as a
+      decorator
+<bjs> since decorators are just higher-order application
+
+<jusss> bjs: they can be part of them, because they implement some functions
+        like fmap, apply, bind, return and join, 
+<bjs> jusss: yes those are higher order functions, decorators is higher-order
+      function application.  You don't need the @-syntax.  Everything is much
+      clearer if you just re-write examples without @-syntax
+<bjs> and see it's just doing function application  [00:09]
+
+<bjs> in a way that does not care what the actual `def f` does or looks like
+<jusss> bjs: sorry for the syntax, 
+
+<bjs> jusss: here https://bpaste.net/show/70bc8816b9da  [00:10]
+
+<jusss> bjs: python's syntax is really not easy to read like haskell's (and
+        haskell's symbols are not easy to read too if you don't understand
+        what they're sometime)
+
+<bjs> jusss: I understand what Haskell's symbols are, I'm just saying you're
+      trying to relate these more concrete ideas to Python's decroators when
+      decorators are just some syntactic sugar for function application
+
+<bjs> jusss: `@g def f` *really is* nothing more than just f = g(f)
+<jusss> bjs: they always focus on the relationship between functions, not how
+        the function works
+<bjs> and clearly then f can do anything, and g needs not retain any structure
+      of it
+
+<jusss> bjs: that's why I use @g f
+
+<bjs> jusss: *you* can use decorator syntax for whatever you like, but it's
+      just a very generic syntax for applying a function to another.
+<jusss> bjs: I wonder 'cause def f(): ... equal f = lambda : ...   will @g f
+        work? if f is lambda expression
+
+<bjs> jusss: no, the syntax is `@<decorator_name> \n <function definition>`
+                                                                        [00:13]
+<FenJai> hey all, Im trying to use the library ip_address so I've added "from
+         ipaddress import ip_address" to my script. However Im getting the
+         error "ImportError: No module named ipaddress". I'm using python 3.6
+         so I dont understand why its complaining
+<bjs> jusss: but you don't need this syntax at all, since you can always just
+      write it out fully like in my paste
+<jusss> bjs: ok, I love the lambda way, but it's not powerful in python like
+        scheme or arrow function in js
+<SnoopJeDi> right, the dedicated syntax is just syntactic sugar. If you wanted
+            to decorate a function captured into a name (like a lambda), you
+            would just directly call the decorating function, no "special"
+            syntax necessary.  [00:14]
+
+<bjs> jusss: I don't know what you mean, lambdas are just functions, there's
+      no difference in "power" between a lambda and a def
+<bjs> jusss: just different syntax.
+<jusss> bjs: you can't do assignment in python's lambda  [00:15]
+<jusss> bjs: also multiple expression
+<Mion> njund: its not
+<SnoopJeDi> jusss, that's sort of the point
+<bjs> jusss: what do you mean "multiple expression"? and of coruse you can do
+      assignment (you have lambdas!)
+<jusss> bjs: but hey, look at arrow function in js and lambda in scheme
+<bjs> jusss: I know what lambda looks like in scheme.
+
+
+<SnoopJeDi> bjs, I think they mean something like `lambda x: foo = 3`
+<jusss> SnoopJeDi: bjs yeah, a statment, assignment  [00:16]
+<bjs> SnoopJeDi: setattr is an expression
+<SnoopJeDi> or uh, (foo = 3)
+
+<bjs> not that you need it, not having assignment doesn't make it less
+      "powerful" in any meaningful way
+<SnoopJeDi> agreed
+<njund> Mion: so what is the scope of env vars set from python files?
+<SnoopJeDi> This conversation kicked off another dive into CPython, looking at
+            compile.c and ast.c for how decorators are implemented. I can't
+            grok it quickly :P  [00:17]
+<jusss> bjs:  SnoopJeDi but after all, we all need the side effects, right?
+        store something into somewhere
+<Mion> the current process and potentially any children
+<bjs> jusss: but yes, everything you can do with Scheme lambdas you can write
+      with Python lambdas,  and everything you can do in Python you can do in
+      pure Python expressions and lambdas
+<jusss> even they're not good for FP
+<bjs> (even if it's ugly)
+
+<bjs> jusss: and FP doesn't mean "no side effects", scheme has set! and ML
+      languages have printf
+<Mion> njund: it is a os thing, not a python thing btw
+<SnoopJeDi> and it likely will be if you try :)
+
+<bjs> jusss: and there are languages like Haskell (mostly) without
+      side-effects!  [00:19]
+<Mion> njund: allowing the children to modify the env of the parent would be
+       rather nasty, eg if the child modified PATH to inject some malware
+<jusss> bjs: so tell me how I can do a=[3] and change a=[3,5] in lambda ?
+
+<jusss> bjs: not exactly! even haskell, it has side effects
+<SnoopJeDi> jusss, if `a` is already defined, you can do `a.append(5)` or
+            `a.extend([5])`, both of which would mutate `a` and return None
+                                                                        [00:20]
+<SnoopJeDi> This is awful.
+<bjs> jusss: I said mostly, and the language doesn't really have side-effects
+      (Unless you're counting things that are prefixed with unsafe* or)
+<bjs> jusss: anyway, and for that you don't even need a lambda, since append
+      is just a method(expression)
+
+<jusss> SnoopJeDi: why it shouldn't return the new a [3,5]? and how I can do
+        b=3 in lambda?
+<bjs> and you can do sequential composition in the usual way: `(lambda:
+      (globals().__setitem__('a', [3]), a.append(5), print(a)))()`
+<bjs> like I said, anything you can do in Python you can do in Python
+      expressions, it just looks ugly  [00:22]
+
+<jusss> bjs: this is really like what you said...
+<bjs> jusss: what do you mean?
+<jusss> bjs: ugly
+
+<jusss> bjs: counter = (lambda x: lambda: [x.append(x[-1]+1),x][-1][-1])([0])
+
+<bjs> jusss: well, you can write ugly programs in all languages.  Even Haskell
+<bjs> trust me :)
+
+<jusss> bjs: have a look at this (lambda g,x,y,z: y if z==0 else
+        g(g,y,x+y,z-1))((lambda g,x,y,z: y if z==0 else
+        g(g,y,x+y,z-1)),0,1,100)
+<python476> bjs: yeah but at least in haskell they don't run unless they
+            compile
+<bjs> jusss: yes, ugly, but totally as poweful as the rest of Python (or any
+      other language)
+<python476> #rimshot
+<bjs> python476: I mean that's true of Python too ...
+<python476> bjs: no worries, I was half trolling facetiously
+<jusss> bjs: this is the CPS version of fibonacci,
+<Trashlord> coulda fooled me
+<bjs> jusss: yes I can see
+<jusss> not readable
+<python476> jusss: you know how to seduce me
+<bjs> jusss: well, CPS is rarely readable anyway, so this isn't a Python
+      problem.  [00:26]
+<jusss> I wrote this a few years ago, and now I don't know what it is
+
+<bjs> jusss: again, that's probably just CPS-style programs causing that, not
+      Python
+<jusss> bjs: ok  [00:27]
+
+<jusss> bjs: and how to do b=3 in lambda? 
+
+<SnoopJeDi> jusss, because you said you wanted to _change_ the object. If you
+            wanted to return a new list that extends by 5, you'd write
+            something like `lambda l: l + [5]`
+<bjs> jusss: it depends, what do you mean by "b=3", the easiest way is just to
+      do an encoding of a let-binding like: `(lambda b: ...)(3)`  [00:28]
+<jusss> bjs: no, this b is outside of lambda
+<jusss> bjs: can I change it
+<bjs> jusss: yes, you can use setattr or globals/locals or something else.
+      You need to do a bit more work to understand exactly *which* b it is
+
+<bjs> when you write `x = 1` as an expression Python does some jumping through
+      hoops to figure things out for you.  Eventually (3.8) we'll get a `x :=
+      1` expression too which does the same jumping for you
+
+<jusss> bjs: you're right, any assignment inside the function they can
+        transform to the (lambda b: ...)(3) form
+<jusss> bjs: like the 'let' did in js or scheme
+<jusss> but not in cl, IIRC, let is a sugar in scheme, but not cl  [00:31]
+<python476> jusss: you seem too familiar with everything fp/lisp
+<jusss> python476: no, I'm just a newbie
+<python476> are you a gnu guile mole in secret mission ?
+<bjs> jusss: whether or not it's sugar will change depending on versions of
+      the compiler and such, I wouldn't think too hard
+<jusss> to any language
+<python476> jusss: a newbie.. broh, we'all noobies then
+<jusss> python476: actually I prefer racket  [00:32]
+<bjs> jusss: but generally `let x = y in z` is pretty similar to `(\x. z) y`
+<python476> this chan is odd today, but I don't dislike this lambda flavouring
+
+<bjs> and the basic point is that all things can be re-written to a lambda
+      like the right-hand side and Python is not different
+<jusss> python476: you can try scheme or js, and you will love it  [00:33]
+<bjs> jusss: and just to end this with some fun, and it's basically tradition
+      to show this at the end of these conversations:
+      https://gist.github.com/habnabit/3805075/
+<python476> jusss: I'm a lisper for life, anything sexp or ml is my joy
+<jusss> bjs: aha, I saw this one years ago  [00:34]
+<jusss> python476: then you should try haskell, and you will find powerful
+        things
+<python476> jusss: I did too
+<jusss> lisp: lambda calculus, Abstract Syntax Tree, CPS
+<jusss> haskell, Category Theroy, ADT, Monad
+<python476> bytecode vm, lambda lifting
+<python476> jusss: you know too many words for a newb
+<jusss> both wonderful and powerful
+<python476> your trust capital has reached bottom :p
+<jusss> python476: and I'm really a newbie to those languages  [00:36]
+<jusss> bjs: I heard that python has type hint now, would it be more like
+        static language some days?  [00:37]
+<SnoopJeDi> Not likely
+<bjs> jusss: I mean, you can always statically type check a language.  But
+      that doesn't mean that everyone will do it or that it'll be the default
+<jusss> I saw that some symbols like : and -> in python's type hint
+<bjs> jusss: there's typecheckers like mypy and pytype that can do it
+      currently, but not everyone writes statically typed programs
+<python476> jusss: it's just doc for the moment
+<han-solo> bjs: Oh, Okay  [00:38]
+<bjs> jusss: yes there's some syntax to support it.
+<python476> I don't recall python devs wishing to make static checking for now
+
+<bjs> jusss: but as is usual, the type information is thrown away at runtime
+      and the interpreter only cares about the (untyped) environments
+<han-solo> python476: mypy ?  [00:39]
+<python476> han-solo: yeah but that's not core python IIUC
+<jusss> bjs: I learn something about metaclass a few days ago, it's very
+        powerful
+<jusss> bjs: I remember I asked some GUI stuff one years ago, and no one
+        anwser...  [00:46]
+
+<jusss> bjs: also tornado,
+
+<bjs> jusss: there's also some factor of asking the right questions:  if you
+      come here looking for an expert on tornado or GUI stuff you're unlikely
+      to get much help because nobody is going to volunteer as an expert.
+      Similarly, lots of non-experts might be able to solve your problem and
+      you end up immediately discarding them.
+<jusss> orgD: maybe you can try to ask in telegram and slack  [00:50]
+<bjs> jusss: it's kind of rude to tell someone to go away when someone else is
+      trying to help them ;)
+<jusss> bjs: sorry
+
+#############################################################
+
 @classmethod  is used for call method with class not instance
 @staticmethod is used for call method with class not instance
 
