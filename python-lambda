@@ -1,3 +1,56 @@
+
+(lambda:
+      (globals().__setitem__('a', [3]), a.append(5), print(a)))()
+
+<jusss> bjs: counter = (lambda x: lambda: [x.append(x[-1]+1),x][-1][-1])([0])
+
+<jusss> bjs: have a look at this (lambda g,x,y,z: y if z==0 else
+        g(g,y,x+y,z-1))((lambda g,x,y,z: y if z==0 else
+        g(g,y,x+y,z-1)),0,1,100)
+
+<bjs> jusss: again, that's probably just CPS-style programs causing that, not
+      Python
+<jusss> bjs: ok  [00:27]
+
+<jusss> bjs: and how to do b=3 in lambda? 
+
+<SnoopJeDi> jusss, because you said you wanted to _change_ the object. If you
+            wanted to return a new list that extends by 5, you'd write
+            something like `lambda l: l + [5]`
+<bjs> jusss: it depends, what do you mean by "b=3", the easiest way is just to
+      do an encoding of a let-binding like: `(lambda b: ...)(3)`  [00:28]
+<jusss> bjs: no, this b is outside of lambda
+<jusss> bjs: can I change it
+<bjs> jusss: yes, you can use setattr or globals/locals or something else.
+      You need to do a bit more work to understand exactly *which* b it is
+
+<bjs> when you write `x = 1` as an expression Python does some jumping through
+      hoops to figure things out for you.  Eventually (3.8) we'll get a `x :=
+      1` expression too which does the same jumping for you
+
+<jusss> bjs: you're right, any assignment inside the function they can
+        transform to the (lambda b: ...)(3) form
+<jusss> bjs: like the 'let' did in js or scheme
+<jusss> but not in cl, IIRC, let is a sugar in scheme, but not cl  [00:31]
+<python476> jusss: you seem too familiar with everything fp/lisp
+<jusss> python476: no, I'm just a newbie
+<python476> are you a gnu guile mole in secret mission ?
+<bjs> jusss: whether or not it's sugar will change depending on versions of
+      the compiler and such, I wouldn't think too hard
+<jusss> to any language
+<python476> jusss: a newbie.. broh, we'all noobies then
+<jusss> python476: actually I prefer racket  [00:32]
+<bjs> jusss: but generally `let x = y in z` is pretty similar to `(\x. z) y`
+<python476> this chan is odd today, but I don't dislike this lambda flavouring
+
+<bjs> and the basic point is that all things can be re-written to a lambda
+      like the right-hand side and Python is not different
+<jusss> python476: you can try scheme or js, and you will love it  [00:33]
+<bjs> jusss: and just to end this with some fun, and it's basically tradition
+      to show this at the end of these conversations:
+      https://gist.github.com/habnabit/3805075/
+<python476> jusss: I'm a lisper for life, anything sexp or ml is my joy
+##############################
 a=3 if 'a' in 'abc' else 4
 <squirrel> i'd have ? : over = if else any day
 -----------------------------------------
