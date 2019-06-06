@@ -1,4 +1,346 @@
 
+
+
+
+#website
+#metaclass
+https://www.pythoncentral.io/how-metaclasses-work-technically-in-python-2-and-3/
+#pymonad #python #monad
+https://github.com/fnl/pymonad/blob/master/pymonad/Either.py
+https://pypi.org/project/PyMonad/
+#monoid
+https://medium.com/@sjsyrek/five-minutes-to-monoid-fe6f364d0bba
+#maybe #monad
+https://jrsinclair.com/articles/2016/marvellously-mysterious-javascript-maybe-monad/
+#either #monad
+https://blog.logrocket.com/elegant-error-handling-with-the-javascript-either-monad-76c7ae4924a1/
+#cps #monad
+https://stackoverflow.com/questions/4525919/continuation-passing-style-vs-monads
+
+
+#keyword #thought #idea
+purify function, share state, state monad, pure function
+lisp haskell lambda calculus AST CPS category theory ADT Monad
+semigroup, monoid, free monad, reader monad, writer monad
+frontend React TypeScript redux, RESTFul API, Vue, knex, mobx, 
+Java vert.x
+python django
+ruby rails
+elixir phoenix
+
+
+
+#abstractmethod #abstractattribute
+zope.interface
+@abstractmethod
+@property
+
+#persistent #python #data #const #pyrsistent
+https://github.com/zopefoundation/persistent
+https://pyrsistent.readthedocs.io/en/latest/intro.html
+
+#reader monad
+https://passy.svbtle.com/dont-fear-the-reader
+https://wiki.haskell.org/All_About_Monads#The_Reader_monad
+
+#face_recognition #website
+https://github.com/ageitgey/face_recognition/blob/master/examples/facerec_from_webcam_faster.py
+https://github.com/ageitgey/face_recognition/blob/master/README_Simplified_Chinese.md
+https://github.com/habrman/FaceRecognition
+https://www.pyimagesearch.com/2018/06/18/face-recognition-with-opencv-python-and-deep-learning/
+https://github.com/Microsoft/Cognitive-Face-Python
+https://realpython.com/face-recognition-with-python/
+https://realpython.com/face-detection-in-python-using-a-webcam/
+
+#higher-order logic 
+https://en.wikipedia.org/wiki/Higher-order_logic
+https://en.wikipedia.org/wiki/First-order_logic
+
+#javascript #monad
+https://medium.com/@tzehsiang/javascript-functor-applicative-monads-in-pictures-b567c6415221
+https://bartoszmilewski.com/2011/01/09/monads-for-the-curious-programmer-part-1/
+
+#history of #functional programming #lisp #haskell
+https://zhuanlan.zhihu.com/p/24648375
+
+#Elm #css #three-ways #css-file #in-js #elm-css #elm-elements
+https://proandroiddev.com/taming-state-in-android-with-elm-architecture-and-kotlin-part-1-566caae0f706
+https://segmentfault.com/a/1190000004886629
+https://github.com/elm/compiler/blob/master/upgrade-docs/0.19.md
+https://elmprogramming.com/model-view-update-part-2.html
+https://qiita.com/jinjor/items/245959d2da710eda18fa
+http://heimdal.hatenablog.com/entry/elm-0.19-sandbox#main%E6%A7%8B%E6%88%90
+https://medium.com/@_safhac_/elm-for-beginners-overview-of-programs-architecture-c8209a09ac18
+https://medium.com/javascript-inside/introduction-into-elm-67a422911ae5
+https://blog.realkinetic.com/elm-changed-my-mind-about-unpopular-languages-190a23f4a834
+
+
+#fibonacci #haskell
+https://wiki.haskell.org/The_Fibonacci_sequence
+
+#python #argparse #ast
+https://docs.python.org/2/howto/argparse.html
+https://docs.python.org/3/library/ast.html
+
+#quick sort
+http://www.ruanyifeng.com/blog/2011/04/quicksort_in_javascript.html
+
+#python #Tkinter #tk
+https://stackoverflow.com/questions/40323850/second-frame-with-fill-both-and-expand-true-not-expanding-fully
+
+#python #tornado #counter #crontab
+http://xiaorui.cc/2016/01/20/%e6%ba%90%e7%a0%81%e5%88%86%e6%9e%90tornado-periodiccallback-crontab%e5%ae%9a%e6%97%b6%e4%bb%bb%e5%8a%a1%e5%ae%9e%e7%8e%b0/
+
+#sql
+https://www.postgresql.org/
+https://simpleisbetterthancomplex.com/series/2017/09/04/a-complete-beginners-guide-to-django-part-1.html
+
+#fetch #mozilla #js
+https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+
+#zhihu #monad
+https://zhuanlan.zhihu.com/p/21624824
+https://zhuanlan.zhihu.com/p/58514370
+https://blog.oyanglul.us/grokking-monad/part2
+http://blog.forec.cn/2017/03/02/translation-adit-tum/
+
+#elm #bootstrap #css
+https://medium.com/javascript-inside/introduction-into-elm-pt-3-272c2e9b9d0
+https://medium.com/javascript-inside/introduction-into-elm-67a422911ae5
+https://cnodejs.org/topic/575c354ce5fa62531af6e1c2
+https://hackernoon.com/how-elm-ports-work-with-a-picture-just-one-25144ba43cdd
+https://elm-lang.org/docs/syntax
+http://elm-bootstrap.info/getting-started
+https://becoming-functional.com/test-driving-the-elm-style-elements-library-7e7771c4159a
+
+
+#haskell #clay
+http://hackage.haskell.org/package/clay-0.13.1/docs/Clay-Background.html
+
+
+################################################################
+
+class Right(Either):
+      def __init__(self,value):
+          self.v1=1
+          self.value = value
+
+      def chain(self,fe):
+          
+
+class Left(Either):
+      def __init__(self,value):
+          self.v0=0
+          self.value=value
+
+
+(Right
+        right1,left1
+                right2,left2
+       right3,left3
+                Left).chain(right1, left1).chain(right2, lfet2)
+
+how right3,lfet3?
+
+unless use
+(Right
+        right1,left1
+                right2,left2
+        right3,lfet3
+                right4,left4
+
+                Left).chain1(right1,left1).chain2(righ2,left2).chain1.(right3,left3).chain2(right4,left4)
+                or a chain-pair to if-else
+                (Right,Left).chain-right(righ1,left1).chain-left(right3,left3).
+
+so this is impossible, use Either Monad to do if-else stuff
+https://dev.to/rametta/basic-monads-in-javascript-3el3
+https://github.com/rametta/pratica#resultchain
+Either will only eval one branch, another branch won't
+
+or
+
+var o = ... // could be undefined or null
+Either.fromNullable(o)
+  .fold(invalidO.fold(invalid1.fold(invald2,good2) ,good1), goodO)
+  .fold(invalid3, good3)
+https://glebbahmutov.com/blog/if-else-vs-either-monad-vs-frp/
+
+Either Monad in Haskell, the Left part shouldn't be evaluated and make a chain on it,
+'cause it means the end, but in if-else, there could be another if-else in the upper else block
+
+https://www.toptal.com/javascript/option-maybe-either-future-monads-js
+#website
+
+" we want to define a happy path and a sad path for our code. On the happy path, we just keep happily running our code until an error happens or we finish. If we end up on the sad path though, we don’t bother with trying to run the code any more."
+eval only on one path,
+https://jrsinclair.com/articles/2019/elegant-error-handling-with-the-js-either-monad/
+still don't handle if-else in else block, 'cause else means end in here
+
+all those three only work on,  or we can say Either Monad can used for this pattern
+if :
+   if:
+        if:
+        else:
+    else:
+else:
+
+not work on, Either won't be used for this pattern
+if:
+        if:
+        else:
+                if:
+                else:
+                
+else:
+        if:
+        else:
+
+but what if
+
+if 3>1:
+else:
+        if 2>1:
+        else:
+
+is equal to
+
+if 3>1:
+else:
+if 2>1:
+else:
+
+??? only equal with the same condition, but not equal with different conditions
+
+
+
+###############################################
+
+jdk https://jdk.java.net/12/
+https://www.oracle.com/technetwork/java/javase/downloads/jdk12-downloads-5295953.html?ssSourceSiteId=otnes
+download android studio from android.com
+https://qisdk.softbankrobotics.com/sdk/doc/pepper-sdk/ch1_gettingstarted/installation.html#installation
+
+https://mazhuang.org/2015/05/06/android-studio/
+
+"从 Android Studio 3.0.1 升级到 3.1 的时候，Check for Updates... 提示超时，于是挂了代理升级。但是升级完成之后，打开以前能顺利构建的工程，提示 Cause: jcenter.bintray.com:443 failed to respond，怀疑是代理的原因，于是在 Settings 里将 HTTP Proxy 选项改为以前的 no proxy，报错变成 Connection refused: connect，搜索了一番之后找到 这个，依提示打开 ~/.gradle/gradle.properties，发现里面果然还存在代理的设置信息，删除之后重启 Android Studio，问题解决。"
+
+Java 8 Optional class same as Maybe in Haskell
+
+######################################################
+
+Prelude> :{
+Prelude| div x y =
+Prelude|     case y of
+Prelude|         0 -> Left "Zero"
+Prelude|         _ -> Right $ x/y                                                --or use Right (x/y)
+Prelude| :}
+
+Prelude> div 3 2
+Right 1.5
+Prelude> div 3 0
+Left "Zero"
+Prelude> :t div
+div :: (Eq b, Fractional b) => b -> b -> Either [Char] b
+
+it seems to me just like return any two type results in one function with Either type,
+'cause static languages's result type is specific, so there Either comes
+just like Either a as Maybe, and Left a as Nothing, Right b as Just a
+Left x >>= f = Left x
+Right x >>= f = Right (f x)
+
+it's two branches, one is right and another is left,
+
+if :
+  if :
+    if :
+    else:
+  else:
+ else:
+ 
+one pair if-else is left-right
+
+f1 = if: return right()  else: return left()
+f2 =
+f3 =
+
+f0().chain(f1).chain(f2).chain(f3)
+
+class Right(Either):
+      def chain(self, branch):
+          return branch()
+
+class Left(Either):
+      def chain(self, branch):
+          return branch()
+
+################################################
+
+none, maybe monad
+if-else, either monad
+
+<ski> if `y' has type `b', then `Right y' has type `Either a b'         [17:15]
+<ski> if `x' has type `a', then `Left x' has type `Either a b'
+<Rembane> jusss`: That is indeed correct, you cannot do anything with the Left
+          in the Monad instance.
+<dminuoso> jusss`: So `Either Text Int` can be thought of a computation to
+           produce an `Int` that could however fail with a Text error.
+<Rembane> jusss`: Left a >>= f -- f doesn't do anything.
+<ski>   Left  e >>= _ = Left e
+<dminuoso> jusss`: `Either e` is conceptually the same as Maybe.
+<dminuoso> jusss`: The only difference is that `Nothing` cannot encode any
+           information into failure. You don't get to write `Nothing "parse
+           failed, no number found"\`
+<dminuoso> But with `Either e` you do. If you for example have `Either String
+           Int`, you can write `Left "parse failed, no number found"` which
+           might be equivalent to some `throw "parse failed, no number found"`
+           in some languages.
+
+module EitherEx where
+ 
+import Data.Map as M
+ 
+ageList :: M.Map String Int
+ageList = M.fromList [("Paul", 21), ("Mary", 17), ("Don", 40)]
+ 
+getAge :: String -> Either String Int
+getAge name =
+  case M.lookup name ageList of
+    Nothing -> Left $ "Could not find any age for " ++ name
+    Just x -> Right x
+ 
+ageSum :: Either String Int
+ageSum = do
+  paulAge <- getAge "Paul"
+  bobAge <- getAge "Bob"
+  maryAge <- getAge "Mary"
+  donAge <- getAge "Don"
+  return $ paulAge + bobAge + maryAge + donAge
+
+
+###############################################
+
+#MRO #python #class #super
+class A
+class B(A)
+class D(A)
+class C (D,B) find in D first, then B in py3k, A in py2k
+
+py2k,  
+class B(A):
+      def __init__(self):
+          B.__init__(self)
+py3k,
+class B(A):
+      def __init__(self):
+          super()__init__()
+
+########################################
+
+@f == fmap f
+
+############################################
+
 for easy to use higher-order function, js got arrow function, python got decorator
 
 f = lambda x: lambda y: x+y
