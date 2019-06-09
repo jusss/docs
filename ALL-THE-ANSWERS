@@ -1,3 +1,156 @@
+do notation, reader monad, share state, create new variable and store value and pass
+but only in this bind chain expression
+
+Just 3 >>= (\x -> Just "!" >>= (\y -> Just (show x ++ y)))
+same with the next one, 'cause of ???
+Just 3 >>= \x -> Just "!" >>= \y -> Just (show x ++ y)
+
+ah, a nested use of >>=! in the outermost lambda. we feed Just "!" to
+the lambda \y -> Just (show x ++ y). inside this lambda, the y becomes "!"
+x is still 3 because we got it from the outer lambda.
+
+foo :: Maybe String
+foo = do
+  x <- Just 3
+  y <- Just "!"
+  return (show x ++ y)
+
+see, x and y is passing in the bind chain, and the return values is bound to them
+
+foo = 
+    Just 5 >>= \x ->
+    Just 4 >>= \y ->
+    return $ x + y
+
+foo = do
+    x <- Just 5
+    y <- Just 4
+    return $ x + y
+
+<nil> lambda abstractions, if thought of as an operator, have the lowest
+      precedence. they just extend as far as possible to the right  [22:53]
+
+<jusss> why                  Just 3 >>= (\x -> Just "!" >>= (\y -> Just (show x ++ y)))
+<jusss> equal to             Just 3 >>= \x -> Just "!" >>= \y -> Just (show x ++ y)
+and it's not equal to        Just 3 >>= (\x -> Just "!") >>= (\y -> Just (show x ++ y))
+<jusss> nil and it equals to Just 3 >>= (\x -> (Just "!" >>= (\y -> Just (show x ++ y)))) ?
+it equals                 to Just 3 >>= (\x -> Just "!" >>= (\y -> Just (show x ++ y)))
+<nil> yes, there's no ambiguity there  [23:04]
+<nil> (hm, there is, actually.)
+<nil> but yes.  [23:05]
+
+<jusss> nil Just 3 >>= \x -> ... >>= \y -> ... >>= \z -> ... equal to Just 3
+        >>= (\x -> ... \z -> ..) ?
+<jusss> Just 3 >>= (\x -> (... >>= \y -> (... >>= \z -> ...))) ?  [23:12]
+
+<[exa]> jusss: open lambda goes all the way to the end of block, so \a ->
+        ... \b -> ... parentheses as (\a -> ... (\b -> ...))  [23:16]
+<[exa]> jusss: the other way, ... (\a -> ...) (\b -> ...) is a bit
+        confusing. You can read '\a ->' as abstracting 'a' from now on
+<jusss> [exa]: Just 3 >>= (\x -> Just "!" >>= (\y -> Just (show x ++ y)))
+        equal to Just 3 >>= \x -> Just "!" >>= \y -> Just (show x ++ y) ?
+<[exa]> jusss: yeah that should work  [23:20]
+
+about compose, it's not only about (.) 
+I think it should about every function
+((+) <$> (2*) <*> (2^))   is also function compose
+
+
+
+construct a chain to avoid global variables, passing a value around to instead of store
+use do-notation to construct that chain
+
+
+<jusss> c_wraith: actually I was wondering how about share state stuff 
+<jusss> and they said something about reader monad   [23:52]
+<jusss> I read them from some articles
+<jusss> I wonder the magic, avoid to create global variable to store a value
+        or state whatever  [23:53]
+<c_wraith> There's no magic involved
+<c_wraith> It's replacing a global variable with just passing a value around
+<[exa]> jusss: let's go the scheme way, let's say you have (lambda (a) (+ (* 2
+        a) (^ 2 a)))  [23:54]
+<[exa]> this way: (\a -> (+) ((*) 2 a) ((^) 2 a))
+<[exa]> now, because single-parameter functions are functors (and also
+        applicatives and monads), you can eliminate a bit of manual parameter
+        forwarding and write this:  [23:55]
+<jusss> c_wraith: but hey, global variable can store values and you can visit
+        it any time, but passing a value around ? you only passing it in a
+        chain, you store values in a chain, the outer function still can't get
+        the value unless they join the chain  [23:56]
+<[exa]> jusss: ((+) <$> (2*) <*> (2^))
+<[exa]> % ((+) <$> (2*) <*> (2^)) 5
+<yahb> [exa]: 42
+<c_wraith> jusss: yes, that's a good thing.  It means you need to be
+           *explicit* about what has access to what
+<[exa]> jusss: and the functor/applicative/monad framework for singleparameter
+        function just nicely silently passes the argument around  [23:57]
+<[exa]> jusss: aaand, if you dig a bit in how that's achieved, you'll
+        eventually find that the rule '(f <*> g) x = f x (g x)' (together with
+        its monadic counterpart) exactly allows all this to happen  [23:59]
+<jusss> c_wraith: [exa] and I think to construct that chain will be difficult
+                                                                        [00:00]
+<c_wraith> jusss: constructing the chain automatically is what types like
+           State get you.  [00:01]
+<jusss> c_wraith: [exa] I don't know if you use python or js or scheme,
+        re-assign is really easy to do something
+<[exa]> jusss: reassign is also an easy way to make your language intractable
+        to static analysis
+<jusss> [exa]: but reassign can make you to store values, and you can visit
+        those values any time, but in a chain? you can't visit it from outside
+        and any time, you can only visit it if you put the visitor in the
+        chain  [00:04]
+<cocreature> you can use actual mutable state in Haskell which is important
+             for concurrency
+<c_wraith> But that's rare to actually need.
+<jusss> I don't know to construct that chain how long it will take, maybe it's
+        a long time
+<[exa]> jusss: have you seen the do-notation?  [00:06]
+<c_wraith> For the programmer or the computer?
+<jusss> [exa]: yep
+<jusss> c_wraith: for the programmer 
+<cocreature> c_wraith: well I’d say concurrency is quite common in Haskell
+             and then mutable state in the form of MVars/TVars/… is quite
+             common
+<[exa]> jusss: it looks just like python, even with assignments and
+        everything, right?
+<cocreature> but yeah it’s definitely less common than in other languages
+                                                                        [00:07]
+<cocreature> that is not a good idea
+<jusss> [exa]: I haven't tried it, maybe I should, construct a chain is the
+        right way to avoid global variable?   [00:08]
+<[exa]> jusss: 'do' basically constructs the chain for you
+<jusss> [exa]: but other languages don't have do notation... unless we
+        implement it in others  [00:09]
+<c_wraith> jusss: other languages *really wish* they had do notation.  Have
+           you noticed how many times it gets reinvented?
+<c_wraith> async/await, null coalescing operators, etc  [00:10]
+<[exa]> jusss: taken to extreme, 'do' notation is just about having a
+        polymorphic, overloadable code-block construct
+<c_wraith> all special cases of do notation
+<[exa]> jusss: in C, all commands in blocks separated by semicolons can be
+        though as do-blocks of IO operations
+<[exa]> jusss: similarly in python, js, etc.  [00:11]
+<[exa]> jusss: you might notice a similarity with Scheme's (begin), although
+        'do' does a bit more work in carrying some extra information between
+        the "commands"
+<jusss> c_wraith: [exa] but the books always use 'let' to explain do-notation
+<[exa]> which books?
+<jusss> [exa]: ghci> let x = 3; y = "!" in show x ++ y   from
+        http://learnyouahaskell.com/a-fistful-of-monads
+<[exa]> jusss: there's no "do" yet, they're just showing what happens if you
+        run the monadic computation manually without having the extra Maybe
+        around (for handling failures)
+<[exa]> jusss: the magic comes 2 samples lower, right next to the owl picture
+<jusss> [exa]: ok, maybe I should keep do-notation in mind and use it to
+        construct the chain then write it on the paper with bind form
+<jusss> [exa]: I haven't implement do-notation in other languages yet, but I
+        implemented bind  [00:26]
+<[exa]> jusss: do notation is just syntactic sugar for bind, nothing more
+
+
+####################################################
+
 in dynamic type languages, class is the type?
 Int is a class and a type?
 and what function object's class is ?
