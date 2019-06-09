@@ -1,5 +1,51 @@
+in dynamic type languages, class is the type?
+Int is a class and a type?
+and what function object's class is ?
+
+<jusss> Int is a type also a class ?
+<jusss> I saw a kotlin code like `fun Bird(birth: DataTime) = ...`  DataTime
+        is a class I think, but they use a class as a type, I don't know
+        this's ok?  [11:57]
+<jusss> bookworm: so I wonder python's class and type
+<energizer> jusss: in python 'type' and 'class' mean the same thing  [12:08]
+<jusss> think about function, function is an object, right? so what's the
+        class of functions?
+<energizer> types.FunctionType
+<jusss> Int is a type, and Int is a class
+<energizer> jusss: there is no distinction between type and class in python
+<energizer> they were different in python 2.1 i think?
+<bookworm> yes
+<bookworm> 2.2 was the unification
+<jusss> energizer the value has the type, the instance is the value, the class
+        is the type, in python , right?
+<energizer> jusss: the instance is the value, yes. but in python, type and
+            class are exactly the same. there is no difference at all. those
+            words may be used differently in other languages, but not python
+<jusss> energizer I see
+<[Tritium]> jusss, energizer: Unless you have to work with python 0.9 through
+            2.1 (....such systems exist)            
+
+"在动态类型语言里，class就是type? Int是个class, 同时又是个type?"
+"动静态类型的区别只是在于运行之前能不能确定类型，给type和class的区别没毛关系，在class based的语言里，type是class接口的抽象，没有class的语言照样有类型，class不能用于推断或检查，所以它们是不同的东西"
+
+"type是class接口的抽象，这句话怎么理解？一个class可以有多个type? 我是因为看到kotlin的代码里用class来做type才产生的疑问，
+func Bird(birth: DateTime) = ..."
+
+"C++里也是这么做的，这一点都不罕见，你看到的跟编译器看到的东西是不一样的"
+
+"所以我就把class当type用也是可以的吗?"
+
+"对于一般使用者来说应该可以忽略它们的区别"
+
+
+#######################################
+
+lisp: lambda calculus, AST, CPS
+haskell: category theory, ADT, Monad
+############################################
+
 what is the monad, monad is related with three patterns
-bind, <*>, and fmap, 
+return, bind, and fmap
 and make it follow the identity law and associativity law
 
 construct something to match that patterns
