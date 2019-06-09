@@ -1,0 +1,137 @@
+kotlinc is a repl on linux
+
+jvm, javascript and native
+
+val a: String = "Kotlin"   like const in js, short for value, final in java, immutable
+var a: String = "Kotlin"  like a variable in other languages, share state
+
+or val a = "Kotlin"  type inference
+
+val a: Int
+a=1
+
+val sum: (Int) -> Int
+sum = {x->x+1}
+
+fun sum(x: Int, y: Int): Int { return x+y}
+
+fun sum(x:Int, y:Int) = x+y
+
+fun sum(x:Int, y:Int): Int = x+y
+
+val sum: (Int,Int) ->Int = {x:Int, y:Int -> x+y}
+
+val sum = {x:Int, y:Int -> x+y}
+
+val sum: (Int, Int) -> Int = { x,y -> x+y}
+
+"it seems only FP languages use = to define functions, Haskell and Kotlin use it,
+but python doesn't, even js use it, and math use it"
+
+test: (Country) -> Boolean
+
+kotlin's parameter must be contain by (), and (a,b) is two parameters, not a tuple
+test: (a,b) -> c   
+equal to
+test :: a->b->c  in haskell
+but test :: (a,b) -> c  this (a,b) is a tuple in haskell
+
+(a) -> ((a) -> Unit)  equal (a) -> a -> Unit    return a function
+
+((a) -> a) -> Unit pass a function, just remember that contain by () is parameter
+
+class method, class-name::method
+
+
+val sum: (Int, Int) -> Int = { x,y -> x+y}
+val sum: (Int) -> (Int) -> Int = { x -> {y -> x+y }}
+fun sum(x:Int): (Int)-> Int = {y -> (x+y)}
+
+fun schedule(sunny: Boolean, day: Day) = when (day) {
+Day.SAT -> basketball()
+else -> when {
+    sunny -> library()
+    else -> study()
+    }
+}
+
+
+fun schedule(sunny: Boolean, day: Day) = when {
+    day == Day.SAT -> basketball()
+    sunny -> library()
+    else -> study()
+}
+
+for (i in 1..10) println (i)
+
+class Person{
+    infix fun called(name:String) {
+        println("my name is ${name}")
+    }
+}
+
+val p = Persion()
+p called "Shaw"
+
+same as p.called("Shaw")
+
+native string  (from python?)
+
+val html = """ <html>
+                    <body>
+                        <p> Hello </p>
+                    </body>
+                </html>
+            """
+
+${ } can eval something in a string
+
+== compare values
+=== compare references
+
+class Bird {
+    val weight: Double = 500.0
+    fun fly() {}
+}
+
+interface Flyer {
+    val speed: Int
+    fun kind()
+    fun fly() {
+        println("I can fly")
+    }
+    val height
+        get() = 1000  // same like @property @abstractmethod f
+}
+
+val bird = Bird()
+val bird = Bird(weight = 1000.0)
+
+class Bird{
+    weight: Double = 0.00
+    val weight: Double
+    init{
+        this.weight=weight
+    }
+}
+
+I think to use "package filename" in the filename.kt is for make this file as a module
+that it can be other file import, and python doesn't have this because python has already
+take files as modules by default
+
+fun Bird(birth: DataTime) = Bird(getAgeByBirth(birth))
+
+open class Bird {
+    open fun fly() {
+    }
+}
+
+class Pengui: Bird() {
+    override fun fly() {
+    }
+}
+    
+use : to inherent, and you must use open to make it inherentable
+
+final in java is default to use for kotlin, prevent inherent
+another is sealed keyword
