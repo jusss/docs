@@ -1,6 +1,204 @@
 
+if you put xmlns:and="http://schemas.android.com/apk/res/android" you would be able to use and: instead android:
+
+You are talking about custom namespace.In android we can create custom views in additional to already available views.
+
+Once you define the custom attributes, you can use them in layout XML files just like built-in attributes. The only difference is that your custom attributes belong to a different namespace. Instead of belonging to the http://schemas.android.com/apk/res/android namespace, they belong to http://schemas.android.com/apk/res/[your package name]
+
+https://stackoverflow.com/questions/28045648/android-layout-when-to-use-app-vs-android
+
+################################################
+
+#kotlin socket for client
+
+import java.net.Socket
+import java.net.ServerSocket
+
+fun main(args: Array<String>) {
+    val sock = Socket("127.0.0.1", 50007)
+    sock.use {
+        it.outputStream.write("aha, it's from kotlin".toByteArray(
+            Charsets.UTF_8
+        ))
+        it.outputStream.flush()
+        var aob = ByteArray(1024)
+        it.inputStream.read(aob)
+        println(aob.toString(Charsets.UTF_8))
+    }
+}
+
+#reference #socket #kotlin #java
+https://docs.oracle.com/javase/8/docs/api/java/net/Socket.html
+https://docs.oracle.com/javase/8/docs/api/java/net/ServerSocket.html
+https://rosettacode.org/wiki/Sockets
+http://net-informations.com/java/net/socket.htm
+https://gist.github.com/banasiak/7069bb7da0cd2dd322c2d554677ac37a
+https://gist.github.com/Silverbaq/a14fe6b3ec57703e8cc1a63b59605876
+################################################
+
+package whatever.classname1
+package whatever.classname2
+just used for import those class in other files
+
+server.use{ it.whatever }  like f( function(x){...}) in js,
+'cause this function(x) {...} will operate on something in f
+and x mean that something, it's equal f(g) and g will operate
+something which in f
+
+java socket code to kotlin, only send is ok, recv isn't
+http://net-informations.com/java/net/socket.htm
+<MoonTide> jusss: 直接一个字节一个字节的读，不要用 readUTF              [17:21]
+<MoonTide> jusss:  readUTF 好像加了 java 自己的黑科技：好像头两个字节是字节长
+           度，后面才是字符串的字节数据
+           
+
+#########################################
+
+irc, twitter, telegram, mail list, usenet, slack, stackoverflow and github
+
+皮亚诺公里， 二阶逻辑， 一阶逻辑， kleisli category, category theory,
+Haskell Curry, Alonzo Church
+
+<LdBeth> 你要看 category 可以看 seven sketches
+<LdBeth> MIT 出的教材
+<LdBeth> 适合给高中数学水平的读者
+<jusss> LdBeth: codewars leetcode上面不全是数学，和编程有啥关系
+                                                                        [13:50]
+<LdBeth> 那特么不就小学生级别的数学么                                   [13:51]
+<jusss> 点开过一次codewars的初级问题，哇，数学，gg
+<jusss> LdBeth: 那我给出个小学生数学题，假设有一个列表里面有若干个数字，求出这
+        个列表里最大且不重复的数字                                      [13:52]
+<eiGHttt> head . filter (== 1) . group . sort
+<LdBeth> Time O(n) space O(n)
+
+<jusss> (Just f) . (Just g) == Just(f.g) ?
+<jle`> jusss: you might be thinking of liftA2 (.), not (.)              [12:08]
+<iqubic> :t (liftA2 (.))
+<lambdabot> Applicative f => f (b -> c) -> f (a -> b) -> f (a -> c)
+<jle`> jusss: liftA2 here lifts an (a -> b -> c) over a (Maybe a) and  (Maybe
+       b) to produce a (Maybe c)
+<jle`> it's like the binary version of fmap
+<jusss> jle`: composeM :: (a->m b) -> (x-> m a) -> (x -> m b)           [13:19]
+<jusss> f composeM g = \x -> (g x) >>= f                                [13:20]
+<slack1256> @type (<=<)                                                 [13:22]
+<lambdabot> Monad m => (b -> m c) -> (a -> m b) -> a -> m c
+<slack1256> composeM seems to be the kleisky(sic) arrow
+<jusss> slack1256: and what this <=< pronouce ?
+<slack1256> I've seen it called the "fish" operator                     [13:24]
+<slack1256> but you can also say it is the composition operator on the kleisky
+            category                                                    [13:25]
+<jle`> jusss: does this answer the question you asked earlier, 'what is
+       composeM look like?'
+<jusss> slack1256: kleisli ?
+<jusss> jle`: sort of                                                   [13:26]
+<jusss> jle`: actually I'd like to see the function definition, not type
+        signature                                                       [13:27]
+<jle`> isn't that what you just gave?                                   [13:28]
+<jle`> 22:20:15 | f `composeM` g = \x -> (g x) >>= f                    [13:29]
+<jle`> or are you looking for something more, maybe
+<slack1256> jusss:
+            https://downloads.haskell.org/~ghc/latest/docs/html/libraries/base-4.12.0.0/src/GHC-Base.html#%3D%3C%3C 
+                                                                        [13:30]
+<slack1256> the code for (<=<)
+<jusss> jle`: yeah, more about f and g's definitions                    [13:31]
+<jle`> they are parameters to a function
+<jle`> for example, `myFunction x y = x + y`
+<jle`> myFunction takes two inputs, x and y, and returns a value
+<jle`> so for `composeM f g = ...`, it takes two inputs, f and g        [13:32]
+<jle`> and rethrns \x -> g x >>= f
+<jle`> x `myFunc` y = ..., is a way of defining a function using infix
+       notation                                                         [13:35]
+<jle`> it's equivalent to myFunc x y = ....
 
 
+################################################
+
+do-notation
+
+Just 3 >>= \x -> Just "!" >>= \y -> Just (show x ++ y)
+Just 3 >>= (\x -> (Just "!" >>= (\y -> Just (show x ++ y))))
+
+from Maybe import *
+foo= Just("3").bind(lambda x:
+               (Just("!").bind(lambda y:
+                               Just(x+y))))
+print(foo.join())
+
+foo = do
+    x <- Just 3
+    y <- Just "!"
+    return $ show x ++ y
+
+foo= Just("3").bind(lambda x:
+               (Nothing.bind(lambda y:
+                               Just(x+y))))
+print(foo.join())
+
+why not use
+let x= Just("3").join()
+     y = Just("!".join()
+     foo=unit(x+y, Just)
+'cause y may be Nothing, and "3" + Nothing will get an error
+
+so we still stay on bind
+
+foo = do
+    (x, Just("3"))
+    (y, Just("!"))
+    (x+y, Just)
+
+<jusss> I wonder if decorator can get (b)..(z) in f(a)(b)(c)...(z) ?
+
+transform this 
+
+foo= Just("3").bind(lambda x:
+               (Just("!").bind(lambda y:
+                               Just(x+y))))
+to this form
+
+foo = do
+    (x, Just("3"))
+    (y, Just("!"))
+    (x+y, Just)       # if mx is Just("3") so we can use (mx.unit(x+y)) to replace this line
+
+so what this do should like ?
+this do should take two paramter and return a function, that function still take the same
+and return a function, until the last one , return a monadic value,
+I don't know if decorator can capture this (b) in f(a)(b)
+
+>>= can filter Nothing
+
+add mx my =
+    case mx of
+        Nothing -> Nothing
+        Just x  -> case my of
+                       Nothing -> Nothing
+                       Just y  -> Just (x + y)
+
+add mx my =
+    mx >>= (\x ->
+        my >>= (\y ->
+            return (x + y)))
+
+add mx my = do
+    x <- mx
+    y <- my
+    return (x + y)
+
+addM = lambda mx,my:
+     mx.bind(lambda x:
+                    my.bind(lambda y:
+                                   unit(x+y)))
+
+'cause of mx and my have the same monad, so we use mx.unit to construct monadic value
+addM = lambda mx,my:
+     mx.bind(lambda x:
+                    my.bind(lambda y:
+                                  mx.unit(x+y)))
+                                   
+and composeM?
+
+#####################################################
 
 #website
 #metaclass
