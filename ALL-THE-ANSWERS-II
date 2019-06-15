@@ -60,6 +60,16 @@ unit = x => new Promise.resolve(x)
 
 composeM = (f,g) => x => g(x).then(f)
 
+don't use Promise.resolve(), use Promise(r => r())
+unit = (x,y) => new Promise(r => r(x)).then(y)
+f = new Promise(r => r(x)).then(y=> new Promise(r => r(y)))
+
+add1 = x=> x+1
+
+this is asynchronous, better than add1(add1(3))
+
+unit(unit(3,add1), add1)   => 5
+
 ############################################
 compose, unary, argument can't pass to another f . g
 reader, unary and binary, one argument pass  f >>= g
