@@ -70,6 +70,20 @@ this is asynchronous, better than add1(add1(3))
 
 unit(unit(3,add1), add1)   => 5
 
+ok, syntax error,  use "new Promise(r => r(x))"  
+or "Promise.resolve(x)"
+don't use "new Promise.resolve(x)"
+
+f = x => Promise.resolve(x)
+composeM = (f,g) => x => g(x).then(f)
+t=composeM(f,f)
+t(3)
+
+add1 = x => Promise.resolve(x+1)
+add2 = x => Promise.resolve(x+2)
+t=composeM(add1,add2)
+t(3)
+
 ############################################
 compose, unary, argument can't pass to another f . g
 reader, unary and binary, one argument pass  f >>= g
