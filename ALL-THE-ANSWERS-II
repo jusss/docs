@@ -1,3 +1,786 @@
+1. don't stuck the main thread, don't run socket in main thread
+2. update UI in non-main thread use runOnUiThread
+
+<serafeim> jusss:  the thing is that you can't do network operations on your
+           main thread                                                  [15:04]
+<serafeim> jusss:  because this will make your app unresponsive
+<serafeim> so you must do that in a different thread. asynctask can help you
+           with this.
+<serafeim> or you can just create a plain old java thread and do that
+           operation. that would make synchronizing more difficult though
+                                                                        [15:05]
+<jusss> serafeim: ok, I will try async                                  [15:08]
+<serafeim> jusss: cool                                                  [15:09]
+
+<serafeim> jusss:  you can't change things in the main thread from other
+           threads. the usual way to resolve that is to use runOnUiThread
+<serafeim> something like this:
+           https://stackoverflow.com/questions/11140285/how-do-we-use-runonuithread-in-android
+<serafeim> i.e from your secondary thread you pass some code to be run on the
+           main thread so that it will update your UI components        [15:38]
+<serafeim> this is basic Android 100 :)
+<serafeim> but i can understand it is overwhelming for a new user
+
+<serafeim> jusss: i don't think i told you to use any function          [15:51]
+<serafeim> i told you to use runOnUiThread
+<jusss> sorry
+<serafeim> the function runs on the same thread
+<serafeim> follow the instructions i have you in the SO answer
+
+https://www.tutorialkart.com/kotlin-android/android-runonuithread-example-kotlin/
+
+enable coroutine in kotlin android
+
+put the next lines to build.gradle and click the import button on the right top
+implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.0.1'
+implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.0.1"
+
+then import kotlinx.coroutines.launch in MainActivity.kt
+GlobalScope.launch { ... }
+##################################################################
+
+function compose
+
+f . g = f (g x)
+f >>= g = g (f x) x
+f >=> g = g (f x y) y
+
+what's the next ?
+
+################################################
+look this and image Promise in JS
+                   g (                  f                ( x                      y   ))          y 
+new Promise( new Promise.resolve(action-x).action-y).action-z
+run x, y, z by order
+
+unit = (x,y) => new Promise.resolve(x).then(y)
+unix ( unix(x,y), z)
+
+unit = x => new Promise.resolve(x)
+
+composeM = (f,g) => x => g(x).then(f)
+
+############################################
+compose, unary, argument can't pass to another f . g
+reader, unary and binary, one argument pass  f >>= g
+kleisli compose, binary and binary, pass one argument, you decide use result and
+argument or not, you construct  them, you construct a binary with an unary!!!
+all that is just function compose!!!
+
+<jusss> jle`: I suddently get something from compose, reader monad and kleisli
+        compose, they're all function compose!
+<jusss> compose is one unary and one unary
+<jusss> reader is one unary and another is binary
+<jusss> kleisli compose is two binary compose
+<jusss> f . g = \x -> f (g x) ;   f >> g = g (f x) x   ;   f >=> g = \x -> \y
+        -> g (f y x) y                                                  [09:25]
+
+<jusss> the results,  f (g x), g (f x) x, and g (f y x) y
+<jusss> are what we want to construct                                   [09:26]
+
+<jusss> to the form
+<jusss> so what about one unary with one three-parameter function?
+<jusss> if we want passing two paramters to a bunch of functions, we need to
+        construct those function with three parameters?
+<Axman6> > (f >> g) x :: Expr
+<lambdabot>  error:
+<lambdabot>      • Ambiguous type variable ‘a0’ arising from a use of ‘f’
+<lambdabot>        prevents the constraint ‘(FromExpr a0)’ from being
+            solved.
+<Axman6> > ((f::Expr -> Expr) >> (g::Expr -> Expr)) x :: Expr           [09:32]
+<lambdabot>  g x
+<jusss> Axman6: is this f >=> g     =     \x -> (\y -> g (f y x) y)   right?
+
+<Axman6> > ((f::Expr -> Expr -> Expr) >=> (g::Expr -> Expr -> Expr)) x y ::
+         Expr
+<lambdabot>  g (f x y) y
+<Axman6> Looks good to me, well done :)                                 [09:34]
+<jusss> (1,1) -> 0 share,  (1,2) -> 1,  (2,2) -> 1,     in compose, unary and
+        unary share 0 parameter, unary and binary share 1, binary and binary
+        share 1, so I wonder (1,3) -> ? and if it exist?                [09:40]
+
+<Axman6> what's the type
+
+<Axman6> always start with the types
+<Welkin> what's *your* type?
+<Axman6> ;)
+<jusss> f>>=g = g (f x) x, this binary function g, we can construct an unary
+        function to a binary and we can decide don't to use this result (f x),
+        so we can use x in f and g                                      [09:44]
+<jusss> g _ x
+
+<jusss> Axman6: Welkin is there somebody has already did this?
+<jusss> I think there must be somebody have already do compose in
+        three-parameter functions                                       [09:46]
+<Axman6> What;s the type. 
+<Axman6> if you can think of the type, you can use hoogle to see if someone
+         has                                                            [09:47]
+
+###################################################################
+
+all that is just about function compose!
+
+functor compose :: (a->b) -> (e->a) -> (e->b)
+
+reader monad >>= :: (e->a) -> (a->e->b) -> (e->b)
+
+kleisli compose <=< :: (b -> m c) -> (a -> m b) -> (a -> m c)
+<edwardk> (>=>) :: (a -> e -> b) -> (b -> e -> c) -> a -> e -> c        [12:19]
+
+f . g = \x -> f (g x)  -- f and g both are unary functions
+
+f >>= g = \x -> g (f x) x    -- f is unary and g is binary,   focus on the result! what it constructs!
+
+f >=> g = \x -> (f x >>= g)    -- f and g both are binary functions
+          
+
+z >>= g = \x -> g (z x) x
+let z = f y
+f y >>= g = \x -> g (f y x) x
+
+f >=> g     =     \x -> (\y -> g (f y x) y)
+
+f (g x)
+g (f x) x    this is one parameter x passing in two functions
+g (f y x) y
+
+###########################################
+(>>) :: m a -> m b -> m b
+k >> f = k >>= \_ -> f
+(>>) is like (>>=), in that it sequences two actions, except that it ignores the result from the first one.
+
+####################################
+<edwardk> (>=>) :: Monad m => (a -> m b) -> (b -> m c) -> a -> m c
+<edwardk> (>=>) :: (a -> e -> b) -> (b -> e -> c) -> a -> e -> c        [12:19]
+<jusss> f >=> g = \x -> (f x >>= g)                                     [12:02]
+#####################################################
+>>= :: (e->a) -> (a-> (e->b)) -> (e->b)
+(a->(e->b)) == (a->e->b)
+so this can be an unary function that take a and return a function e->b
+also this can be a binary function that take two parameters a and e then return b
+
+t = (+1) >>= (+)
+t 3 will get 7
+
+##################################################
+
+<jusss> wait a sec, this is really change my mind,   'cause think (a->(e->b))
+        as a binary function
+
+<jusss> Axman6: wait a sec, in "<jle`> ((f >=> g) 3) 10  ==> g 10 (f 10 3)"
+        yes, we pass 10 to f and g both, but why g still need f's result ?
+
+<jle`> the only time Reader ever is relevant is in teaching examples
+
+<jle`> jusss: f >=> g is function composition, so you're eventually passing
+       the result of f to the result of g
+
+<jle`> look at the type of join -- join :: (e -> e -> a) -> e -> a
+<jusss> jle`: that would be join f x = f x x
+<jle`> so join f x = f x x is sugar for join f = \x -> f x x
+
+<jusss> I'm attracted by this special thing                             [13:14]
+
+<jle`> yes, it is okay to be attracted to it
+<jle`> but just be aware that it is not useful
+<Axman6> c_wraith: slightly mindblown. I had noticed that but never put into
+         words
+<jle`> this is the nature of life, in a way
+<jusss> fine
+
+<jusss> I hope one day I can find the useful way for it                 [13:15]
+<jle`> yes, you are attracted to it. that's a good thing, and a lot of us here
+       share your fascination
+<jle`> but, we also know that it is a more or less useless thing
+<Axman6> spark plugs are pretty cool though
+
+<jle`> jusss: so yes, functional programming is useful. functions are
+       useful. but this is not. and that's ok                           [13:16]
+<c_wraith> jusss: it comes up sometimes.  Sometimes you have a function with
+           the right shape and realize that you can use Reader to pass extra
+           arguments.
+
+<jusss> special but useless...
+
+<Axman6> jusss: Reader by itself isn't very useful, but ReaderT gets used all
+         the time in applications which need to pass configuration around to
+         many different components
+<jle`> just because functional programming is useful doesn't mean that every
+       single minute function that exists ever, will be useful
+<c_wraith> jusss: and that is fun!
+
+<jle`> functional programming is about finding the useful functions, and using
+       those :)
+<jle`> it isn't about making all functions useful                       [13:17]
+<Axman6> @remember jle`: functional programming is about finding the useful
+         functions, and using those.  it isn't about making all functions
+         useful.
+<lambdabot> Good to know.
+
+#################################################
+<jusss> what this Kleisli compose is used for?
+
+<juliusdeane> Like the (>=>) type of composition?
+<jusss> juliusdeane: yeah
+<jusss> juliusdeane: what it's used for
+
+<juliusdeane> It's like (.) but for monadic actions                     [11:59]
+
+<juliusdeane> As an example, you could do mapM uncons >=> mapM (return . fst)
+              $ ["excuse", "this", "absurd", "example"]                 [12:00]
+<juliusdeane> And you'd get Just "etae"
+
+<jusss> f >=> g = \x -> (f x >>= g)                                     [12:02]
+<jusss> z >>= g = \x -> z (g x) x
+
+<jusss> f >=> g = \x -> (f x) (g x) x
+
+<jusss> ?
+<juliusdeane> The first definition you had for (>=>) looks good, that's
+              actually how it's defined in Control.Monad I'm pretty sure
+                                                                        [12:06]
+<jusss> the second is not
+<juliusdeane> Yeah
+<juliusdeane> Same for (>>=)
+<jle`> i use it sometimes when i have two (a -> Maybe b)'s i want to compose
+<jusss> 'cause z >>= g , z::e->a  and g::a->(e->b)                      [12:07]
+<jle`> to "double-filter", so to speak
+
+<jusss> those stuff beyond my comprehension, I have seen those Reader and
+        Kleisli compose article enough, and I still don't understand it
+                                                                        [12:08]
+<edwardk> jusss: i use it when i start refactoring code a lot
+
+<juliusdeane> It's good for making stuff point-free, kind of like
+              Control.Arrow
+<jle`> jusss: what stuff exactly?
+<edwardk> foo x = do x <- y; z                         then becomes foo x = y
+          >>= z          then becomes foo = y >=> z
+
+<edwardk> er
+<jle`> jusss: specific usages of >=> like we are talking about, or its
+       behavior with the (e ->) monad?
+<edwardk> foo x = do w <- y; z
+<jusss> jle`: I can't understand (e->) monad
+<jusss> jle`: also >=>
+<jle`> you don't understand how to use it, or how to implement it?
+<edwardk> in general (>=>) is a tool for avoiding one use names
+<jusss> I don't know what they're used for, what situation they would be help?
+<juliusdeane> Like if you have lots of configuration data that you send
+              through functions                                         [12:10]
+<jle`> honestly nobody really uses (e ->)'s Monad or Functor instance
+<jusss> jle`: I know how to implement it, I don't understand why it's look
+        like that and what is it used for
+<jle`> except in rare situations, and it's usually always more readable to
+       pass values normally
+<edwardk> jle`: i use the monad a lot actually
+<jle`> jusss: well, one answer to "why it looks like that" is...that's the
+       only way that will typecheck :)
+<edwardk> :t join (,)
+<lambdabot> b -> (b, b)
+<juliusdeane> (e->) still works like a data constructor, it just looks wacky
+                                                                        [12:11]
+<jle`> is join (,) really more readable than \x -> (x,x) ?
+<edwardk> atomicModifyIORef foo $ join (,) . what i want to do to the foo
+<edwardk> jle' now i don't have to name the temporary variables on either side
+<edwardk> because that is a lot shorter than
+<jusss> juliusdeane: jle` but (e->) is not like Maybe or List,
+<jle`> you're shifting the cost from write-time to read-time
+<jle`> jusss: that is also true
+<edwardk> atomicModifyIORef $ \x -> let y = something complicated x in (y,y)
+<jusss> Maybe or List are simple to image, like a wrapper or container
+        whatever
+<jusss> but functions're not                                            [12:12]
+<juliusdeane> Think of (->) as an infix constructor
+<jle`> it's difficult to imagine functions?
+
+<jusss> jle`: no, it's difficult to put function in those pattern like bind
+<edwardk> i mostly use it for the atomicModifyIORef case
+<jusss> fmap is ok, but bind or >=>                                     [12:13]
+
+<jusss> put function in bind, like the monad you all called Reader Monad,
+        that's not easy to understand, I don't understand what it's used for,
+        what situation it would be help with which form, 
+<juliusdeane> jusss it's easier to use (->) like a prefix constructor and then
+              give it a normal name like `Arrow` in your head           [12:14]
+<edwardk> the functor for ((->) e) matters for a bunch of things like the
+          existence of setters in lens, it pretty much is the reason why
+          linear can exist, because every monad i offer in there is isomorphic
+          to reader for some basis.
+<juliusdeane> So a -> b becomes Arrow a b
+<jusss> juliusdeane: I wonder why (e->) is monad, and what `return` would like 
+<jle`> jusss: edwardk's suggestion with something like join (,) was that you
+       just use it as a useful utility function, without worrying about the
+       fact that it is a monad
+<jle`> for example, `join (,)` is the same as \x -> (x,x)
+<jle`> and it's useful to have \x -> (x, x)                             [12:15]
+<juliusdeane> jusss There's lots of blog posts all about the (->) monad
+<edwardk> jusss: join for (->) e isn't that bad. try to write it.
+<edwardk> (e -> e -> a) -> e -> a
+<jle`> jusss: it's just useful exactly because of what it does
+<jle`> there is no 'deeper' reason
+<jusss> I don't know how to construct this monadic function
+<jle`> i think you might be trying to find a deeper reason than there actually
+       is
+<edwardk> you are given a function that needs 2 e's give you an a    and an e,
+          you have no way to combine or manipulate the e so you have to pass
+          it through unmolested
+<jle`> don't construct it as a 'monadic function'
+<jle`> just write a function (e -> e -> a) -> e -> a
+<jle`> in the end, (e -> e -> a) -> e -> a is a useful function to have
+<jusss> f >=> g     = \x -> f x >>= g    so this monadic function f, how to
+        construct one?                                                  [12:16]
+<edwardk> @djinn (e -> e -> a) -> e -> a
+<lambdabot> f a b = a b b
+<jusss> f take a normal value and return a function
+<jle`> jusss: for (>=>) and (e ->), the type is (a -> e -> b)
+<jle`> jusss: that's just any two-argument function
+<jusss> when monad is [], we know `return` would like [a]
+<jle`> there are several in base that you can use
+<jle`> one famous one is (+)
+<jle`> another famous one is (,)
+<jle`> in general you can write one as \x y -> ..., using lambda syntax, too
+                                                                        [12:17]
+<jusss> and monad is Promise, `return` like _ => new Promise.resolve(_)
+<edwardk> > join (+) 2
+<lambdabot>  4
+<edwardk> > join (*) 5
+<lambdabot>  25
+<edwardk> > join (-) 4 -- =)
+<lambdabot>  0
+<jle`> jusss: for (f >=> g) for the (e ->) monad instance, f is just any
+       function (a -> e -> b).  there are bunches of these :)
+<jle`> jusss: are you familiar with how to define functions?
+<jle`> myFunc x y = x * y + 2, for example                              [12:18]
+<edwardk> (>=>) :: Monad m => (a -> m b) -> (b -> m c) -> a -> m c
+<jusss> jle`: wait a sec, you mean binary functions are monadic function?
+<edwardk> when m = (e ->)
+<edwardk> we get
+
+<jle`> jusss: look at the type of a -> (e -> b)
+<jle`> jusss: that's just the type of a binary function
+<edwardk> (>=>) :: (a -> e -> b) -> (b -> e -> c) -> a -> e -> c        [12:19]
+<jle`> the (a -> m b), where m ~ (e ->), is just a -> e -> b
+
+<jusss> jle`: but I think it's a unary function
+<jusss> jle`: it take a value and return a function value
+<jle`> that's what a binary function is in haskell
+<jle`> all binary functions in haskell are like that :)
+<jle`> look at the type of (+):
+<jle`> (+) :: Int -> (Int -> Int)
+<edwardk> in english 'if you know how to turn an a into a b with the help of
+          an e, and know how to turn b into c with the help of an e, you can
+          turn a into c with the help of an e.
+<Axman6> All functions take one argument
+<Axman6> never forget
+
+<jle`> jusss: a -> (e -> b) is equivalent to a -> e -> b
+<jle`> just because that's how -> associates
+<jusss> edwardk: so "<edwardk> (>=>) :: (a -> e -> b) -> (b -> e -> c) -> a ->
+        e -> c" means >=> take two binary functions and return one binary
+        functions ?                                                     [12:21]
+
+<jle`> you can think about it as taking two binary functions and returning a
+       binary function
+<jle`> (a -> e -> b) -> (b -> e -> c) -> (a -> e -> c)
+<jusss> and this >>= :: (e->a) -> (a -> (e->b)) -> (e->b)  it means >>= take a
+        unary function and a binary function then return a unary function?
+                                                                        [12:22]
+<jle`> jusss: do you see how (a -> m b) turns into (a -> e -> b) when we set m
+       ~ (e ->) ?
+<jusss> jle`: I see
+<edwardk> jusss: effectively, yes.
+<jusss> jle`: 'cause m is (e->)
+<jle`> yeah. follow the types :)
+<jle`> earlier you asked how to construct the 'f'.  to do it, just look at the
+       type, (a -> e -> b), and look back in your memory if you ever learned a
+       way to construct an (a -> e -> b)                                [12:23]
+<jle`> :t ((+) >>=)
+<lambdabot> Num a => ((a -> a) -> a -> b) -> a -> b
+
+<jle`> oops
+<jusss> wait a sec, this is really change my mind,   'cause think (a->(e->b))
+        as a binary function
+<jle`> :t ((+) >=>)
+<lambdabot> Num b => (b -> b -> c) -> b -> b -> c
+<jle`> jusss: right, there are many ways to think of an a -> (e -> b)
+
+<Axman6> jle`: strictly, in Haskell there is no such thing as a binary
+         function. _all functions take one argument_ __always__         [12:25]
+<Axman6> UH, jusss
+<Axman6> I will assume jle` already knows this
+<jle`> i don't mind hearing it again :)
+
+<Axman6> ____always____
+                                                                        [12:26]
+<jusss> so (+) is the (a->e->b)
+<jle`> in fact, a -> e -> b might even be a "trinary function", if b is a
+       function type
+<Axman6> (+) is a -> (a -> a)
+
+<jle`> > ((+) >=> (+)) 3
+<lambdabot>  <Integer -> Integer>
+<jle`> > (((+) >=> (+)) 3) 10
+<lambdabot>  23
+<jle`> that was less helpful than i had imagined                        [12:27]
+<jusss> jle`: wait a sec, how this >=> works in this example?
+<jusss> this is really change my mind about the pattern of monad, think
+        (a->e->b) as a binary function                                  [12:28]
+<jle`> it's basically "plus ten" twice
+
+<jle`> so 10 becomes the first argument to (+), it becomes:
+<jle`> (10 +) ((10 +) 3)                                                [12:29]
+
+<jle`> if we use useful names like f and g, we'd get
+
+<jle`> ((f >=> g) 3) 10  ==> g 10 (f 10 3)
+
+<Axman6> imagine 10 is some configuration both f and g need to access. now ou
+         have a way to pass that config to both of them without having to do
+         it explicitly                                                  [12:31]
+<jle`> and also remember that nobody really ever uses (>=>) for functions
+
+<jle`> so if this is puzzling you...know it would puzzle most haskellers as
+       well :P
+<Axman6> but they do for Reader, which is just a newtype over functions which
+         all need the same config                                       [12:32]
+<Axman6> @src Reader
+<lambdabot> type Reader r = ReaderT r Identity
+<lambdabot> --OR
+<lambdabot> data Reader r a = Reader { runReader :: r -> a }
+<jle`> i have never in my life seen anyone use Reader
+<jle`> but a lot of people do use ReaderT :)
+<jusss> Axman6: wait a sec, in "<jle`> ((f >=> g) 3) 10  ==> g 10 (f 10 3)"
+        yes, we pass 10 to f and g both, but why g still need f's result ?
+
+<jle`> the only time Reader ever is relevant is in teaching examples
+<Axman6> There's a spiderman pointer at spiderman meme to be had here...
+<jackdk> reader is good practice when teaching someone by helping him or her
+         write out the instances. Though it's probably better to use (->) r
+         for that
+<jle`> jusss: that's just what >=> does
+<jackdk> as in good-as-practice, not "good practice"
+<jle`> that's like saying "why does (+) add two numbers together?"
+<Axman6> :t (>=>)
+<lambdabot> Monad m => (a -> m b) -> (b -> m c) -> a -> m c
+
+<jusss> is there another example for Reader Monad?
+<jle`> jusss: f >=> g is function composition, so you're eventually passing
+       the result of f to the result of g
+<jusss> pass value to two functions?
+<jle`> try implementing join
+<Axman6> :t join                                                        [12:36]
+<lambdabot> Monad m => m (m a) -> m a
+<jusss> join (Just (Just x)) = Just x
+<jle`> right, but join for (-> e)
+<Axman6> :t join @((->) r)
+<jle`> joinFunc :: (e -> e -> a) -> (e -> a)
+<lambdabot> error: parse error on input ‘->’
+<MarcelineVQ> % :t join @((->) _) -- Axman6
+<yahb> MarcelineVQ: (w -> w -> a) -> w -> a
+
+<Axman6> <3
+<MarcelineVQ> @((->) _) isn't the most clear thing to a learner tho
+<lambdabot> Unknown command, try @list
+<MarcelineVQ> @botsnack
+<lambdabot> :)
+<jusss> this one I can't, 'cause we only can get the output by apply it on f
+                                                                        [12:38]
+<jusss> join:: m(m a) -> ma
+
+<jusss> if f:: m(m a),  we must f(x) get m a
+<jusss> make something apply on f                                       [12:39]
+
+<jusss> jle`: how you implement this ? when (e->) is m in join          [12:40]
+<MarcelineVQ> jusss: jle is asking you to write joinFunc :: (e -> e -> a) ->
+              (e -> a)
+<jle`> jusss: plug in (e ->) for m, the same way you just did before    [12:41]
+<jle`> join :: m (m a) -> m a
+
+<jle`> join :: (e ->) ((e ->) a) -> (e ->) a
+<jle`> join :: (e -> (e -> a)) -> (e -> a)
+
+<jusss> I know it's look like join take a binary function and return a unary
+        function, but hey, this is a function , not like List or Maybe that
+        container is not changed , 
+<Axman6> join e2e2a = ...
+<jusss> [a] and Just a, that [] and Just are not changed, but not same for
+        functions                                                       [12:43]
+
+<jle`> try writing it out
+<jle`> join f = ....
+<Axman6> jusss: if you have a function which takes two arguments, both of the
+         same type, and you have one of those things, can you fet that
+         function to return its result?
+
+<jle`> note the type is join :: (e -> e -> a) -> e -> a
+<jle`> so you can start out:
+<jle`> `join f x = ....`
+
+<Axman6> if I have f :: Int -> Int -> String, and I have x = 4 :: Int, can you
+         give me a String?
+
+<jle`> you want an 'a' as the result, right?  and you have an 'e' and an 'e ->
+       e -> a'
+
+<jusss> f:: e->e->a,   and f e:: e->a  so join f ... wait a sec , let me think
+<jusss> I'm not sure the paremeter of join now                          [12:46]
+<jusss> f x or  f x y or f x y z
+<jle`> `join f x = ???`
+<jle`> right, giving x to f gives you an e -> a
+<jle`> and you want an 'a' as a final result
+<Axman6> jle`: you are join, I have given you f :: Int -> Int -> String, and x
+         = 7, please give me a String
+<jusss> but that x is e->a
+<jusss> no                                                              [12:47]
+<jle`> jusss: no, that x is e :)
+<Axman6> no, that x is e
+<jusss> and f x is e->a
+<Axman6> @quote stereo
+<lambdabot> monochrom says: Welcome to #haskell, where @remember's are in
+            majestic stereo!
+<jle`> look at the type of join -- join :: (e -> e -> a) -> e -> a
+<jle`> right, `f x :: e -> a`
+<jle`> but you want an 'a' in the end
+<jusss> join f = f x
+<jle`> so, riddle me this:
+<jle`> if you have an 'e -> a'
+<jle`> and you have an 'e'
+<jle`> how do you get an 'a' ?
+<Axman6> join f e = ...                                                 [12:48]
+<jusss> but x is not in the left =
+<jusss> wait a sec,  what yours f::?
+<jle`> yes it is. witness:
+<Axman6> look at the type: join :: (e -> e -> a) -> e -> a
+
+<jle`>   `join f x = ....`
+<jle`> the x here is on the left hand side of the =, as opposed to the right
+       hand side
+<jusss> jle`: what's your f 's type?
+<jle`> (e -> e -> a)
+<Axman6> join f returns a function of type e -> a
+<jle`> jusss: i also wrote this a few times, but:
+<jle`> the type of join is (e -> e -> a) -> e -> a                      [12:49]
+<jle`> so the first argument is (e -> e -> a), and the second argument is e
+<jusss> jle`: but if f:: e->e->a and x:e  so join f = f x,
+<jusss> and x can not be right if it's not in the left
+<jusss> so this is confilicted
+<jle`> right, good thing it's on the left                               [12:50]
+<jle`> join f x = ...
+<jle`> see, it is on the left :)
+<jusss> jle`: that would be join f x = f x x
+<Axman6> join f = \x -> ...
+<jle`> hooray :D
+<Axman6> ues!
+<Axman6> yes*
+<jusss> based on point-free or whatever-expanse or expand?              [12:51]
+<jusss> I don't know the name, put the same symbol both on the side of =
+<Axman6> so... the pointfree implementation of join f x = f x x is... join
+                                                                        [12:52]
+<jusss> so I'm think wrong
+<jusss> a x = \x -> a
+
+<jusss> I know what you means
+<jusss> join f = \x -> f x                                              [12:54]
+<jusss> we give f a x to get f's result 
+<jusss> but still I don't know why this lambda can do this, 'cause x is not
+        showing in the left of = and we can use it on the right part of =
+                                                                        [12:55]
+<jle`> join f = (\x -> f x x)
+
+<jle`> you can think of (\x -> f x x) as its own expression
+
+<jle`> it's a self-contained lambda expression
+
+<jusss> jle`: wait a sec, join f= \x -> f x x is right? not \x -> f x?
+
+<jle`> right, because giving x to f is (e -> a)
+<jle`> so you need to give x again to the (e -> a) to get the 'a'
+
+<jusss> jle`: join f x = f x x, is right?                               [12:58]
+
+<jle`> yes
+<jle`> remember that myFunc x = ... is just sguar for myFunc = \x -> ...
+
+<jle`> so join f x = f x x is sugar for join f = \x -> f x x
+<jusss> jle`: but apply one parameter on same function twice is really weird,
+        not just join, bind and >=> too                                 [12:59]
+<jusss> they all apply twice
+<jle`> is that something you think is weird?
+<jle`> you might be bringing in some preconceived notions of weirdness to the
+       table :)                                                         [13:00]
+<jusss> in other languages, we may do f(g(x)) , 
+<jusss> but not f(g(x), x)
+<jle`> have you ever went out on the street and ask people for the easiest
+       'arithmetic question' they know?
+<jle`> usually they will give you 1 + 1
+<jle`> or 2 + 2
+<jle`> applying the same value to a function twice is pretty normal :)  [13:01]
+<jle`> jusss: you do f(g(x), x), sometimes. not all the time
+<jle`> you aren't going to be doing f(g(x), x) for every function
+<jle`> but sometimes, you do do it
+<jusss> jle`: I don't remember I did this in other function programming, like
+        js or python or scheme
+<jusss> what the situation I would do that?                             [13:02]
+<jle`> that's because you haven't needed it, right?
+<jusss> yeah, I haven't needed it and I haven't seen it yet
+<jle`> so, you rarely need it here, too
+<jle`> just because it *exists* doesn't mean that it's *useful*
+
+<jle`> you seem to think that because (>=>) *exists* for functions, it means
+       that it's *useful*
+<jle`> but, it doesn't
+
+<jle`> maybe your problem is that you are looking at (>=>) and asking "why is
+       this function useful for (e ->)? i have enver used it before"    [13:03]
+<jusss> I thought that >=> and Reader Monad are useful, 'cause they're
+        functions
+<jle`> functions are useful
+<jusss> and functions are everywhere 
+<jle`> but not every function combinator is useful
+<jusss> they must be made for something
+<jle`> nobody made (>=>) for Reader
+<jusss> something I haven't met
+<jle`> they made it for Maybe, [], etc.
+<jle`> we get (>=>) for Reader as a mistake, an accident
+<jle`> it was never meant to be used for Reader. it was meant to be used for
+       other monads                                                     [13:04]
+
+<jusss> jle`: I mean bind pattern for Reader, and >=> for monadic values
+<jusss> jle`: for example, Maybe can use for nullable detect, and Either can
+        do some part of if-else(not all)                                [13:05]
+<jle`> i even mentioned earlier that pretty much nobody ever uses Reader
+<jle`> just because it *exists* doesn't mean that it's *useful* :)      [13:06]
+
+<jusss> so I thought that Reader should be used for something too, and I don't
+        know that what is that yet
+<jle`> you're out of luck, i'm afraid
+<jusss> I hope I can understand them                                    [13:07]
+<jle`> it looks like you do understand them already :) 
+<jle`> but you might be stuck on finding a useful situation to use them
+
+<jusss> that's right
+<jle`> that part, i can tell you now, you won't really find
+<jle`> just because the monad instance exists doesn't mean that it's useful
+
+<jle`> also note that you might be giving 'Monad' a little bit more importance
+       than it's due
+<jle`> monad is only one small aspect of a type's interface
+<jle`> usually it's maybe like 5% of what makes that type useful
+<jusss> but all the articles said how them're important , how they changed
+        something like corotine
+<jle`> i made that number up, but it's probably lower :)
+<jle`> maybe those articles were trying to sell you something. save your
+       credit card number :)                                            [13:09]
+
+<jusss> people are selling Functional Programming at every languages now
+                                                                        [13:10]
+<jle`> functional programming is useful
+<jle`> "the Monad instance for (->)" is much much much much less useful
+<jusss> jle`: about free monad, they said it can seal the side effect   [13:11]
+<jle`> that's a property about the free monad
+<jle`> that doesn't have to do with the specific Monad instance for Reader
+<Axman6> monads are important because they are very simple, extremely general
+         and very widely applicable to many problems.
+<jusss> but Reader is a special case for me
+<Axman6> they're important because people use them all the time in all
+         languages but don't know it
+<Axman6> it's no more special than State                                [13:12]
+<jle`> jusss: yes, Reader is an uninteresting special case
+
+<jle`> jusss: here's an analogy: let's say somebody just invented the first
+       ever car.  it's a great invention that can take you from city to city,
+       for a very low cost
+
+<jle`> you buy a car, and you look at it and say you want to learn how to
+       drive it
+<jle`> you look at a screw on the dashboard
+<jle`> "this screw cannot take me anywhere. but i will spend ten years
+       studying it"                                                     [13:13]
+
+<c_wraith> the only thing that makes reader special is that its Monad
+           interface doesn't actually give more power than its Applicative
+           interface.
+<jle`> you are only looking at a very small part of functional
+       programming. and furthermore, it is a specific part that is not useful
+       at all
+
+<jle`> so, what if someone comes up to you and says, "this screw on my
+       dashboard is not very useful.  but, i have heard that cars are useful.
+       what is the deal?"
+<jusss> I'm attracted by this special thing                             [13:14]
+
+<jle`> yes, it is okay to be attracted to it
+<jle`> but just be aware that it is not useful
+<Axman6> c_wraith: slightly mindblown. I had noticed that but never put into
+         words
+<jle`> this is the nature of life, in a way
+<jusss> fine
+
+<jusss> I hope one day I can find the useful way for it                 [13:15]
+<jle`> yes, you are attracted to it. that's a good thing, and a lot of us here
+       share your fascination
+<jle`> but, we also know that it is a more or less useless thing
+<Axman6> spark plugs are pretty cool though
+
+<jle`> jusss: so yes, functional programming is useful. functions are
+       useful. but this is not. and that's ok                           [13:16]
+<c_wraith> jusss: it comes up sometimes.  Sometimes you have a function with
+           the right shape and realize that you can use Reader to pass extra
+           arguments.
+<jusss> special but useless...
+<Axman6> jusss: Reader by itself isn't very useful, but ReaderT gets used all
+         the time in applications which need to pass configuration around to
+         many different components
+<jle`> just because functional programming is useful doesn't mean that every
+       single minute function that exists ever, will be useful
+<c_wraith> jusss: and that is fun!
+
+<jle`> functional programming is about finding the useful functions, and using
+       those :)
+<jle`> it isn't about making all functions useful                       [13:17]
+<Axman6> @remember jle`: functional programming is about finding the useful
+         functions, and using those.  it isn't about making all functions
+         useful.
+<lambdabot> Good to know.
+<dibblego> but Reader is useful
+<jle`> the problem was more that they believed that every single possible
+       monad combinator in Control.Monad, as applied to Reader, must be
+       generally useful
+<jle`> or else it wouldn't have been included in Control.Monad          [14:03]
+<jle`> generally useful as in, (>=>) for Reader would be something that is
+       useful enough to use all the time
+
+<Axman6> jusss: if you're still around, you might find dibblego's somewhat
+         enlightening. It helped me a lot to stop thinking about what classes
+         mean and focus on what the types mean:
+         https://blog.tmorris.net/posts/20-intermediate-haskell-exercises/
+                                                                        [14:08]
+<Axman6> uh, dibblego's 20 intermediate haskell exercises*
+<Axman6> is that really 11 year old D: jesus
+#####################################################
+
+composeM, Kleisli compose,
+(<=<) :: Monad m => (b -> m c) -> (a -> m b) -> (a -> m c)
+(.)   ::            (b ->   c) -> (a ->   b) -> (a ->   c)
+
+https://elvishjerricco.github.io/2016/10/12/kleisli-functors.html
+
+compose two Promise Monad in js
+
+<jusss> f >=> g     = \x -> f x >>= g                                   [10:22]
+<jusss> (<=<) = flip (>=>)                                              [10:23]
+
+https://downloads.haskell.org/~ghc/8.6.1/docs/html/libraries/base-4.12.0.0/src/Control-Monad.html#%3C%3D%3C
+
+<jusss> 而根据lambda在haskell里的结合顺序，其实 f >=> g = \x -> (f x >>= g)
+                                                                        [10:28]
+<jusss> kalxd[m]: 但这个 f x的返回值不可能是个普通值吧？ 因为后面是>>=g, 所以
+        (f x)返回的必须是个monadic value                                [10:30]
+<jusss> 假如f和g都是函数， (f x)返回的也必须是个函数
+<kalxd[m]> f的类型是a -> m b，说得很明白了！                            [10:33]
+
+##################################################
 
 if you put xmlns:and="http://schemas.android.com/apk/res/android" you would be able to use and: instead android:
 
