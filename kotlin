@@ -1,3 +1,91 @@
+
+
+// update UI in coroutines, without runOnUiThread in Thread
+
+package com.example.myapplicationpp
+
+import android.support.v7.app.AppCompatActivity
+import android.os.Bundle
+import android.support.v7.app.AppCompatViewInflater
+import android.view.View
+import android.widget.TextView
+import android.widget.Toast
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.w3c.dom.Text
+
+class MainActivity : AppCompatActivity() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+
+    }
+
+    fun test(view: View) {
+        GlobalScope.launch {
+            withContext(Dispatchers.Main) {
+                val im = findViewById<TextView>(R.id.text1)
+                im.text = "what".toString()
+
+            }
+
+        }
+    }
+}
+
+
+///////////////////////////////////////////////////////////
+
+sudo pacman -S intellij-idea-community-edition
+then run `idea`
+it can install android plugin
+
+1. click run, pop up configuration, no module, install gradle
+2. v7 not resloved, classpath not resolved android.support.v7.app.compat whatever
+https://stackoverflow.com/questions/18025942/how-do-i-add-a-library-android-support-v7-appcompat-in-intellij-idea/18026612#18026612
+make sure you sdk api is installed, like api 27, and your project is android, 5.0 make it relate with the right api level,
+and then in build.gradle's dependencies 
+    
+    compile 'com.android.support:appcompat-v7:+'
+
+or
+
+implementation 'com.android.support:appcompat-v7:27.1.1'
+
+I. create a new project with android 5.0 api 21
+II. make sure api 21 is fully insstalled, not patially installed
+III. in MyApplication/app/build.gradle
+dependencies{
+    implementation 'com.android.support:appcompat-v7:+'
+}
+      
+
+/////////////////////////
+
+kotlinx.coroutines
+
+// don't need the result
+GlobalScope.launch {
+    delay(1000)
+    ...
+}
+
+// need the result
+// async {} will return an instance of Deferred<T>, which has an await() function that returns the result of the coroutine
+
+val deferred = GlobalScope.async { ... }
+val sum = deferred.await()
+
+
+
+
+
+//////////////////////////////////////
+
 kotlinc is a repl on linux
 
 jvm, javascript and native
