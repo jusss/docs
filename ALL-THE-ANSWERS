@@ -1,3 +1,18 @@
+
+
+join = concat -- []
+join f = \x -> f x x -- (e ->)
+join f = \s -> let (f', s') = f s in f' s' -- State
+join (Just (Just a)) = Just a; join _ = Nothing -- Maybe
+join (Identity (Identity a)) = Identity a -- Identity
+join (Right (Right a)) = Right a; join (Right (Left e)) = Left e; 
+                                  join (Left e) = Left e -- Either
+join ((a, m), m') = (a, m' `mappend` m) -- Writer
+join f = \k -> f (\f' -> f' k) -- Cont
+
+https://stackoverflow.com/questions/11234632/monads-with-join-instead-of-bind
+##########################################
+
 do notation, reader monad, share state, create new variable and store value and pass
 but only in this bind chain expression
 
