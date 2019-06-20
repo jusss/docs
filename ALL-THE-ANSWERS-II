@@ -1,3 +1,770 @@
+
+
+type variables for parameter polymorphism, different types with same behavior, the behavior don't depend on the type
+typeclass for behavior polymorphism, different types with different behaviors, the behavior depend on the type
+
+
+polymorphic in python haskell and kotlin
+
+def f(x):
+    if isinstance(x, int):
+        return x+1
+     if isinstance(x, str):
+        return x[::-1]
+
+in haskell, we have pattern matching to do that
+
+f :: Either Int String -> Either Int String
+
+f (Left x) = Left (x+1)
+
+f (Right x) = Right (reverse x)
+
+in kotlin, use overload method, functions have same names but different parameters
+
+fun getValue(id: Int): Any { ... } 
+
+fun process(value: Int) { ... } 
+fun process(value: String) { ... }
+val value = getValue(valueId)
+ when (value) { 
+is Int -> process(value)
+is String -> process(value)
+else -> ... }
+
+https://stackoverflow.com/questions/56680581/how-to-create-a-type-that-may-contain-int-or-string?noredirect=1#comment99929450_56680581
+
+
+<__monty__> jusss: Most common way to have function implementation depend on
+            the type of the value they're applied to is through
+            typeclasses. `class X a where f :: a -> a; instance X Int where f
+            = (+1); instance X String where f = reverse` then you can do both
+            `f 4` and `f "abc"`.                                        [16:25]
+
+
+
+
+#################################################
+
+how to create a type that contain Int or String?
+use Either Int String,  so Left 3 has Either Int String, Right "3" has Either Int String
+we can pass it, and it may contain Int or String
+
+<jusss>  data T = Either Int String;   f :: T -> T;   f x = x;   f (Left 3)
+        got an error , why?                                             [13:36]
+<jle`> defines a new data type T        
+<jle`> with a single data constructor, 'Either'
+<jusss> jle`: oh, my fault, I should use Either on the right side
+<jusss> without a value constructor
+<jle`> fwiw this is a pretty confusing data type constructor, because 'Either'
+       is commonly used as a type name from Prelude
+<jusss> jle`: I should just use f :: Either Int String -> Either Int String
+<jle`> if that's what you want :)                                       [13:39]
+<jle`> that'd be a very different type, yeah
+<jle`> but the only person who really knows what you want is you, yourself. so
+       search inside your heart :)
+<jusss> jle`: I want the either type, 'cause I'm not sure which type the
+        paramter is
+<jusss>  ff :: (Either Int String) -> (Either Int String);  ff x = x;   ff
+        (Left 3);  ff (Right "3")
+
+and we still can get 3 from (Left 3) by
+f (Left x) = x
+
+it's about polymorphic, for example,
+f(x) if x is String, then make reverse x and return it,
+if x is Int, then plus one and return it
+
+
+f :: Either Int String -> Either Int String
+f (Left x) = Left (x+1)
+f (Right x) = Right (reverse x)
+
+g :: Either a a -> a
+g (Left x) = x
+g (Right x) = x
+
+the right way:
+
+<__monty__> jusss: Most common way to have function implementation depend on
+            the type of the value they're applied to is through
+            typeclasses. `class X a where f :: a -> a; instance X Int where f
+            = (+1); instance X String where f = reverse` then you can do both
+            `f 4` and `f "abc"`.                                        [16:25]
+
+
+
+<jusss> how to know a value's type?                                     [15:37]
+<jusss> like python, we can use isinstance(x, int) to know if x has int type
+                                                                        [15:38]
+<jusss> if x has  Either Int String, so how we know x is Left a or Right b ?
+                                                                        [15:39]
+<winny> Interactively you can use :t , but since haskell is statically typed,
+        you know types at compile time
+<winny> https://wiki.haskell.org/Algebraic_data_type                    [15:40]
+
+<ski> jusss : "how we know x is Left a or Right b ?" -- pattern-matching. but
+      that is not knowing type
+<jusss> winny: I want to write a function, and its parameter has Either Int
+        String,  if it's Left a then return Left (a+1), if it's Right b then
+        return Right b
+<ski>   foo :: Either Int String -> ...
+<ski>   foo (Left  n) = ..n..                                           [15:41]
+<ski>   foo (Right s) = ..s..
+<ski> that's pattern-matching
+<jusss> ski: aha, I see
+<ski> you're checking which "shape" the input has. that is not checking its
+      type                                                              [15:42]
+<jusss> we don't need to check the type of parameter, 'cause we have pattern
+        matching!
+
+<jusss> ski: another silly question, how we can reverse a string?
+<jusss> "ab" to "ba"
+<ski> > reverse "ab"                                                    [15:43]
+<lambdabot>  "ba"
+<jusss> ...
+<ski> or are you asking about how that is implemented ?
+<jusss> no
+
+<ski> `String's are lists of `Char'acters, in Haskell. this is sometimes not
+      so good for performance, but it means that general list operations will
+      also work on strings
+
+<ski> > ['a','b']                                                       [15:45]
+
+<lambdabot>  "ab"
+<winny> :t "abc"
+<lambdabot> [Char]
+
+<erikd> __monty__: fixed it. "instance (KnownNat i, KnownNat o, KnownNat (i +
+        o), (i <= (i + o)) ~ 'True"                                     [15:49]
+
+<__monty__> I didn't know addition and constraints on values was allowed, TIL.
+                                                                        [15:50]
+<fuzzy_id> i'm trying to run a haskell exec on aws lambda and use HTTP to
+           fetch the next invocation id.
+<fuzzy_id> in the logs i see 'c_poll: permission denied (Operation not
+           permitted)' and later 'ioManagerDie: write: Bad file descriptor'
+<jusss> ski: about polymorphic, we can return any type in dynamic languages
+        like python or javascript, and can we return any type in static
+        languages?
+<fuzzy_id> any ideas what this is and how to work around this?          [15:51]
+<fuzzy_id> (i mean the HTTP library…)
+                                                                        [15:52]
+<erikd> fuzzy_id: c_poll is not the HTTP library, its the haskell runtime
+        system
+
+<fuzzy_id> yeah                                                         [15:53]
+<__monty__> jusss: You can return any type you want from a function of
+            course. But you can't have that type depend on the values of the
+            parameters. Oftentimes Either is enough though, like your Either
+            Int String example.
+<ski> jusss : the question doesn't make sense to me                     [15:54]
+
+<ski> jusss : you can write e.g. `id :: a -> a; id x = x'. then `id' can
+      return a value of any type you like (provided you call it with a value
+      of that type) ..
+<ski> .. but i suspect that's not what you meant
+
+<ski> (instead of `id', you could take `(!!) :: [a] -> Int -> a', or other
+      functions, if you want something less trivial)
+<erikd> or "read :: Read s => String -> a"                              [15:57]
+* ski nods
+
+<erikd> (even though i screwed up the type var names)
+<ski> (also, nitpick. you don't return types from function. you return value,
+      which belong to types)
+<ski> @type read
+<lambdabot> Read a => String -> a
+<jusss> f = lambda x: x+1 if isinstance(x, int) else ( x[::-1]  if
+        isinstance(x, str))
+<jusss> f(3) get 4, and f("ab") get "ba", polymorphic
+<ski> and `f("abc")' ?                                                  [16:03]
+<jusss> "cba"
+<ski> you can do that, if you *really* want to
+<ski> but why would you want to ?
+
+<merijn> The solution to wanting that is to stop wanting bad things
+<jusss> we already have f :: Either Int String -> Either Int String ; f (Left
+        x) = Left (x+1) ; f (Right x) = Right (reverse x)               [16:04]
+
+<jusss> how to implement a function that take x from Left x or Right x?
+                                                                        [16:05]
+
+<jusss> 'cause x in Left x is Int, and in Right x is Str, so that one function
+        may return two type
+
+<Rembane> jusss: There's either from Data.Either IIRC.
+<Rembane> :t either
+<lambdabot> (a -> c) -> (b -> c) -> Either a b -> c
+
+<ski> > nonsense 3                                                      [16:07]
+<lambdabot>  4
+<ski> > nonsense "abc"
+<lambdabot>  "cba"
+<ski> jusss : happy ?
+<jusss> ski: yeah                                                       [16:08]
+
+<ski> @type either id id
+
+<lambdabot> Either c c -> c
+<jusss> @type nonsense
+<lambdabot> Typeable a => a -> a
+<jusss> I don't understand how your nonsense did that                   [16:13]
+<merijn> Via Typeable, which is basically a short way of saying "I absolutely
+         hate knowing what my code does before I run it", so at least it's a
+         good match if you like Python                                  [16:14]
+                                                                        [16:20]
+<jusss>  f::Either a a -> a ; f (Left x) = x ; f (Right x) = x  
+
+<ski> that's the same as `either id id', yes                            [16:21]
+
+<__monty__> jusss: Most common way to have function implementation depend on
+            the type of the value they're applied to is through
+            typeclasses. `class X a where f :: a -> a; instance X Int where f
+            = (+1); instance X String where f = reverse` then you can do both
+            `f 4` and `f "abc"`.                                        [16:25]
+
+<__monty__> Hmm, that's not quite true, I guess the most common way is
+            parametric polymorphism. But that doesn't get you what you want.
+<jusss> and polymorphic result                                          [16:27]
+
+<lortabac> jusss: it depends on what you mean by "polymorphic result". When
+           you have a signature 'a -> a', the return type must be the same as
+           the argument type                                            [16:32]
+<lortabac> jusss: if you want the return type to depend on the argument type,
+           you need more advanced stuff like associated types or functional
+           dependencies
+<__monty__> jusss: Read does this kind of. It's just that it infers the type
+            *first* and then picks the right implementation of `read :: String
+            -> InferredType`, rather than looking at the *value* and
+            determining what that type should be.                       [16:34]
+<jusss> ok                                                              [16:36]
+
+<__monty__> jusss: Do note that even though this all may sound constricting to
+            a pythonista there's generally good reasons for the limitations.
+                                                                        [16:42]
+                                                                        [16:44]
+<ski> jusss : `id' is polymorphic, its result is not
+<jusss> __monty__: ski I love type variables, I love polymorphic, but I'm
+        still not good at it                                            [16:46]
+<__monty__> ski: Though its result *could* be, right?                   [16:47]
+<tdammers> it is a limitation, but the trick is that by constraining what we
+           allow ourselves (and the compiler) to do, we free ourselves from
+           having to take a million things into account that we would never
+           want to occur in the first plcae
+<jusss> did type limite your image?                                     [16:48]
+<jusss> or may?
+<ski> __monty__ : with `ImpredicativeTypes', sure
+<merijn> Friends don't let friends use -XImpredicativeTypes             [16:50]
+<ski> constraining the implementor can mean giving more power to the user, and
+      vice versa
+<__monty__> ski: Hmm, I was talking about `id id` not familiar with
+            impredicative types.
+<ski> __monty__ : that's another thing
+<merijn> That extension should really be deprecated and/or produce a HUGE ass
+         warning
+<ski> __monty__ : in that case, conceptually, the result returned by the `id'
+      call is still not polymorphic
+<__monty__> But it would be if ImpredicativeTypes was enabled?
+<ski> both `id's are specialized to be monomorphic (as always with polymorphic
+      values, except when there's higher-rank stuff going on). the first one
+      having type `(_a -> _a) -> _a -> _a', the second having type `_a -> _a',
+      so that the result has type `_a -> _a' .. then, depending on the context
+      in which you use this result, either `_a' will be instantiated to some
+      specifi type, like `Integer', or it would be generalized upon, so that
+      e.g. the result gets assigned                                     [16:54]
+
+<ski> (hrm, possible cut off near ".., or it would be generalized upon, so
+      that e.g. the result gets assigned type `forall a. a -> a'")
+<ski> __monty__ : it could be, at least                                 [16:55]
+
+<__monty__> Hmm, does this mean `polyId = id id` would retain the
+            polymorphism?
+<__monty__> And would it still be lost if we'd dare use polyId?
+ERC> 
+
+
+#############################################
+
+c.kt
+package c // used for imported in other files
+class C<T>(v:T) {
+    val vv = v
+}
+fun  add(x:C<Int>, y:C<Int>):Int{
+    return x.vv + y.vv
+}
+fun <T> another(x: C<T>):T{
+   return x.vv
+}
+fun main() {
+    val w = C<Int>(3)
+    val y = C<Int>(7)
+    println(add(w,y))
+    println(another(C<String>("aha")))
+}
+
+###################################################
+
+fun <T,U> fun_name(x: T, y: U, z: A<T>, a: <T,U>) {...}
+
+<T,U> before the function's name is called type parameters,
+https://stackoverflow.com/questions/54880432/generic-type-t-parameter-before-the-function-name
+
+1. it is used to indicate that generics are used and not some type T or U are referenced.
+
+2. if you use <T> in a class, Whenever you create an instance of this class, you must specify an actual type in place of T
+
+type constraints class TreeNode<T : Vehicle>
+if there're several type constraints, then use `where`
+class TreeNode<T> where T : Vehicle, T : HasWheels
+
+https://kotlinlang.org/docs/tutorials/kotlin-for-py/generics.html
+
+
+##################################################
+
+f :: a->a->a
+f x y = x + y
+will be an error, 'cause (+) function's parameter are Int,
+(+)'s type signature has type constraint, so we can not use type variables in (+)
+(+) :: Num a => a -> a -> a
+
+1. you need check the function's type signature before call it !
+2. type variables have the ability to do polymorphism
+3. typeclasses describe shared behavior that multiple types can have
+
+about type variables and typeclass
+
+type variables have the ability to do polymorphism
+id :: a -> a
+id :: (e->a) -> (e->a)
+id :: (e->a) -> e -> a
+
+then why we need typeclass?
+<oats> typeclasses describe shared behavior that multiple types can have
+
+<jusss> type variables have the ability to do polymorphism, then why we need
+        typeclass?                                                      [09:42]
+<Welkin> parametic vs adhoc polymorphism                                [09:43]
+<Welkin> totally different
+<Welkin> also nothing at all like oop polymorphism
+<Axman6> type classes let you know what you can do with those type
+         variables. what's the difference between foo :: a -> String and bar
+         :: Show a => a -> String?
+<Welkin> type classes are for function overloading
+<Welkin> describing interfaces
+<Axman6> in the first one, I know _nothing about a, so I can guarantee there
+         is nothing in that String that came ferom a. in the second, I know
+         that there is a way to turn an a into a String, so there;s ia good
+         chance that there is information from a in the returned string
+<oats> Axman6: so could it be said that the first example is a "useless"
+       function?                                                        [09:48]
+<oats> since there's nothing of a that produces String, there's no mapping, no
+       transformation happing
+<oats> I'm guessing it'd have to be a constant function                 [09:49]
+<Axman6> )yep
+<jusss> or let's talk about the monad typeclass
+<jusss> it seems to me like typeclass force the instance to implement its
+        method                                                          [09:51]
+<jusss> >>= :: m a -> (a -> m b) -> m b
+<jusss> in Maybe, >>= :: Maybe a -> (a -> Maybe b) -> Maybe b           [09:52]
+<oats> I think maybe "force" isn't the most accurate way to think of it here
+                                                                        [09:53]
+<jusss> oats: and what's the more specific word to express?             [09:54]
+<oats> you're guaranteeing to the compiler that values provided to the
+       function fit in a "constraint"
+<oats> if you don't provide a typeclass constraint, as with your (>>=) Maybe
+       example there, you won't be able to compute any function of `a` that
+       has a more "restricted" constraint                               [09:56]
+<oats> and the compiler will enforce that
+<oats> for example, if you tried to do `show a` as a part of that (>>=)
+       implementation for some reason, the compiler will remind you that you
+       haven't guarunteed that your `a` can be turned into a String (via the
+       Show typeclass)
+<oats> please let me know if that was unclear, I'm still new to haskell and
+       trying to reason through some of this stuff too :)               [09:59]
+<oats> does that answer your question?
+<jusss> I don't know, I'm still fuzzy
+<Welkin> hi fuzzy
+<jusss> think about why we need a typeclass or interface in other languages
+<Welkin> having a standard API is very useful                           [10:01]
+<Welkin> you don't need to know anything about how it's implemented for
+         different data types
+<Welkin> you can fmap over a list, a tree, a graph
+<Welkin> your custom data structure too
+<jusss> all I see is that typeclass can make its instances to implement its
+        function                                                        [10:02]
+<oats> typeclasses describe shared behavior that multiple types can have
+<oats> continuing the `Show` example, there's lots of things that can be
+       turned into strings                                              [10:03]
+<oats> Bools, Integers, lots of stuff
+<oats> so when we implement `Show Foobar` for some imaginary type `Foobar`,
+       we're telling the compiler, “This is a thing that can be turned into a
+       string, with this neat function I have, `show`!”                [10:05]
+<jusss> oats: "<oats> typeclasses describe shared behavior that multiple types
+        can have" this is good
+<oats> jusss: I hope that was helpful :)                                [10:07]
+<oats> and so when we declare a function `bar :: Show a => a -> BarBaz`, we're
+       telling the compiler that the type variable has a constraint on it,
+       `Show a`, and so the compiler will hold us to our promise that whatever
+       value we give to `bar` will be a thing that can be turned into a string
+<jusss> oats: and do wee need to use typeclass frequently?
+<jusss> create we own typeclass I mean
+<oats> typeclasses cut down on function clutter :)
+<oats> are you familiar with a language like C that doesn't have typeclasses
+       or interfaces?
+<jusss> oats: I don't know if python counts
+<jusss> python have abstract method
+<oats> I am unfortunately unfamiliar with python                        [10:10]
+<jusss> or javascript, scheme?
+<oats> I think this stuff mostly only applies to statically-type languages
+<jusss> scheme doesn't have typeclass also declared type, I think
+<jusss> also OO
+<oats> but, since there's no way to describe shared behavior among types in C,
+       we have to create a separate function with a different name for every
+       type we want to be able to string-ify
+<oats> for example, intToString(), boolToString(),...                   [10:11]
+<jusss> what about the simple function id
+<jusss> idInt :: Int -> Int
+<oats> jusss: what about it?
+<jusss> idStr :: String -> String
+<oats> ah
+<jusss> that's what you want to talk?
+<jusss> and now we have id :: a -> a                                    [10:12]
+<oats> yes, that is how you'd have to do it in C
+<oats> (we will pretend pointers don't exist :))
+<oats> pointers makes things super fuzzy!
+<oats> jusss: do you understand why the `id` function works in haskell?
+<jusss> but the point here is that id :: a->a is just type variables or call
+        generics in other languages                                     [10:13]
+<jusss> oats: actually no, or I can ask you do you know why the `id` function
+        shouldn't work in haskell?
+<nitrix> Ironically, if you were to use pointers and cast them to `void *` to
+         implement a `void *(void *, void *)` function, you'd be
+         re-implementing what Haskell does by boxing types and its parametric
+         polymorphism + newtype.
+<Welkin> id :: forall a. a -> a
+<oats> ah, yes, the hidden forall!                                      [10:14]
+<jusss> actually, I did notice that keyword forall, but I haven't see a
+        article tell me what it is
+<Welkin> there is an implicit forall in every type that contains all type
+         variables                                                      [10:15]
+<nitrix> Universal quantification. `a` being a type variable, it has to come
+         from somewhere. Something introduces `a`.
+<nitrix> This becomes more important when you start nesting polymorphic type
+         signatures, they have their own scopes (:                      [10:16]
+<nitrix> e.g. `forall a. a -> (forall b. b -> b) -> a`
+<Welkin> that's existential quantification then, right?                 [10:20]
+<Welkin> for the b -> b
+<nitrix> Yeah. Going towards Rank-2 and such.       
+
+#############################################
+
+interface Collection<E> …… {
+  void addAll(Collection<E> items);
+}
+
+void copyAll(Collection<Object> to, Collection<String> from) {
+  to.addAll(from);
+ }
+
+'cause of the definition of interface about addAll,
+so when 'to' has Collection<Object> type, addAll's parameter has Collection<Object> type
+but we pass the parameter 'from' which has Collection<String> type, not Collection<Object>,   there will be an error, 'cause Collection<String> is not a subclass of Collection<Object> even String is a subclass of Object
+
+interface Collection<E> …… {
+  void addAll(Collection<? extends E> items);
+}
+this can make the type of addAll's parameter, Collection<String> can be here,
+this ? means String, <String extends Object>
+addAll's parameter type can be Collection<String> or Collection<Int> whatever
+'cause if the object is Collection<Object> and String and Int both are subclass of Object
+
+the opposite is Collection<? super E>, which means ? is a superclass of E, Object is String's superclass
+
+interface Collection<E> …… {
+  void addAll(Collection<? super E> items);
+}
+
+void copyAll(Collection<String> to, Collection<Object> from) {
+  to.addAll(from);
+ }
+
+<? extends E>  which means ? is a subclass of E,   <out E>
+
+
+<? super E> which means ? is a superclass of E,  <in E>
+
+
+think about, value null has any type, and any value has Object/Any type
+
+out and in or <? extends E> and <? super E> are for type inheritance
+
+ we need to use the out keyword on the generic type.
+ It means that we can assign this reference to any of its supertypes.
+
+We can use the in keyword on the generic type if we want to assign
+it to the reference of its subtype
+
+########################################################
+
+Kotlin has two types of references, Nullable and Non-Nullable Reference Types
+var a: String = "value"
+
+If we want to create a nullable reference, we need to
+create append the question mark(?) to the type definition:
+var b: String? = "value"
+After that, we can assign null to it:
+b = null
+
+data class Person(val country: Country?)
+ data class Country(val code: String?)
+ Note that the country and code fields are of nullable reference type.
+To access those fields in a fluent way, we can use the safe call syntax:
+val p: Person? = Person(Country("ENG"))
+ val res = p?.country?.code
+ assertEquals(res, "ENG")
+ Should the variable p hold a null, the safe calls syntax will return a null result:
+val p: Person? = Person(Country(null))
+val res = p?.country?.code
+assertNull(res)
+
+The let() method, To execute an action only when a reference holds a non-nullable value, we can use a let operator.
+val firstName = "Tom"
+val secondName = "Michael"
+val names: List<String?> = listOf(firstName, null, secondName)
+Next, we can execute an action on every non-nullable element of the names list by using a let function:
+	
+var res = listOf<String?>()
+for (item in names) {
+    item?.let { res = res.plus(it) }
+}
+ 
+assertEquals(2, res.size)
+assertTrue { res.contains(firstName) }
+assertTrue { res.contains(secondName) }
+
+If we want to apply some additional operation, for example logging on every non-nullable value we can use an also() method and chain it with a let()
+
+Kotlin has a run() method to execute some operation on a nullable reference. It is very similar to let() but inside of a function body, the run() method operates on this reference instead of a function parameter
+
+Sometimes, when we have a reference, we want to return some default value from the operation if the reference holds a null. To achieve that, we can use an elvis (?:) operator.
+
+The double exclamation mark operator (!!) takes a value from a nullable reference and throws a NullPointerException if it holds null.
+
+? means it could be null, ?. means non-null check, ?: return something if there's a null
+!! if a reference hold a null then throws a NullPointerExeception
+
+The List class in Kotlin has a utility method filterNotNull() that returns only non-nullable values from a list that holds nullable references
+
+https://www.baeldung.com/kotlin-null-safety
+
+p?.country?.code only when p and country both are not null, code will execute, otherwise return a null result,  like Maybe
+
+null can has any type in java, so kotlin has null and non-null type,  null type use ?, and the
+others would be non-null 
+Int? == Int or null   like Maybe a = Just a | Nothing
+but Int only can be Int, null can not has Int type in kotlin, but null can has Int type in java
+
+java is not a pure OO language, 'cause of its primitive data type's values and functions are not objects,
+any value has Object type in java,
+any non-null value has Any
+and null and non-null have Any? type
+Nothing type only has one value, null
+
+class SmartList<T>: ArrayList<T> () {
+      fun find(t: T): T? {
+          val index = super.indexOf(t)
+          return if (index >= 0) super.get(index) else null
+          }
+ }
+
+fun main(args: Array<String>) {
+    val smartList = SmartList<String>()
+    smartList.add("one")
+    println(smartList.find("one"))
+    println(smartList.find("two").isNullOrEmpty())
+    }
+
+type constraint, <T: Fruit> T can only be Fruit or its sub-class type
+open class Fruit(val weight: Double)
+class Apple(weight: Double): Fruit(weight)
+class Banana(weight: Double): Fruit(weight)
+
+class FruitPlate<T: Fruit>(val t: T)
+
+haskell doesn't have type inheritance, like type in OO
+###############################################33
+
+what's the difference between class and type?
+Roman Elizarov [JB]  [1 hour ago]
+https://stackoverflow.com/questions/468145/what-is-the-difference-between-type-and-class
+can we use a class as a type?
+Roman Elizarov [JB]  [9 minutes ago]
+Yes.
+Roman Elizarov [JB]  [8 minutes ago]
+(unless class is generic, in which case you’ll need to instantiate it with specific type arguments to get a type) (edited)
+
+and can we think instances of classes as values of types?
+Roman Elizarov [JB]  [5 minutes ago]
+They are
+
+
+################################################
+
+class without declared type                type without class
+(python,js,scheme)                            (c,haskell)
+
+                                class with type
+                                (java, kotlin, c++)
+
+there're two ways to operate something in classes,
+1. inheritance, A inherit from B, then A can operate something in B
+2. passing, pass B to A, then A can operate something in B
+
+3. the class is the type, the type is the class, the instance is the value, the value is the instance
+4. C use typedef to define a new type to an existing value like list constructor , construct primitive data type to new type, or use enum or tagged union for something like `data Whatever = YouWant` in haskell
+5. https://stackoverflow.com/questions/468145/what-is-the-difference-between-type-and-class
+6. function and class both can have type variable, but instances must have the specific type,  value and instance have the specific type, class and type or function have type variable
+
+<jusss> LdBeth: 对于java/kotlin这种同时有class和type的语言，我们能认为它们的
+        class就是type吗？                                               [09:42]
+<jusss> class C<T> 就是 type ,  C是type constructor, <T>是type variable
+<jusss> 而这个C<T>的instance 就是 value ?                               [09:43]
+<LdBeth> 所以你没见过同时有 type 和 class 但是 class 不是 type 的语言么
+<LdBeth> 比如 C++                                                       [09:44]
+<jusss> LdBeth: 我没见过那么多的语言，python/js/scheme这些不需要声明type,
+        haskell这个没有oo based on class
+<jusss> LdBeth: 我没学过c++
+<jusss> c有tpye但没有class
+<LdBeth> 所以你连 C++ 佛没见过
+<jusss> C++佛是什么？                                                   [09:45]
+<LdBeth> 那不就好了
+<jusss> LdBeth: C++里class不是type?                                     [09:46]
+<LdBeth> jusss: 你可以有和一个类型同名的 class，也可以没有        
+<jusss> LdBeth: 那怎么定义一个类型呢？如果不用class
+<LdBeth> jusss: 和 C 一样                                               [09:50]
+<jusss> LdBeth: C能自己定义新的type?                                    [09:51]
+<jusss> LiuYan: 你们传参时，把参数的类型声明为某个class也是可以的吧
+<Flandre`> 当然。。                                                     [09:52]
+<LdBeth> 完了
+<LdBeth> C 都不会
+<jusss> 我真的不会
+<onlylove> typedef
+<jusss> 我感觉我学过的两门有类型的语言里，c和haskell，只有haskell可以自己创建
+        新的type
+<jusss> typedef is a keyword used in C language to assign alternative names to
+        existing datatypes.                                             [09:54]
+<jusss> existing
+<LdBeth> 啥，那 Haskell 不是同样的么                                    [09:55]
+<LdBeth> 没有 primitive type 哪来新类型                                 [09:56]
+<jusss> haskell可以写 data Whatever = YouWant 这样的
+<jusss> LdBeth: 你用c写个上面这种
+<jusss> LdBeth: python就没有primitive type
+<LdBeth> jusss: 那不就是个 enum
+<LdBeth> 或者 tagged union                                              [09:57]
+<jusss> LdBeth: 你认为haskell的data x = y做的就是enum ?
+<LdBeth> jusss: http://www.pythonvisually.com/ebook/primitive-data-types.html
+<anotitlebot> Primitive data types — Python book 1.0 documentation
+<LdBeth> 打你脸来了
+<LdBeth> jusss: 或者 tagged union 啊
+<jusss> LdBeth: Int在python里是个class, 1是Int的instance, 所以1有(+)
+<LdBeth> 那特么还不是得有 primitive type                                [09:59]
+<LdBeth> 只不过“常见语言里实现成 primitive type 的它做了包装”
+<jusss> LdBeth: 那能把type看成一些values的集合吗?                       [10:12]
+<LdBeth> jusss: programming 意义上的 type 不是 set, mathematical 上的可以
+<jusss> LdBeth: 那programming上的type是啥？
+<LdBeth> mode
+###################################################
+
+if function's type is a generic, put it before the function
+
+fun <T> boxIn(value: T) = Box(value)
+
+mix the type and class,
+
+class Box<T>(t : T) {
+    var value = t
+}
+
+think this Box as type constructor, and <T> is type variable, so
+Box<T> is like Maybe a
+and also the type is the class, and the class is the type in kotlin
+generic in kotlin is like type variable in haskell
+everything is so clear now!
+
+###################
+
+
+do-notation,  or kleisli compose on promise
+
+do
+a <- m a
+b <- m b
+return a +b
+
+a = async ...
+b = async ...
+a whatever b
+
+###############################################
+
+`this@MainActivity`
+
+Thread(Runnable { }).start()
+
+sealed class Maybe<out T> {
+       object `Nothing#` : Maybe<Nothing>() {
+              override fun toString(): String = "Nothing#"
+        }
+        data class Just<out T>(val value: T)
+}
+
+lambda in kotlin, {it -> it}
+
+f ({ x -> x })
+f {x -> x}
+
+object.method { it.whatever }  it means object
+
+use {} to contain lambda,
+{ x:Int, y:Int -> x+y}
+
+https://kotlinlang.org/docs/reference/lambdas.html
+
+############################################
+
+update UI in coroutine
+
+GlobalScope.launch{ ... withContext(Dispatchers.Main){ update-UI-here
+        }}
+
+fun updateUI(view: View){
+        GlobalScope.launch {
+            val showTextView = findViewById<TextView>(R.id.text1)
+            val sock = Socket("192.168.31.204", 50007)
+            sock.use {
+                it.outputStream.write(
+                    "aha, it's from kotlin".toByteArray(
+                        Charsets.UTF_8
+                    )
+                )
+                it.outputStream.flush()
+                var aob = ByteArray(1024)
+                it.inputStream.read(aob)
+                withContext(Dispatchers.Main){
+                    showTextView.text=aob.toString(Charsets.UTF_8)
+                }
+            }
+        }
+    }
+
+Dispatchers.Main is for UI, Dispatchers.IO is for IO, there're also Default and Unconfined
+https://stackoverflow.com/questions/54671817/update-ui-async-call-with-coroutines
+
+#############################################
 1. don't stuck the main thread, don't run socket in main thread
 2. update UI in non-main thread use runOnUiThread
 
@@ -55,34 +822,6 @@ run x, y, z by order
 
 unit = (x,y) => new Promise.resolve(x).then(y)
 unix ( unix(x,y), z)
-
-unit = x => new Promise.resolve(x)
-
-composeM = (f,g) => x => g(x).then(f)
-
-don't use Promise.resolve(), use Promise(r => r())
-unit = (x,y) => new Promise(r => r(x)).then(y)
-f = new Promise(r => r(x)).then(y=> new Promise(r => r(y)))
-
-add1 = x=> x+1
-
-this is asynchronous, better than add1(add1(3))
-
-unit(unit(3,add1), add1)   => 5
-
-ok, syntax error,  use "new Promise(r => r(x))"  
-or "Promise.resolve(x)"
-don't use "new Promise.resolve(x)"
-
-f = x => Promise.resolve(x)
-composeM = (f,g) => x => g(x).then(f)
-t=composeM(f,f)
-t(3)
-
-add1 = x => Promise.resolve(x+1)
-add2 = x => Promise.resolve(x+2)
-t=composeM(add1,add2)
-t(3)
 
 ############################################
 compose, unary, argument can't pass to another f . g
