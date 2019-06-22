@@ -1,5 +1,118 @@
 
 
+
+
+
+parametric polymorphism, is like type variables in Hasekll or generics in Java,
+different types with the same behavior
+
+Ad-hoc polymorphism, method overload, is like typeclass in Hasekll or interface in Java,
+different types with different behaviors, different behaviors return diffrents result types
+I'd like to call it result polymorphism
+
+
+#####################################
+
+1. overload function (two functions, same name, different parameter's types)
+2. interface typeclass
+3. Object Any
+4. Either out in Int String type inheritance
+
+##############################################
+
+type variables for parameter polymorphism, different types with same behavior, the behavior don't depend on the type
+typeclass for behavior polymorphism, different types with different behaviors, the behavior depend on the type
+
+
+polymorphic in python haskell and kotlin
+
+def f(x):
+    if isinstance(x, int):
+        return x+1
+     if isinstance(x, str):
+        return x[::-1]
+
+in haskell, we have pattern matching to do that
+
+f :: Either Int String -> Either Int String
+
+f (Left x) = Left (x+1)
+
+f (Right x) = Right (reverse x)
+
+in kotlin, use overload method, functions have same names but different parameters
+
+fun getValue(id: Int): Any { ... } 
+
+fun process(value: Int) { ... } 
+fun process(value: String) { ... }
+val value = getValue(valueId)
+ when (value) { 
+is Int -> process(value)
+is String -> process(value)
+else -> ... }
+
+https://stackoverflow.com/questions/56680581/how-to-create-a-type-that-may-contain-int-or-string?noredirect=1#comment99929450_56680581
+
+
+<__monty__> jusss: Most common way to have function implementation depend on
+            the type of the value they're applied to is through
+            typeclasses. `class X a where f :: a -> a; instance X Int where f
+            = (+1); instance X String where f = reverse` then you can do both
+            `f 4` and `f "abc"`.                                        [16:25]
+
+
+
+
+#################################################
+
+how to create a type that contain Int or String?
+use Either Int String,  so Left 3 has Either Int String, Right "3" has Either Int String
+we can pass it, and it may contain Int or String
+
+<jusss>  data T = Either Int String;   f :: T -> T;   f x = x;   f (Left 3)
+        got an error , why?                                             [13:36]
+<jle`> defines a new data type T        
+<jle`> with a single data constructor, 'Either'
+<jusss> jle`: oh, my fault, I should use Either on the right side
+<jusss> without a value constructor
+<jle`> fwiw this is a pretty confusing data type constructor, because 'Either'
+       is commonly used as a type name from Prelude
+<jusss> jle`: I should just use f :: Either Int String -> Either Int String
+<jle`> if that's what you want :)                                       [13:39]
+<jle`> that'd be a very different type, yeah
+<jle`> but the only person who really knows what you want is you, yourself. so
+       search inside your heart :)
+<jusss> jle`: I want the either type, 'cause I'm not sure which type the
+        paramter is
+<jusss>  ff :: (Either Int String) -> (Either Int String);  ff x = x;   ff
+        (Left 3);  ff (Right "3")
+
+and we still can get 3 from (Left 3) by
+f (Left x) = x
+
+it's about polymorphic, for example,
+f(x) if x is String, then make reverse x and return it,
+if x is Int, then plus one and return it
+
+
+f :: Either Int String -> Either Int String
+f (Left x) = Left (x+1)
+f (Right x) = Right (reverse x)
+
+g :: Either a a -> a
+g (Left x) = x
+g (Right x) = x
+
+the right way:
+
+<__monty__> jusss: Most common way to have function implementation depend on
+            the type of the value they're applied to is through
+            typeclasses. `class X a where f :: a -> a; instance X Int where f
+            = (+1); instance X String where f = reverse` then you can do both
+            `f 4` and `f "abc"`.                                        [16:25]
+
+
 join = concat -- []
 join f = \x -> f x x -- (e ->)
 join f = \s -> let (f', s') = f s in f' s' -- State
