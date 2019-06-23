@@ -1,0 +1,4 @@
+vim /etc/fstab
+tmpfs	/tmp	tmpfs	size=5g	0 0
+
+sudo mount -o remount tmpfs

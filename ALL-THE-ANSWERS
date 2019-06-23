@@ -1,7 +1,56 @@
 
+1. types are used to describe values, types are sets of values in math, modes in CS
+2. think class as type constructor, and instance as value constructor,
+    List<T> is like Maybe a, List is not a type, List<T> is a type, if there's no type
+    variable then type constructor is the type like Int
+    value = List<Int>(x:Int)
+    value is the value constructor, value.x is the value, like Just a
+    Either<A,B> is like Either a b
+    and A,B or a b are used to describe values's type
+    Either<A,B>(x:A, y:B) is like Either a b = Left a | Right b
+
+###########################
+
+1. the type is the class, the value is the instance
+   class C<T> (x:T){...}
+    C is like type constructor and T is type variable, 
+    the instance of C<T> is the value constructor, 
+    the instance may have x as value, or not,
+    the instance means it may use T type 
+
+2. C<out T>   and somewhere C<T>
+
+3. C2<T2>: C<Int>
 
 
 
+###########################3
+sealed class E
+data class L(val v: String) : E()
+data class R(val v: Int): E()
+
+
+fun poly(expr: E):E  = when(expr) {
+    is L -> L(expr.v)
+    is R -> R(expr.v + 1)
+}
+fun poly2(expr: E):Any?  = when(expr) {
+    is L -> expr.v
+    is R -> expr.v + 1
+}
+fun main(){
+    val t = poly(L("aha"))
+    println(poly(poly(R(3))))
+    println(poly2(R(9)))
+    println(L("a").v)
+}
+
+why this t.v is not resolved?
+
+'cause poly return a value of type E and the sealed class E itself does not define
+the property v.
+
+####################################
 
 parametric polymorphism, is like type variables in Hasekll or generics in Java,
 different types with the same behavior
@@ -16,7 +65,7 @@ I'd like to call it result polymorphism
 1. overload function (two functions, same name, different parameter's types)
 2. interface typeclass
 3. Object Any
-4. Either out in Int String type inheritance
+4. Either out in Int String type inheritance, sealed class
 
 ##############################################
 
