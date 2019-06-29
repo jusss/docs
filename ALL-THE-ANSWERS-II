@@ -1,4 +1,137 @@
 
+about REST Ful API,
+
+url, headers, params, data, json, auth, cookies, timeout, allowRedirects, stream, files
+
+    //1. every value in key-value should do URLEncoder.encode in java, but python has urllib.urlencode(dict) for a dict
+    //2. pass a key-value string like a=b&c=d, not a json {a=b;c=d}, declare this in header by "Content-Type", "application/x-www-form-urlencoded"
+    //3. params is in body in post, in header in get
+    //4. headers is look like accept: application/json content-type: application/json
+    //5. params is in body, so they're same, when headers application/x-www-form-urlencoded, params and body like parameter=value&also=another
+    //6. multipart/form-data is for files, application/json is for json like "{a=b;c=d}"
+    //7. check post or get first, check json or urlencoded second,
+    //8. if it's urlencoded, value should be urlencoded, if it's json, the dict or map should be to json
+    //9. headers maybe a json, and body maybe bytes from file
+
+# restful passing file
+self.headers = {'Ocp-Apim-Subscription-Key': '45af723cb74d4fb0b07bbedb68f73b80','Content-type': 'audio/ogg; codec=audio/pcm; samplerate=16000','Accept': 'application/json'}
+response = self.http_client.fetch('https://westus.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=zh-CN',method='POST',headers=self.headers,body=open(self.filename,'rb').read())
+
+# passing json
+post_data={"reqType":0,"perception":{"inputText":{"text":p},"inputImage":{"url": "imageUrl"},"selfInfo":{"location":{"city":"北京","province":"北京","street":"信息路"}}},"userInfo":{"apiKey":"79229c49d0014c68ab90b9282ebf7156","userId": "360371"}}
+                data_send = json.dumps(post_data).encode("utf-8")
+                response = self.http_client.fetch('http://openapi.tuling123.com/openapi/api/v2',method='POST',body=data_send)
+
+# passing urlencoded
+paramsDict = {'app_id':'2111117142',
+              'question':questionBytes,
+              'time_stamp':time_stamp,
+              'nonce_str':nonce_str,
+              'session':'10000'
+             }
+body = urllib.urlencode(paramsDict)
+response = http_client.fetch(url, method='POST', body=body,  validate_cert = False)
+
+//10. body are bytes, the different is that read bytes from file, or turn json to bytes or turn urlencoded to bytes
+
+
+##################################################
+
+kotlin and java have two dependcy trees, maven and gradle, pom.xml and build.gradle
+khttp in build.gradle
+add JitPack repository to build file
+repositories{
+        maven { url 'https://jitpack.io' }
+}
+add the dependency
+dependencies {
+             implementation 'com.github.jkcclemens:khttp:0.1.0'
+}
+then import khttp.post in you code.kt
+
+fun sendw(question: String):String{
+    val res = khttp.post(
+        url = "https://api.ai.qq.com/fcgi-bin/nlp/nlp_textchat",
+        data = get_params(question)
+    )
+    return res.text
+}
+
+https://www.baeldung.com/kotlin-khttp
+
+khttp is better than httpurlconnection okhttp retr*** spring boot
+
+create maven and choose kotlin archtype then next will generate pom.xml and kotlin file
+create gradle and chosse kotlin, will do build.gradle and kotlin
+###################################################
+
+they like this
+    finalObject = Object.changeAttrB(x).changeAttrA(x)
+    finalObject.run()
+    and that changeAttrB and changeAttrA will return Object itself with x
+
+class Test:
+    def __init__(self):
+          self.attb = 'whatever'
+          self.atta = 'aha'
+    @classmethod
+    def changeAttrB(cls,x):
+        tt=cls()
+        tt.attb=x
+        return tt
+    @property
+    def run(self):
+        print(self.atta)
+        print(self.attb)
+
+t=Test.changeAttrB(3)
+t.run
+
+#python #class
+
+######################################
+
+kotlin class and inheritance
+
+1. if the class has no body, curly braces can be omitted.
+class Empty
+
+2. primary constructor and secondary constructor
+class Person constructor(firstName: String) { ... }
+
+for declaring properties and initializing them from the primary constructor,
+class Person(val firstName: String, val lastName: String, var age: Int) { ... }
+or  Initialization code can be placed in initializer blocks, which are prefixed with the init keyword.
+
+If the constructor has annotations or visibility modifiers, the constructor keyword is required, and the modifiers go before it:
+class Customer public @Inject constructor(name: String) { ... }
+
+the secondary constructor
+class Person {
+    constructor(parent: Person) {
+        parent.children.add(this)
+    }
+}
+
+If the class has a primary constructor, each secondary constructor needs to delegate to the primary constructor,
+class Person(val name: String) {
+    constructor(name: String, parent: Person) : this(name) {
+        parent.children.add(this)
+    }
+}
+
+open class Base(p: Int)           // 定义基类
+
+class Derived(p: Int) : Base(p)
+
+why Derived have p?
+
+secondary constrctor is like __init__ , and this constructor will run, super() will jump to Base class's secondary constructor and run
+
+http://www.runoob.com/kotlin/kotlin-extend.html
+
+
+#############################################################
 
 type variables for parameter polymorphism, different types with same behavior, the behavior don't depend on the type
 typeclass for behavior polymorphism, different types with different behaviors, the behavior depend on the type
