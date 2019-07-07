@@ -1,0 +1,11 @@
+#replace abc with xyz
+cat file| tr "abc" "xyz" > new_file
+
+# delete abc
+cat file| tr -d "abc" > new_file       
+
+#delete ^M cause by windows
+cat file| tr -d "\r" > new_file
+or 
+cat file | tr -s "\r" "\n" > new_file
+
