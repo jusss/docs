@@ -1,0 +1,19 @@
+https://github.com/deepinstruction/deepnude_official
+
+https://zhuanlan.zhihu.com/p/72521898
+
+https://pytorch.org/get-started/locally/
+
+1. git clone that repo
+2. deepnude_official-master/checkpoints
+wget -t 0 -c -O cm.lib https://github.com/open-deepnude/deepnude-model-3/raw/master/checkpoints/cm.lib
+wget -t 0 -c -O mm.lib https://github.com/open-deepnude/deepnude-model-2/raw/master/checkpoints/mm.lib
+wget -t 0 -c -O mn.lib https://github.com/open-deepnude/deepnude-model-1/raw/master/checkpoints/mn.lib   (if this is slowly, try proxychains + v2ray)
+3. install numpy Pillow setuptools six whell opencv-python
+4. visit pytorch.org chosse None if it use CPU otherwise CUDA
+pip3 install https://download.pytorch.org/whl/cpu/torch-1.1.0-cp37-cp37m-win_amd64.whl
+pip3 install https://download.pytorch.org/whl/cpu/torchvision-0.3.0-cp37-cp37m-win_amd64.whl
+5. deepnude_official-master\opencv_transform\nude_to_watermark.py
+change create_watermark to return nude
+6. python3 main.py will take input.png as input and output output.png, it must be png format and 512px * 512px
+
