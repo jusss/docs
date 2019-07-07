@@ -1,3 +1,9 @@
+ffmpeg -i IMG_2037.MOV -c:v libx265 -crf 28 -c:a aac -b:a 128k IMG_2037.mp4
+
+trac.ffmpeg.org
+x265 hecv
+ffmpeg -i input -c:v libx265 -crf 28 -c:a aac -b:a 128k output.mp4
+-------------------------------
 除了帧内编码精确控制，如果是mp4格式，可以 1.在用ffmpeg剪切的过程中强制C-c中断截取前面这一段所需的，而不要后面的
 2. 2次剪切，第一次截取的大概，然后在第一次截取出来的片段上再次截取，直到所需的
 
