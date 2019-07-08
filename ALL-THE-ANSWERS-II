@@ -1,4 +1,408 @@
 
+java's class instance must be in a method of a class!
+you can instance a class in a class directly, do it in a method of a class!
+
+kotlin, src/k2p.kt   there's a class Robot in it, and no main function,
+and its main class is K2pKt
+if it's main.kt, its main class should be MainKt
+
+src if it's not blue, 'cause it's not source root, right click change it to source root
+
+src/ right click create package, com.sun.k2p
+right click create a new file Robot.kt on that package,
+pacakge com.sun.k2p will auto show in that new file
+main class will be com.sun.k2p.RobotKt
+so in kotlin, main class is "pacakge-name.file-name"
+
+export to jar
+Project Structure - Artifacts - '+' - JAR - from modules with dependices
+main class is com.sun.k2p.RobotKt
+Build Artifacts - build 
+
+import jar
+create lib folder in project, and copy jar to that folder,
+Project Structure - Modules - Dependencies - + - JARs or directories choose that jar in lib
+
+#1
+java need junit to run a part of code,
+download jnit.jar and import it in project, then put it on above on the method like
+
+import com.sun.k2p.Robot;
+import com.sun.k2p.RobotKt;
+public class Test {
+    @org.junit.Test
+    public void main(){
+        Robot n = new Robot("127.0.0.1", 50017);
+        n.sendToRobot("hello");
+    }
+}
+
+right click Run Test will run this function
+
+#2 use gradle
+build.gradle
+ compile 'junit:junit:4.11'
+ do the same
+
+#3 use maven  pom.xml
+<dependencies>
+    <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>4.11</version>
+    </dependency>
+    </dependencies>
+    do the same
+
+#############################################
+
+use in kotlin is like with statement in python, auto close file io or socket io
+socket.use{
+        it.inputStream.read(read_buffer)
+}
+//without socket.close() in it
+
+#####################################################
+
+#socket #python #server
+
+socket server, 1 to 1 , multiple connection times
+import socket
+def net_init():
+        conn, addr = sock.accept()
+        #conn.settimeout(10)
+        while True:
+            try:
+                t=conn.recv(1024)
+                if not t:
+                    break
+            except:
+                break
+            print(t)
+        conn.close()
+        net_init()
+
+if __name__ == '__main__':
+        sock=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        sock.bind(('0.0.0.0',50017))
+        sock.listen(50)
+        net_init()
+
+#########################################
+
+json can handle list too, not just dict
+
+c=json.dumps(list)
+alist = json.loads(c)
+and json is a str
+
+but an object can not be jsonlized!
+
+#######################################
+
+java anonymous thread
+
+new Thread()
+{
+    public void run() {
+        System.out.println("blah");
+    }
+}.start();
+
+#####################################################3
+
+import jar in java project, jetbrain intellij idea, gradle with java
+vim build.gradle
+dependencies {
+     implementation files('d:\\k2pjar-1.0-SNAPSHOT.jar')
+}
+
+in android studio
+you can use the same way with upside, or 
+File - Project Structure -Dependencies - <All Modules> -All Dependencies - click '+' -
+input your jar's path
+
+on linux you can use one command "grade clean build"
+
+export jar, kotlin with gradle in intellij idea
+click right sidebar Gradle - Tasks - build - double click build, it will generate jar in the project directory C:\Users\admin\IdeaProjects\k2pjar\build\libs
+or File - Project Structure - Artifacts - '+' -  jar - empty -ok - then
+Build - Build Artifacts - choose your jar name - build (but it seems alwasy faild to me)
+
+#######################################
+<jusss> how to use kotlin code in java project?
+<roboirc> jusss: you can create separate kotlin file and use the kotlin code
+          in it
+<roboirc> jusss: depends what your kotlin code is in? class or ?
+<jusss> roboirc: class or what?                                         [16:53]
+<roboirc> but problem is only have custom file commons-codec-1.12.jar in libs,
+          not common-codec-1.10.jar
+<roboirc> jusss: what is your kotlin code?
+<jusss> roboirc: it's look like this https://paste.ubuntu.com/p/TTPmGxzP4r/
+<jusss> roboirc: now it's just a simple socket code
+<roboirc> jusss:
+          https://kotlinlang.org/docs/tutorials/mixing-java-kotlin-intellij.html
+                                                                        [16:56]
+<jusss> roboirc: I want run this a.sendToRobot() when a picture is clicked on
+        android
+<jusss> and that android project is written by java
+<roboirc> your using android studio right, jusss?
+<jusss> roboirc: right                                                  [16:58]
+<jusss> roboirc: but the config I always don't understand
+<roboirc> jusss: check out the site I showed you?
+<jusss> roboirc: yeah
+<roboirc> jusss: since your code is a class, just create a new kotlin class
+          and paste it there and start using it                         [17:06]
+<jusss> roboirc: but I want the java code to call this kotlin method    [17:10]
+<jusss> roboirc: I can import this kotlin file in java ?
+<roboirc> yes                                                           [17:11]
+<roboirc> just drag and drop it into your project
+<roboirc> should be fine
+<jusss> how to wrap kotlin code to a jar file and use that jar in java?
+<Tazmain> I believe you just compile to a jar and import it             [16:57]
+<dreamreal> jusss: mvn package, or gradle jar... it's just a regular jar, and
+            java can use the kotlin code pretty much out of the box in a lot
+            of cases                                                    [17:07]
+<dreamreal> there are a few things to consider, because kotlin has a lot of
+            features java does not (package level functions, default arguments
+            for methods, stuff like that) that might necessitate using
+            specific annotations and class names for use in java, but it's
+            usually pretty sane                                         [17:09]
+<jusss> dreamreal: the question is I don't how to use gradle to make a jar,
+<dreamreal> if only I had said a simple command to use! That might have helped
+            you a lot. Such a command would look like "gradle jar", you know?
+<jusss> I don't know the envrionement variable on windows, 
+<dreamreal> WHAT environment variable?                                  [17:29]
+<jusss> there's no /usr/lib or /usr/bin/ on windows
+<dreamreal> It's a SIMPLE COMMAND!
+<dreamreal> "grqdle jar"
+<jusss> and where I can run the simple command?
+<dreamreal> cmd.exe?
+#################################################################
+
+return/break/continue to the caller of the lambda
+
+fun foo() {
+    listOf(1, 2, 3, 4, 5).forEach lit@{
+        if (it == 3) return@lit // local return to the caller of the lambda, i.e. the forEach loop
+        print(it)
+    }
+    print(" done with explicit label")
+}
+1245 ,  return to the caller of the lambda, i.e. the forEach loop
+
+we can also return using an implicit label, like return@forEach
+https://www.baeldung.com/kotlin-return-break-continue
+
+Without a label, continue will proceed to the next iteration of the enclosing loop
+when we use continue with a label marking a loop, it will proceed to the next iteration of that loop
+
+Without a label, break terminates the nearest enclosing loop. 
+we can use break with a label, which terminates the loop marked with that label
+
+Any expressions in Kotlin can be marked with a label.
+For example, abc@,
+loop@ for (i in 1..10) {
+    // some code 
+}
+
+@Test
+fun givenLoop_whenBreakWithLabel_thenComplete() {
+    var value = ""
+    outer_loop@ for (i in 'a'..'d') {
+        for (j in 1..3) {
+            value += "" + i + j
+            if (i == 'b' && j == 1)
+                break@outer_loop
+        }
+    }
+    assertEquals("a1a2a3b1", value)
+}
+
+
+###########################################3
+this is receiver,
+
+class A { // implicit label @A
+    inner class B { // implicit label @B
+        fun Int.foo() { // implicit label @foo
+            val a = this@A // A's this
+            val b = this@B // B's this
+
+            val c = this // foo()'s receiver, an Int
+            val c1 = this@foo // foo()'s receiver, an Int
+
+            val funLit = lambda@ fun String.() {
+                val d = this // funLit's receiver
+            }
+
+
+            val funLit2 = { s: String ->
+                // foo()'s receiver, since enclosing lambda expression
+                // doesn't have any receiver
+                val d1 = this
+            }
+        }
+    }
+}
+
+https://kotlinlang.org/docs/reference/this-expressions.html#qualified
+https://kotlinlang.org/docs/reference/keyword-reference.html
+https://kotlinlang.org/docs/reference/basic-syntax.html
+# kotlin this at notation
+###########################################################
+
+https://kotlinlang.org/docs/reference/extensions.html
+extension functions
+fun MutableList<Int>.swap(index1: Int, index2: Int) {
+    val tmp = this[index1] // 'this' corresponds to the list
+    this[index1] = this[index2]
+    this[index2] = tmp
+}
+The this keyword inside an extension function corresponds to the receiver object (the one that is passed before the dot). Now, we can call such a function on any MutableList<Int>:
+
+val l = mutableListOf(1, 2, 3)
+
+l.swap(0, 2) // 'this' inside 'swap()' will hold the value of 'l'
+
+Of course, this function makes sense for any MutableList<T>, and we can make it generic:
+
+fun <T> MutableList<T>.swap(index1: Int, index2: Int) {
+
+    val tmp = this[index1] // 'this' corresponds to the list
+
+    this[index1] = this[index2]
+
+    this[index2] = tmp
+
+}
+
+#############################################
+
+#catagory theory
+# seven sketches mit
+https://ipv4.google.com/search?source=hp&ei=Ke39XMK4B822mAWa5Iv4Ag&q=seven+sketches+mit+&oq=seven+sketches+mit+&gs_l=psy-ab.12...576.5630..6252...0.0..0.772.5710.2-15j1j1j1j1......0....1..gws-wiz.....0..0i131j0j0i10j0i22i30j0i22i10i30j33i22i29i30j33i160.vN6W_ZEhvZM
+
+<$> and >>= different, >>= can return Nothing, but <$> can't if (f a) is not Nothing
+https://stackoverflow.com/questions/35387237/difference-in-capability-between-fmap-and-bind
+#combine two decorators
+https://stackoverflow.com/questions/5409450/can-i-combine-two-decorators-into-a-single-one-in-python
+
+#java #http request #post #get #RESTFul API
+https://www.cnblogs.com/newflydd/p/4891809.html
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+ 
+public class SendPostDemo {
+ 
+    public static void main(String[] args) throws Exception{
+        String urlPath = new String("http://localhost:8080/Test1/HelloWorld");  
+        //String urlPath = new String("http://localhost:8080/Test1/HelloWorld?name=丁丁".getBytes("UTF-8"));
+         
+         
+        String param="name="+URLEncoder.encode("丁丁","UTF-8");
+         
+        //建立连接
+        URL url=new URL(urlPath);
+        HttpURLConnection httpConn=(HttpURLConnection)url.openConnection();
+         
+        //设置参数
+        httpConn.setDoOutput(true);     //需要输出
+        httpConn.setDoInput(true);      //需要输入
+        httpConn.setUseCaches(false);   //不允许缓存
+        httpConn.setRequestMethod("POST");      //设置POST方式连接
+         
+        //设置请求属性
+        httpConn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+        httpConn.setRequestProperty("Connection", "Keep-Alive");// 维持长连接
+        httpConn.setRequestProperty("Charset", "UTF-8");
+         
+        //连接,也可以不用明文connect，使用下面的httpConn.getOutputStream()会自动connect
+        httpConn.connect();
+             
+        //建立输入流，向指向的URL传入参数
+        DataOutputStream dos=new DataOutputStream(httpConn.getOutputStream());
+        dos.writeBytes(param);
+        dos.flush();
+        dos.close();
+         
+        //获得响应状态
+        int resultCode=httpConn.getResponseCode();
+        if(HttpURLConnection.HTTP_OK==resultCode){
+            StringBuffer sb=new StringBuffer();
+            String readLine=new String();
+            BufferedReader responseReader=new BufferedReader(new InputStreamReader(httpConn.getInputStream(),"UTF-8"));
+            while((readLine=responseReader.readLine())!=null){
+                sb.append(readLine).append("\n");
+            }
+            responseReader.close();
+            System.out.println(sb.toString());
+        }  
+    }
+}
+
+###################################################
+
+android cast screen to TV or PC (dell laptop inspiron 5480), miracast
+https://www.jianshu.com/p/bc8a7ecfd083
+https://www.asus.com.cn/support/faq/1031773
+1. Window + P 投影到这台电能
+2. 所有位置都可用
+
+on you android phone (asus zenfone 5)
+1. connect the same wifi with PC or TV
+2. PlayTo connect to TV or PC
+3. allow the connection on PC or TV
+##########################################################
+
+#postgresql
+
+pip install psycopg2
+
+5432 is the default port to postgresql
+pgAdmin is the manage tool for postgresql
+add the path of psql.exe into you $PATH environment on win10
+
+use pgAdmin to create a new database
+
+notice, add new server is not the same with creating new database
+
+there's a default database called postgres, and user is postgres, 
+click 'Servers' - 'PostgreSQL' - 'Databases' right click create 'Database'
+right click on that new databases create cast
+
+import psycopg2
+conn = psycopg2.connect(database="j4", user="postgres", password="pepper", host="127.0.0.1", port="5432")
+print ("Opened database successfully")
+cur = conn.cursor()
+cur.execute('''CREATE TABLE COMPANY2
+       (ID INT PRIMARY KEY     NOT NULL,
+       NAME           TEXT    NOT NULL,
+       AGE            INT     NOT NULL,
+       ADDRESS        CHAR(50),
+       SALARY         REAL);''')
+print ("Table created successfully")
+
+conn.commit()
+conn.close()
+################################################################
+
+https://kotlinlang.org/docs/reference/extensions.html
+
+#kotlin #arrow
+follow the arrow website
+"Could not find io.arrow-kt:arrow-effects-kotlinx-coroutines-data:0.9.1-SNAPSHOT."
+put
+ maven { url 'https://mvnrepository.com/artifact/io.arrow-kt'}
+ into repositories {} in build.gradle
+
+#############################################################
+
 about REST Ful API,
 
 url, headers, params, data, json, auth, cookies, timeout, allowRedirects, stream, files
