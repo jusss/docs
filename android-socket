@@ -1,0 +1,28 @@
+1. in AndroidManifest.xml
+<uses-permission android:name="android.permission.INTERNET" />
+
+2. socket can not be in main thread, put it in another thread
+public class MainActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        new Thread()
+        {
+            public void run() {
+                Robot m = new Robot("192.168.1.147", 50017);
+                m.sendToRobot("hello");
+                m.close();
+            }
+        }.start();
+    }
+}
+ 
+this Robot class is from a jar package which is written with kotlin
+in build.gradle
+dependencies {
+    implementation fileTree("/tmp/socket-k2p/k2p.jar")
+}
+
+https://stackoverflow.com/questions/29992292/
