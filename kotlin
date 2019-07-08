@@ -1,3 +1,10 @@
+https://intellij-support.jetbrains.com/hc/en-us/community/posts/115000156824-How-to-choose-main-class
+https://stackoverflow.com/question/43307532/auto-errors-detection-in-intellij-idea/43319356#43319356
+when you click `run` and it always pop up configuration, it's 'cause your `src` directory is not configured
+as `Sources root`, and `src` is grey not blue, right click on `src` and set it as `Sources root`,
+then you can run it normally
+
+//////////////////////////////////////////////////////
 
 the type is the class, the class is the type  in kotlin also python
 the instance is the value, the value is the instance 
