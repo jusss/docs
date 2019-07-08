@@ -1,0 +1,36 @@
+it's about src folder, src folder should be blue in idea, mark as `source root`
+then create a package 'com.sun.k2p' and create a new file Robot.kt under it,
+there's a class Robot in Robot.kt, and the main class is com.sun.k2p.RobotKt
+if there's a package 'com', and pacakge 'sun' in package 'com', and package 'k2p' in 
+package 'sun' and file Robot.kt in package 'sun', it's the same main class
+this is used to describe several pacakges like com.sun.k2p or com.microsoft.k2p
+or com.google.k2p
+
+if there's main.kt in src, then its main class is MainKt without any prefix name
+
+
+java's class instance must be in a method of a class!
+you can instance a class in a class directly, do it in a method of a class!
+
+kotlin, src/k2p.kt   there's a class Robot in it, and no main function,
+and its main class is K2pKt
+if it's main.kt, its main class should be MainKt
+
+src if it's not blue, 'cause it's not source root, right click change it to source root
+
+src/ right click create package, com.sun.k2p
+right click create a new file Robot.kt on that package,
+pacakge com.sun.k2p will auto show in that new file
+main class will be com.sun.k2p.RobotKt
+so in kotlin, main class is "pacakge-name.file-name"
+
+export to jar
+Project Structure - Artifacts - '+' - JAR - from modules with dependices
+main class is com.sun.k2p.RobotKt
+Build Artifacts - build 
+
+import jar
+create lib folder in project, and copy jar to that folder,
+Project Structure - Modules - Dependencies - + - JARs or directories choose that jar in lib
+
+
