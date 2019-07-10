@@ -1,4 +1,144 @@
 
+compile kotlin with arrow code to a jar, and import that jar in java, and it works!
+pack jar use kotlin's artifacts build
+
+###############################################
+
+#java #classpath #main class
+
+java -classpath xxx    main-class
+
+1. create a class
+java with gradle, del2\src\main\java\Main.java,  there's a public static Main{ psvm {}} in it
+there's no package, so the main class is "Main", if this Main.java is in package "com.sun",
+then its main class is "com.sun.Main", and the path of Main.java is the classpath, if it's package,
+then the path of package is the classpath, `cd del2` then `java -cp src\main\java`,
+`cd del2\src\main\java` then `java -cp .`
+
+2. build.gradle 
+jar {
+    manifest {
+        attributes 'Main-Class': 'Main'       //this make it as a runnable jar
+    }
+    // from(zipTree("path-of-dependency-jar"))
+    //https://stackoverflow.com/questions/21721119/creating-runnable-jar-with-gradle
+    //https://medium.com/@preslavrachev/kotlin-basics-create-executable-kotlin-jars-using-gradle-d17e9a8384b9
+}
+this will find Main.java in source root folder "src\main\java" then pack Main.java alone into a jar without the path,
+'cause main class is Main, there's no prefix package
+
+3. cd into del2, run `gradle build`, it will output  del\build\libs\del.jar
+
+4. cd del\build\libs\ , run `java -cp del2-1.0-SNAPSHOT.jar Main`, that main method in Main.java will run
+
+5. or compile Main.java to Main.class via `cd del2\src\main\java`, `javac -cp . Main.java`, then run `java -cp . Main`
+if there's "import org.junit.Test;" in Main.java
+then put junit-4.12.jar in current directory, run `javac -cp junit-4.12.jar Main.java`, you can put several jars here split with ';' on  windwos, ':' on unix
+and `java -cp . Main` to run this code
+you can not run `java -cp . Main` without compile Main.java to Main.class
+
+6. about jar files, it just a simple zip file which contains some *.class files
+and a *.class is just a binary code file, you can create jar files with
+`jar cvf del2.jar      *.class`
+`java -cp del2.jar      Main`  but this is not a runnable jar, you can not run it with `java -jar del2.jar`, or change manifest file in jar file
+but you can create a runnable jar with gradle, but it needs edit build.gradle, append jar{ manifest {... }}
+
+now there're four ways to create jars, 1. use intellij idea-artifact build, 2. `gradle build`, 3. maven, 4. `jar cvf x.jar x.class`
+https://github.com/junit-team/junit4/wiki/Getting-started
+https://enigmastation.com/2014/07/11/repost-rocket-java-that-stupid-classpath-thing-you-should-understand/
+https://docs.oracle.com/javase/6/docs/technotes/tools/solaris/classpath.html
+https://docs.oracle.com/javase/tutorial/rmi/compiling.html
+
+################################################
+
+the classpath points to paths of packages
+
+Cool.class in the package utility.myapp.
+If the path to that directory is /java/MyClasses/utility/myapp,
+% java  -classpath /java/MyClasses       utility.myapp.Cool
+
+But when classes are stored in an archive file (a .zip or .jar file)
+the class path entry is the path to and including the .zip or .jar file.
+% java  -classpath /java/MyClasses/myclasses.jar      utility.myapp.Cool
+
+To find class files in the directory /java/MyClasses as well as classes
+in /java/OtherClasses, you would set the class path to:
+% java  -classpath /java/MyClasses:/java/OtherClasses       ...
+Note that the two paths are separated by a colon.
+
+-cp is short for -classpath
+on unix is colon ':', but on windows is ';'
+
+java -cp foo.jar:bar      foo.bar.Baz
+the classpath is foo.jar in the current directory, or bar folder in the current directory
+Java will then look inside foo.jar, looking for a file entry of “/foo/bar/Baz.class”
+If foo.jar contains “/foo/bar/Baz.class”, Java uses it and stops looking further in the classpath.
+If foo.jar does not contain “/foo/bar/Baz.class”,
+then Java will look in the “bar” directory for “./foo/bar/Baz.class”
+
+
+
+##########################################################
+#gradle build jar
+
+javac is used to compile package to jar or java file to class file 
+java is used to run jars or class
+
+1. build.gradle
+jar {
+    manifest {
+        attributes 'Main-Class': 'Main'
+    }
+}
+put your main class in build.gradle, if src\main\java\Main.java without package,
+then the main class is Main
+
+2. public class Main {} in Main.java should have one public static void main(String[] args) {} as entry point, and import others pacakges in this Main.java
+
+3. cd into the root of this project, run `gradle build` will output a jar in "build\libs\"
+
+4. java -jar a.jar to run it
+
+https://stackoverflow.com/questions/21721119/creating-runnable-jar-with-gradle
+##############################################
+
+1. build.gradle
+    implementation 'junit:junit:4.12'
+2. Settings - Build - Gradle - Runner - Platform Test Runner
+
+there're two junit, junit 4 and junit 5
+
+Settings - Build - Gradle - Runner - Gradle Test Runner
+
+###############################################
+
+one file only has one public class, it can have several other class,
+every class only has one main() method, as the entry point,
+and the file name must be the same with the public class name
+put cursor on the code block you may want to run, then right click,
+choose run the function
+
+main() should be  public static void main(String[] args) {}
+main() is the entry point, so main() doesn't need @Test
+
+##############################################
+
+JAVA_HOME in windows 10, download java sdk 12 from oracle, 
+and install it,
+JAVA_HOME is point to "C:\Program Files\Java\jdk-12.0.1"
+and append "%JAVA_HOME%\bin" to PATH
+
+download gradle from gradle.org, and unzip it to C:\Gradle\
+put this "C:\Gradle\gradle-5.5\bin" into PATH via search "Advance xxx"
+cd into the root of project, then do `gradle build`  will generate "build\libs\xxx.jar"
+you should change build.gradle for main class, like MainKt, then in main.kt to import
+other files it wants to use, then `gradle build`
+
+######################################
+class name in java should be the same with file name
+Main.java
+public class Main
+
 java's class instance must be in a method of a class!
 you can instance a class in a class directly, do it in a method of a class!
 
