@@ -1,3 +1,10 @@
+1. All things that are made abstract exist only to be made concrete again.
+2. the only purpose of a function is to be applied to an argument
+3. Maybe a is abstract, but Maybe Int is a concrete type
+4. create and describe with abstract, but apply with concrete
+5. like parameter and type, you create a function with variable and type variable
+but you must call it with concrete value and concrete type
+##########################################
 
 1. types are used to describe values, types are sets of values in math, modes in CS
 2. think class as type constructor, and instance as value constructor,
