@@ -1,0 +1,7 @@
+there're Primary and Clipboard on linux,
+and select by cursor just copy them to Primary, not clipboard
+and vim doesn't come with +clipboard attribute from the most distro
+so install gvim and uninstall vim
+gvim will enable this on Xorg environment by default
+or you can use :set guioptions+=a
+or you can compile vim with +clipboard option or use xclip
