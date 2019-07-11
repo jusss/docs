@@ -1,4 +1,53 @@
 
+compile java code on windows 10 and run it on gentto
+http://doc.aldebaran.com/2-1/dev/java/index_java.html
+1. download jdk
+download jdk7 for windows from oracle.com
+download jre7 or jdk7 for linux from oracle.com
+
+2. download dependecy library
+download java-naoqi-sdk-2.1.4.13-win32-vs2010.jar for windows from aldebaran.com
+download java-naoqi-sdk-2.1.4.13-atom.jar not *-linux.jar for linux from aldebaran.com
+
+3. coding on windows 10
+open intellij idea and create a project based on jdk7 then import that download jar file,
+after coding, then
+>"c:\Program Files (x86)\Java\jdk1.7.0_60\bin\javac.exe" -cp D:\java-naoqi-sdk-2.1.4.13-win32-vs2010.jar src\HelloWorld.java
+it will output a HelloWorld.class, copy this HelloWorld.class to gentoo
+
+4. run *.class on gentoo
+export JAVA_HOME=/home/nao/java/jdk1.7.0_60
+export PATH=$PATH:/home/nao/java/jdk1.7.0_60/bin
+ java -cp .:java-naoqi-sdk-2.1.4.13-atom.jar HelloWorld
+
+remember! the -cp must contain '.' when you run `java -cp `
+'cause '.' is where HelloWorld.class is
+the default -cp contain '.', but if you tell it -cp x.jar, then it doesn't include '.',
+you need to point it in -cp like '-cp .:x.jar'
+
+5. compile kotlin code to jar on windows 10 and run it on gentoo
+create a kotlin/JVM project based on jdk7 and use intellij idea artifacets build to jar
+pass that jar to gentoo,
+java -cp .:java-naoqi-sdk-2.1.4.13-atom.jar:KotlinOnNaoqi.jar HelloWorldKt
+
+6. use jdk8 test that java-naoqi-sdk-2.1.4.13-win32-vs2010.jar which is compiled by jdk7
+download jdk8 for windows and linux
+>"c:\Program Files (x86)\Java\jdk1.8.0_212\bin\javac.exe" -cp D:\java-naoqi-sdk-2.1.4.13-win32-vs2010.jar src\HelloWorld.java
+copy that src\HelloWorld.class to gentoo
+ ~/java8 $ ./jdk1.8.0_212/bin/java -cp ~/java-naoqi-sdk-2.1.4.13-atom.jar:. HelloWorld
+ and it just works!
+
+7. use kotlin based on jdk8 compile on windows run on gentoo
+compile with intellij idea artifacts build to jar on windows 10,
+./jdk1.8.0_212/bin/java -cp ~/java-naoqi-sdk-2.1.4.13-atom.jar:Java8Naoqi.jar HelloWorld
+
+or java on jdk8
+"c:\Program Files (x86)\Java\jdk1.8.0_212\bin\javac.exe" -cp D:\java-naoqi-sdk-2.1.4.13-win32-vs2010.jar src\Hello.java
+./jdk1.8.0_212/bin/java -cp ~/java-naoqi-sdk-2.1.4.13-atom.jar:. Hello
+
+String seems different betweeen java and kotlin
+##################################################
+
 compile kotlin with arrow code to a jar, and import that jar in java, and it works!
 pack jar use kotlin's artifacts build
 
