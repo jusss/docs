@@ -1,4 +1,138 @@
 
+#kotlin #String #ByteArray
+
+String to ByteArray,   "a".toByteArray(Charsets.UTF_8)
+ByteArray to String,  String(aByteArray, Charsets.UTF_8)
+
+.toString is showing as string, you even can ByteArray.toString show the bytes as string
+but .toString can not return a string, so use String(aByteArray, Charsets.UTF_8) to convert
+a ByteArray to String
+
+type(3) in python, is like 3.getClass()
+
+String.substring(0,2)
+ByteArray.sliceArray(0..2)  or (0 until sizeVar)
+
+IntRange is look like 0..1  or 0..size
+
+python has socket.recv() and send(),
+but java and kotlin don't have that , they have write() and read()
+and read() may read one byte once or one byte array once
+there's no a sign of end, you need to design it by yourself, like
+you can use "\r\n" as end sign, then you write ("abcd\r\n") and
+when put read in a loop, when read "\r\n" then break the loop,
+also you need to use the byte array's size to get the valid byte array
+to turn it to a string
+
+val size = client.inputStream.read(aob);
+val recvMsg:String =
+        String(aob.sliceArray(0 until size), Charsets.UTF_8)
+###################################################
+
+<Bombe> An array’s toString() does not return a representation of the content
+        of the array.                                                   [14:18]
+<Bombe> And InputStream.read(byte[]) is not guaranteed to fill the array or
+        generally return more than one byte. If you are expecting multiple
+        bytes you need to make sure you read them all before proceeding.
+<Bombe> You can wrap it in a BufferedReader which offers readLine(), sure.
+<jusss> does kotlin have list/set/dict comprehesion, decorator, generator,
+        those features those modern languages have?                     [16:15]
+<jusss> I saw that kotlin has coroutine, and java doesn't               [16:16]
+<jusss> and kotlin's coroutine is related with Promise/Future ?
+<yawkat> yes, kotlin has some of those features.                        [16:17]
+<yawkat> no, coroutines are not related to promises or futures, though they
+         can be used to implement them.
+<jusss> and I also saw kotlin has a static type system, and does it have
+        typeclass ?                                                     [16:18]
+<yawkat> no.                                                            [16:19]
+<jusss> and I saw kotlin say coroutine libraries are stable now, and when it
+        will make it as buit-in or called std lib?
+<yawkat> im not sure if they ever will be in the stdlib - the stdlib is meant
+         to be light.
+<jusss> if kotlin's coroutine doesn't to do with Promise/Future, then what's
+        the meaning of exist?                                           [16:20]
+<jusss> it can not be flattern, can not be cancel, can not be append
+<yawkat> coroutines are a nicer way to implement state machines. what you do
+         with them is up to you.
+<jusss> even javascript the front language has Promise now, I don't understand
+        a language like java/kotlin why still not have it               [16:21]
+<Bombe> Because the language designers didn’t put it in.               [16:22]
+<jusss> it's too difficult to implement to kotlin? 
+<yawkat> jusss: that is an entirely different statement.
+<Bombe> And especially JavaScript shouldn’t be taken as an example for
+        anything.                                                       [16:23]
+<jusss> all those features other modern langues have, and kotlin is design as
+        a moder language?
+<jusss> I heard your sugestion,and put "1" as a sing of end, but why the
+        "c.length" is 1017, even I just send a 4 character string       [16:28]
+<Bombe> jusss, that… doesn’t contain anything of what we talked about.
+<yawkat> jusss: because your array is that big.
+<yawkat> youre converting the entire array to a string.
+<jusss>   val size = client.inputStream.read(aob)                       [19:19]
+<jusss>  val recvMsg:String = String(aob, Charsets.UTF_8)
+<jusss> how I can do ByteArray slice on aob?
+<jusss> aob[0:size] on kotlin?
+<jusss> I saw that slice method, but I don't understand why it
+        aob.slice(0..size) is wrong?
+<yawkat> use sliceArray                                                 [19:23]
+<yawkat> also, 0 until size, because .. is inclusive
+<yawkat> also, read may terminate before the input has been fully read, so
+         calling it outside a loop is almost always wrong               [19:24]
+<yawkat> also, just use an inputstreamreader instead of decoding it yourself.
+<jusss> yawkat: fun ByteArray.sliceArray(indices: IntRange): ByteArray,  I
+        don't know what IntRange looks like?                            [19:29]
+<yawkat> 0..4 is an intrange.                                           [19:30]
+<jusss> 0 until size?
+############################################
+
+#kotlin #socket #server
+import java.net.ServerSocket
+fun main(){
+    val server = ServerSocket(50017)
+    val client = server.accept()
+    val msg = "hello"
+    var aob = ByteArray(1024)
+
+    client.outputStream.write(msg.toByteArray(Charsets.UTF_8))
+    client.outputStream.flush()
+    //client.inputStream.read(aob)
+    val size = client.inputStream.read(aob)
+    //println(aob.toString(Charsets.UTF_8))
+    println(String(aob.sliceArray(0 until size), Charsets.UTF_8))
+
+}
+
+#kotlin #socket #client
+import java.net.Socket
+class Client(addr:String, port:Int){
+    val sock = Socket(addr, port)
+    fun sendToRobot(msg:String): Boolean {
+        sock.outputStream.write(msg.toByteArray(Charsets.UTF_8))
+        sock.outputStream.flush()
+        return true
+    }
+    fun recvFromRobot():String{
+        var aob = ByteArray(1024)
+        val size = sock.inputStream.read(aob)
+        //println(aob.toString(Charsets.UTF_8))
+        return String(aob.sliceArray(0 until size), Charsets.UTF_8)
+    }
+    fun close(){
+        sock.close()
+    }
+}
+
+fun main(){
+    val a = Client("127.0.0.1",50017)
+    //val a = Client("192.168.31.207",50007)
+    a.sendToRobot("3\n")
+    a.sendToRobot("7")
+    println(a.recvFromRobot())
+}
+// sock.use {} is like with statement in python, auto close file io or socket io
+
+#############################################
+
 compile java code on windows 10 and run it on gentto
 http://doc.aldebaran.com/2-1/dev/java/index_java.html
 1. download jdk
