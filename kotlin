@@ -1,3 +1,44 @@
+alist = []
+class T:
+    def __init__(self):
+        alist.append(self)
+
+fun main(){
+    val allFoos = mutableListOf<Any>()
+    class Foo{
+
+        init{
+            allFoos += this
+        }
+    }
+}
+this case in python is used to handle websocket,
+every new coming client will store to a global list,
+so we can send messages to all the client
+///////////////////////////////
+
+class MyClass constructor(name: String) { var siteName = name }
+this constructor (){ } is the primary constructor
+
+constructor () {} inside the primary constructor is the secondary constructor
+
+class MyClass constructor(){
+    constructor(){
+    }
+}
+
+instantiate with which constructor, with different parameters
+
+var a:Array<Any> = arrayOf(1,"2")
+a[1] is String
+a[0] is Int
+
+is equal isinstance in python
+
+a += 3
+
+////////////////////////////////////////////////
+
 https://intellij-support.jetbrains.com/hc/en-us/community/posts/115000156824-How-to-choose-main-class
 https://stackoverflow.com/question/43307532/auto-errors-detection-in-intellij-idea/43319356#43319356
 when you click `run` and it always pop up configuration, it's 'cause your `src` directory is not configured
