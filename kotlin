@@ -12,6 +12,16 @@ fun main(){
         }
     }
 }
+
+java version
+
+public class User(){
+        public User(){
+            Test2.list.add(this);
+        }
+}
+ when User t = new User(), t will be stored in Test2.list
+
 this case in python is used to handle websocket,
 every new coming client will store to a global list,
 so we can send messages to all the client
