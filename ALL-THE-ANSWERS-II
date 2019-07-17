@@ -1,4 +1,302 @@
 
+abstract, sealed and data class in kotlin
+
+in java, List is an interface, and ArrayList is an implement of List
+inheritance a class use `extend' keyword
+use `implement' to implement interfaces,
+you can implement some interfaces in one class,
+class xxx () implemnt xxx implemnt xxx { }
+
+abstract class is like interface, but you only inheritance one abstract class from a class
+class xxx () extend a-abstract-class
+
+data class is a class that only stored data, nothing more, no methods
+sealed class is can not be inheritance in java, only via reflection to visit
+className.class.attributes
+
+sealed class can be inheritance in kotlin, can not be instantiated,
+use sealedClass.attributes to visit
+
+sealed class can not be instantiated
+data class must have at least one parameter as constructor
+
+type inheritance!
+
+open class G
+class G2():G()
+fun S(s: G){}
+fun z() { val e = G2();  S(e)}
+
+if A as parameter type in a function, then the instance of class B which inherit A,
+can be applied by this function
+
+##################################
+
+#Either
+f :: Either Int String -> Either Int String
+fl :: Either a b -> a
+fr :: Either a b -> b
+
+f (Left x) = Left (x+1)
+f (Right y) = Right (reverse y)
+
+fl (Left x) = x
+fr (Right y) = y
+
+#################################################
+
+java has @nullable annotation to declare a pointer cannot be null
+<jusss> does haskell have Object type and null value ?
+<jackdk> no                                                             [11:39]
+<koz_> That's an oddly-specific question, jusss.
+<koz_> What do you wanna do?
+<jusss> koz_: I'm learning java and kotlin just now,                    [11:40]
+<jusss> so I wonder                                                     [11:41]
+<jusss> undefined in haskell is a value or a type? and what is bottom type?
+<heatsink> jusss: In Java, there was no way to declare that a pointer cannot
+           be null, and mistakes cause NullPointerExceptions.  Java introduced
+           @nullable annotations to help deal with the problem, saying at
+           least sometimes that a pointer can't be null
+<Cale> jusss: undefined is a value, but it's a value which is
+       indistinguishable from your program going into an infinite loop
+<heatsink> jusss: Haskell comes from the opposite direction.  "Pointers" are
+           always pointing to valid data.  If you want an maybe-present,
+           maybe-absent value, like a pointer that can be null, you would use
+           the Maybe data type.
+<Cale> So, you don't "test for undefined" the way you might "test for null"
+<M31violet13[m]> That's what the Maybe monad is for, no?                [11:45]
+<glguy> The Maybe type at least                                         [11:46]
+<Cale> Yeah, as heatsink mentioned.
+<Cale> You might not bother using the Monad instance, just the type and
+       pattern matching can be good enough a lot of the time.
+<jusss> what we call Maybe a?  Maybe Int is a type, Maybe a is a type?
+<M31violet13[m]> That is a type.                                        [11:48]
+<jusss> ok
+<EvanR> undefined is theoretically indisinguishable but...              [11:50]
+<EvanR> you can do evil things like catch undefined exception
+<jusss> haskell has Exception stuff?                                    [11:56]
+<EvanR> yes                                                             [11:57]
+<jusss> I thought Haskell is like C, just have a static type system without OO
+<EvanR> theres few ways haskell is like C                               [11:58]
+<glguy> EvanR: It's not relevant to this discussion, but catching undefined
+        evaluation exceptions are much less precise than matching on null
+<glguy> you can't tell where the undefined came from
+<jusss> now I learn four kinds of languages, 1. dynamic type with OO like
+        Python and Javascript,  2. static type without OO like C and Haskell,
+        3. static type with OO like Java and Kotlin, 4. dynamic type without
+        OO, scheme...
+<EvanR> yeah but haskell feels much different from python, javascript, C,
+        Java, and scheme                                                [12:02]
+<EvanR> so that 2-bit criteria seems like its missing something
+<jusss> that 3. static type with OO was really make me confused a few days
+        ago, 'cause they have type and class!
+<jusss> and they even have type inheritance!
+<jusss> they can use class as type, or say type as class?               [12:05]
+<heatsink> jusss: Besides those 4 kinds of languages, some programming
+           languages are designed to help programmers prove that their code
+           works correctly.  For example, some languages let you wrote proofs
+           and code together; invalid proofs and invalid code alike are
+           detected by the compiler.                                    [12:08]
+<heatsink> jusss: Haskell isn't really in that category of languages
+           supporting formal proofs, but it's influenced by that domain
+<jusss> heatsink: you mean like @ annotation in java?
+<heatsink> jusss: Some Java tools use annotations to prove specific kinds of
+           correctness, such as null-safety.  It's similar.
+<heatsink> jusss: The difference is, each tool proves just one thing.  If you
+           want to prove that your program doesn't access arrays out of
+           bounds, your @nonnull annotations won't help at all.
+<___laika> i think the idea is to be more explicit about what functions have
+           access to which capabilities
+<heatsink> jusss: Proof-oriented languages try, more or less, to let you prove
+           anything that's proveable
+<jusss> heatsink: decorator in python is a proof?                       [12:19]
+<heatsink> jusss: No
+<___laika> and then not tying it to IO allows users to be more flexible about
+           monad stack and such, i guess                                [12:21]
+<___laika> jusss: python decorators are just syntax sugar to make it easier to
+           wrap top normal definitions                                  [12:22]
+<jusss> heatsink: ___laika ok                                           [12:23]
+<___laika> if you annotate a function foo with @bar
+<___laika> thats the same as saying foo = bar(foo)
+<___laika> err
+<___laika> foo = bar(original definition of foo)                        [12:24]
+<___laika> it rebinds it to the same name
+<jusss> ___laika: I wonder if decorator in python is like compose in haskell?
+<jusss> function compose, of course
+<___laika> not exactly i dont think                                     [12:26]
+<jusss> ok
+<___laika> a decorator basically extends an existing function with some given
+           functionality                                                [12:27]
+<___laika> in haskell it would look more like
+<___laika> decorator = <some definition>
+<___laika> f = <other>
+<___laika> f' = decorator f
+<___laika> function composition in python can be accomplished via a couple
+           mechanisms
+           https://mathieularose.com/function-composition-in-python/    [12:28]
+<jackdk> in a similar vein, you can think of fmap, liftA(n), foldMap, >>=,
+         traverse etc as "function transformers"                        [12:43]
+
+#####################################
+
+#Types have Functions  or Functions appy on Types?
+#abstract&concrete
+
+Prelude> :{
+Prelude| f::Either a b -> a
+Prelude| f (Left x) = x
+Prelude| :}
+Prelude> f (Left 3)
+3
+
+Prelude> :{
+Prelude| g :: Either a b -> Either a b
+Prelude| g (Left x) = Left (x+1)
+Prelude|
+Prelude>      is not ok, 'cause x+1 need x is Int, 'cause Types have Functions
+but here x is just a, not Int
+
+if you want use x+1 and reverse a string, then make Either a b concrete!
+'cause concrete Int has +1 and String has reverse function
+
+Prelude> :{
+Prelude| g::Either Int String -> Either Int String
+Prelude| g (Left x) = Left (x+1)
+Prelude| g (Right y) = Right (reverse y)
+Prelude| :}
+Prelude> g (Left 2)
+Left 3
+Prelude> f (g (Left 2))
+3
+
+Prelude> :{
+Prelude| t :: Either Int b -> Int
+Prelude| t (Left x) = x+1
+Prelude| :}
+Prelude> t (Left 2)
+3
+
+########################################
+
+instance variable self.var in python is look like
+class T2 {
+      var time:Time
+      init{
+        time = Time()
+      }
+      fun test(){
+          time = Whatever
+      }
+}
+'cause to instantiate a class to an object, it must be in a method of class
+but you can declare it outside a method and inside a class, and
+init it in the init block,
+or
+class T2(var time:Time){
+      init{
+        time = Time()
+      }
+ }
+ don't do variable instantiate in init block
+ init { var time = Time() } you won't visit time in other place
+
+this keyword
+
+this in kotlin is not like self in python
+ class T:
+...     def __init__(self):
+...             self.t = self()
+...
+>>> s=T() will be an error AttributeError: T instance has no __call__ method
+
+>>> class T:
+...     def __init__(self):
+...             pass
+...     @classmethod
+...     def finit(cls):
+...             self.t = cls()
+...
+>>> s=T()
+>>> s.t
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+AttributeError: T instance has no attribute 't'
+
+ Every secondary constructor must invoke another (primary or secondary)
+ constructor by using the this keyword as if it were a function (so that every instance
+ construction eventually calls the primary constructor).
+
+class Person(val name: String, var age: Int) {
+    constructor(name: String) : this(name, 0)
+    constructor(yearOfBirth: Int, name: String)
+        : this(name, 2018 - yearOfBirth)
+}
+
+val a = Person("Jaime", 35)
+val b = Person("Jack") // age = 0
+val c = Person(1995, "Lynne") // age = 23
+
+I feel `this' keyword in kotlin is look like `this' in javascript,
+`this' is the stuff where it's in a scope when it runs
+
+so init { this.age = 22; var time = Time() } are stupid
+
+#infix expression
+
+infix fun marry(spouse: Person) {
+    println("$name and ${spouse.name} are getting married!")
+}
+val lisa = Person("Lisa")
+val anne = Person("Anne")
+lisa marry anne // Prints "Lisa and Anne are getting married!"
+
+https://kotlinlang.org/docs/tutorials/kotlin-for-py/classes.html
+
+###########################################
+
+val f2 = mutableMapOf<String,String>()
+f2["1"] = "2"
+println(f2["2"])
+will print null
+#############################################
+
+#kotlin #map #dict
+
+why to instantiate a class, it must be in a method of a class? not in a class directly?
+class Intro{
+    fun MyInit():Map<String,String>{
+       // why instantiate an class must be put into a method?
+       val duce = mutableMapOf<String, String>()
+       duce["key"] = "value"
+       return duce
+   }
+    val duce = MyInit()
+}
+
+###########################################
+
+#kotlin global variable, instance variable
+
+class Test {
+     fun f(): Int{
+         var t = 1
+         return t
+         }
+    t = f()
+    fun g(){
+        // then you can use t here
+        }
+ }
+###############################
+
+#socket
+
+about two socket exceptions
+1. shutdown without exit signal, catch Exception to handle
+2. shutdown with exit signal, read() will return -1
+
+##########################################
+
 #kotlin #String #ByteArray
 
 String to ByteArray,   "a".toByteArray(Charsets.UTF_8)
@@ -9,6 +307,7 @@ but .toString can not return a string, so use String(aByteArray, Charsets.UTF_8)
 a ByteArray to String
 
 type(3) in python, is like 3.getClass()
+isinstance in python is like is in kotlin
 
 String.substring(0,2)
 ByteArray.sliceArray(0..2)  or (0 until sizeVar)

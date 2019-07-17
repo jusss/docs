@@ -1,3 +1,15 @@
+instance variable
+class T {
+    fun gv(){
+        val t = someClass or Method call
+        return t
+    }
+    val t = gv()
+    fun gv2(){
+        print(t)
+    }
+}
+///////////////
 alist = []
 class T:
     def __init__(self):
