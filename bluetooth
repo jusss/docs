@@ -1,5 +1,6 @@
 blueman-applet show "unable to load plugin module AppIndicator"
 sudo pacman -S libappindicator-gtk3
+or try blueberry
 #####################################
 
 systemctl start bluetooth

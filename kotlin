@@ -1,3 +1,8 @@
+it's AD 9102, java/kotlin not yet implemnet something like a=[1,2] or b={"a":1}
+not even decorator, generator, and list comprehension, 
+not even special stuff like macro and continuation in lisp, pattern matching in haskell
+promise in js, future in python, I wonder why java/kotlin stay on 90's
+//////////////////////////
 instance variable
 class T {
     fun gv(){
