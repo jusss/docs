@@ -1,4 +1,83 @@
 
+
+1. kotlin implement java interface
+ Java 8, interfaces with exactly one function (known as "functional interfaces")
+ can be replaced by lambdas. 
+an instance of an anonymous class can be replaced by lambda
+
+2. f(a,b) to f(a)(b)
+Whenever you have a function of the form `func(..., f: (...) -> T)`
+(so `f` is a function type and is the last argument in `func`'s parameter list),
+you can move `f` outside the parentheses and include it as a block
+within curly braces after the close paren.
+
+3. override method when instantiate a class
+
+new EventCallback<Float>() {
+                    @Override
+                    public void onEvent(Float arg0)
+                            throws InterruptedException, CallError {
+                        // 1 means the sensor has been pressed
+                        if (arg0 > 0) {
+                        exitDialog(dialog,topic,"myModule");
+                        }
+                        else {tts.say("ouch!");}
+                    }
+}
+
+object : EventCallback<Float> {
+          override fun onEvent(arg0: Float): Unit =
+          if (arg0 > 0) exitDialog(dialog,topic,"myModule")
+          else
+                tts.say("ouch!")
+}
+############################################
+
+// Subscribe to FrontTactilTouched event,
+        // create an EventCallback expecting a Float.
+        frontTactilSubscriptionId = memory.subscribeToEvent(
+                "FrontTactilTouched", new EventCallback<Float>() {
+                    @Override
+                    public void onEvent(Float arg0)
+                            throws InterruptedException, CallError {
+                        // 1 means the sensor has been pressed
+                        if (arg0 > 0) {
+                            tts.say("ouch!");
+                        }
+                    }
+                });
+<jusss> js里是在参数里定义函数，java竟然在参数里定义一个类并实例化
+实例化时重载某个方法
+
+#java #constructor
+
+instantiate an class inside itself
+it's look like make `self' of python in java
+
+public class ReactToEvents {
+
+    public static void main(String[] args) throws Exception {
+                ReactToEvents reactor = new ReactToEvents();
+                reactor.run(application.session());
+                //what if we do reactor.attribute = "value"
+                //but main() won't execute when class instantiate
+                // what if we put this reactor into a constructor function and return it
+                //constructor function will run this object when class instantiate
+                // gg,
+                //https://www.w3schools.com/java/java_constructors.asp
+    }
+
+     public void run(Session session) throws Exception {
+     }
+}
+<jusss> 这个链接里有class constructor 和 the constructor(是个object), class
+        constructor里已经做了初始化呀
+<jusss> 那这个the constructor又是来干啥的                               [11:10]
+<jusss> 也对，这个main()实例化时是不执行的
+
+
+##################################
+
 abstract, sealed and data class in kotlin
 
 in java, List is an interface, and ArrayList is an implement of List
