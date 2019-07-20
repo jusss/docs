@@ -1,3 +1,52 @@
+
+Collections: List(order), Set(unique), Map(unique)
+read-only and mutable
+
+val num = mutableListOf("one","two")  //listOf is read-only
+num.add("3")
+num[0]
+
+val num2 = mutableListOf<String>()
+num2.add("what")
+
+val bob = Person("Bob",33)
+val people = listOf<Person>(Person("Adam",20), bob, bob)
+
+val dict = mutableMapOf<String, String>() //mapOf is read-only
+dict["1"] = "1"
+
+val dict = mapOf("key1" to "value1", "key2" to "value2")
+
+val dict = mutableMapOf("key1" to "value1", "key2" to "value2")
+dict.put("key3", "value3")
+dict["key1"]
+
+
+lists are different to arrays,
+an array's size is defined upon initialization and is never changed
+a list doesn't have a predefined size
+
+in kotlin, the default implementation of List is ArrayList which 
+you can think of as a resizable array
+
+////////////////////////////////////////////
+
+fun <T> Iterable<Iterable<T>>.flattern(): List<T>
+
+it's not a recursion in type definition or call
+it's just an interable of iterable of T which gets flattened into a list of T
+like
+[[1,2],[3]] -> flatten -> [1,2,3]
+
+not like that MapTree type definition in haskell
+
+data Tree a = Leaf a | Node (Tree a) (Tree a)
+    deriving (Show)
+
+"it is indeed a recursive generic type but you're not going to be able to do anything
+particularly Haskell-ey with them"
+
+//////////////////////////////////////////
 abstract & concrete
 
 if you want use a type's methods, then make the type concret
