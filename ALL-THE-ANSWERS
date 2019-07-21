@@ -1,4 +1,35 @@
 
+you can not use function call directly in a class, you must put it in a method
+class T2{
+    fun gg(){}
+    gg() is not ok, "Expecting member declaration"
+}
+
+but you can make that function call as a right value
+
+class T2{
+    fun gg(){}
+    val t = gg()
+}
+
+also you can use lambda do that
+class T2{
+    val z2 = {
+        x:ArrayList<String> ->
+        for (i in 0..100){
+            x.add("/home/$i.ogg")
+        }
+        x
+    }(arrayListOf())
+}
+
+about class initial, python's __init__(self), java's class constructor, 
+kotlin's attributes are initialized as default,
+if class's parameter are different, use secondary constructor 
+if you like, see primary constructor and secondary constructor in kotlin
+
+///////////////////////////////////////////////
+
 Collections: List(order), Set(unique), Map(unique)
 read-only and mutable
 
@@ -28,6 +59,11 @@ a list doesn't have a predefined size
 
 in kotlin, the default implementation of List is ArrayList which 
 you can think of as a resizable array
+
+ArrayList is a better choice than List
+
+val x:ArrayList<String> = arrayListOf()
+x.add("whatever")
 
 ////////////////////////////////////////////
 
