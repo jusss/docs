@@ -1,9 +1,109 @@
+#kotlin #httpurlconnection #use httpconn.setRequestProperty for header
+#data use urlencoded or json depend on header  #RESTful #post 
+httpurlconnection
+val reader: BufferedReader = BufferedReader(InputStreamReader(httpconn.inputStream, "UTF8"))
+var output = reader.readLine()
+        var result = ""
+        while (output != null){
+            result += output
+            output = reader.readLine()
+        }
 
+val outputStream: DataOutputStream = DataOutputStream(httpconn.outputStream)
+        outputStream.write(
+            getBody(filePath)
+                .toByteArray(charset=Charsets.UTF_8))
+        outputStream.flush()
+#######################################
 
+json to map, kotlin
+json is just a string,
+val aJson = "{ret:x, msg:x}"
+data class Msg(val ret:String, val msg:String)
+val gson=Gson()
+val result = gson.fromJson(aJson, Msg::class.java)
+println(result.ret)
+
+or just take what you need
+data class Msg(val ret:String)
+val gson=Gson()
+val result = gson.fromJson(aJson, Msg::class.java)
+println(result.ret)
+
+map to json
+val sendDataStr  = gson.toJson(whatever)
+
+###############################################
+
+<ski> and `(<=<)' composes functions whose results are monadic actions
+<jusss> eiGHttt: fish operator, <=<
+<jusss> eiGHttt: https://zhuanlan.zhihu.com/p/65449477                  [13:28]
+<jusss> eiGHttt: 但compose并不是组合monad, 而是组合返回结果是monadic actions的
+        函数                                                            [13:31]
+<eiGHttt> 组合'monad的方法。                                            [13:33]
+<eiGHttt> 就是compose的monad版。
+###########################################
+
+free mail receiver
+http://www.utilities-online.info/email/
+
+##############################################
+
+#lambda in #kotlin
+
+val exitDialog:(ALDialog,String,String) -> Unit = {
+    a,b,c ->
+        a.deactivateTopic(b)
+        a.unloadTopic(b)
+        a.unsubscribe(c)
+}
+
+https://www.baeldung.com/kotlin-lambda-expressions
+##############################
+
+`static' keyword in java is like class variables in python,
+all the objects share the same variables at any time
+it's called companion object in kotlin
+
+java's singleton is implement by `object' keyword in kotlin
+
+##########################################
+#SAM #kotlin #interface
 1. kotlin implement java interface
  Java 8, interfaces with exactly one function (known as "functional interfaces")
  can be replaced by lambdas. 
 an instance of an anonymous class can be replaced by lambda
+
+with a single method defined, making it a Single Abstract Method interface, which can be converted to a lambda
+
+Kotlin has SAM ("single abstract method") only for Java interfaces.
+
+EventCallback { it: Float ->
+  if (it > 0) println("ouch!") else println("1")
+}
+
+or
+
+EventCallback<Float> { if (it > 0) println("ouch!") else println("1") }
+
+instead of
+
+        object : EventCallback<Float> {
+            override fun onEvent(arg0: Float): Unit = if (arg0 > 0) println("ouch!")
+             else println("1")
+             
+and
+
+new EventCallback<Float>() {
+                    @Override
+                    public void onEvent(Float arg0)
+                            throws InterruptedException, CallError {
+                        // 1 means the sensor has been pressed
+                        if (arg0 > 0) {
+                            tts.say("ouch!");
+                        }
+                    }
+                }
 
 2. f(a,b) to f(a)(b)
 Whenever you have a function of the form `func(..., f: (...) -> T)`
