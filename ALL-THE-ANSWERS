@@ -1,3 +1,16 @@
+map a binary tree
+
+data Tree a = Leaf a | Node (Tree a) (Tree a)
+            deriving (Show)
+
+maptree :: (a->b) -> Tree a -> Tree b
+maptree f (Leaf a) = Leaf (f a)
+maptree f (Node xl xr) = Node (maptree f xl) (maptree f xr)
+
+Prelude> maptree (+1) (Node (Leaf 2) (Node (Leaf 5) (Leaf 9)))
+Node (Leaf 3) (Node (Leaf 6) (Leaf 10))
+
+########################################################
 
 you can not use function call directly in a class, you must put it in a method
 class T2{
