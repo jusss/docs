@@ -1,3 +1,32 @@
+kotlin's sealed class is like `data` in haskell
+and `when` can do something like pattern matching
+
+// sealed class Tree<T> {
+//  class Leaf<T>(val value: T): Tree<T>()
+//  class Node<T>(val left: Tree<T>, val right: Tree<T>): Tree<T>()
+// }
+
+sealed class Tree<T>
+data class Node<T>(val left: Tree<T>, val right: Tree<T>): Tree<T>()
+data class Leaf<T>(val value: T): Tree<T>()
+
+fun <T,R> Tree<T>.map(transform: (T) -> R): Tree<R> {
+    return when (this) {
+        is Node -> Node(
+            left = left.map(transform),
+            right = right.map(transform)
+        )
+        is Leaf -> Leaf(transform(value))
+    }
+}
+
+fun main(){
+    val tree = Node(Leaf(1), Node(Leaf(2), Leaf(3)))
+    val mapped = tree.map { it * it }
+    println(mapped)
+}
+
+##########################
 map a binary tree
 
 data Tree a = Leaf a | Node (Tree a) (Tree a)
@@ -9,6 +38,14 @@ maptree f (Node xl xr) = Node (maptree f xl) (maptree f xr)
 
 Prelude> maptree (+1) (Node (Leaf 2) (Node (Leaf 5) (Leaf 9)))
 Node (Leaf 3) (Node (Leaf 6) (Leaf 10))
+
+########################################################
+
+#modern language's features
+kotlin doesn't have list comprehension, decorator, generator, coroutine library is not yet avaiable in stdlib
+no Promise/Future, not even typeclass, continuation, macro, patter matching, metaclass, those more fancy things
+it's AD 9102, kotlin/java don't support like a=[3,5] or b={"a":3} this form, but kotlin do have a project called
+KEEP and it's unstable now
 
 ########################################################
 
