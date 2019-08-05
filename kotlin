@@ -1,3 +1,25 @@
+#clear ByteArray
+
+```
+var aob = ByteArray(1024)
+while (true) {
+  try{
+  size = client.inputStream.read(aob)
+  }catch(e:Exception){
+     client.close()
+     client = re_connect_network()
+   }
+  recvMsg = String(aob.sliceArray(0 until size), Charsets.UTF_8)
+  if recvMsg.contains(“something”) doSomthing
+  ...
+}
+```
+that’s how I handle it, but when the connection is disconnected without an exit signal, so this try-catch will work and make a new connection, but the last received recvMsg will still go through those next if-else, so that’s I wonder if there’s a way can clear aob the ByteArray?
+also I find a way to solve this, just set size to 0, so sliceArray will not work, this can avoid those next if-else
+
+It probably makes more sense to just throw away the old array and allocate a new one in the `catch` block: `aob = ByteArray(1024)`. It's likely that the overhead of the exception is far higher than the cost of re-allocating an array, and also zeroing an existing array in code might actually be slower.
+
+//////////////////////////////////
 it's AD 9102, java/kotlin not yet implemnet something like a=[1,2] or b={"a":1}
 not even decorator, generator, and list comprehension, 
 not even special stuff like macro and continuation in lisp, pattern matching in haskell
