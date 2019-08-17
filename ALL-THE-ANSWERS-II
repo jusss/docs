@@ -1,3 +1,1034 @@
+
+
+
+
+
+there's no a general way to get its function definition through its type
+
+add :: Int -> Int
+assume x :: Int
+at least we get one fit function add x = x, but there's also add x = x+1 fit it up
+
+one type may have multiple function definitions
+
+>>= :: m a -> (a -> m b) -> m b
+when m is e-> and x :: m, f :: m a, g :: a -> m b
+we can get >>= f g x == b == g ( f x ) x
+
+but when m is Maybe
+>>= :: Maybe a -> (a -> Maybe b) -> Maybe b
+
+we can not get its function definition through its type signature
+
+not all the function can get its function definition through its type signature
+
+there's a syntax sugar, which is
+>>= f g x = g (f x) x , this can be turn to >>= f g = \x -> g (f x) x
+<dmwit> jusss: `>>= f g x = ...` is defined to mean `>>= f g = \x -> ...`
+        (and, therefore, to mean `>>= = \f -> \g -> \x -> ...`)
+
+<jusss> dmwit: does this transformer or syntax sugar has a name?
+<dmwit> Not one I know.
+<jusss> ok then                                                         [11:47]
+
+Reader and not Reader
+it seems only monad is e-> we can do type inference to get the function's definition
+otherwise we may not, that's why Reader is special
+'cause when m is e-> and m b is e->b, we can make x as e then give it a x to get b
+f :: e-> b
+x :: e
+f x :: b
+
+#1 from its type get its function definition
+
+>>= :: m a -> (a -> m b) -> m b
+when m is e->
+>>= :: (e->a) ->(a -> (e->b)) -> (e->b)
+f :: e->a
+g :: (a -> (e -> b))
+x :: e
+
+>>= f g x == b == g (f x) x 
+
+and the sugar syntax  >>= f g = \x -> g (f x) x
+
+<bifunctorial> every type is inhabited in haskell though
+
+#2 get its type through other types
+
+fmap . fmap :: ?
+(a -> b) -> f1 (f2 a) -> f1 (f2 b)
+
+#3 get new function from other  functions
+
+fmap :: (a->b) -> f a -> f b
+<*> :: f (a->b) -> f a -> f b
+pure :: a -> f a
+
+i :: f a
+j :: a ->b
+
+fmap j i = f b
+<*> (f j) i = f b
+now we need get the f j
+
+pure j = f j
+
+fmap j i == f b == <*> (pure j) i
+j <$> i = (pure j) <*> i
+
+
+
+#################################################################
+
+so any types which kind is *->* and implement those functions make them as instances of Monad, so they become Monad, right?
+
+can we get bind through >=> and unit ?
+
+Monad:  1. types's kind is *->*   2. implement bind apply fmap functions 
+
+01:34:06 <dminuoso> jusss: In principle we could give you two functions "pack :: a -> IO a" and "then :: IO a -> (a -> IO b) -> IO b"
+01:34:17 <dminuoso> jusss: The point of Monad is just this observation
+01:34:46 <dminuoso> You also have two functions packState :: a -> State s a; nextState :: State s a -> (a -> State s b) -> State s b
+01:35:17 <dminuoso> jusss: Monad is just the observatoin that all these function look the same way. So instead of making up a new function name every time, they just share the same function name.
+01:35:23 <dminuoso> That pretty much all there is to Monad.
+01:35:55 <merijn> jusss: Monad instances don't add anything to a type, the same functionality would exist without Monad. The monad instances just allow us to conveniently reuse operators (and syntactic sugar) and write code that is generic across multiple instances of Monad
+
+02:02:57 <dminuoso> jusss: So if we again think of (>>=) as a family of functions indexed by a type m, then the index type is of kind (* -> *)
+02:03:12 <jusss> dminuoso: ok
+02:03:39 <dminuoso> jusss: Now, we still cant pick an arbitrary type of kind * -> * either.
+02:04:01 <jusss> dminuoso: until?
+02:04:24 <dminuoso> jusss: The limitation is, whatever type you pick, let's call it âŒœt0âŒ, there must be an âŒœinstance Monad t0âŒ
+02:04:28 <dminuoso> Nothing more.
+
+
+#Monad Types
+
+before being monads, State and Reader are just types, just like Maybe and Either,
+they don't have to be monads, until they have an instance of Monad through implement
+bind apply map join and return functions
+
+01:27:12 <jusss> State and Reader are types rightï¼Ÿ
+01:27:17 <dminuoso> jusss: Yes.
+01:28:26 <jusss> dminuoso: before it's a monad, it just is a type? until we implement that bind apply  fmap mempty functions
+01:28:47 <merijn> jusss: "being a monad" is a property of some types
+01:28:47 <dminuoso> jusss: "It being a monad" just means there exists an instance Monad for that type. :)
+
+01:29:12 <dminuoso> jusss: Perhaps its cleaner to think "IO is not a monad. IO just have an instance Monad"
+01:29:34 <merijn> jusss: "foo :: m Int" <- here 'm' is a type that has kind "* -> *"
+01:29:35 <dminuoso> (It's technically not correct, but perhaps this mindmodel is more helpful for you)
+01:30:08 <dminuoso> jusss: The usefulness from this phrasing is to stop thinking about 'what is it about IO that it makes a "monad" and what does "being a monad mean"'
+01:30:16 <merijn> jusss: "bar :: Monad m => m Int" <- here 'm' is a type that has kind "* -> *" *and* that type has to have a Monad instance (alternatively "that type has to be a monad")
+01:30:25 <dminuoso> jusss: And it introduces the idea that "Monad" is just an interface (like say in Java), consisting of just two functions.
+01:30:28 <EvanR> sometimes you can implement a typeclass properly in more than 1 way
+01:30:38 <dminuoso> jusss: And IO conforms to that interface.
+01:31:21 <merijn> jusss: I always like to explain constraints like "foo :: Monad m => m Int" as: IFF 'm' has an instance of Monad THEN 'foo :: m Int' ELSE type error"
+01:31:22 --- quit: ___laika (Ping timeout: 244 seconds)
+01:31:38 <dminuoso> jusss: So a typeclass in general can be thought of an interface, and writing an instance of an type for that typeclass can be thought of "writing an implementation for that interface" :)
+01:32:41 --- join: doublex (~doublex@c-73-117-89-215.hsd1.oh.comcast.net) joined #haskell
+01:33:01 <jusss> merijn: dminuoso I just wonder if we forget that monad things, can we use State or other monad types like regular types?
+01:33:09 <dminuoso> jusss: Yes absolutely!
+01:33:13 <dminuoso> jusss: State is just a type!
+01:33:19 <dminuoso> jusss: You can use it without the monad interface just fine.
+01:33:38 <jusss> dminuoso: and IO?
+01:33:47 <merijn> jusss: IO (and Reader and everything) else would work just as well without a Monad instance
+01:34:06 <dminuoso> jusss: In principle we could give you two functions "pack :: a -> IO a" and "then :: IO a -> (a -> IO b) -> IO b"
+01:34:15 <merijn> jusss: What you lose is the ability to have a single set of operators used for each and the ability to write code that is generic across different monad instances
+01:34:17 <dminuoso> jusss: The point of Monad is just this observation
+01:34:27 * hackage boots 0.0.100 - IoC Monad in Haskell  https://hackage.haskell.org/package/boots-0.0.100 (leptonyu)
+01:34:46 <dminuoso> You also have two functions packState :: a -> State s a; nextState :: State s a -> (a -> State s b) -> State s b
+01:34:49 <merijn> jusss: Consider Maybe. If Monad disappeared we could still write "foo :: Maybe a -> (a -> Maybe b) -> Maybe b"
+01:35:17 <dminuoso> jusss: Monad is just the observatoin that all these function look the same way. So instead of making up a new function name every time, they just share the same function name.
+01:35:23 <dminuoso> That pretty much all there is to Monad.
+01:35:24 --- quit: gienah_ (Ping timeout: 245 seconds)
+01:35:28 --- join: fosterite (~fosterite@2601:445:447f:dd14:441a:5e8a:d6c2:4223) joined #haskell
+01:35:44 <dminuoso> From a consumer perspective, you take (>>=) and set m to say "State Int"
+01:35:50 --- quit: jose_zap (Quit: My MacBook has gone to sleep. ZZZzzzâ€¦)
+01:35:55 <merijn> jusss: Monad instances don't add anything to a type, the same functionality would exist without Monad. The monad instances just allow us to conveniently reuse operators (and syntactic sugar) and write code that is generic across multiple instances of Monad
+01:35:56 <dminuoso> then (>>=) :: State Int a -> (a -> State Int b) -> State Int b
+01:36:18 <jusss> ok
+
+#anonymous type
+
+01:37:43 <jusss> 'cause we have anonymous function like lambda, so I wonder is there anonymous type?
+01:38:17 <dminuoso> jusss: I suppose every type not bound to a type alias is anonymous in a sense.
+01:38:22 <dminuoso> jusss: or a type family
+01:38:36 <merijn> jusss: You could have "type lambdas", yes. But we don't in Haskell because they make type checking undecidable
+01:38:40 <dminuoso> jusss: If you just write âŒœEither Int BoolâŒ in the type system its anonymous because its not bound to any particular type.
+01:38:56 <merijn> jusss: i.e. there would be no way to guarantee that typechecking doesn't infinite loop, additionally it breaks type inference
+01:39:04 <dminuoso> merijn: We actually covered various forms of type functions yesterday. I think they rather care about the "anonymous" part. :)
+01:39:19 <merijn> jusss: But there are type systems and languages where you can have anonymous type lambdas
+01:39:37 <[exa]> jusss: you can get a similar feeling from types like (forall a. ... a ...) that are implicitly put into almost all types you see
+01:40:01 --- quit: fosterite (Ping timeout: 264 seconds)
+01:40:12 <dminuoso> jusss: There exist a way to build anonymous functions even in the Haskell type system if you enable about 6 type extensions. At least conceptually
+01:40:15 --- join: jakobhillerstrom (~jakobhill@h-74-117.A137.corp.bahnhof.se) joined #haskell
+01:41:42 <dminuoso> [exa]: That's wildly different though.
+01:41:56 --- quit: gienah (Ping timeout: 246 seconds)
+01:42:03 <dminuoso> [exa]: The reason is that forall quantification in haskell gives you terms that can bind types.
+01:42:33 --- quit: ktonga (Ping timeout: 248 seconds)
+01:42:53 --- quit: keepLearning512 (Remote host closed the connection)
+01:42:55 <dminuoso> (where terms refers to value-level constructs)
+01:43:28 --- quit: jedws_ (Quit: My MacBook has gone to sleep. ZZZzzzâ€¦)
+01:43:39 <[exa]> dminuoso: I know, didn't want to imply it's the same technically
+01:44:01 --- join: agander_ (agander@gateway/vpn/protonvpn/agander) joined #haskell
+01:45:35 <[exa]> but it's generally interesting to compare the computational vs. symbolic value of (\a->f a) and (forall a.F a)
+
+01:46:25 <dminuoso> jusss: My preferred way to think about Monad these days, is to just look at (>>=) and see it as a family of functions. You can pick one of those functions by setting m to some appropriate type (so you could say that it's indexed by the type m, sort of like a map from m to a function type)
+01:47:23 --- quit: yahb (Ping timeout: 244 seconds)
+01:47:25 --- quit: petersen (Quit: petersen)
+01:47:29 --- quit: MoarSpaceFi (Ping timeout: 245 seconds)
+01:47:36 <dminuoso> jusss: So the function (>>=) at m ~ IO gives you âŒœthen :: IO a -> (a -> IO b) -> IO bâŒ, (>>=) at m ~ State Int gives you âŒœnextState :: State Int a -> (a -> State Int b) -> State Int bâŒ, and so forth. Do you notice how the word Monad has disappeared?
+01:48:30 --- join: gienah (~mwright@gentoo/developer/gienah) joined #haskell
+01:48:51 --- join: bolichep (~bolichep@2802:8000:2707:5100:f8f1:13e5:d45b:872) joined #haskell
+01:48:53 <dminuoso> jusss: The question is merely "but what do those functions do" - and Id say it doesnt matter. If you just know that the function âŒœIO a -> (a -> IO b) -> IO bâŒ is the one you want, then you can "grab and use it" so to speak. Ignore all the other functions, they are irrelevant to you.
+01:49:00 <dminuoso> jusss: Does that make any sense?
+01:49:42 <jusss> dminuoso: remove that m part?
+01:50:06 <Cale> That's just a way of thinking about type classes in general though. It's important to know the meaning of the things that you're using...
+01:50:10 <jusss> dminuoso: or why m is *->*
+01:50:21 --- join: ilikeheaps (~sushi@176.120.120.135.telemedia.pl) joined #haskell
+01:50:31 <Cale> But yeah, it's only important to know what the specific instance you're using does
+01:50:37 <dminuoso> jusss: Look at the type signature of then/nextState, or the maybe function merijn mentioned above.
+01:50:57 <dminuoso> jusss: Do you notice that if you set m ~ IO, then you end up with something like "IO a" 
+01:51:35 <jusss> dminuoso: what it means m ~ IO?
+01:51:44 <jusss> this symbol ~?
+01:51:48 <dminuoso> jusss: ~ is to denote equality on the type level.
+01:52:00 <dminuoso> % :t (>>=)
+01:52:10 --- join: jose_zap (~jose_zap@176-20-96-236-dynamic.dk.customer.tdc.net) joined #haskell
+01:52:15 <dminuoso> :t (>>=)
+01:52:18 <lambdabot> Monad m => m a -> (a -> m b) -> m b
+01:52:22 <jusss> ok
+
+01:53:27 <dminuoso> jusss: You could read this as: "Pick m, a and b to be any type you want and Ill give you a function"
+01:53:28 * hackage salak-toml 0.3.3.2, salak-yaml 0.3.3.2 (leptonyu): https://qbin.io/utah-debut-24u7
+01:53:57 --- join: gienah (~mwright@gentoo/developer/gienah) joined #haskell
+01:53:57 <dminuoso> jusss: Now as a disclaimer, you cant pick something completely arbitrary for m. You can only pick m out of a certain set.
+01:54:05 --- join: keepLearning512 (~keepLearn@49.204.75.26) joined #haskell
+01:54:17 <dminuoso> jusss: Lets ignore the a and b variables, and just focus on the type variable m.
+01:54:38 <jusss> dminuoso: yeah
+01:54:39 <dminuoso> jusss: Let's try and set m ~ Either
+01:54:39 --- quit: dansho (Quit: Leaving)
+01:55:05 <dminuoso> jusss: What's the type of the function you get back?
+01:55:19 <jusss> dminuoso: Either a b?
+01:55:24 <dminuoso> :t (>>=)
+01:55:29 <lambdabot> Monad m => m a -> (a -> m b) -> m b
+01:55:33 <dminuoso> jusss: Just replace m with "Either" in that type signature.
+01:56:22 <jusss> Either a 'a -> ( 'a -> (Either a b)) -> Either a b
+01:56:32 <dminuoso> jusss: Wait. That's sneaky of you.
+01:56:40 <dminuoso> jusss: We said "Either", not "Either a"
+01:56:46 <jusss> haha
+01:57:03 <jusss> Either a -> (a -> Either b) -> Either b
+01:57:19 <dminuoso> jusss: So here comes the issue. This is a function demanding a value of type âŒœEither aâŒ
+01:57:21 <dminuoso> :k Either
+01:57:23 <lambdabot> * -> * -> *
+01:57:41 <dminuoso> jusss: Using the knowledge you obtained yesterday, can there be a value of âŒœEither aâŒ for some choice of a?
+01:58:07 <jusss> :k (Either a)
+01:58:10 <lambdabot> error: Not in scope: type variable â€˜aâ€™
+01:58:14 --- quit: hexfive (Ping timeout: 244 seconds)
+01:58:22 <dminuoso> jusss: Pick some concrete type for a, say Int or whatever you like.
+01:58:26 <jusss> :k Either Int
+01:58:29 <lambdabot> * -> *
+01:58:31 --- quit: treehaqr (Ping timeout: 258 seconds)
+01:58:43 --- join: dfeuer (~dfeuer@wikimedia/Dfeuer) joined #haskell
+01:58:51 --- join: dmitri (~dima14@ppp-124-122-27-35.revip2.asianet.co.th) joined #haskell
+01:58:53 <jusss> no value has Either Int
+01:59:12 <dminuoso> jusss: Is Either Int inhabitatable at all? Could we make up values of that type?
+01:59:14 <jusss> 'cause values have types which's kind is *
+01:59:29 <dminuoso> jusss: Right! And can types with a kind different from * have values at all?
+01:59:50 <jusss> no
+01:59:59 <dminuoso> jusss: Alright! So clearly setting m to a type of kind âŒœ* -> * -> *âŒ is not valid. Do you agree?
+02:00:05 --- join: oish (~charlie@host81-130-206-144.in-addr.btopenworld.com) joined #haskell
+02:00:13 --- quit: mniip (Quit: This page is intentionally left blank.)
+02:00:18 <jusss> yes
+02:00:23 --- quit: wjp1 ()
+02:00:30 --- join: ___laika (~laika@99-0-83-18.lightspeed.sntcca.sbcglobal.net) joined #haskell
+
+02:00:32 <dminuoso> jusss: Try something else. Do you think we could set âŒœm ~ BoolâŒ perhaps?
+02:00:47 --- join: yahb (~yahb@178.219.46.58) joined #haskell
+02:00:47 --- quit: yahb (Changing host)
+02:00:47 --- join: yahb (~yahb@haskell/bot/yahb) joined #haskell
+02:00:49 --- nick: agander_ -> agander
+02:01:01 <jusss> dminuoso: m is *->* and Bool is *, so no
+02:01:18 <dminuoso> jusss: But why is m required to have a kind of âŒœ* -> *âŒ, really?
+02:01:29 --- join: mniip (mniip@freenode/staff/mniip) joined #haskell
+02:01:54 <jusss> dminuoso: that means why monad have to be *->*?
+02:02:00 <dminuoso> jusss: It's because the function (>>=) would make any sense, otherwise. (>>=) takes that m, applies one type to it, and then demands that this type be inhabitatable (since eventually a function is produced, that demands value of m applied to that type, and it produces values of m applied to another type)
+02:02:07 --- quit: gienah (Remote host closed the connection)
+02:02:17 --- join: gienah (~mwright@gentoo/developer/gienah) joined #haskell
+02:02:28 * hackage boots-app 0.1.0.5 - Startup factories using IoC monad  https://hackage.haskell.org/package/boots-app-0.1.0.5 (leptonyu)
+02:02:35 --- join: smakarov (~user@217.12.249.74) joined #haskell
+02:02:57 <dminuoso> jusss: So if we again think of (>>=) as a family of functions indexed by a type m, then the index type is of kind (* -> *)
+02:03:12 <jusss> dminuoso: ok
+02:03:39 <dminuoso> jusss: Now, we still cant pick an arbitrary type of kind * -> * either.
+02:03:56 --- quit: keep_learning (Ping timeout: 268 seconds)
+02:04:01 <jusss> dminuoso: until?
+02:04:24 <dminuoso> jusss: The limitation is, whatever type you pick, let's call it âŒœt0âŒ, there must be an âŒœinstance Monad t0âŒ
+02:04:28 <dminuoso> Nothing more.
+
+02:04:55 <dminuoso> How do we know which ones have that instance? We can look at the haddoc documentation of Monad to get sizable list of instances.
+02:05:18 <dminuoso> jusss: https://hackage.haskell.org/package/base-4.12.0.0/docs/Prelude.html#t:Monad scroll down to the section that says "instances"
+02:05:38 <dminuoso> jusss: [] is a valid choice for m. Maybe is a valid choice for m, IO is a valid choice for m. Each "choice" gives you a different function (>>=)
+02:05:57 <jusss> yeah
+02:06:26 --- quit: gienah (Ping timeout: 246 seconds)
+02:08:37 --- quit: o1lo01ol1o (Remote host closed the connection)
+02:09:17 --- join: asymptotically (~quassel@gateway/tor-sasl/asymptotically) joined #haskell
+02:09:22 <dminuoso> jusss: So Monad can be viewed as "the collection of all those types that have an instance/the collection of all those types that are valid to pick for "m" in (>>=)"
+02:09:45 <dminuoso> jusss: There's even a language to ask whether a type is a member of that collection, its constraints. 
+02:09:52 <dminuoso> % data SomeType a = SomeType
+02:09:53 <yahb> dminuoso: 
+02:10:16 --- quit: gentauro (Quit: leaving)
+02:10:26 --- join: Sgeo_ (~Sgeo@ool-18b98455.dyn.optonline.net) joined #haskell
+02:11:26 <dminuoso> jusss: So a constraint "Monad m" can be also be thought of as "m must be a member of Monad"/"Whatever the choice of m, there must be an instance Monad m"
+02:11:27 --- join: mastarija_ (~mastarija@cm-2171.cable.globalnet.hr) joined #haskell
+02:11:59 <dminuoso> jusss: You see, the notion of "IO is a Monad" is slippery and not useful. Perhaps its better to say "IO conforms to the interface of Monad" or "IO has an instance Monad"
+02:12:08 <dminuoso> jusss: The same applies to State, Reader, etc..
+02:12:32 --- join: gienah (~mwright@gentoo/developer/gienah) joined #haskell
+02:12:48 --- join: mastarija__ (~mastarija@cm-2171.cable.globalnet.hr) joined #haskell
+02:13:28 --- quit: Sgeo__ (Ping timeout: 258 seconds)
+02:14:06 --- quit: sw1nn (Quit: WeeChat 2.5)
+02:14:10 --- join: treehaqr (~treehaqr@unaffiliated/treehaqr) joined #haskell
+02:15:05 --- join: fosterite (~fosterite@2601:445:447f:dd14:441a:5e8a:d6c2:4223) joined #haskell
+02:15:37 --- quit: mastarija (Ping timeout: 248 seconds)
+02:15:57 --- join: xff0x (~fox@210.57.57.162) joined #haskell
+02:16:32 --- quit: mastarija_ (Ping timeout: 272 seconds)
+02:17:20 <jusss> dminuoso: ok
+
+#Types have values, Types have functions
+
+02:32:02 <jusss> dminuoso: we can say values have types, or types have values, can we say types have functions?
+02:32:11 <jusss> 'cause functions are values
+02:32:53 --- join: DavidEichmann (~david@213.31.79.26) joined #haskell
+02:32:59 <dminuoso> jusss: Depending on the context that could be a valid thing to say, though Im not convinced that this is a particularly useful thing to say.
+02:33:02 --- quit: v01d4lph4 (Remote host closed the connection)
+02:33:50 --- join: v01d4lph4 (~v01d4lph4@125.16.234.60) joined #haskell
+02:34:56 <dminuoso> jusss: I'd probably prefer to use the word "inhabitant/inhabited" rather than "have"
+02:35:19 <dminuoso> jusss: e.g. "âŒœInt -> DoubleâŒ is inhabited by functions/values"
+
+http://tunes.org/~nef/logs/haskell/
+
+
+################################################################
+
+#Monad Transformer
+
+monad transformer, used to compose monads
+mtl library provides typeclasses for monads
+the effects from two or more monads
+<Axman6> IT's the difference between foo :: ReaderT Config IO a and foo ::
+         (MonadReader Config m, MonadIO m) => m a
+
+<jle`> so one way you can look at using MaybeT is, ">>= for IO doesn't do what
+       I want.  it doesn't short circuit when I hit a Nothing.  but if i wrap
+       it in this newtype wrapper, >>= will do what i want it to do"
+<jle`> >>= for MaybeT IO, that is
+<jle`> Control.Monad.Trans.Maybe                                        [15:13]
+<dminuoso> jusss: MaybeT is, at the end, just a newtype.
+
+<jle`> so for example i have `do action1; action2`.  and both of them are `IO
+       (Maybe Int)`
+<jle`> normally for IO, >> will do one, then the other
+<jle`> it won't care if action1 returns Just or Nothing
+<jle`> but we want a different >>; we want one that will stop as soon as it
+       sees a Nothing
+<jle`> so you can do MaybeT action1; MaybeT action2, and now this will not
+       perform action2 if action1 returns Nothing
+
+<jle`> so if i apply MaybeT to IO, then `MaybeT IO` is just a slightly
+       different version of IO with a slightly different Monad instance
+<jle`> like a Monad -> Monad type-level function, in a way
+<dminuoso> jusss: The usual monad transformers take a base monad, a precursor
+           monad and then imbue the base monad with the effect of the
+           precursor monad, somehow.
+<dminuoso> jle`: In case of "MaybeT IO" the base monad is IO, and it gets
+           imbued with the effect from Maybe, somehow.           
+
+<dminuoso> newtype MaybeT m a = MaybeT { runMaybeT :: m (Maybe a) } -- with
+           the implicit understanding that "m" usually has an instance Monad.
+
+###############################################################
+#Either Catch Exceptions
+
+<jusss> jle`: actually I have never understand why you people call Either can
+        catch the exceptions,
+<jusss> like python or java they do have try ... except statement for catching
+        exceptions
+<jle`> ah, "exceptions" here is something slightly different
+<lavalike> because when things don't go Right that's what you're Left with
+<jle`> what you are talking about in python or java is exceptions as a
+       language feature
+<jle`> and a feature of the runtime
+<dminuoso> jusss: By exception we mean the generalized notion of "here we set
+           an error state and shortcircuit any further computation until some
+           "catching" mechanism.
+<jle`> when people talk about Either, we're more talking about the abstract
+       "idea" of an error
+<jle`> and not an actual built-in language feature                      [15:18]
+<jle`> the idea of "something going wrong", as a first-class value
+<jle`> we're implementing a sort of error system "inside" the language, using
+       normal values
+<jle`> instead of relying on built-in features of the language/runtime
+<jusss> ok, it seems to me like it can be Left a or Right b, because they both
+        have Either a b,                                                [15:19]
+<jle`> right. now, the behavior of >> is to stop as soon as it sees a Left
+<jle`> > Right 1 >> Right 2 >> Right 3
+<jusss> and it seems there's no type inheritance in haskell, but in kotlin or
+        java, it seems there're type inheritance
+<jle`> > Right 1 >> Right 2 >> Right 3 >> Left True >> Right 4
+<dminuoso> jusss: Right, we dont have the usual concept of inheritance at all.
+<jle`> so if there is any Left, >> will pattern match it and return the Left
+<jle`> this is 'short-circuiting', like with Maybe. but you also return the
+       'reason' why it short circuits: the value inside the Left
+<jle`> so we don't really say "Either can catch the exceptions".  instead, we
+       say that Either can be used to model exception-handling in a
+       first-class value sort of way
+<jle`> we can use Either e and its monad instance to simulate some sort of
+       exception system
+<jle`> but this doesn't mean "Either can catch runtime exceptions"
+<jusss> fine, but that's really weird, 'cause exception in haskell doesn't
+        mean what it means in other languages
+<jle`> fwiw, Haskell actually *does* have a runtime exception system, within
+       IO and its runtime
+<jle`> and haskell has actual runtime exceptions and a try/catch system like
+       python/java
+<jle`> that system is unrelated to Either
+<jle`> MaybeT m is a way of enhancing an 'm' with short-circuiting >>=  [15:26]
+<jle`> the emphasis is on what the 'm' already does, and what it adds to the
+       'm'
+<jle`> and this is a specific statement that isn't ambiguous
+
+<jle`> whereas "combining IO and Maybe" is sort of ambiguous and doesn't
+       really mean anything specific
+<jusss> MaybeT is a monad?                                              [15:27]
+<jle`> MaybeT is not a monad, but `MaybeT m` is a monad
+<jle`> it takes a monad (m) and returns a new monad (MaybeT m)
+<jusss> wait a sec, but m in `MaybeT m` is already a monad              [15:29]
+<jle`> right
+<jle`> just like 1 is already a number
+<jle`> 'negate 1' is also a number
+<jusss> jle`: let's assume that m is Either a, so MaybeT Either a is a monad?
+<jle`> MaybeT (Either a) is a monad, yes
+<jle`> `MaybeT (Either a)` is a monad, so it's kind * -> *
+<comerijn> jusss: It's already a type, it just not a type with kind * (all
+           values have types with kind *)
+<jusss> so we give a 'a' to Maybe and we get Maybe a, right/
+<jle`> yup
+
+not all the types have values, types's kind is * have values, otherwise not
+
+###################################################
+#Type Function
+
+<dminuoso> jusss: A motivating example to see how things like (->) and Either
+           themselves are types, is understanding that on the value level not
+           only ⌜1⌝ and ⌜"foobar"⌝ are values, but functions like ⌜\x -> x +
+           10⌝ themselves are values too.                               [15:50]
+<dminuoso> jusss: So on that basis you can also understand (->) and Either as
+           type functions, but that does not preclude them from being types.
+<dminuoso> Similarly how "value functions" are functions too.
+<dminuoso> Err how "value functions" are values too. :)                 [15:52]
+
+<dminuoso> Either is all three: a) a type, b) a type function (that is a
+           function acting on types), and c) a type constructor
+
+<dminuoso> Right is also all three: a) a value, b) a (value-level) function,
+           and c) a data constructor
+
+<jusss> they're type/value constructor, I can understand, because they need a
+        type or value to consturct an new one
+<dminuoso> jusss: Formally speaking, a type is just something that exists on
+           the type level.
+<dminuoso> jusss: Just like a value is something that exists on the value
+           level.
+<dminuoso> jusss: The kind system is to the type system as the type system is
+           to the value world. Just like the type system classifies values and
+           creates limitations about what you can and cant do in the value
+           world, the kind system classifies types and it creates limitations
+           about what you cant and can do in the type world.            [16:43]
+<dminuoso> jusss: And just like you can do computation in the value world,
+           computation in the type world is possible too.
+
+
+<jusss> dminuoso: Either is a type? Either a b is a type                [15:55]
+<jusss> and also Right b is a value, Right is a value?
+<dminuoso> Yes.
+<dminuoso> jusss: The key part is what jle` said:                       [15:56]
+<dminuoso> 09:42:43        jle` | some confusion comes from baggage coming
+           from other languages, though.  in other languages, the only context
+           in which you hear about types is by how they classify values
+<dminuoso> 09:42:54        jle` | so you start to believe that the only use of
+           types is for classifying values
+
+<jle`> jusss: 'Right' is a value, right?
+<jle`> do you agree that 'Right' is worth calling a value, as an expression?
+<jusss> jle`: base your story, it is
+<jle`> it's something you can pass to 'id'
+<jle`> or any other higher-order function
+
+<dminuoso> jusss: Forget the notion that a "type is something that has
+           values", its a dangerous assumption that holds true for only the
+           simplest type systems. Lets just define the type system as a
+           separate detached universe in which objects are allowed to exist.
+<jusss> I can pass Right String to function id, but I don't think I can pass
+        Right to id
+<dminuoso> jusss: Elements inside that universe are called types.
+<jle`> jusss: try :)
+<jle`> :t id Right
+<lambdabot> b -> Either a b
+<jle`> ta dah ~
+<jusss> jle`: no, that's currying
+<jle`> > let f = id Right in f 10
+<dminuoso> jusss: No its not.
+<lambdabot>  Right 10
+<dminuoso> jusss: Its proper function application.
+<jle`> jusss: what is being curried here?
+<jle`> `id x = x`, and you evaluate that by substituting `id x` with `x`.
+       that's what's going on here: how do you evaluate `id Right`?     [16:00]
+<jusss> wait, I will try it
+<jle`> `const x y = x`
+<jle`> so `const Left Just = Left`.
+<jusss> ok, f = id Right, it's fine
+<jle`> simple. that's because we don't treat Left any different...it's just
+       like any other value we could pass to 'const'
+<jusss> Right is a value,
+<dminuoso> jusss: The specialty of Right is just that it's also a data
+           constructor. The relevance of that is merely that you can do
+           pattern matching with it.                            
+<jusss> so can we say monad is a type now?
+<jusss> Maybe is a type?
+<jle`> well, a monad like Maybe is a type
+<jusss> ok then, you guys blow up my mind, I remember some people told me that
+        Maybe is not a type, Maybe a is a type
+<dminuoso> jusss: monad itself is a typeclass now!                      [16:03]
+<merijn> jusss: There's a lot of people using very sloppy terminology,
+         unfortunately
+<jusss> dminuoso: I mean type, not typeclass stuff
+<jle`> honestly i don't think it's a universal consensus and you'll get
+       different people saying different things on whether or not type-level
+       terms can be called types                                        [16:04]
+<jle`> in the end the terminology is a tool to aid in understanding
+<jusss> dminuoso: merijn jle` does this type Maybe has a value?
+<dminuoso> jusss: Nope!
+<jle`> nope, Maybe has no values of that type
+<jusss> or monad can have value?
+<MarcelineVQ> Maybe being a type isn't too contentious. The more common
+              confusion is when someone says Either is a type constructor but
+              Either e isn't
+<jle`> or more importantly, "X is a type" doesn't mean that there are values
+       of type X
+<dminuoso> jusss: Now the interesting part is, you can use the kind system to
+           classify types according to whether they can have inhabitants at
+           all.
+<dminuoso> jusss: Some types can have values, others cant.              [16:05]
+<dminuoso> jusss: We use the kind system to, amongst other things, classify
+           types to say whether/when a type can have inhabitants at all.,
+<jusss> dminuoso: how to use this kind system
+<dminuoso> jusss: In Haskell its tied into the type system automatically, just
+           like the type system is tied into the value world.
+<jle`> jusss: one basic way to utilize it is that only types of kind * can be
+       inhabited
+<dminuoso> So the kind of Either is "* -> * -> *"
+<dminuoso> Since, like jle` just said, only types of kind * can be
+           inhabitated, Either cannot because it does not have kind *.
+<jle`> so you can answer your question: "does Maybe have any values of this
+       type", by looking at the kind of Maybe
+<jusss> so if a type's kind is *, it can have values, otherwise it can't?
+<dminuoso> jusss: Precisely.                                            [16:13]
+<jusss> wait a sec, [] is *->*
+<dminuoso> jusss: [] is just a bit weird because it has special cased syntax.
+                                                                        [16:15]
+<dminuoso> jusss: You could imagine ⌜[Int]⌝ as just ⌜List Int⌝
+<jusss> [Int] is *
+<tdammers> it sometimes help to think of [] (the type) as an alias for List,
+           and [a] as an alias for List a
+<jusss> but it seems ghci doesn't auto import the type List             [16:16]
+<dminuoso> jusss: For what its worth, you could also write: ([]) Int
+<jusss> :k List got error
+<merijn> dminuoso: UnliftedRep doesn't exist in Haskell
+<jusss> :k List
+<dminuoso> jusss: It doesnt actually exist.
+<dminuoso> jusss: Im just saying imagine that type constructor existed.
+<jusss> dminuoso: ...
+<dminuoso> jusss: My point is, [a] is just special because it has special
+           application syntax.                                          [16:17]
+<dminuoso> But you could also apply [] to another type via juxtaposition
+<merijn> > [1..5] :: [] Int -- doesn't even need parenthesis
+<dminuoso> % :k [] Int
+<lambdabot>  [1,2,3,4,5]
+<yahb> dminuoso: [] Int :: *
+<dminuoso> jusss: ^- see? You can write "[] Int" just fine. :p
+<dminuoso> jusss: It's just that [Int] means "[] Int" really
+<jusss> dminuoso: why not List, people prefer names I think,not symbols
+<dminuoso> jusss: Good question, it was a design decision.
+<dminuoso> jusss: It could have been List just as well, really. But [] won.
+<dminuoso> jusss: Next up, the kind system tells you how application can work
+                                                                        [16:19]
+<dminuoso> jusss: For example
+<dminuoso> % :k []
+<yahb> dminuoso: [] :: * -> *
+<dminuoso> jusss: Do you think [Maybe] is a valid type? Make an arugment for
+           your position.
+<dminuoso> jusss: :t operates on value level constructs. So you give :t a
+           value-level expression, and it tells you its type.           [16:20]
+<dminuoso> jusss: similarly how :k takes a type-level expression, and it tells
+           you its kind.
+<jusss> :t [Nothing]
+<lambdabot> [Maybe a]
+<dminuoso> jusss: My point is, the kind system tells you that [] takes a type
+           of kind * and it returns a type of kind *
+<dminuoso> jusss: So [] applied to Maybe will not kind check, since [] expects
+           a type of kind *, but Maybe :: * -> *
+<dminuoso> jusss: The kind system is to the type system as the type system is
+           to the value world. Just like the type system classifies values and
+           creates limitations about what you can and cant do in the value
+           world, the kind system classifies types and it creates limitations
+           about what you cant and can do in the type world.            [16:43]
+<dminuoso> jusss: And just like you can do computation in the value world,
+           computation in the type world is possible too.
+
+
+#RankN
+<jusss> dminuoso: and what about Rank-N and higher logic stuff          [16:51]
+<jusss> higher-order logic                                              [16:52]
+<jusss> it's related to kind?
+<dminuoso> jusss: Nope
+<merijn> jusss: RankN isn't really
+<dminuoso> jusss: Its basically about extending where you can put universal
+           quantification in.
+<merijn> jusss: This is the simplest example of exactly what problem RankN
+         types solve: https://gist.github.com/merijn/77e3fa9757658e59b01d
+{-# LANGUAGE RankNTypes #-}
+module RankN where
+
+data Foo = Foo Int | Bar Double
+
+mangle :: (forall a . Num a => a -> a) -> Foo -> Foo
+mangle f (Foo i) = Foo (f i)
+mangle f (Bar d) = Bar (f d)
+<dminuoso> jusss: In very short terms, RankNTypes is, amongst other things,
+           what allows you to specify "my argument itself must be a
+           polymorphic function"
+<dminuoso> So with rank 1, you can only produce polymorphic things, but you
+           cant demand that your consumer must pass you a polymorphic thing.
+<jusss> ok, and higher-order logic?
+<dminuoso> Well that's a logic topic, isn't it? :)                      [16:56]
+<jusss> type for value, kind for type, so what for kind?
+<jusss> kind for kind?
+<dminuoso> jusss: the next layer is called "sort" in haskell, but its blant
+           and boring.
+<dminuoso> Its boring because there exists only a single sort called "BOX"
+<dminuoso> So there's no useful classification anymore.
+<jusss> dminuoso: what type system haskell use?
+<dminuoso> jusss: Some other languages have infinite towers.
+<jusss> about those type systems, there're differences among them?
+<dminuoso> jusss: So in Agda for example you have ⌜Set : Set1⌝, ⌜Set1 : Set2⌝,
+           ⌜Set2 : Set3⌝ and so forth
+<dminuoso> Ad infinitum.
+<dminuoso> jusss: In Haskell however we are making a move to change our type
+           and kind system to do something completely different
+
+<dminuoso> Called TypeInType where we crush the tower of "types, kinds and the
+           rest" into just the "type world"
+
+<dminuoso> Such that: Type :: Type
+<dminuoso> So values have types, and types have a types.
+<Ariakenom> 1 :: Int, Int :: Type, Type :: Type. (Type is same as *)    [17:03]
+<merijn> Also, TypeInType is an abomination
+<merijn> I'll take stratified universes over it any day
+<dminuoso> jusss: Regarding your question "what kind of type system does
+           Haskell have" - I dont think it has a particular name other than
+           "the type system of Haskell/GHC". Some features are inherited, such
+           as inference coming from Hindley Milner.
+<jusss> wow, types have types?
+<dminuoso> jusss: Well yeah. Anyway, you probably best forget it again - it's
+           just what the future holds for us. Until then, types have *kinds*
+                                                                        [17:07]
+<dminuoso> And after kinds there's nothing really.
+<merijn> Sorts!
+
+<dminuoso> jusss: At the end the kind system is very simple, consisting of,
+           essentially, just two primitives. * and (->). A confusing part here
+           is that (->) is a construct that exists in all three worlds. It
+           exists, syntactically at least, in the value world, it exists as a
+           type, and it exists as a kind.
+<dminuoso> Unlike types which can be much richer since you can have type
+           families and type constructors
+<jusss> dminuoso: and what that (->) is named? and it's related to Kleisli
+        arrow?                                                          [17:15]
+<dminuoso> jusss: I'd say "function" 
+<dminuoso> So the kind (* -> *) is the kind of all type functions taking a
+           type of kind * and returning a type of kind *                [17:16]
+<dminuoso> Maybe is one inhabitant of that kind.
+<dminuoso> Either Int is another inhabitant of that kind.
+<dminuoso> Const () is yet another.
+<dminuoso> (All three are type functions)
+<dminuoso> Equivalently, the type "Int -> Char" is inhabitated by all the
+           functions taking an Int and returning a Char.                [17:17
+<jusss> dminuoso: and *->*->* is a type function which take two types of kind
+        * and return one type of kind *?                                [17:19]
+
+<dminuoso> jusss:  *->*->* is a *kind*
+<Ariakenom> % :k Void#                                                  [17:20]
+<yahb> Ariakenom: Void# :: TYPE ('TupleRep '[])
+<dminuoso> jusss: This might sound like pedantry, but being careful about the
+           terminology can save you from confusion. And not exactly actually
+<dminuoso> jusss:  * -> * -> * is the kind of all types, who take something of
+           kind * and return a type of kind * -> *
+<dminuoso> Just like in the value level, all type functions take just a single
+           argument.                                                    [17:21]
+<dminuoso> Ariakenom: Shush!
+<jusss> dminuoso: aha, but in the value level, we can say take two parameter
+        and return one value
+<dminuoso> jusss: But its not really two parameters on the value level either.
+<dminuoso> ⌜f :: Int -> Double -> Char⌝ formally takes only a single argument.
+                                                                        [17:22]
+<jusss> dminuoso: it depends what it function definition, not types 
+<Ariakenom> dminuoso: it's C's void. Haskell's ()
+<dminuoso> ⌜f 1 10.0⌝ is not "f applied to two arguments", its rather "f
+           applied to 1, producting a new function, which in turn is applied
+           to 10.0"
+<dminuoso> jusss: All functions in Haskell take a single argument.      [17:23]
+<jusss> dminuoso: that's currying
+<dminuoso> jusss: Currying exists in your head.
+<dminuoso> jusss: But sure, if that helps.
+<jusss> dminuoso: yeah, all functions are unary functions in haskell
+<dminuoso> jusss: Right. Same thing on the type level. :)
+<merijn> jusss: "\x y -> x + y" is just syntactic sugar for "\x -> (\y -> x +
+         y)"
+<jusss> ok                                                              [17:24]
+<dminuoso> jusss: Of course sometimes we employ different mind models.
+<dminuoso> jusss: Once you have completely accepted that functions can take
+           only single arguments, we sometimes pretend that "f :: Int -> Float
+           -> Char" takes two arguments, understanding that its a function
+           that returns a function.                                     [17:25]
+<dminuoso> jusss: The same holds true on the type level.
+<jusss> so there're three levels, kind, type and value, right?
+<dminuoso> So we could view Either as a type function taking two arguments, or
+           think of it as a type function that returns a type function.
+<dminuoso> jusss: Right.
+<jusss> and (->) you called function is in all of them                  [17:26]
+<jusss> about Either a b = Left a | Right b, how I can think it as a type
+        function?
+<dminuoso> jusss: So the "Either" part is a type function.
+<dminuoso> jusss: It acts a sum/plus if you want. So Either "adds" two types
+           together.
+<jusss> and it takes a type a then?
+<dminuoso> jusss: Sure, so using our previous knowledge, we could say Either
+           takes two types and it "computes/constructs" a new type.     [17:28]
+<jusss> Either adds a and b return Either a b?
+<jusss> it's interesting about those three levels, to think data Either a b =
+        Left a | Right b again, this `data` connect that type level and value
+        level                                                           [17:29]
+<jusss> use '=' is really interesting part, types are equals to values
+<lortabac> jusss: in data declarations '=' does not mean equality       [17:32]
+<jusss> dminuoso: so is there another keyword that connect kind level with
+        type level?
+<dminuoso> jusss: Its the same as type and value level, ::
+<lortabac> it's just a way to introduce the definition of a data type
+<jusss> lortabac: maybe we should use another symbol                    [17:33]
+<dminuoso> jusss: You can use GADTSyntax if you prefer.
+<dminuoso> data Either a b where Left :: a -> Either a b; Right :: b -> Either
+           a b
+<jusss> dminuoso: the simple ADT is good for me :)
+<jusss> I really don't like record syntax...
+<dminuoso> jusss: Thats not record syntax. Its GADTSyntax.
+<jusss> dminuoso: I know...                                             [17:35]
+<jusss> I mean that {...}
+<dminuoso> jusss: You get used to it.
+<jusss> dminuoso: yeah
+<dminuoso> jusss: Anyhow. The relevant part is not the sum part, that's merely
+           how the new type acts. It's that Either takes two types and it
+           returns another type.                                        [17:36]
+<jusss> dminuoso: what it returns?
+<jusss> Either a b?
+<dminuoso> jusss: A new type that doesnt have a name of its own.
+<dminuoso> jusss: We just identify it by the same name how it was constructed.
+                                                                        [17:37]
+<dminuoso> jusss: This is what we mean by "Either is a type constructor"
+<jusss> dminuoso: so what we think about like Int?
+<dminuoso> jusss: What do you mean?                                     [17:38]
+<jusss> Int is a type function?
+<merijn> % :k Int
+<yahb> merijn: Int :: *
+<dminuoso> jusss: No.
+<dminuoso> jusss: ^- what merijn just did :)
+<jusss> Either is a type function which take two parameters
+<jusss> :k Either
+<merijn> % :k Either
+<yahb> merijn: Either :: * -> * -> *
+<lambdabot> * -> * -> *
+<dminuoso> jusss: Note, because I think this is a good fit now, there are
+           other type functions.                                        [17:39]
+<jusss> dminuoso: like what?
+<dminuoso> jusss: type families for example are type functions that return
+           known types!
+<dminuoso> (Rather than constructing new ones, like type constructors)
+<jusss> what are type families?
+<dminuoso> You could have a type function First which takes two type arguments
+           and always returns the first type.                           [17:40]
+<dminuoso> jusss: just type functions, where you can say ⌜F Int = Double; F
+           Char = String⌝
+<dminuoso> Such that when you use ⌜F Int⌝ somewhere in the type system, it
+           evaluates to Double.
+<jusss> wow, we can use patter matching in type level?
+<dminuoso> Yes! :)
+<jusss> how we can do that?                                             [17:41]
+<dminuoso> % type family F p
+<yahb> dminuoso: 
+<dminuoso> % type instance F Int = Double
+<yahb> dminuoso: 
+<dminuoso> % type instance F Char = String
+<yahb> dminuoso: 
+<dminuoso> % x :: F Char; x = "foobar"                                  [17:42]
+<yahb> dminuoso: 
+<dminuoso> jusss: There's also a different pattern matching on types, which is
+           implemented by typeclasses.                                  [17:43]
+<jusss> dminuoso: ok, 
+<dminuoso> jusss: Note that F is vastly different from a type
+           constructor. That is, "F Int" is not a new type of its own. Rather,
+           F is applied to Int, computing the type "Double" in its place.
+                                                                        [17:44]
+<dminuoso> jusss: But both type families and type constructors functions are
+           type functions that take some types and return types.        [17:45]
+<maralorn> So, why doesn‘t run TypeInType in all the Russel‘s Paradoxon
+           problems?
+<merijn> maralorn: It does
+<merijn> TypeInType isn't consistent
+<dminuoso> maralorn: It does, but the reasoning is that the type system is
+           crapped anyway :)
+<dminuoso> merijn: So adding TypeInType doesnt lead to additional
+           inconsistency.
+<dminuoso> Err maralorn ^-
+<dminuoso> maralorn: https://www.seas.upenn.edu/~sweirich/papers/fckinds.pdf
+           explains why                                                 [17:46]
+<maralorn> dminuoso: Thx
+<mniip> that's hardly an explanation
+<jusss> since we have value function and type function, so we have kind
+        function too?
+<merijn> jusss: Conceptually you could, but they're not expressible in
+         Haskell+extensions
+<merijn> jusss: There are languages with type systems where such things exist
+<dminuoso> jusss: Note that TypeInType allows you express that idea.    [17:48]
+<jusss> merijn: dminuoso ok
+<jusss> those three worlds, kind type and value, change my mind
+<dminuoso> jusss: Once you get into this business, there's lots of
+           trivialities to discover. Like there is a type with no inhabitants,
+           called Void. So just like "a + 0 = a" you get "Either a Void ~
+           a". You can start to think of ADTs are just adding and multiplying
+           types together. :)
+<dramforever> > sortOn Down [1..5]
+<lambdabot>  [5,4,3,2,1]
+<dminuoso> jusss: (,) takes the role of multipyling two types, with () as its
+           unit. 
+<kuribas> dminuoso: except that every type in haskell is inhabited with bottom
+<dminuoso> kuribas: I honestly wonder what the point of raising that point is,
+           repeatedly. :p
+<jusss> dminuoso: we can do function on type level that is really change my
+        mind about type stuff
+<jusss> dminuoso: is there only two functions on type level? add and multipy?
+<dminuoso> jusss: Well you can make your own type constructors which use them
+           inside.
+<kuribas> dminuoso: because it makes the Void type useless in haskell
+<jusss> dminuoso: for example?
+<MarcelineVQ> can't be that useless, it's occupying space in base       [17:56]
+<dminuoso> jusss: Using a pseudo language you could make "T a b = (a * b) + b"
+           - in actual Haskell that would look: newtype T a b = L a b | R b
+<dminuoso> Err, data type of course!                                    [17:57]
+<jusss> dminuoso: yeah, but that's still just multipy and add, any others?
+
+<kuribas> MarcelineVQ: for completeness probably
+<dminuoso> jusss: You can use type families too!
+<dramforever> jusss: you can also throw recursive data types in the mix
+<jusss> dramforever: wow, you mean do recursive in the type function?   [17:58]
+<jusss> that sounds what should I say
+<dramforever> Uhh not really
+<dminuoso> jusss: So for example you could make some ⌜T a b = (Better a b) +
+           b⌝, which would be encoded by : ⌜data T a b = L (Better a b) | R b⌝
+<dminuoso> Where Better is some suitable type function (could be a type family
+           or a type constructor)                                       [17:59]
+<dramforever> But consider data List a = Nil | Cons a (List a)
+<dminuoso> jusss: You can achieve full computational power in the type system,
+           so you can do complicated type computations.
+<dramforever> List *is* of kind * -> *
+<dramforever> I don't know if you consider that a 'type function'
+<dramforever> (The built-in List is called [] in Haskell)               [18:00]
+<dminuoso> dramforever: We've been operating under the assumption that any
+           type of kind ⌜g -> k⌝ for some choices of g and k are type
+           functions.
+<dramforever> Then it is                                                [18:01]
+<jusss> about type families, this is an exist term?
+<dminuoso> jusss: I just made one earlier, did I not? :)                [18:02]
+<jusss> dminuoso: I'm not familiar with it yet :(
+
+<dminuoso> jusss: A type family is just a "mapping from types to types"
+           basically. This should be familiar, remember how (value) functions
+           are just mappings from values to values?
+
+<jusss> dminuoso: yeah
+<dminuoso> % type family F x where F Int = Char; f x = Int              [18:04]
+<yahb> dminuoso: ; <interactive>:359:37: error: Malformed head of type or
+       class declaration: f x
+
+<dminuoso> % type family F x where F Int = Char; F x = Int
+<yahb> dminuoso: 
+<MarcelineVQ> kuribas: That's not especially compelling, there's plenty of
+              things missing from base, should be put them in there? :>
+              https://www.fpcomplete.com/blog/2017/07/to-void-or-to-void is a
+              reason Void is pretty neat, there's probably more compact
+              examples out there though
+<dminuoso> jusss: ^- this is a simple type family mapping Int to Char, and
+           every other type to Int.
+
+<jusss> dminuoso: ok                                                    [18:05]
+
+<dminuoso> jusss: Which type does ⌜F String⌝ evaluate to?
+
+<jusss> Int
+<dminuoso> jusss: And ⌜F Int⌝ ?
+<jusss> dminuoso: Char
+
+<dminuoso> jusss: There you go. That's a type family in a nutshell.
+<jusss> dminuoso: ok
+<dminuoso> jusss: There's of course further type computation you can do by
+           means of type application.                                   [18:10]
+<jusss> dminuoso: like?                                                 [18:11]
+<dminuoso> jusss: Phantom types is a very simple example of how one can
+           leverage the type system to produce guarantees.
+<dminuoso> jusss:
+           https://gist.github.com/dminuoso/bb97536e4c38ce7e0040b1b04f69e522
+                                                                        [18:14]
+data ValidationError = BadSyntax
+                     | TooLong
+                     | HasSqlInjection
+
+data Validated = IsValidated
+               | NotValidated
+
+data Input (k :: Validated) = Input Text
+
+getFromUser :: IO (Input NotValidated)
+getFromUser = ...
+
+saveIntoDatabase :: Input IsValidated -> IO ()
+saveIntoDatabase = ...
+
+validateInput :: Input NotValidated -> Either ValidationError (Input IsValidated)
+validateInput = ...
+
+<dminuoso> jusss: Guaranteeing that no unsanitized input ever goes into the
+           database.
+<dminuoso> jusss: Anyway. There's many other ways to express ideas in the type
+           system. 
+<jusss> dminuoso: yeah
+<dminuoso> jusss: Notice how the parameter to Input is completely disregarded?
+           It doesn't correspond to any values.
+<maralorn> What does it mean for a kind to be inhabitate?
+<dminuoso> maralorn: It would mean that it can have types belonging to it.
+                                                                        [18:17]
+
+<dminuoso> maralorn: There is no kind that is not inhabitated by a type.
+
+<dminuoso> iow every kind is inhabitated by some type
+<dminuoso> *inhabited.                                                  [18:18]
+
+<dminuoso> (* -> *) e.g. is inhabited by Maybe, Const (), Either Int etc...
+
+########################################################
+
+:t for values
+:k for types
+<jusss> so if a type's kind is *, it can have values, otherwise it can't?
+<dminuoso> jusss: Precisely.                                            [16:13]
+
+:k Maybe Int, it's *, 
+monads are types too, but they're *->*, so monads can not have values
+or no value can have monad types
+
+there's no List type in haskell, only []
+<jusss> dminuoso: why not List, people prefer names I think,not symbols
+<dminuoso> jusss: Good question, it was a design decision.
+<dminuoso> jusss: It could have been List just as well, really. But [] won.
+
+<jusss> wait a sec, [] is *->*
+<dminuoso> jusss: [] is just a bit weird because it has special cased syntax.
+                                                                        [16:15]
+<dminuoso> jusss: You could imagine ⌜[Int]⌝ as just ⌜List Int⌝
+<jusss> [Int] is *
+
+<jusss> Right is a value,
+f = id Right   
+f 3 will get Right 3
+and it's not curried
+
+type for value, kind for type, and sort for kind
+
+type function , type family and typeclass
+type family F x where F Int = Char; F x = Int
+
+
+<dminuoso> jusss: In Haskell however we are making a move to change our type
+           and kind system to do something completely different
+<dminuoso> Called TypeInType where we crush the tower of "types, kinds and the
+           rest" into just the "type world"
+<dminuoso> Such that: Type :: Type
+
+<dminuoso> So values have types, and types have a types.
+<Ariakenom> 1 :: Int, Int :: Type, Type :: Type. (Type is same as *)    [17:03]
+
+<jusss> wow, types have types?
+<dminuoso> jusss: Well yeah. Anyway, you probably best forget it again - it's
+           just what the future holds for us. Until then, types have *kinds*
+
+not all the types can have values, only types which kind is * can have values,
+and monad types's kind is *->*
+
+<dminuoso> jusss: A type is something that exists on the type level.
+
+<jle`> well, a monad like Maybe is a type
+Maybe's kind is *->* ,so Maybe doesn't have a value
+
+<dminuoso> Either is all three: a) a type, b) a type function (that is a
+           function acting on types), and c) a type constructor
+<dminuoso> Right is also all three: a) a value, b) a (value-level) function,
+           and c) a data constructor
+
+<dminuoso> jusss: We say that types of kind * are inhabitatable, which means
+           that they *could* be inhabitated. (We dont know for sure, but the
+           kind system at least allows for it)                          [16:10]
+<dminuoso> So a type of kind * is, by the rules of the kind system, allowed to
+           have values - but its allowed to have none. Contrarily a type of
+           kind (* -> *) is not allowed to have any values.             [16:12]
+<dminuoso> jusss: If a type is inhabitated, there exist values of that type.
+<jle`> "can have a type"
+<merijn> jusss: "type Foo is inhabited" = "there is at least one value with
+         type Foo"                                                      [16:09]
+<merijn> jusss: And reversed: "type Foo is uninhabited" = "there are no values
+         with type Foo"
+
+
+
+############################################
+
+#newtype #type
+1. newtype is faster than type
+2. the value constructor introduced by newtype is strict
+   and the value constructor introduced by data is lazy
+3. you can only have one value constructor and that value constructor can only have one field
+
+data CoolBool = CoolBool { getCoolBool :: Bool }
+it means
+data CoolBool = CoolBool Bool   // the first CoolBool is type constructor, and the last is value constructor
+getCoolBool :: CoolBool -> Bool
+
+helloMe :: CoolBool -> String  
+helloMe (CoolBool _) = "hello"
+
+newtype CoolBool = CoolBool { getCoolBool :: Bool }   
+#########################################
+
+Monad Transformer
+Kleisli Arrow
+CPS
+
+##############################################
 #kotlin #httpurlconnection #use httpconn.setRequestProperty for header
 #data use urlencoded or json depend on header  #RESTful #post 
 httpurlconnection
@@ -6,7 +1037,7 @@ var output = reader.readLine()
         var result = ""
         while (output != null){
             result += output
-            output = reader.readLine()
+            output = reader.readLine()  // readLine need "\r\n" as end of a line!
         }
 
 val outputStream: DataOutputStream = DataOutputStream(httpconn.outputStream)
@@ -356,6 +1387,9 @@ Prelude> t (Left 2)
 3
 
 ########################################
+#instance #variable #kotlin
+another way is define function B inside function A,
+then you can call B inside A
 
 instance variable self.var in python is look like
 class T2 {
@@ -4841,6 +5875,8 @@ def f(a):
 <dminuoso> jusss: I wouldnt focus on Monad really, ask what the ((->) e)
            instance does                                                [18:12]
 ##############################################
+
+#type inference
 
 deduce a function definition from its type signature, and this one function is just an instance of its type signature, this type can have different function definition,
 id :: a->a
