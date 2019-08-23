@@ -1,3 +1,43 @@
+
+ssh -6 -p port root@2400:x
+
+v2ray support ipv6
+"routing": {
+    "strategy": "rules",
+    "settings": {
+      "rules": [
+        {
+          "type": "field",  
+          "ip": [
+            "0.0.0.0/8",
+            "::1/128"
+          ],
+          "outboundTag": "blocked"
+        }
+      ]
+    }
+  }
+
+in the client
+{
+  "port": 7070,
+  "log": {
+    "access": ""
+  },
+  "inbound": {
+    "protocol": "socks",
+    "settings": {
+      "auth": "noauth",
+      "udp": false,
+      "ip": "::1"
+    }
+  },
+and set server ip with ipv6 
+
+in the browser, set proxy address ::1
+
+######################################################
+
 v4 v6两种玩法，一种4to6 tunnel, 一种纯v6
 纯v6需要申请ip block，都是公网的，比如64位的要前4组一样
 4to6玩法把公网v4转换保留的v6段，但需要4to6   私有ip 10 192 172
@@ -5,4 +45,5 @@ v4 v6两种玩法，一种4to6 tunnel, 一种纯v6
 link local fe80加mac地址转换 在v4里是169.254.0.0 两台电脑直连会获得这个地址 多台电脑交换机直连得到的也是169 如果加nat能出去？
 2000:：3全球网络单薄地址，全局流量转发
 如果我在国内买个ipv6 block，我可以在国外的vps上用来配置openvpn吗 不可以 需要机房申请的ipv6 block绑定机房路由
+
 
