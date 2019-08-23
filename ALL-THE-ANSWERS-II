@@ -1,7 +1,31 @@
 
+f :: a->b; f=undefined
+fish::Monad m => (a->m b)->(b->m b) ->(a->m b); fish=undefined
+:t (fish (return . f) return)
 
+##########################################################
 
+CUDA GPU Accelerated h264/h265/HEVC Video Encoding with ffmpeg
 
+download ffmpeg with enable_nvenc and enable_nvdec version
+https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-20190708-f83b46e-win64-static.zip
+
+>ffmpeg.exe -hwaccel cuvid -i Desktop\IMG_0667.MOV -c:v h264_nvenc -pix_fmt yuv420p -preset slow -rc vbr_hq -b:v 8M -maxrate:v 10M -c:a aac -b:a 224k outmovie.mp4
+
+https://ntown.at/de/knowledgebase/cuda-gpu-accelerated-h264-h265-hevc-video-encoding-with-ffmpeg/
+
+Encoding high quality h264 video with CPU only:
+ffmpeg.exe -i inmovie.mov -c:v libx264 -pix_fmt yuv420p -preset slow -tune film -crf 19 -c:a aac -b:a 224k outmovie.mp4
+
+Encoding high quality h264 video via GPU:
+ffmpeg.exe -hwaccel cuvid -i inmovie.mov -c:v h264_nvenc -pix_fmt yuv420p -preset slow -rc vbr_hq -b:v 8M -maxrate:v 10M -c:a aac -b:a 224k outmovie.mp4
+
+Encoding high quality h265/HEVC 10-bit video via GPU:
+ffmpeg.exe -hwaccel cuvid -i inmovie.mov -pix_fmt p010le -c:v hevc_nvenc -preset slow -rc vbr_hq -b:v 6M -maxrate:v 10M -c:a aac -b:a 240k outmovie.mp4
+
+but this ffmepg require a higher version nvida driver than 418.31
+
+#####################################################
 
 there's no a general way to get its function definition through its type
 
@@ -78,6 +102,38 @@ fmap j i == f b == <*> (pure j) i
 j <$> i = (pure j) <*> i
 
 
+(.) :: (b->c) -> (a -> b) -> (a->c)
+let's assume c = m b              #mark two
+(.) :: (b-> m b) -> (a->b) -> (a-> m b)
+return :: a -> m a                     #mark one
+return :: b -> m b
+f :: a->b
+(.) return f :: a-> m b
+
+>>= g (return . f) = fmap f g
+f <$> x = x >>= (return . f)
+
+for all c, you can use any b to instead of c  #mark three
+
+>=> :: (a-> m b) -> (b-> m c) -> a -> m c
+>>= :: m b -> (b -> m c) -> m c
+
+f :: a-> m b
+g :: b -> m c
+x :: a
+
+>=> f g x :: m c :: >>= (f x) g
+after the sugar syntax
+>=> f g = \x -> >>= (f x) g
+infix
+f >=> g = \x -> (f x) >>= g
+
+<dminuoso> jusss: So things get easier if we adopt the explicit forall
+           notation.                                                    [16:53]
+<dminuoso> (>>=) :: forall m a b. Monad m => m a -> (a -> m b) -> m b   [16:54]
+<dminuoso> The "forall m a b" merely means "for every choice of m, a, b ... ",
+           which indicates that the occurance of "m", "a", and "b" in the
+           right side is actually introduced through "forall"
 
 #################################################################
 
