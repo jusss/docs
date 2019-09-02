@@ -1,4 +1,53 @@
 
+>>= :: (e->a) -> (a->e->b) -> (e->b)
+the context is the input e, and function (->), the value above context is the result a
+
+( (+1) >>= \x -> return ) 3
+
+pass 3 into this, now, e is 3 and -> is (+1), a is 4,
+so x is 4, and the context is still 3 and (+1),
+pass the context 3 to return, so it will return 3
+
+( (+1) >>= \x -> (+) x ) 3
+x is 4, and context is 3, so (+) 4 3 will get 7
+
+(+1) >>= \x -> return will return a function return which has e->b
+(+1) >>= \x -> (+) x will return a function (+) x x
+
+
+///////////////////////////////////////
+
+the value constructor is the context
+Maybe String has two contexts, one is Just String, another is Nothing
+
+Maybe holds Just and Nothing in context
+
+fmap Nothing -> Nothing
+>>= non-Nothing -> Nothing
+
+fmap only work on Nothing, it will get Nothing
+but >>= can work on non-Nothing value, and in the f, it can return Nothing
+Nothing means failure computation in >>=
+
+m x >>= \x-> m y >>= \y -> m x+y
+
+trans to do notation
+
+do 
+x <- m x
+y <- m y
+return (x+y)
+
+the context is import in the calculation, computate with context
+
+Maybe need to be an instance of Monad, 
+so it implement Nothing >>= f = Nothing 
+so this will instead of "case...of Nothing"
+use pattern matching or overloading to instead of if-else
+
+and implent Just x >>= f = f x to instead of if-else if it's true conditons
+
+#####################################################################
 
 
 #Maybe
