@@ -1,4 +1,404 @@
 
+
+########################################################################
+
+22:52:30 <jusss> what is Functor composition?
+23:01:35 <jusss> ski: f . g is function composition?
+23:03:26 <ski> if `f' is a function from `T' to `U', and `g' a function from `U' to `V', (`T',`U',`V' being types / (structural) sets), then `g . f' is a function from `T' to `V', the composition of `g' after `f'. defined by `(g . f) x = g (f x)', for all inhabitants/values `x' in `T'
+23:05:37 <ski> if `F' is a functor from `C' to `D', and `G' a functor from `D' to `E', (`C',`D',`E' being categories), then `G . F' is a functor from `C' to `E', the composition of `G' after `F'. defined on all objects `A' of `C' by `(G . F) A = G (F A)' (result is an object in `E'); and defined, for all objects `A',`B' of `C', on all morphisms `f' (in `C') from `A' to `B', by `(G . F) f = G (F f)' (result is a morphism (in `E') from `G (F A)' to `G (F B)')
+23:08:07 <ski> in Haskell, an instance `f' of the type class `Functor' (iow an `f' where `Functor f' holds) must be a type `f' of king `* -> *', so the from and to categories (say `C' and `D' above) would both be the same category, corresponding to `*', sometimes written `Hask'. so `f' is a functor from `Hask' to `Hask' (both `C' and `D' being `Hask'), iow an *endo*functor (on `Hask')
+23:11:04 <ski> one could also talk about functors between other categories in Haskell, but they wouldn't be instance of the type class `Functor' (which is only for endofunctors on `Hask')
+23:11:04 <ski> e.g. if one defines `newtype StreamVia f a = SV (f (a,StreamVia f a))', then `StreamVia' is a functor to `Hask', from : the category of all functors from `Hask' to `Hask'. iow from the category of endofunctors on `Hask'
+23:11:12 <ski> er, actually, sorry, the "to" is also that functo category here, not `Hask'
+23:11:50 <ski> let's say `newtype IntegerStreamVia f = ISV (f (Integer,IntegerStreamVia f))' instead, to remedy that
+23:12:46 <ski> in terms of Haskell kinds, we then have `IntegerStreamVia :: (* -> *) -> *' (`StreamVia :: (* -> *) -> (* -> *)' for the other one) -- but that doesn't say anything about `Functor'
+23:14:14 <ski> one could imagine writing something like `IntegerStreamVia :: {f :: * -> * | Functor f} -> *', or `IntegerStreamVia : Hask^Hask >---> Hask' (in more "mathematical" notation)
+23:15:36 <ski> for simpler cases, like `Maybe',`Either e' (for some `e :: *'), we get `Maybe :: * -> *',`Either e :: * -> *' (or `Maybe : Hask >---> Hask',`Either e : Hask >---> Hask')
+23:16:27 <ski> we can compose `Maybe' and `Either e', in either way (let's take `Maybe' after), so `Maybe . Either e :: * -> *' (or `Maybe . Either e : Hask -> Hask')
+23:17:03 * ski looks at jusss, idly wonders whether they're bewildered yet
+23:20:02 <dminuoso> You probably intimidated them. ;)
+23:22:30 <ski> anyway, `Either e' is a functor from `Hask' to `Hask', because it will accept one concrete type (like `Integer'), before producing a concrete type (then `Either e Integer') (assuming `e' is a concrete type, a type of kind `*', the type would be an object in the category `Hask' of all concrete types)
+23:22:30 <ski> anyway, `Either e' is a functor from `Hask' to `Hask', because it will accept one concrete type (like `Integer'), before producing a concrete type (then `Either e Integer') (assuming `e' is a concrete type, a type of kind `*', the type would be an object in the category `Hask' of all concrete types)
+23:25:24 <ski> what then is `Either' ? it will accept a concrete type `e' (an object in `*' / `Hask'), and produce a type `Either e' (a functor from `*' / `Hask' to itself). iow produce an object in the category of endofunctors on `*' / `Hask', written `{f :: * -> * | Functor f}' / `Hask^Hask' above
+23:26:41 <ski> iow, `Either :: * -> {f :: * -> * | Functor f}' is a functor from `*' to `{f :: * -> * | Functor f}'. in other notation, `Either : Hask >---> Hask^Hask'
+23:27:50 <ski> combining that with `IntegerStreamVia :: {f :: * -> * | Functor f} -> *' / `IntegerStreamVia : Hask^Hask >---> Hask'. composing that functor `IntegerStreamVia' after `Either', we get `IntegerStreamVia . Either :: * -> *' / `IntegerStreamVia . Either : Hask >---> Hask'
+23:28:51 <ski> (and i'll stop here. the point/goal was to show a slightly more complicated composition than say `Maybe . Maybe' or `Maybe . Either e', where the categories involved were not all `*' / `Hask')
+
+########################################################################
+
+#compose monad and monad transformer
+
+compose two functors and get a functor,
+compose two applicatives get an applicative
+but compose two monads may not get a monad, by Compose, or :.: Maybe :.: IO
+that's why monad transformer come,
+monad transformer is a type function, it takes a monad and return a monad, MaybeT IO
+>=> is composition of functions "into" monads
+
+Compose Monad is from Data.Functor.Compose.Compose
+<tsahyt> :t Data.Functor.Compose.Compose
+<lambdabot> forall k1 k (f :: k -> *) (g :: k1 -> k) (a :: k1). f (g a) ->
+            Data.Functor.Compose.Compose f g a
+
+monad is a type-function of kind *->*
+but you can compose type-functions with :.:, and it's a type level
+:k (:.:)
+<yahb> dminuoso: (:.:) :: (k2 -> *) -> (k1 -> k2) -> k1 -> *
+<dminuoso> jusss: So if `(f . g) x = f (g x)`, can you solve `(Maybe :.: IO)
+           Bool = ...`  ? :)                                            [15:35]
+<jusss> dminuoso: Maybe (IO Bool) ?                                     [15:38]
+<dminuoso> jusss: Indeed. Now they are not fully equal, but isomorphic.
+
+Maybe :.: IO is the composition of Maybe after IO
+:.: is an infix of Data.Functor.Compose
+
+<dminuoso> jusss: A monad transformer is a type function that, itself, accepts
+           a monad and gives you a new monad back
+<dminuoso> jusss: So it sort of transforms a monad into a new monad.
+
+import Control.Monad.Trans.Maybe
+monad transformer MaybeT :: (*->*)->*->*
+it takes a monad which kind is *->* and return a monad which kind is *->*
+
+MaybeT IO gives you a new monad
+MaybeT (Either a) gives you a monad
+
+(Maybe :.: IO) Bool is a monad composition,
+(MaybeT IO) Bool, MaybeT is the monad transformer, MaybeT IO is a new monad
+
+<dminuoso> jusss: If F is a functor, and G is a functor, then (F :.: G) is
+           also a functor. but when both F and G are monad, then `F :.: G` is
+           not necessarily a monad. So you cant combine them into new monads
+           arbitrarily.                                                 [15:49]
+<dminuoso> jusss: Which is a shame, because it means we cant just arbitrarily
+           compose the effects we want. So if we want the effect of both F and
+           G we need something else, we can't just compose them together.
+<jusss> dminuoso: that's why monad transformer come?
+<dminuoso> jusss: Indeed.
+<dminuoso> jusss: So instead of composing (Maybe :.: IO) and hoping for a
+           monad, we create a type function that takes an arbitrary monad, say
+           IO, and "gives it the exception-effect of Maybe" and returns the
+           new monad.                                                   [15:52]
+<dminuoso> jusss: So MaybeT transforms an arbitrary monad by giving it
+           "exception effects"
+<dminuoso> jusss: The cool trick is, MaybeT works on *any* monad. :)    [15:53]
+<dminuoso> jusss: MaybeT is not a monad, so it cant be applied to itself.
+
+MaybeT is a type function, we can compose two type functions with :.:
+
+<dminuoso> jusss: The type system works differently, :.: is not exactly
+           "evaluated to some definition"                               [15:58]
+<dminuoso> jusss: So :.: sort of acts like composition, but it creates a new
+           type in the process.
+<jusss> dminuoso: then what it's used to? Maybe :.: IO
+<dminuoso> jusss: Its when we want to capture the composition as a separate
+           entity.
+<dminuoso> jusss: So (:.:) is a type constructor at the end, so its not just a
+           type function.           
+<dminuoso> jusss: `(Maybe :.: IO) Bool` is not equal to `Maybe (IO Bool)`,
+           it's rather comparable to it. The first gives you a brand new type
+           in comparison.                                               [16:06]
+<dminuoso> jusss: The usefulness stems from being able to write instances like
+           `instance (Functor f, Functor g) => Functor (f :.: g)` which only
+           works if :.: computes a new type
+<dminuoso> jusss: The thing is, while you have things like "type functions"
+           and sort of "evaluation at the type level", its a different
+           language. The type system in itself can be thought of a separate
+           programming language that isnt concerned with "database calls" or
+           "drawing images"           
+
+#######################################################
+compose monads is like combine two set to new one,
+and there're value constructor in that set or called context,
+so we can have two effect constructors in the new one and have two effects
+MaybeT IO we can have Maybe's exception effects by its Nothing in the context
+
+
+think context as a set, Maybe has a context, there're two values in the context, Just and Nothing
+Either has Left and Right in the context
+3 is a normal value, Just 3 is a fancy value, is a data type
+Just a >>= you can "return" Just a or Nothing
+Nothing >>= you can only "return" Nothing
+Left a >>= you can "return" Left a
+Right a >>= you can "return" Left a or Right a
+the unit in >>= is "return", and return can pick value constructor from the context and combine one
+
+>>= will split the data type and get its mornal value, and then it picks one value constructor from
+its context and combine it to a data type then return it
+
+return is the unit, the identity law in >>=, so
+m >>= return = m
+id is the unit in the monoid (.), so
+f . id = f
+
+semigroup: mappend is for the associativity law, two combine to one, and (a<>b)<>c = a<>(b<>c)
+monoid: the associativity law , identity law,  x+0=x, f . id = f,  0 and id is the unit, + and . is the monoid
+the associativity law (f . g) . h = f . (g . h),   m>>=f>>=g  =  m >>= \x -> f x >>= g
+
+
+(>>=) :: Either e a -> (a -> Either e b) -> Either e b
+(>>) :: Either e a -> Either e b -> Either e b
+return :: a -> Either e a
+fail :: String -> Either e a 
+
+instance Monad (Either e) where
+    Left  l >>= _ = Left l
+    Right r >>= k = k r
+
+either :: (a -> c) -> (b -> c) -> Either a b -> c
+use either can get the normal value in Left a or Right a
+either id id (Left 3) = 3
+either id id (Right 2) = 2
+
+either f _ (Left x)     =  f x
+either _ g (Right y)    =  g y
+
+-- | Promote a function to a monad.
+liftM   :: (Monad m) => (a1 -> r) -> m a1 -> m r
+liftM f m1              = do { x1 <- m1; return (f x1) }
+
+Prelude> import Control.Monad
+Prelude Control.Monad> :t liftM
+liftM :: Monad m => (a1 -> r) -> m a1 -> m r
+Prelude Control.Monad> liftM (+1) (Just 2)
+Just 3
+Prelude Control.Monad> Just (+1) <*> (Just 2)
+Just 3
+
+liftM :: (a->b) -> f a -> f b
+<*> ::  f (a -> b) -> f a -> f b
+pure :: a -> f a
+
+aha, liftM is fmap, ap is <*>
+ap :: Monad m => m (a -> b) -> m a -> m b
+and ap is the Monad version of <*>
+
+<tsahyt> all monads are applicatives, all applicatives are functors.
+<tsahyt> but not the other way round. there are functors that aren't
+         applicatives, and there are applicatives that aren't monads.
+<tsahyt> the Const functor apparently
+<tsahyt> jusss: monad transformers are actually something you can use to "get
+         around" the problem of composing monads.                       [15:26]
+<tsahyt> that's why they exist. otherwise we'd probably just use Compose*
+<tsahyt> jusss: and >=> is composition of functions "into" monads (or Kleisli
+         arrows, if you wanna be technical), not of the monads themselves
+
+<jusss> tsahyt: to make a type as an instance of typeclass Monad, it has to
+        implement how many functions at least?
+<tsahyt> jusss: return and (>>=). but return is also in Applicative (called
+         pure), so it's really just (>>=).                              [15:21]
+<jusss> like >>= and return is nessecary
+<tsahyt> ah and indeed the docs now name (>>=) as the minimal complete
+         definition
+<tsahyt> so it's only >>= now, because Applicative is a superclass of monad
+                                                                        [15:22]
+<jusss> tsahyt: does that mean it has to be an instance of Functor and
+        Applicative first?
+<tsahyt> yes
+<jusss> so there're four functions to make a type become an instance of monad,
+        fmap, <*>, pure and >>= ?                                       [15:24]
+<tsahyt> jusss: but perhaps most importantly, stuff you get out of
+         Compose. you can compose functors together with it, and the
+         composition of two applicatives are also always an applicative. but
+         the composition of two monads may not be a monad.        
+
+http://hackage.haskell.org/package/base-4.12.0.0/docs/Control-Monad.html
+find Monad (Either e) click the # Source will get its function definition
+click the '+' before it will get its type signature 'bout >>=
+or http://hackage.haskell.org/package/base-4.12.0.0/docs/Data-Either.html
+
+######################################################################
+
+t = [(+)] <*> [1,2]
+t is [(+1), (+2)] :: Num a => [a->a] , so you need a way to get (+1) out of [(+1)] to do something
+t >>= \x -> return (x 1)    = [2,3]
+t <*> [1,2]                          =[2,3,3,4]
+
+Prelude| t2 = do
+Prelude| n <- [(+1),(+2)]
+Prelude| m <- [1]
+Prelude| return (n m)
+Prelude| :}
+Prelude> t2
+[2,3]
+
+Just because something is made an instance of the Monad type class doesn't mean that it's a monad, it just means that it was made an instance of a type class. For a type to truly be a monad, the monad laws must hold for that type.
+
+left identity:
+return x >>= f       =      f x
+right identity:
+m >>= return        =      m
+associativity:
+m >>= f >>= g     =      m >>= (\x -> f x >>= g)
+
+Reader is not the other monads
+when m ~ e->
+>=> f g x y = g (f x y) y
+f >=> g = \x -> \y -> g (f x y) y
+
+but m ~ []
+>=> :: Monad m => (a -> m b) -> (b -> m c) -> a -> m c
+>=> :: (a->[b]) -> (b->[c]) -> (a->[c])
+f ::(a->[a])
+f x = [x]
+g :: b->[b]
+g x = [x+1]
+>=> f g 3 = [4]
+
+if m~e-> you give it three parameters it supposes to return a function, four to return value
+but m~[] you give it three parameters, it returns a list
+check the type, it's not necessary to be four, a -> e-> b, can be f g :: a->e->b
+the polymorphic, you give functions to >=>, and it returns functions
+you give lists to >=> and it returns lists
+
+<jusss> dmwit: did f <=< (g <=< h)  =   (f<=<g) <=< h?
+<dmwit> That equation is fine.
+but  m >>= f >>= g is not equal to m >>= (f >>= g)
+m >>= f >>= g  =   m >>= (\x -> f x >>= g)
+
+<jusss> m x >>= \x -> m y >>= \y -> x+y
+<jusss> equal m x >>= \x -> ( m y >>= \y -> x + y) ?
+
+
+(m >>= f) >>= g      =        m >>= (f >>= g)                                   incorrect!
+m >>= f >>= g         =        m >>= (\x -> f x >>= g)                      correct!
+f >>= g                      =       \x -> (f x) >>= g                                 incorrect
+f <=< (g <=< h)        =       (f<=<g) <=< h                                    correct!
+(f . g) . h                     =        f . (g . h)                                               correct!
+f >=> g                      =       \x -> (f x) >>= g                                   correct!
+m >>= f >>= g         =       m >>= (f >=> g)                                   correct!
+f >>= g                       =    \x -> f (g x)                                            correct!
+
+the associative law
+(f . g) . h = f . (g .h)
+(f >=> g) >=> h = f >=> (g >=> h)
+m >>= f >>= g = m>>= (\x -> f x >>= g)
+
+
+
+semigroup has associative law (a<>b)<>c = a<>(b<>c)
+monoid has associative law and identity law
+the right identity law
+a `op` unit = a  
+the left identity law
+unit `op` a = a
+
+
+<jusss> dminuoso: instances of monads can turn to instances of monoid and
+        semigroup?
+<dminuoso> jusss: Yes, for example through the EndoKleisli construction I have
+           just shown you.                                              [18:06]
+
+return is the unit,
+<jusss> dminuoso: the unit, if return is the unit, then f >>= return = f?
+<dminuoso> jusss: Yes!
+
+<jusss> (>>=) :: Either e a -> (a -> Either e b) -> Either e b 
+<jusss> return :: a -> Either e a
+
+<dminuoso> jusss: So here's the lie: the additional requirement for Semigroup
+           and Monoid is something called "closure". The operation in question
+           must take two things of exact same type and return something of the
+           exact same type back.
+
+<dminuoso> % :t (>=>)
+<yahb> dminuoso: Monad m => (a -> m b) -> (b -> m c) -> a -> m c
+<dminuoso> As you can see this doesnt fit the bill, becaue the types vary.
+<dminuoso> We could however make it a monoid if we somewhat constrict it.
+<dminuoso> If we say "what if a ~ b ~ c", then we'd have `(a -> m a) -> (a ->
+           m a) -> (a -> m a)` and we could certainly make a Semigroup and
+           Monoid instance for that.                                    [17:58]
+<jusss> dminuoso: wow
+<dminuoso> jusss: Its the same thing with (.) by the way. And there is a
+           newtype wrapper that does exactly that, its called Endo.
+
+<jusss> :t (>>=)
+<lambdabot> Monad m => m a -> (a -> m b) -> m b
+<jusss> m a ->(a -> m a) -> m a?
+<dminuoso> jusss: Doesnt fit the "both input types and the output types must
+           be the same" rule                                            [18:00]
+<jusss> dminuoso: no
+<dminuoso> jusss: But we could use it as the underlying implementation
+           regardless
+<dminuoso> jusss: So this is what the Monoid would look like:           [18:01]
+<dminuoso> % newtype EndoKleisli m a = EndoKleisli { appEndoKleisli :: a -> m
+           a }
+<yahb> dminuoso: 
+<dminuoso> % instance Monad m => Semigroup (EndoKleisli m a) where EndoKleisli
+           kl <> EndoKleisli kr = EndoKleisli kl >=> kr
+<dminuoso> % instance Monad m => Semigroup (EndoKleisli m a) where EndoKleisli
+           kl <> EndoKleisli kr = EndoKleisli (kl >=> kr)
+<dminuoso> % instance Monad m => Monoid (EndoKleisli m a) where mempty =
+           EndoKleisli return                                           [18:02]
+<dminuoso> jusss: So (>=>) is actually something more general than a Monoid
+           because the types sort of vary, and we don't call this "A
+           semigroup" or "A monoid" but "A category". :)                [18:04]
+<dminuoso> But this is quickly getting into mathematical topics
+<jusss> dminuoso: instances of monads can turn to instances of monoid and
+        semigroup?
+<dminuoso> jusss: Yes, for example through the EndoKleisli construction I have
+           just shown you.                                              [18:06]
+<jusss> dminuoso: I think I can't follow this right now...
+<dminuoso> jusss: Then dont. Note that none of this is relevant to practical
+           Haskell programming, you can become a proficient programmer without
+           understanding any of this.
+<dminuoso> I just sort of digressed.           
+
+##################################################################
+
+action computation context with monad
+
+Maybe is the Monad, Just is the context
+
+3 is normal value, Just 3 is added context Just to 3 and get a data type Just 3, this is called pure
+return :: a-> m a, if there's no >>= to get the m, return will be pointless,
+you can't return 3 to get Just 3 or Left 3, 'cause there's no m
+you can only get m when return is used in >>=,
+and it's like >>= split m to an namespace and bound m
+
+Just 3 >>= f  , >>= will split Just and store Just as m,
+so return will get Just when it finds m in the current temporary namespace
+it's like (let ((m Just)) ...)
+
+(>>=) = (lambda (m a f)
+                (return m f a))
+
+pure or return is used for \x -> ... , when f is \x -> ...
+otherwise we use pattern matching to do that, no need for pure or return
+
+<*> (Just f) (Just x) = Just (f x) = \x -> return (f x)
+fmap f (Just x) = Just (f x) = \x -> return (f x)
+>>= (Just x) (f =(\x -> return (doSomeThing x))) = f x
+
+
+
+
+<jusss> :t fmap (-) [3,4]                                               [16:03]
+<lambdabot> Num a => [a -> a]
+<jusss> :t (-)
+<lambdabot> Num a => a -> a -> a
+<jusss> :t fmap
+<lambdabot> Functor f => (a -> b) -> f a -> f b
+<jusss> why we can put (-) into fmap?                                   [16:04]
+<merijn> jusss: Well, why not?
+<jusss> merijn: 'cause it's (a->b)
+<merijn> jusss: 'b' is allowed to be 'a -> a'
+<merijn> jusss: Remember that "a -> b -> c" is equivalent to  "a -> (b -> c)"
+<jusss> merijn: so it's fmap :: (a->(a->a)) -> f a -> f (a->a) ?
+<merijn> jusss: Yes
+<jusss> and fmap (-) [3,4] == [(-)3 , (-) 4] ?
+<merijn> Yes                                                  
+<merijn> jusss: Because the Applicative for list does cross-product     [16:11]
+<merijn> It applies every function from the first list to every value from the
+         second
+<merijn> jusss: There are, in fact, two lawful Applicatives for lists. Cross
+         product (the default one) and "zip"
+<jusss> merijn: then it should be [2,1,0,3,2,1]
+<merijn> > (-) <$> ZipList [3,4] <*> ZipList [1,2,3]
+<lambdabot>  ZipList {getZipList = [2,2]}
+<jusss> yeah, map (-) 3 on the second list get [2,1,0]
+#############################################
+
 f :: a->b; f=undefined
 fish::Monad m => (a->m b)->(b->m b) ->(a->m b); fish=undefined
 :t (fish (return . f) return)
@@ -134,6 +534,37 @@ f >=> g = \x -> (f x) >>= g
 <dminuoso> The "forall m a b" merely means "for every choice of m, a, b ... ",
            which indicates that the occurance of "m", "a", and "b" in the
            right side is actually introduced through "forall"
+
+
+get function definition from its type signature when m is e->
+
+m~e->
+fmap :: (a->b)->(b->c)->(a->c)
+f :: a->b
+g :: b->c
+x :: a
+fmap f g x :: c = g (f x)     sugar syntax fmap f g = \x -> g (f x)
+<*> :: (a->b->c)->(a->b)->(a->c)
+<*> f g x :: c = f x (g x)
+>>= :: (e->a)->(a->(e->b))->(e->b)
+>>= f g x :: b = g (f x) x
+>=> :: (a->e->b)->(b->e->c)->a->e->c
+>=> f g x y :: c = g (f x y) y
+
+j <$> i = (pure j) <*> i
+f <$> x = x >>= (return . f)
+f >=> g = \x -> (f x) >>= g
+
+f <$> g = \x -> g (f x)
+f <*> g = \x -> f x (g x)
+f >>= g = \x -> g (f x) x
+f >=> g = \x -> \y -> g (f x y) y
+
+#type inference
+
+1. there're how many type variables in the type signature, then you need the exactly variables in the function defintion, (or by -> ?)
+2. only when m is e->, get a function definition based on its type signature
+3. inference functions to function, no need variables if it's no need to resolve
 
 #################################################################
 
