@@ -1,5 +1,288 @@
 
 
+#######################################
+module ReaderTest where
+data Environment = Env
+  { firstName :: String
+  , lastName :: String
+  } deriving (Show)
+
+t2 :: Environment -> String
+--t2 x = "Hello " ++ (firstName x) ++ (lastName x)
+--t2 x = ( firstName >>= \x -> lastName >>= \y -> return $ x ++ y ) x
+-- the interesting thing here is that \x -> lastName is a binary function, we put a prefix \x -> to an unary, then it's binary now
+t2  = do
+  x <- firstName
+  y <- lastName
+  return $ "Hello " ++ x ++ y
+
+main = putStrLn (t2 $ Env "John " "Doe")
+################################################
+
+haskell-mode on emacs, also python-mode
+;;; show line number
+(dolist (hook '(python-mode-hook
+                javascript-mode-hook
+                html-mode-hook
+                css-mode-hook
+                js-mode
+				mhtml-mode
+                haskell-mode-hook
+		c-mode-common-hook))
+(add-hook hook (lambda () (display-line-numbers-mode t))))
+
+;;; python-mode will not eval python buffer if there is threading code
+(defun my-python-compile ()
+  (interactive)
+  (setq tmp-file (concat (buffer-file-name) ".tmp"))
+  (write-region (point-min) (point-max) tmp-file)
+  (compile (concat "python " tmp-file)))
+
+(add-hook 'python-mode-hook
+	  (lambda () (local-set-key (kbd "<f5>") 'my-python-compile)))
+
+;;; haskell-mode, runghc will only read .hs file, so suffix with .tmp.hs
+(defun my-haskell-compile ()
+  (interactive)
+  (setq tmp-file (concat (buffer-file-name) ".tmp.hs"))
+  (write-region (point-min) (point-max) tmp-file)
+  (compile (concat "runghc " tmp-file)))
+
+(add-hook 'haskell-mode-hook
+	  (lambda () (local-set-key (kbd "<f5>") 'my-haskell-compile)))
+
+(setq compilation-save-buffers-predicate '(lambda () nil))
+(setq compilation-always-kill t)
+
+##########################################################
+Test.hs
+
+module X where
+{-# LANGUAGE FlexibleContexts #-}
+
+import Control.Monad.Reader
+
+data Tree a = Leaf a | Node (Tree a) (Tree a) deriving (Show)
+mapTree :: (a->b) -> Tree a -> Tree b
+mapTree f (Leaf x) = Leaf (f x)
+mapTree f (Node xl xr) = Node (mapTree f xl) (mapTree f xr)
+
+data Environment = Env
+  { firstName :: String
+  , lastName :: String
+  } deriving (Show)
+
+helloworld :: Reader Environment String
+helloworld = do
+  f <- asks firstName
+  l <- asks lastName
+  return ("Hello " ++ f ++ l)
+
+runHelloworld :: String
+runHelloworld = runReader helloworld $ Env "Jichao" "Ouyang"
+                         
+main = putStrLn runHelloworld
+
+#########################################################
+
+#Reader #Monad
+
+<jusss> return x = \_ -> x is return = \x -> \_ -> x
+const = return in Reader, const is the unit in the monoid >>=
+
+(+1) >>= return   this will return an unary function, so if you give it a input, it outputs a result, return takes two input, the first one is (+1)'s result, the second one is (+1)'s input, and it will return (+1)'s result
+
+f x = f x, based on eta-conversion
+f = \x -> (f x)
+f y = (\x -> f x) y
+
+f >>= return   =    f >>= \x -> return x     =   f
+
+<jusss> ( (+1) >>= return ) 2   -- this one, the (+1)'result is 3, we pass 3
+        to return as its firt input, and the context is 2, we pass 2 as
+        return's second input, right?                                   [09:44]
+
+<jle`> jusss: one way to find out --- you can just expand all of the
+       definitions                                                      [09:45]
+<jle`> of (>>=) and return
+<jle`> ( (+1) >>= (\r _ -> r) ) 2
+<jusss> jle`: that would be (+1) >>= return = \x -> return ((+1) x) x   [09:46]
+<jle`> yeah, which is \x -> const (x + 1) x, which is \x -> (x + 1)
+
+<jusss> jle`: I want the intuition...                                   [09:49]
+<jusss> my intuition is ok? 
+<jle`> if you think of it as monadic actions, the "result" of (+1) is 3, and
+       the "result" of `return 3` is then therefore 3 as well
+<EvanR> lambdas are the intuition, >>= return are notation
+<jle`> if you want to think of reader actions as monadic actions with results,
+       the "result" of the (+1) action there is 3 yes, when you apply the
+       whole thing to 2
+<jle`> consider another example using do notation, if you are trying to get
+       away from the literal function applications:                     [09:52]
+<jle`> one = do x <- sin; y <- cos; return (x^2 + y^2)
+<jle`> if you do `one 0.2`, for instance, the "result" of the `sin` action is
+       0.199, the "result" of the `cos` action is 0.980
+<jle`> and the final result is then 0.199^2 + 0.980^2                   [09:54]
+<jle`> @let one = do x <- sin; y <- cos; return (x^2 + y^2)
+<lambdabot>  Defined.
+<jle`> > one 0.2
+<lambdabot>  1.0
+<jusss> and return 0.199^2+0.980^2 0.2
+<jle`> the final result is 0.199^2 + 0.980^2, which is approcimately 1.0
+<jle`> > 0.199^2 + 0.980^2
+<lambdabot>  1.000001
+<jle`> the result of `return blah` is `blah`                            [09:55]
+<jle`> this is the abstract intepretation in terms of monadic actions and
+       results.  written in do notation it hides what is going on underneath
+       to emphasize the "action/result" interpretation, but you can recover
+       what is going on by doing the desugaring                         [09:57]
+<jle`> writing 'sin'/'cos' inline like that, though, is pretty bad for
+       readability.  so sometimes we use something like 'ask' to help remind
+       us that we are thinking in terms of monadic actions              [09:58]
+<jle`> in this case ask = id
+<jusss> jle`: the term "action", what is it?
+<jle`> it's somewhat meaningless, but it's a way to interpret lines of a do
+       block
+<jle`> where you imagine each line is sequencing some series of monadic
+       actions (values of type `M a`)                                   [09:59]
+<jle`> and each line has a result, and the result of the final line is the
+       result of the entire do block
+<jle`> *result of the final action
+<jle`> more generally it is an abstract word to help us interpret values of
+       type `M a` for some monad M...also known as monadic values or motes
+       etc.                                                             [10:00]
+<jle`> but choosing the word 'action' emphasizes the fact that we're
+       sequencing a bunch of them, potentially using the results they produce
+                                                                        [10:01]
+<jle`> choosing to use the word 'action' in a particular
+       explanation/interpretation, i mean
+<jle`> for example in do x <- getLine; putStrLn ("hello " ++ x), we have two
+       actions sequenced one after the other on each line of the do block, and
+       the result of the first action is called x (and is the reuslt of
+       getLine)                                                         [10:02]
+<jle`> in do x <- [1,2,3]; y <- [4,5,6]; return (x + y), we have three actions
+       sequenced, where the result of the first action is bound to x, and the
+       result of the second action is bound to y
+<jle`> and the result of the third action is (x + y)
+<jle`> it's just one way of interpreting the things you are sequencing in a do
+       block, or >>'s/>>='s                                             [10:03]
+<jusss> ok
+
+
+#############################################
+
+(isEven >>= \i ->
+       if i then double
+       else half) y
+
+isEven = \x -> 
+	if (x mod 2) == 0 then True
+	else False
+halt = \x -> (x div 2)
+double = \x -> x*2
+algo y = if (isEven y) then (double y)
+	else (halt y)
+
+<dminuoso> jusss: With the monad instance you'd write: do { i <- isEven; if i
+           then double else half } y                                    [14:24]
+<dminuoso> Or, using >>= explicitly: (isEven >>= \i -> if i then double else
+           half) y
+<dminuoso> It's still the same code, except the monad instance makes argument
+           passing implicit.                                            [14:25]
+
+
+###########################################################
+
+<jusss> like in Maybe, there're Just and Nothing in the context, so what's in
+        the context of functions?
+<pacak> It passes around  value you pass in.                            [10:37]
+<jusss> pacak: so if e->a and e-> is the monad, then a is the result of the
+        function, right?                                                [10:38]
+<pacak>
+        http://hackage.haskell.org/package/base-4.12.0.0/docs/src/GHC.Base.html#line-828
+<jusss> pacak: and the context is the function (->) and input e
+<jusss> ？
+<pacak> I guess so                                                      [10:39]
+<jusss> :t (.)                                                          [10:40]
+<lambdabot> (b -> c) -> (a -> b) -> a -> c
+<jusss> if a-> is the context, input a and function (->) is the context, the
+        result b is the a in f a, right? so (.) will apply a function (b->c)
+        on another function (a->b) and get a new function (a->c) , which has
+        the same context (a->) but changed the result                   [10:44]
+<jusss> ?
+<pacak> (a->) stays the same, value changes.                            [10:45]
+<jusss> pacak: but hey, when it's in >>= , it seems diffrent
+<jusss> :t (>>=)                                                        [10:46]
+<lambdabot> Monad m => m a -> (a -> m b) -> m b
+<pacak> (a ->) sits inside m
+<jusss> >>= :: (e->a) -> (a->(e->b)) -> (e->b)
+
+>>= apply a->mb on m a and get m b
+e-> is what in the context, the input e and the function (->)
+so (.) apply b->c on a->b , changed the result b to c and attatch the context a->
+we get a->c,   f . g x = f (g x)
+>>= apply a->e->b on e->a and get e->b
+so a->e->b is a binary function and e->a is an unary function
+let's assume x :: e and f :: e->a, g :: a->e->b, so g (f x) x :: b
+a->e->b work on a then get b, attatch the context e->,  so e->b
+but a->e->b need e->a's result a and e->a's input
+
+the input and the result both are not coming yet in the context
+
+instance Monad ((->) r) where
+    f >>= k = \ r -> k (f r) r
+
+instance Functor ((,) a) where
+    fmap f (x,y) = (x, f y)
+
+instance  Functor Maybe  where
+    fmap _ Nothing       = Nothing
+    fmap f (Just a)      = Just (f a)
+
+
+newtype State s a = State { runState :: s -> (a,s) }  
+(>>=) :: State s a -> (a -> State s b) -> State s b  
+
+    instance Monad (State s) where  
+        return x = State $ \s -> (x,s)  
+        (State h) >>= f = State $ \s -> let (a, newState) = h s  
+                                            (State g) = f a  
+                                        in  g newState
+
+data Reader r a = Reader {  runReader :: r -> a }
+date Reader r a = Reader r->a
+runReader Reader r a :: r->a
+#######################################################
+
+newtype Writer w a = Writer { runWriter :: (a, w) }
+it means
+data Writer w a = Writer (a, w)
+runWriter :: Writer w a -> (a, w)
+
+(a,w) is a type,
+if x :: a and l :: w, then (x,l) :: (a,w)
+() is the type of the value ()
+() :: ()
+the unit type, or the empty tuple type, and the value the empty tuple
+<ski> in the MLs, you have `(2,"true",false) : int * string * bool' and `() : unit'
+<Ariakenom> ski: is the ML type x * y * z special syntax or some inductive
+            tuple?                                                      [15:29]
+<Athas> Ariakenom: it's just (x,y,z).                                   [15:30]
+<Athas> ML has odd syntax, including postfix application of type constructors.
+<EvanR> i know x * y * z is effectively (x,y,z), but that doesn't tell me
+        whether (x * y) * z means the same thing or different thing as x * (y
+        * z)
+<Ariakenom> Athas: so (x * y) * z  /=  x * (y * z)  /=  x * y * z ?
+<Athas> Right.                                                          [15:32]
+<Ariakenom> (I meant to say they're all different)
+<EvanR> wacky
+<Athas> It's still magical syntax, even though it looks like repeated
+        application of an infix operator.
+<Athas> Haskell did this one better.
+<Athas> (As with most things syntax.)
+* EvanR doesn't mention record field syntax
+<Athas> Everybody lost that battle, except OCaml.
+
 ########################################################################
 
 22:52:30 <jusss> what is Functor composition?
