@@ -1,3 +1,38 @@
+
+ffmpeg concat videos
+ 
+vi mylist.txt
+file fileName1.mp4
+file fileName2.mp4
+ 
+ffmpeg -f concat -i mylist.txt -c copy output.mp4
+ 
+ffmpeg rescaling videos
+If you need to simply resize your video to a specific size (e.g 320x240), you
+can use the scale filter in its most basic form:
+ffmpeg -i input.avi -vf scale=320:240 output.avi
+Same works for images too:
+ffmpeg -i input.jpg -vf scale=320:240 output_320x240.png
+https://trac.ffmpeg.org/wiki/Scaling
+ 
+x265 hecv encoding
+ffmpeg -i input -c:v libx265 -crf 28 -c:a aac -b:a 128k output.mp4
+ 
+concat videos side by side, make sure they have same resolution first,
+otherwise rescale them
+ffmpeg -i left.mp4 -i right.mp4 -filter_complex "hstack" -c:v libx264 -crf 18
+output.mp4
+ 
+clip videos
+ffmpeg -i input -ss start-time -t dust-time -acodec copy -vcodec copy output
+ 
+filter audio
+ffmpeg -i input -vcodec copy -an output
+ 
+concat videos side by side, and delay one?
+
+-------------------------------------------
+
 ffmpeg -i IMG_2037.MOV -c:v libx265 -crf 28 -c:a aac -b:a 128k IMG_2037.mp4
 
 trac.ffmpeg.org
