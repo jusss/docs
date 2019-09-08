@@ -1,3 +1,46 @@
+monad transformer
+MaybeT IO a = IO (Maybe a)
+ReaderT r m a = m (Reader r a)
+
+lift :: m a -> t m a
+
+there's no IOT, but we have liftIO
+
+there're typeclass MonadTrans and MonadPlus
+
+MonadTrans only has one implement lift
+
+liftIO :: IO a -> m a
+
+IO (Maybe String) = runMaybeT (MaybeT IO String)
+
+getLine :: IO String
+lift getLine :: MaybeT IO String = IO (Maybe String)
+
+lift put the context into the m a, 
+if the context is Maybe, and the monad is IO String,
+then lift IO String will get IO (Maybe String) , this is the value form
+which has MaybeT IO String type
+
+and in MaybeT IO String, do-notation can get String
+
+import Control.Monad
+import Control.Monad.Trans.Maybe
+import Control.Monad.Trans.Class
+
+liftIO can do multiple layers, but lift only do one layer
+
+newtype MaybeT m a = MaybeT { runMaybeT :: m (Maybe a) }
+runMaybeT (MaybeT m a ) = m (Maybe a)
+
+https://www.schoolofhaskell.com/user/commercial/content/monad-transformers
+https://zh.m.wikibooks.org/wiki/Haskell/Monad_transformers
+
+------------------------
+Reader e a = Reader e->a = Reader (->) e a
+
+Reader (->) e is the monad
+----------------------------------------------
 
 >>= :: (e->a) -> (a->e->b) -> (e->b)
 the context is the input e, and function (->), the value above context is the result a
