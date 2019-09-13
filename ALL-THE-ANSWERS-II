@@ -1,4 +1,135 @@
 
+<jusss> like python has tornado, flask, django, and java has spring stuff,
+        what haskell has?
+<jusss> Taneb: haskell can work with postgresql?
+<Taneb> Yesod, servant, happstack, snap, scotty, warp
+<Taneb> jusss: yes                                                      [17:55]
+<jgt> jusss: https://lmgtfy.com/?q=haskell+web+framework
+<Taneb> jusss: http://hackage.haskell.org/package/postgresql-simple is a
+        commonly used library for working with postgresql in Haskell
+
+############################################
+
+CPS, concurrency, Y-combinator, anonymous function recursion,
+Cont Monad
+inversion of control, dependency injection
+effect
+side effect
+
+###########################################
+docker
+docker need root privilege, so
+sudo usermod -aG docker john
+sudo systemctl start docker
+docker image ls #check local images
+docker image rm imageName #remove local images
+the official repo is Docker Hub
+docker image pull library/hello-world #pull an image from the repo
+the default is library, so it can be missing here, just pull hello-world is fine
+docker container run hello-world #run this image
+docker container kill containID #kill it
+docker container ls #show the running images
+docker container rm containerID #remove the image
+
+search on hub.docker.com, even mysql
+docker image pull mysql  or docker pull mysql
+usage https://hub.docker.com/_/mysql
+
+docker image pull fauria/vsftpd
+
+[john@CASE ~]$ sudo mkdir /opt/vsftpd
+[john@CASE ~]$ sudo chown john:docker /opt/vsftpd/
+[john@CASE ~]$ ls /opt/vsftpd/
+
+docker run -d  -v /opt/vsftpd/  -e FTP_USER=test -e FTP_PASS=test  -e PASV_ADDRESS_ENABLE=no --name ftpd fauria/vsftpd 
+
+
+
+#####################################################
+
+MaybeT is also a value constructor
+MaybeT m is the monad, and return = lift . return , so do in MaybeT m will get the monadic value (Maybe a) from m (Maybe a)
+
+newtype MaybeT m a = MaybeT { runMaybeT :: m (Maybe a) }
+runMaybeT will get m (Maybe a), then do will get Maybe a
+
+instance (Monad m) => Monad (MaybeT m) where
+  return = lift . return             -- the context is MaybeT m (Maybe )
+  x >>= f = MaybeT $ do    -- add the context MaybeT, 
+        v <- runMaybeT x     -- get Maybe a
+        case v of
+             Nothing -> return Nothing  -- return MaybeT m Nothing
+             Just y -> runMaybeT (f y)    -- Maybe a
+
+<dmwit> There is no reason to think that "return calls MaybeT" means "(>>=)
+        calls MaybeT". There is no reason to think that "return calls MaybeT"
+        means "(>>=) does not call MaybeT".                             [09:38]
+<iqubic> return and (>>=) are two separate functions.
+<jusss> dmwit: if there's no return, and that MaybeT should be given by f in x
+        >>= f                                                           [09:44]
+<jusss> dmwit: do we put Just in the x >>= f = Just $ ... when Maybe is the
+        monad?
+<dmwit> Okay, this question is much better.                             [09:45]
+<dmwit> The trick is that we want to use the (>>=) of the transformed monad.
+<dmwit> To do that, we must unwrap the MaybeT wrapper that f provides.
+<dmwit> But then, to be type-correct, we must rewrap eventually.        
+
+#####################################################
+
+inputString :: MaybeT IO String
+inputString = lift getLine      -- so this will lift Maybe into IO String to IO (Maybe String)
+
+t = return 3 :: Maybe Int   -- t will be Just 3, 'cause the context Maybe is claimed in the type
+
+main :: IO ()
+main =  do                -- do will get the context IO from the type
+     x <- IO a
+     return x
+
+use M-x shell RET runghc x.hs   for interactive input haskell code
+
+#########################################
+
+<jle`> liftIO lifts *from* IO, not *to* IO
+<jle`> jusss: in any case, you can't really say that the fact that 'liftIO'
+       exists means that IOT exists; liftIO is actually backwards from the
+       type you would need for IOT to exist                             [11:26]
+<dmwit> IOT m a definitely can't be m (IO a), or else we would have e.g. \x f
+        -> Just x >>= f :: IO a -> (a -> Maybe (IO b)) -> Maybe (IO b). This
+        would be bad, because it would mean we could observe whether the
+        function returned Just or Nothing without doing any IO.
+
+
+##################################################
+
+ffmpeg concat videos
+
+vi mylist.txt
+file fileName1.mp4
+file fileName2.mp4
+
+ffmpeg -f concat -i mylist.txt -c copy output.mp4
+
+ffmpeg rescaling videos
+ If you need to simply resize your video to a specific size (e.g 320x240), you can use the scale filter in its most basic form:
+ffmpeg -i input.avi -vf scale=320:240 output.avi
+Same works for images too:
+ffmpeg -i input.jpg -vf scale=320:240 output_320x240.png
+https://trac.ffmpeg.org/wiki/Scaling
+
+x265 hecv encoding
+ffmpeg -i input -c:v libx265 -crf 28 -c:a aac -b:a 128k output.mp4
+
+concat videos side by side, make sure they have same resolution first, otherwise rescale them
+ffmpeg -i left.mp4 -i right.mp4 -filter_complex "hstack" -c:v libx264 -crf 18 output.mp4
+
+clip videos
+ffmpeg -i input -ss start-time -t dust-time -acodec copy -vcodec copy output
+
+filter audio
+ffmpeg -i input -vcodec copy -an output
+
+concat videos side by side, and delay one?
 
 #######################################
 module ReaderTest where
