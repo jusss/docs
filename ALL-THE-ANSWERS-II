@@ -1,3 +1,232 @@
+function somefun(x,y) { return 2*x + y; }
+ 
+function main() {
+  a = 5+6;
+  b = somefun(a,a);
+ 
+  print (5+b);
+  print ("haha here");
+  print (b);
+}
+
+<[exa]> the aim is to rewrite the code so that it does the same thing, but you
+        can never 'return' from any function
+
+function somefun(x,y,k) {  k(2*x + y);}
+ 
+function main() {
+  a = 5+6;
+  somefun(a,a,k);
+  function k(b){
+  print (5+b);
+  print ("haha here");
+  print (b);
+  }
+}
+<[exa]> notice you can just take 'k' out of main and it will still work
+<[exa]> after that, the code is basically in the same language as before, but
+        uses no returns, and CPS is done, and that's it :]              [16:00]
+<[exa]> jusss: Q: what is it good for? A1: You don't need the underlying
+        system to remember "return addresses" itself, so e.g. tail recursion
+        is much easier to implement                                     [16:01]
+<jusss> [exa]: and A2?
+<[exa]> jusss: A2: you've got 'goto' for free in a nicely looking functional
+        language
+
+<[exa]> let's try exceptions for example: Instead of calling 'somefun(x,y,k)',
+        you would call 'somefun(x,y,k,e)' where 'e' is the landing point for
+        whenever something goes wrong. No other language modifications needed.
+<jusss> ok
+<[exa]> jusss: in short, the whole point of CPS is 'tremendous jumping power
+        with no underlying system required'                             [16:04]
+<[exa]> s/no/minimal/
+<[exa]> oh they call 'trampoline' a thing that repeatedly calls thunk
+        evaluation                                                      [16:17]
+<[exa]> yes, basically an engine for evaluating whatever gets returned again
+        and again until there's an actual value
+<jusss> [exa]: is this CPS?                                             [16:20]
+<[exa]> no, but CPS makes this pretty simple -- after CPS there is no stack,
+        so you don't need to keep any intermediate "state" of the functions
+        being evaluated
+<[exa]> but still you can perfectly "interrupt" them                    [16:21]
+<tdammers> the basic idea is simple. instead of making a recursive call and
+           returning its value, you return the equivalent continuation, and
+           then you have a "trampoline" function at the top level that calls
+           your function, and keeps calling the return value until it is not a
+           continuation anymore
+<jusss> [exa]: so how to do this if it uses CPS?
+<merijn> jusss: You give f an extra argument which is the function that will
+         use the result of f                                            [16:22]
+
+<merijn> jusss: So instead of "result = f(0); print(result)" you'd simply do
+         "f(0, print)"                                                  [16:26]
+<merijn> jusss: Note that at not point do you actually need to "return" so the
+         code can continue, because you're explicitly passing the "continue"
+         as argument
+<merijn> jusss: If you never have to return, then you don't have to remember
+         where to return to, and if you don't have to remember where to return
+         to, you don't need a function call stack
+<merijn> (which, of course, means you can't overflow your function call stack
+         either!)
+<jusss> merijn: wow!
+<merijn> jusss: Now imagine your entire program is just a giant expression
+         (like Haskell programs effectively are) you can always just pass in a
+         continuation that is "the rest of the program" which means you never
+         have to "return" and, indeed, GHC compiles function calls to assembly
+         jumps, rather than assembly calls
+<merijn> jusss: Even compiler in imperative languages secretly do this
+         internally
+<merijn> jusss: A common compiler technique is to turn imperative code into
+         "Static Single Assignment" form, where each variable is only ever
+         assigned once (which makes code much easier to optimise/simplify),
+         which has basically the same effect
+<koz_> I think there was even a paper saying that SSA is CPS in disguise.
+                                                                        [16:32]
+<merijn> koz_: It's not even really in disguise
+<merijn> CPS and SSA are quite obviously "the same thing from a slightly
+         different viewpoint"
+<merijn> jusss: The wikipedia page on SSA seems to have some ok examples (for
+         as far as I can tell from quickly skimming)                    [16:34]
+
+<jusss> merijn: ok
+<jusss> merijn: I run your code https://paste.debian.net/1101388/  and
+        "RuntimeError: maximum recursion depth exceeded"
+<merijn> jusss: Right, because python use a callstack for call because it
+         can't tell it's not needed there                               [16:59]
+         
+#trampoline
+def f(n):
+    if n> 10000:
+        return 0
+    else:
+        return lambda: n+f(n+1)
+
+def trampoline(f):
+    while isFunction(f):
+        f=f()
+return f
+
+#CPS
+def id(x):
+    return x
+
+def f(n, continuation):
+    if n > 10000:
+        continuation(n)
+    else:
+        f(n+1, lambda x: continuation(n + x))
+
+f(0, id)
+##########################################################
+
+#haskell #stack https://tech.fpcomplete.com/haskell/get-started/linux
+wget -qO- https://get.haskellstack.org/ | sh
+echo "export PATH=$PATH:/home/john/.local/bin" >> ~/.bashrc
+source ./.bashrc
+
+Copy the following content into a file called HelloWorld.hs
+    #!/usr/bin/env stack
+    -- stack --resolver lts-13.7 script
+    main :: IO ()
+    main = putStrLn "Hello World"
+Open up a terminal and run stack HelloWorld.hs. then it will download the depend packages
+
+v2ray --config tokyo2.json
+proxychains stack new webConn yesodweb/sqlite && cd webConn
+
+stack use AWS to store files, so it may sucks!
+use cabal to install yesod
+cabal update
+cabal install yesod
+
+and cabal sucks too!
+
+on archlinux, hackage, stack, cabal, pacman
+
+pacman -Ss haskell-yesod
+
+###################################
+
+<dminuoso> jusss: The Cont monad is one particular style of CPS. But any
+           language that has first-class functions can implement
+           continuations.
+<dminuoso> jusss: In any language that has first class functions you are very
+           likely to find libraries that offer a continuation based approach.
+<ggole> Manually passing continuations is pretty common.
+<ski> btw, first-class continuation( side-effect)s is something else
+<ski> (as in Schemw, SML/NJ, and in some other languages / implementations)
+                                                                        [14:31]
+<ski> (er, s/Schemw/Scheme/)
+<jusss> ski: do JS and Python have call/cc ?
+<dminuoso> jusss: dont conflate call/cc with continuations.             [14:32]
+<dminuoso> jusss: CPS is a general concept.
+<ggole> Full first-class continuations in the guise of call/cc are probably a
+        mistake though
+<dminuoso> jusss: The general concept is about passing a "continuation", a
+           sort of "here's how you can resume"
+<dminuoso> jusss: If we squint a bit, functions like `withConnection ::
+           (Connection -> IO a) -> IO a` accept a continuation.         [14:33]
+<dminuoso> (It does slightly more than that though)
+<masaeedu[m]> it's pretty easy to implement the continuation monad in JS
+
+e.g:
+
+```
+const pure = x => cb => cb(x)
+const bind = amb => ma => cb => ma(a => amb(a)(cb))
+const lift2 = f => ma => mb => bind(a => bind(b => pure(f(a)(b)))(mb))(ma)
+
+const delay = d => v => cb => setTimeout(() => cb(v), d)
+
+const hello = delay(1000)("hello")
+const world = delay(1000)("world")
+const format = x => y => `${x}, ${y}!`
+const main = lift2(format)(hello)(world)
+
+main(result => { console.log(result) })
+// after a couple seconds, logs "hello, world!"
+```
+
+<masaeedu[m]> that's it. if you curry most node js and browser apis and
+              whatnot a tiny bit they all turn into continuations that you can
+              sequence using those operations
+<masaeedu[m]> and traverse/monad transform etc.                         [14:36]
+<dminuoso> jusss: In general CPS is about returning some kind of
+           object/value/thing that requires the consumer to specify how to
+           resume, rather than the result itself.
+<dminuoso> % :t ($ "foobar")
+<yahb> dminuoso: ([Char] -> b) -> b
+<dminuoso> This could be thought of as a continuation.
+<dminuoso> It's some value, but you don't see it as String/[Char], instead you
+           are being asked to specify some function how to resume this
+           computation.
+<dminuoso> It's a programming style, sort of.                           [14:39]
+<ski> jusss : `call/cc' (in the form it's present in Scheme, and SML/NJ), is a
+      means to express continuation side-effects
+<dminuoso> jusss: They allow you to alter control flow in your program
+           differently.                                                 [14:41]
+<ski> (`callCC' in `Control.Monad.Cont' is not)
+<jusss> dminuoso: instead of if-else?
+<dminuoso> jusss: It's much more wide ranging than that.
+<dminuoso> jusss: The entire program structure becomes different.
+<ski> (however, several people think that composable / delimited / sub- /
+      partial continuations, say using `shift' & `reset' (there are some
+      alternatives), are better, than using ordinary (undelimited)
+      continuations (as with `call-with-current-continuation'))         [14:43]
+<jusss> dminuoso: it sounds wonderful! do people use it usually?
+<dminuoso> jusss: Yes, sometimes.
+<dminuoso> jusss: There's essentially two main reasons: CPS gives you much
+           higher control about how to do control flow/exception handling, and
+           with CPS you can do things like suspend computations.
+* ski . o O ( "Web Programming" by Eli Barzilay at
+  <http://tmp.barzilay.org/cont.txt> )                                  [14:46]
+<ski> jusss ^
+<mniip> here's a library that uses CPS to safely handle allocation of foreign
+        types
+        http://hackage.haskell.org/package/marshal-contt-0.2.0.0/docs/Foreign-Marshal-ContT.html
+<dminuoso> But we dont need CPS to implement either, they might just be a
+           useful technique for some problem domains. :)
+###########################################################
 
 <jusss> like python has tornado, flask, django, and java has spring stuff,
         what haskell has?
