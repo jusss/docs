@@ -1,3 +1,227 @@
+you can't return a function, 'cause Java doesn't really have first-class functions
+<surial> jusss: in java, anytime you have a lambda or method ref, or example:
+         (String a) -> a.length();   or perhaps String::length, the compiler
+         will then infer from the context of where you use it, which so-called
+         functional interface (an interface definition with precisely one
+         method in it) you intended it to be, and the lambda then acts as if
+         it is an instance of that interface. This is why [A] something like
+         Object a = (String a) ->                                       [20:08]
+<surial>  a.length(); does not compile (the compiler cannot tell what
+         functional interface you're implementing), but ToIntFunction<String>
+         f = (String a) -> a.length(); DOES. Also, [B] why you can write
+         ToIntFunction<String> f = a -> a.length(); – the compiler will infer
+         a = String for you. Not even haskell can do that.
+<surial> jusss: because it acts like an instance of the interface, to invoke a
+         function, you can't do varName(). you have to do
+         varName.funcName(). For example, the ToIntFunction interface is
+         defined as: public interface ToIntFunction<T> { int apply(T in);
+         }. So, ToIntFunction<String> f= String::length; and to invoke it:
+         f.apply("Hello");... not f("Hello"). Yes, this is different from,
+         say, javascript.                                               [20:09]
+
+<jusss> how I can return the function itself in the function?           [09:52]
+<jusss> like def f(x): print(x); return f
+<jusss> then I can do f(1)(2)(3)
+<Axman6> that sounds like an infinite type to me
+
+
+return a function in a function is ok, but return itself in the function would produce
+an infinite type
+
+but java even can't return another function in a function,
+haskell and kotlin (return ::f) can return aother funciton in a function, but it still can't return itself
+
+is that all the type-checked languages can't return itself in a function?
+scheme
+(define f (lambda (x) (display x) f))
+((f 3) 5)
+js
+f = x => {console.log(x); return f}
+f(3)(5)
+all the dynamic type languages can do that, but not java or haskell can,
+'cause it would produce an infinite type in the those type-checked langauges?
+
+but there's a trick in kotlin, we can change the result type manually
+fun test(x:String):(String)->Any {
+    println(x)
+    return ::test
+}
+then we can do `test("1")("2")`
+change its result type to (String)->(String)->Any, and we can call `test("1")("2")("3")`
+
+fun test(x:String):(String)->(String)->Any{
+    println(x)
+    return ::test
+}
+test("1")("2")("3")
+
+kotlin:
+lateinit var f: (String) -> ((String) -> Any)
+f = {
+  print(it)
+  f
+ }
+
+f("1")("2")("3")
+
+object test {
+       operator fun invoke(i: Int) = also
+                { println(i) }
+        }
+fun main() {
+    test(0)(1)(2)
+}    
+ 
+<jusss> but in a language like java, their class is their type, can we return
+        the instance itself in the class?                               [10:44]
+<jusss> that would produce an infinite type?
+<EvanR> otoh in some interpretations an OOP class is "just a function" (that
+        returns objects)                                                [10:47]
+<monochrom> That means you go through a wrapper type in Java. And you can use
+            a wrapper type in Haskell too.
+<monochrom> Java: public class C { public C f() { return this; } }      [10:48]
+<monochrom> Haskell: data/newtype C = MkC{f :: C}
+<EvanR> MkC, McK, KmEtt, ...
+
+
+#1 point out the type, avoid infinite type, point out how many times it will call, like kotlin examples above
+#2 use class, return instance or class itself,
+
+#################################################
+
+#amb
+
+https://wiki.haskell.org/Combinator
+https://docs.huihoo.com/homepage/shredderyin/wiki/ContinuationPassingStyle.html
+https://docs.huihoo.com/homepage/shredderyin/wiki/SchemeAmb.html
+https://www.rosettacode.org/wiki/Amb#Haskell
+https://cgi.soic.indiana.edu/~c311/lib/exe/fetch.php?media=cps-notes.scm
+
+https://zhuanlan.zhihu.com/p/65449477
+
+#CPS
+https://2ality.com/2012/06/continuation-passing-style.html
+https://blog.oyanglul.us/grokking-monad/part1
+
+###########################################
+
+amb function, y combinator, continuation passing style,
+delimited continuation, lambda calculus, eta-conversion,
+continuation monad, monad transformer,
+
+############################################
+
+#eta-conversion
+f x = f x
+f = \x -> f x      -- if x is not free in f, \x -> x y this y is free in this lambda
+
+f s = g 3 s
+f = \s -> g 3 s = g 3
+
+
+eta-expand
+
+<Solonarv>             map . map
+<Solonarv> = \f     -> map (map f)               -- 1. definition of (.)
+<Solonarv> = \f     -> map (\xs -> map f xs)     -- 2. eta expand the inner 'map' call
+<Solonarv> = \f xss -> map (\xs -> map f xs) xss -- 3. eta expand outer 'map' call
+
+\f -> map (\xs -> map f xs)
+\f -> (\xss -> map (\xs -> map f xs) \xss)
+\f xss -> map (\xs -> map f xs) xss
+
+eta-conversion
+
+f x = f x
+f = \x -> f x
+
+#####################################################
+
+<[exa]> jusss: https://pastebin.com/pZM1tRt5  this is CPS with recursion
+
+function factAcc(n,acc,k) {
+   if n > 1
+   then factAcc(n-1, acc*n, k)
+   else k(acc)            // (\r -> main2(r,k))(acc)
+}
+ 
+function factorial(n,k) {
+    factAcc(n,1,k);
+}
+ 
+function main(k) {
+    n = read()
+    factorial(n, main2(_,k));     // it's factorial(n, \result -> main2(result,k) ), eta-conversion
+}
+ 
+function main2(a, k) {
+    print(a)
+    k()
+}
+
+<[exa]> jusss: you're missing the lambda there
+<[exa]> jusss: with _ I meant this: factorial(n, \result -> main2(result,k) )
+<[exa]> jusss: you create a tiny function that just takes its argument and
+        puts it to main2, and give it to factorial as a continuation    [18:09]
+<[exa]> trick: main2() receives continuation from the original main(), so that
+        they virtually behave as a single function
+<jusss> [exa]: oh, it's a lambda
+<jusss> [exa]: this lambda will eval to main2(result,k)                 [18:10]
+<jusss> and main2(result,k) is the k
+<jusss> and in the factAcc , main2(result,k)(acc), right?               [18:11]
+<[exa]> (\r -> main2(r,k))(acc)  --more precise I believe
+<[exa]> which evaluates to main2(acc,k)                                 [18:12]
+<[exa]> so that the factAcc simply jumps to main2
+<jusss> [exa]: is there a k I can use in this code?
+<[exa]> how do you mean it                                              [18:24]
+<jusss> [exa]: main(?) to run this up
+<jusss> [exa]: we pass what to main()?
+<[exa]> jusss: main needs a continuation. It can't return, what would it do
+        with the result?                                                [18:29]
+<[exa]> in case of main, the continuation may be something like system.exit(0)
+<jusss> [exa]:  k() in main2, and   else k(acc) in factAcc, this k's parameter
+        is not ...                                       
+######################################################
+
+Generics were introduced to the Java language to provide tighter type checks at compile time and to support generic programming.
+
+泛型信息只存在于代码编译阶段，在进入 JVM 之前，与泛型相关的信息会被擦除掉。
+为了实现泛型，Java编译器进行了在编译的时候会进行类型擦除
+
+Replace all type parameters in generic types with their bounds or Object if the type parameters are unbounded. The produced bytecode, therefore, contains only ordinary classes, interfaces, and methods.
+Insert type casts if necessary to preserve type safety.
+Generate bridge methods to preserve polymorphism in extended generic types.
+
+java uses type erasure to handle generics,
+and haskell uses type variables, but they're very different
+you can't really compare Java's generics with Haskell's polymorphism
+###########################################################
+#javascript
+fact = (n, ret) =>{ if (n==0) ret(1); else fact(n-1,t => ret(n*t))}
+fact(1000,console.log)
+
+#python
+fact = lambda n, ret: ret(1) if n==0 else fact(n-1, lambda t: ret(n * t))
+fact(1000, lambda x: x)
+
+#haskell
+fact = \n -> \ret ->
+   if n==0 then ret 1
+   else fact (n-1) (\t -> ret $ n * t)
+
+fact 1000 id
+
+
+#lang racket
+(define (fab-cps n k)
+  (if (= 1 n)
+      (k n)
+      (fab-cps (- n 1)
+               (λ (v) (k (* n v))))))
+
+(fab-cps 5 displayln)
+##########################################################
+
 function somefun(x,y) { return 2*x + y; }
  
 function main() {
