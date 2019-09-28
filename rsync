@@ -1,3 +1,9 @@
+mkstemp function not implemented
+
+rsync -avP --no-p --no-o --no-g a.mp4 ~/emp/
+
+#####################################
+
 rsync -a --progress martian.* ~/movies/Seen/
 rsync -avP sleeping.*   ~/movies/Seen/
 it can show a progress when copy files.
