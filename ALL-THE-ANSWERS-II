@@ -1,3 +1,224 @@
+
+
+Y = \f.(\x.f(x x))(\x.f(x x))
+Y g = (\x.g(x x))(\x.g(x x))
+      =g((\x.g(x x))(\x. g(x x)))
+      =g(Y g)
+
+Y combinator, fixed-point, infinite type, recursive type
+
+fib = Y fib' = fib' (Y fib') = fib' fib
+
+01:47:31 <merijn> jusss``: "newtype Fix f = MkFix (f (Fix f)"
+01:48:09 <merijn> jusss``: So, say, "Fix Maybe" is "a MkFix constructor containing 'Maybe (Fix Maybe)" inside it
+01:49:37 <merijn> Now, Fix with Maybe is usually not very interesting, because it's just going to be a bunch of "Just" until you eventually (maybe...) hit a Nothing
+01:53:07 <jusss``> merijn: how we implement the MkFix function?
+01:53:30 <jusss``> merijn: your examples is like binary tree
+
+01:53:41 <merijn> jusss``: Suppose we define "data Foo b a = Foo b a | Nil" now if we look at "Fix (Foo a)" we get...[a]! "Fix (Foo a)". Let's see what's inside Fix. We see MkFix which has a "Foo a (Fix (Foo a))" so it has an element 'a' and another "Fix (Foo a)", alternatively inside our MkFix we find "Nil" and the list is finished
+01:54:05 <merijn> jusss``: "newtype Fix f = MkFix (f (Fix f)" <- this *is* the definition of MkFix
+
+
+#################################################################
+typescript
+type Fun = (_: any) => Fun
+const f : Fun = _ => {console.log(_); return f };
+
+turn it to haskell
+data Fun = any -> Fun
+any->Fun is already a type, data Type = Value,
+so it will think any->Fun as a value, that's not what we want,
+we have to add a value constructor,
+data Fun = MkFun (any -> Fun)
+
+f::Fun
+based on the type, f will be
+f = MkFun (\i -> f)
+runFun Fun :: any -> Fun
+'cause there's no any in hasekll, let's replace it with Int
+runFun Fun :: Int -> Fun
+runFun f 1 :: Fun
+
+runFun (runFun f 1) 2 :: Fun
+
+
+ <dminuoso> % newtype F = MkF { unF :: Int -> F }
+<dminuoso> % f :: F; f = MkF (\i -> f)
+ <dminuoso> % :t unF (unF (unF f 1) 2) 3 
+ <yahb> dminuoso: F
+http://tunes.org/~nef/logs/haskell/19.10.01
+
+
+<jusss`> dminuoso: I suddently understand your `newtyfpe F = MkF { unF :: Int
+         -> F }`,  I talked infinite type with a typescript guy, and he give
+         me a `type Fun = (_: any) => Fun` for that `const f : Fun = _
+         =>{console.log(_); return f};` and then I tried to turn it to
+         haskell, I wrote `data Fun = any -> Fun`, but `any -> Fun` is already
+         a type, so we have to add a value constructor MkFun, which is `data
+         Fun = MkFun (any -> Fun)`, and your `unF
+<jusss`> F :: Int -> F`,  let's assume `f :: Int -> F` , so `unF (MkF f) = f`
+<jusss`> dminuoso: and this `unF (MkF f) = f` is look like Y g = g (Y g) ,
+         right?
+
+
+<jusss``> dminuoso: a little misunderstood here, you use `f::F; f=MkF (\i ->
+          f);` then `unF f 1 = f `                                      [16:21]
+<jusss``> unF (unF f 1) 2 = f       which is related to Y g = g (Y g) = g (g
+          (Y g)) ???                                                    [16:23]
+<jusss``> function return itself, it's useful when it works on some
+          side-effect operations,                                       [16:55]
+
+unF (unF f 1) 2 :: F  it's not equal to f, so unF (unF f 1) 2 = f is wrong,
+
+<jusss``> \s: 我想的是这种函数返回自身的用法，它的意义就是用于那些有副作用的操
+          作，如IO 打印 存储                                            [16:50]
+<jusss``> \s: Promise那种就是用返回实例来实现的吧，和函数不是很意义
+                                                                        [16:51]
+<jusss``> 很一样
+<jusss``> \s: 在类里返回实例，和在函数里返回函数自身，不一样
+<jusss``> \s: 一个是OOP,一个是FP                                        [16:52]
+
+<jusss`> \s: ts可以type Fun = (_: any) => Fun, 但是在haskell里需要在 any->Fun
+         这个类型前加个值构造器，因为any->Fun本身已经是个类型了，不能data Type
+         = Type，所以要加上值构造器 MkFun, 于是就是data Fun = MkFun (any ->
+         Fun)
+<jusss`> \s: 构造值用的，结构体名字
+<jusss`> 神奇! 我把一个ts的类型定义转成haskell，然后我明白了为什么haskell的定
+         义会是那个样子                                                 [15:14]
+<jusss`> \s: 你的type Fun = (_: any) => Fun; 等同于 data Fun = MkFun ( _ ->
+         Fun)  haskell没有any类型                                       [15:09]
+<jusss`> \s: data Fun = MkFun (any -> Fun)                              [15:06]
+
+type Fun = (_: any) => Fun;
+const f : Fun = _ => { console.log(_); return f };
+
+type Fun<T> = (_: T) => Fun<T>;
+const f : Fun<number> = _ => { console.log(_); return f};
+const g: Fun<string> = _ => {console.log(_); return g};
+
+f(1)(2)(3)
+g('a')('b')('c')
+
+no function type signature, no recursive type,
+how to do that in Kotlin with class implement for recursive type?
+
+#whyWeHaveALotOfValueConstructorInHaskell
+that's why we have a lot of value consturctors in haskell,
+'cause data Type = Value, so that other type want to be the right of '=', it needs a
+value constructor, otherwise it will think that type like Int as a value constructor Int,
+a value Int not the type Int
+
+https://stackoverflow.com/questions/18249583/infinite-type-error-when-returning-a-self-referential-function-in-haskell
+
+To express something like this, you'd need a recursive type. Since Haskell doesn't support equirecursive types, you'll need to use newtype/data.
+
+So you might define newtype Foo s = Foo { runFoo :: s -> (s, Foo s) }, for instance, and then write noOp :: Foo (A,B,C); noOp = Foo (\(a,b,c) -> ((a,b,c), noOp)).
+
+This looks like a Mealy machine. The package machines exports a similar type: newtype Mealy i o = Mealy { runMealy :: i -> (o, Mealy i o) }
+
+I gave an example there. It'll compile if you change (A,B,C) to some types you actually have. E.g. for Int state, you can write noOp :: Foo Int; noOp = Foo (\x -> (x, noOp)). Then noOp :: Foo Int. To get a function out of it, you can just use runFoo: runFoo noOp :: Int -> (Int, Foo Int)
+
+####################################################################
+
+00:57:30 <jusss`> dminuoso: I found an anwser is like your anwser a few days ago, about that recursive type, https://stackoverflow.com/questions/18249583/infinite-type-error-when-returning-a-self-referential-function-in-haskell       but I still don't know what this means...
+00:57:52 <jusss`> about the anwser, I can't understand why create an new value constructor can solve that
+00:59:28 <jusss`> how this trick can solve recursive type, can make function to return itself without product an infinite type
+01:01:44 <merijn> jusss`: Infinite types are problematic because they bork the typechecker. Consider "x = [x]" what's the type of 'x'?
+01:02:18 <merijn> jusss`: Obviously it's an infinitely nested [], but there's no way to work with infinite nestings in the compiler, you'd just loop forever
+
+01:02:57 <merijn> jusss`: By going "newtype Foo = MkFoo [Foo]" you insert a sort of loopbreaker
+01:03:05 <ski> (it's not that hard to adapt a type-checker to be able to work with such infinite types. however, enabling them would make a lot of common mistakes into strange inferred types, rather than type errors)
+01:03:29 <merijn> "x = Foo [x]" What's the type of 'x'? "Foo", done. What's inside a "Foo"? A list, containing a Foo.
+01:03:39 <ski> (if you want to play with such types, try `ocaml -rectypes')
+01:03:43 <koz_> merijn: Is this similar to the Fix type recursion schemes use?
+
+01:04:05 <merijn> jusss`: Note that now none of the questions ever have to deal with an uncomfortable answer that requires infinite unrolling to answer
+01:04:17 <merijn> koz_: Fix is a newtype (instead of a type alias) to workaround this, yes
+01:04:42 <merijn> koz_: Fix is one of the most common "infinitely nested" types
+01:06:16 <merijn> jusss`: Wanting to nest an infinite/indefinite number of times isn't wrong, doing it "directly" just makes the type checker infinite loop while checking things (therefore making it impossible to handle them directly)
+01:28:11 <jusss``> merijn: sorry about the bad network, I just saw your anwsers, what is the Foo of "x = Foo [x]"? a function? a value constructor?
+
+01:29:12 <dminuoso> jusss``: Its both a function and a data constructor.
+01:29:37 <jusss``> dminuoso: then how it's defined?
+01:29:57 <dminuoso> jusss``: I think merijn made a typo and meant to write `x = MkFoo [x]`
+01:30:18 <jusss``> is this related fix-point stuff?
+01:30:26 <jusss``> y combinator?
+01:30:46 <merijn> jusss``: x is a variable with type Foo and value "Foo [x]"
+01:30:55 <merijn> eh, yes
+01:31:06 <merijn> jusss``: Foo is is Fix specialised to Foo, yes
+01:31:44 <jusss``> merijn: I just know the name and I never understand it 
+01:33:13 <jusss``> merijn:  x = Foo [x]   but x is a variable, not a function name, how we canuse  x = Foo [x] to define function Foo?
+01:34:25 <jusss``> Foo [x] = x?
+01:45:55 <merijn> jusss``: Fix is "I have a Functor and I want to nest it an infinite number of times"
+01:46:36 <merijn> jusss``: So Foo was nesting lists an infinite number times, but we could also, say, want to infintely nest Maybe, or "Either e", etc.
+01:47:31 <merijn> jusss``: "newtype Fix f = MkFix (f (Fix f)"
+01:48:09 <merijn> jusss``: So, say, "Fix Maybe" is "a MkFix constructor containing 'Maybe (Fix Maybe)" inside it
+01:49:37 <merijn> Now, Fix with Maybe is usually not very interesting, because it's just going to be a bunch of "Just" until you eventually (maybe...) hit a Nothing
+01:53:07 <jusss``> merijn: how we implement the MkFix function?
+01:53:30 <jusss``> merijn: your examples is like binary tree
+
+01:53:41 <merijn> jusss``: Suppose we define "data Foo b a = Foo b a | Nil" now if we look at "Fix (Foo a)" we get...[a]! "Fix (Foo a)". Let's see what's inside Fix. We see MkFix which has a "Foo a (Fix (Foo a))" so it has an element 'a' and another "Fix (Foo a)", alternatively inside our MkFix we find "Nil" and the list is finished
+01:54:05 <merijn> jusss``: "newtype Fix f = MkFix (f (Fix f)" <- this *is* the definition of MkFix
+01:54:30 <jusss``> data Tree a = Leaf a | Node (Tree a) (Tree a) deriving (Show)
+01:55:36 <merijn> jusss``: You could also do trees using Fix, yes. "data TreeF a b = Leaf a | Node b b" then "Fix (TreeF a)" becomes equivalent to "Tree a"
+01:55:37 <jusss``> merijn: the function form of MkFix?
+
+01:55:54 <merijn> jusss``: MkFix is a constructor, just like Just or Nothing
+
+01:56:42 <jusss``> merijn: this confused me, data constructor is function or not?
+01:57:18 <merijn> jusss``: Yes, no, maybe. It depends on how you define "is" and function. They have a function type, yes
+01:57:20 <jusss``> newtype or data are used to define types
+01:57:43 <jusss``> merijn: f x = x, this is a function
+01:57:59 <ski> `newtype' and `data' are used to define type constructors, and associated data constructors
+01:58:12 <jusss``> merijn: f Int :: Int , this is a function type signature
+01:58:40 <ski> some data constructors (like `Just',`MkFix') are functions. some are not (like `Nothing',`False',`True')
+01:59:02 <dminuoso> jusss``: We've been interacting for a while now, and it is my honest opinion that what you are doing is ineffective.
+01:59:20 <ski> `f Int :: Int' is not a function type signature
+01:59:21 <jusss``> ski: and do those Just MkFix have a function form? or can those turn to lambda expressions?
+01:59:47 <dminuoso> jusss``: You seem to digress in topics that are not relevant for writing effective Haskell code and, at the same time, far outside your reach. :)
+01:59:49 <ski> `Just' is already a function. not sure what you mean by "function form"
+02:00:02 <jusss``> dminuoso: I just feel it's so hard to return function itself within those static type-checked languages...
+02:00:14 <ski> `Just' is equal to `\x -> Just x'. that's a lambda expression
+
+02:00:50 <dminuoso> jusss``: I think the main problem is that you still conflate functions and actions - if you properly understood the difference, you wouldn't even be asking about "how can a function return itself".
+02:01:02 <dminuoso> jusss``: (Im saying this, because I know why you are chasing this stopic)
+02:01:20 <jusss``> dminuoso: sorry, I should stop
+02:02:02 <dminuoso> jusss``: It's just my opinion. If you want to carry on, feel free to - but when after weeks you still have difficulties with this, I think you could spend your time more effectively and visit this topic later when you have basic type level competencies.
+
+02:04:15 <dminuoso> jusss``: The original topic came up when you asked for the equivalent of `f(1)(2)(3)` where f would print a value, and then return itself. In Haskell you'd just write `f 1 >> f 2 >> f 3 ...` there's little point in f returning itself, since you already have access to f.
+02:04:46 <dminuoso> Or, equivalently: traverse_ f [1,2,3,...]
+02:05:37 <koz_> Yay traverse_. Probbo my favourite function.
+02:05:44 <dminuoso> And even here, the notion of "a function returning something" and "f executing some actions" are orthogonal things. You are just chasing the function part, but we cant express printing something in a function.
+02:05:57 <koz_> How would you even pronounce 'traverse_'? 'Traverse underscore'?
+
+02:06:32 <merijn> dminuoso: Well, you can, it just doesn't mean what you'd naively expect it to mean from other languages :p
+02:07:14 <dminuoso> merijn: The point Im getting at, is that a function itself doesn't do the printing.
+02:07:21 <dminuoso> (Ignoring things like unsafePerformIO for sanity)
+02:08:35 <dminuoso> So "a function that first prints something and then returns itself" would rather be expressed as some `f ~ Int -> IO f`
+
+02:11:45 <ski> @let newtype Consumer m a = Consume {applyConsumer :: a -> m (Consumer m a)}
+
+02:12:29 <ski> @let printConsumer :: Show a => Consumer IO a; printConsumer = Consume (\a -> do print a; return printConsumer)
+
+02:14:22 <ski> @type printConsumer `applyConsumer` 0 >>= (`applyConsumer` 1) >>= (`applyConsumer` 2)
+02:14:23 <lambdabot> (Show a, Num a) => IO (Consumer IO a)
+
+02:14:53 <ski> (that's rather clunky, though)
+02:17:04 <ski> @let printAccumulator :: (Show a,Num a) => Consumer IO a; printAccumulator = loop 0 where loop acc0 = Consume (\n -> do let {acc1 = acc0 + n}; print acc1; return (loop acc1))
+
+02:23:38 <jusss```> dminuoso: actually I'm not chasing about the printing stuff, 
+
+02:30:44 <dminuoso> ski: This smells like there's a monad transformer hidden.
+
+02:33:56 <ski> well, this one is contravariant in `a'
+02:35:16 <maerwald> you're smelling a contravariant transformer?
+
+http://tunes.org/~nef/logs/haskell/19.10.08
+
+fib = Y fib' = fib' (Y fib') = fib' fib
+
+##################################################################
+
 you can't return a function, 'cause Java doesn't really have first-class functions
 <surial> jusss: in java, anytime you have a lambda or method ref, or example:
          (String a) -> a.length();   or perhaps String::length, the compiler
