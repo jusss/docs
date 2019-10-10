@@ -1,4 +1,111 @@
 
+bmiTell'' :: Double->Double->String
+bmiTell'' weight height
+    | bmi <= 18.5 = "You are underweight!"
+    | bmi <= 25.0 = "You are normal!"
+    | bmi <= 30.0 = "You are fat!"
+    | otherwise = "You are whale!"
+    where bmi = weight / height ^ 2 
+
+*Main> 4 * (let a = 9 in a + 1) + 2
+4 * (a+1) +2
+a=9
+
+fix f = let x = f x in x
+fix f = x
+x = f x
+fix = \f -> let x = f x in x
+https://stackoverflow.com/questions/8308394/y-combinator-infinite-types-and-anonymous-recursion-in-haskell
+
+import Data.Function
+fix (1:)
+
+fix f = f (fix f) = f (f (fix f))
+
+let x = 1:x in x will produce a list x like [1,1,1,1...]
+fix (\x -> 1:x) or simply fix (1:) which will find a fixed point of the (1:) function
+
+fix f = f(...  f (f (f x)))
+https://stackoverflow.com/questions/4787421/how-do-i-use-fix-and-how-does-it-work
+
+fixed-point is used for recursion, in other languages, it can be used for some side-effect functions
+
+y combinator is a higher-order function, function Y take a function f and return a function z, and that function z is the fixed-point of function f, so f(z) = z
+Y f = z
+f z = z
+Y f = f (Y f)
+
+Y is the Y combinator, and Y f is the fixed-point function of f
+
+即 fix 函数的意义在于寻找函数 f 的不动点 y = fix f，使得 f y == y。
+一阶函数的不动点是个常数，二阶以上的高阶函数的不动点是低一阶的函数。
+在 fix 函数的定义中，等式右边只有对参数的引用，所以 fix 函数是一个组合子（combinator）。这也是它被定义在Data.Function 这个组合子专用模块的原因。
+在计算机科学中，fix 函数这个用来求函数 f 的不动点的组合子被称为不动点组合子或 Y 组合子。
+https://blog.csdn.net/zwvista/article/details/81070680
+##############################################
+
+$signature = @"
+[DllImport("user32.dll")]
+public static extern bool SystemParametersInfo(int uAction, int uParam, ref 
+int lpvParam, int flags );
+"@
+
+$systemParamInfo = Add-Type -memberDefinition  $signature -Name SloppyFocusMouse -passThru
+
+[Int32]$newVal = 1
+$systemParamInfo::SystemParametersInfo(0x1001, 0, [REF]$newVal, 2)
+
+save this to FocuseFollowsMouse.ps1, and right-click run with Powershell
+https://superuser.com/questions/954021/how-do-you-enable-focus-follows-mouse-in-windows-10
+
+#####################################################
+
+I think that Y combinator apply on value level, we get the same function `Y g = g(Y g)`
+apply on type level, we get the same type `newtype Fix f = MkFix (f (Fix f))`
+we can think that value constructor as a function
+Maybe a = Just a | Nothing
+Just = \x -> Just x
+Just :: a -> Maybe a
+Just is a function
+Nothing :: Maybe a, Nothing is not a function, there's no -> there
+
+<jusss> MarcelineVQ: so we can think everything within a -> can be functions?
+<Axman6> well yes, that's what -> means                                 [09:57]
+<MarcelineVQ> Directly, if your type (after constraints) starts with -> it's a
+              function, because -> is the type of functions. Just :: a ->
+              Maybe a is, Just :: (->) a (Maybe a), Just starts with ->
+
+(->) is the type of function, which's type have (->) in it, which is a function
+
+<MarcelineVQ> The reason I say that in that way is because you might see foo
+              :: IO​ (a -> b), this is not a function despite having ->
+
+data F = MkF (Int -> F)
+MkF :: (Int -> F) -> F
+<jusss> this value constructor MkF is a function just like Just
+
+<jusss`> EvanR: Just 3, Nothing are monadic values also monadic actions, but
+         Just is also a function, and Nothing is not a function, right?
+
+IO () is a action, not a function
+
+#action #function
+
+all the recursive type, in the end we need a value to return0
+1:47:31 <merijn> jusss``: "newtype Fix f = MkFix (f (Fix f)"
+01:48:09 <merijn> jusss``: So, say, "Fix Maybe" is "a MkFix constructor containing 'Maybe (Fix Maybe)" inside it
+01:49:37 <merijn> Now, Fix with Maybe is usually not very interesting, because it's just going to be a bunch of "Just" until you eventually (maybe...) hit a Nothing
+########################################
+
+it seems Y combinator is only used to solve recursive issue,
+
+<Axman6> any recursive function can be written using fix
+<Axman6> so, if we only had fix, we could write any computable function, even
+         if we weren't allowed to use recursion directly                [09:12]
+<Axman6> well no, but it's not really any different than things lik const, (.)
+         etc. existing. it exists because it does                       [09:13]
+         
+###########################################################
 
 Y = \f.(\x.f(x x))(\x.f(x x))
 Y g = (\x.g(x x))(\x.g(x x))
