@@ -1,0 +1,23 @@
+tar --help :  -I, --use-compress-program=PROG
+
+平常是这样用的
+
+tar -I 'xz -9' -cvf foo.tar.xz foo/
+tar -I 'gzip -9' -cvf foo.tar.gz foo/
+
+那么lz4 也可以这样用
+
+also compress with non tar-native compressors: 创建压缩文档
+
+tar -I 'lz4 -1' -cvf foo.tar.lz4 foo/
+tar -I 'zstd -9' -cvf foo.tar.zst foo/
+
+注意 这里的lz4 -数值,意思是压缩比 ,从1-9 越大越狠
+
+decompress non tar-native compressors: 解压压缩文档
+
+tar -I lz4 -xvf foo.tar.lz4  tar -I zstd -xvf foo.tar.zst
+
+list archive non tar-native compressors: 列出压缩文档
+
+tar -I lz4 -tvf foo.tar.lz4tar -I zstd -tvf foo.tar.zst

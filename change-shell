@@ -1,0 +1,61 @@
+*adduser*
+
+The adduser defaults file is /etc/adduser.conf. The default shell defined
+by the DSHELL variable is /bin/bash by default.
+
+*useradd*
+
+Most likely you don't need this because useradd is a very low-level
+utility, and it's hardly ever used directly.
+
+If you use useradd, edit the /etc/default/useradd skeleton file (don't
+forget to make a backup though).
+
+Set the SHELL variable to /bin/bash instead of /bin/sh.
+
+Now every time you use useradd to add a new user bash is automatically
+their default shell.
+
+*Already existing users*
+
+If you want to change the shell of already existing users you have to edit
+the /etc/passwd file (please make sure to back have a backup of it).
+
+Here is a description of the columns
+
+   1. login name
+   2. optional encrypted password
+   3. numerical user ID
+   4. numerical group ID
+   5. user name or comment field
+   6. user home directory
+   7. optional user command interpreter
+
+In that order separated by colons (:) like this.
+
+root:x:0:0:root:/root:/bin/bash
+
+For more information about that file consult the man page man 5 passwd.
+
+
+As Octavian pointed out, the way to change the defaults depends on the way
+you're creating the user. I tried creating a new user through my Gnome
+Settings just now, and it seems to follow /etc/default/useradd, so that
+might be your best bet. For existing users, the safest way to change
+someone else's login shell is with *usermod*:
+
+usermod -s /bin/bash $USERNAME
+
+If you're not root, you'll need to *sudo* that. An alternative is to
+*sudo* into
+the user you want to modify and just run *chsh*, like this:
+
+sudo -u $USERNAME chsh -s /bin/bash
+
+It's best to avoid editing /etc/passwd by hand, because a mistake in there
+could break all sorts of things.
+
+
+
+
+https://askubuntu.com/questions/28969/how-do-you-change-the-default-shell-for-all-users-to-bash
