@@ -1,0 +1,18 @@
+---------- Forwarded message ---------
+From: ifvwm1 <ifvwm1@gmail.com>
+Date: Wed, Oct 2, 2019 at 8:12 AM
+Subject: debootstrap on archlinux
+To: 229333713@qq.com <229333713@qq.com>, John Clare <ifvwm1@gmail.com>
+
+
+sudo debootstrap —arch amd64 —foreign sid ./sid/
+http://mirrors.aliyun.com/debian
+
+cd ./sid
+sudo chroot . /bin/bash
+/debootstrap/debootstrap —second-stage
+export PATH=$PATH:/bin:/usr/bin
+
+exit the chroot env, then
+cp mount.chroot.share.X.sh ./sid
+cd sid ; ./mount.chroot.share.X.sh
