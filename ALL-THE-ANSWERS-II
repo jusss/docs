@@ -1,4 +1,387 @@
 
+#expressions #functions #actions #effects #side-effects #monadic actions
+
+monadic actions have effects!
+
+expressions which have function types can be evaluated to functions,
+functions don't have effects.
+
+actions can be executed, actions have effects, all the monadic actions have
+their own effects.
+
+"no side-effects in Haskell"
+
+<ski> jusss : `[]' allows expresssing "possibly no result at all, and possibly
+      more than one result"-effects
+<ski> jusss : `return x' (equal to `pure x') always gives an action which
+      actually performs no effects at all. or, if you prefer, only performs
+      the "trivial effect", the "no-op effect"                          [10:43]
+<jusss> ski: next time I meet a monad, I should ask what its effect is first
+<jusss> % :t return
+<yahb> jusss: Monad m => a -> m a
+<jusss> ski: this m a is an action, right?
+<ski> jusss : `IO' is (primarily) for doing Input/Output interaction, with the
+      outside world (from the POV of the Haskell process). however, `IO' tends
+      to be used as a sin-bin, so it also allows expressing local mutable
+      state, and multiple threads of execution (whose synchronization is
+      indeterministic)                                                  [10:45]
+<ski> jusss : no, the *value* of type `m a' is an `m'-action. `m a' itself is
+      the *type* of that action
+
+<jusss> ski: next time I meet a monad, I should ask what its effect is first
+
+<ski> jusss : `f x' is function application. `f' is a function expression (an
+      expression evaluating to a function), `x' is another expression whose
+      value will be passed to the function
+<ski> also, the only way to cause `IO'-actions to execute, is by making them
+      part of `main' (or entering them into the interactor)             [10:33]
+<ski> the only way to cause I/O to happen, is by making the `IO'-action part
+      of `main' (or by entering it into the interactor)      
+####################################################
+
+<jusss> dmwit: getLine is not a function, it's a IO action, right?
+<jusss> % :t getLine
+<yahb> jusss: IO String
+<dmwit> jusss: Right.
+<jusss> dmwit: can I think action are some operations which may have
+        side-effect?
+<dmwit> Sure.
+* ski . o O ( s/side-effects/effects/ )                                 [10:01]
+<jusss> ski: functions have effects too
+<ski> you might think of an action as "list of instructions", or a "recipe"
+<ski> jusss : not in this sense
+<jusss> ski: wait a sec, what are monad actions? it means that may have side
+        effects?
+<jusss> or monadic actions?
+<ski> remove "side"                                                     [10:03]
+<jusss> those terms I saw them a lot, when I learned Monad, but I never
+        understood them
+<ski> they're not happening on the side. it's an explicit part of the value
+      (the monadic action)
+<jusss> ski: why ? you don't think funtions have effects? or what you call
+        them?
+<ski> it's not `openFile :: FilePath -> IOMode -> Handle', it's `openFile ::
+      FilePath -> IOMode -> IO Handle'
+<ski> the `IO' is an explicit part of the result. the I/O is not happening "on
+      the side"
+<ski> @type lookup
+<lambdabot> Eq a => a -> [(a, b)] -> Maybe b
+<jusss> ski: sorry, I don't get the term of "on the side", it's a metaphor ?
+        or just literally?
+<ski> same thing there, the `Maybe'-effects aren't happening on the side (no
+      exceptions (possibly) implicitly being thrown). failure (`Nothing') is
+      an explicit result                                                [10:05]
+<jusss> ski: and what's happening on the side?                          [10:07]
+<ski> when calling `FILE *fopen(const char *path, const char *mode);' in C,
+      like `fopen("/path/to/file","r")', that is an expression of type `FILE
+      *'. the I/O that is happening as a result of the call is not explicitly
+      declared in the result type
+<ski> in Haskell, nothing is happening on the side. no side-effects in Haskell
+<jusss> ski: waht?
+<jusss> ski: "no side-effects in Haskell" ? then how print somthing, visit
+        files?
+<ski> those are effects, not side-effects, in Haskell                   [10:09]
+<ski> @type print
+<lambdabot> Show a => a -> IO ()
+<dmwit> I don't think I've ever heard this distinction made before, but I like
+        it a lot.
+<ski> the I/O is part of the result, is explicitly declared in the result type
+<jusss> ski: then functions does have effects?
+<ski> no
+<jusss> ski: aha!                                                       [10:10]
+<ski> calling `print' doesn't cause any I/O to happen
+<ski> *executing* the resulting I/O-action, causes the I/O to happen
+<ski> the only way to cause I/O to happen, is by making the `IO'-action part
+      of `main' (or by entering it into the interactor)
+<ski> just calling `print' will "compute what to do", but won't actually do it
+<ski> evaluating expressions (which includes calling functions) can't cause
+      I/O to happen. can't cause `IO'-actions to be executed            [10:12]
+<jusss> ski: then what will cause IO actions to be executed?
+<jusss> ski: put them to `main'?
+<ski> (however, to execute an `IO'-action, one must determine what
+      I/O-operations to perform. iow, one must first evaluate the action. in
+      practice, these two "phases", execution and evaluation of an
+      `IO'-action, are interleaved)
+<ski> yes
+<ski> also, note that it doesn't matter that "it all mutates memory locations,
+      and probably does memory-mapped I/O, or else some I/O machine
+      instructions"
+<ski> (or that it executes C code, when GHC used to compile via C)      [10:14]
+<ski> whether something has side-effects, or merely effects, is a matter of
+      perspective, of which language one's looking from
+<jusss> ski: if we put IO actions into functions, and put functions to `main',
+        this IO actions will be executed?                               [10:15]
+<jusss> % :t putStrLn
+<yahb> jusss: String -> IO ()
+<ski> it's about what reasoning laws one can apply, at the level of the
+      language. how it is implemented is irrelevant
+<jusss> like you see putStrLn is a function, which has an IO action as the
+        result
+<ski> if you write
+<ski>   main = putStrLn =<< getline                                     [10:16]
+<ski> then this will (evaluate and) execute `getLine', and the resulting
+      monadic result (a `String', call it `s') will be passed to `putStrLn'
+      (calling `putStrLn', like `putStrLn s', call the resulting action `p'),
+      then that action `p' will be executed                             [10:17]
+<ski> so, depending on the run-time result of executing `getLine', we'll
+      perform/execute *different* actions (returned by `putStrLn') next
+<jusss> ski: actions can be executed, and actions have effects, functions can
+        be evaluated, and functions don't have effects, that's right?   [10:18]
+<ski> dmwit : hm, i would have assumed you'd heard this story before, given
+      that you've been here some time (can't recall how long ..)
+<ski> functions are called
+<ski> expressions are evaluated                                         [10:19]
+<ski> an expression can be a function call/application
+<jusss> ski: wow,
+<ski> yes "functions don't have effects"
+<ski> however, as a shorthand, we commonly say "invoke `openFile'", when we
+      mean "call `openFile', and execute the resulting action"          [10:20]
+<jusss> ski: then what's the different between functions and expressions, also
+        function calls and function applications?
+<ski> (and, sometimes people say "call `openFile'" when they mean this)
+<ski> `2' is an expression. so is `x'
+<ski> neither of those are function calls                               [10:21]
+<ski> `let x = 2 in max x y' is not a function call
+<dmwit> ski: evaluate/execute I've seen many times. side-effect/effect I've
+        never seen.
+<ski> dmwit : i drew out the lines of this story, years ago
+<jusss> ski: then expressions can be executed, expressions don't have effects,
+        expressions can be function calls,                              [10:24]
+<jusss> ski: what's function application?
+<jusss> this term I saw it a lot, but I don't get it
+<ski> jusss : expressions are syntactic things (things in the program
+      text). functions are really semantic things (things when the program is
+      running). however one can talk about expressions which will evaluate to
+      functions, and often also just call those "functions" as well
+
+<ski> jusss : `f x' is function application. `f' is a function expression (an
+      expression evaluating to a function), `x' is another expression whose
+      value will be passed to the function
+
+<ski> jusss : "function application" is more or less synonymous to "function
+      call". by the former, we typically mean the thing in the program
+      text. by the latter, we often also mean how it behaves, when the program
+      is running                                                        [10:27]
+<jusss> ski: but `f' and `f x' both are expressions?                    [10:28]
+<ski> crestfallen : you can think of "executing a list action" as "selecting
+      an element from the list", which is what `x <- xs' and `y <- ys' do
+<ski> jusss : yes
+<ski> jusss : `max x (min y z)' is also a function application. applying `max
+      x' to `min y z'
+<ski> (`f x' is applying `f' to `x')                                    [10:30]
+<jusss> ski: function expressions and function calls are expressions,
+        expressions can be evaluated to functions, and functions don't have
+        effects, actions can be executed, actions have effects, this is right?
+                                                                        [10:31]
+<ski> "expressions can be evaluated to functions" -- in case they have
+      function types, yes                                               [10:32]
+<ski> by "function expressions" i basically means "expressions of function
+      types"
+<ski> jusss : yes
+<ski> also, the only way to cause `IO'-actions to execute, is by making them
+      part of `main' (or entering them into the interactor)             [10:33]
+<ski> however, you can e.g. execute `Maybe'-actions, without needing to do
+      anything like that                                                [10:34]
+<jusss> ski: expressions like `2', function expressions like `f', function
+        applications like `f 2', they all are expressions, but only function
+        expressions and function applications can be evaluated to functions,
+        this is ok?
+<ski> you can write `let act = do k1 <- lookup k0 env0; v <- lookup k1 env1;
+      guard (pred v); return (frob v) in case act of Nothing -> ...; Just w ->
+      ..w..'
+<ski> here, one could argue the `case act of ...' causes the execution of the
+      `Maybe'-action `act'                                              [10:36]
+<ski> jusss : "function applications can be evaluated to functions" sounds
+      confused. a function application does not evaluate to a function, unless
+      the function being applies is a function whose result will also be a
+      function (e.g. if the function is defined in "curried style")     [10:37]
+<ski> the function application `not False' will not evaluate to a function
+      (however, in order to evaluate that application, we first need to
+      evaluate the function expression `not', getting back the function value)
+<ski> otoh, `delete "b"' is a function expression which will evaluate to a
+      function                                                          [10:38]
+<ski> @type delete
+<lambdabot> Eq a => a -> [a] -> [a]
+<jusss> ski: about the monad Maybe action, I still have a little confused
+<jusss> ski: it's an action, so it has an effect                        [10:39]
+<ski> > let f = delete "b" in map f [["a","b"],["b","cde"],["c","de","f"]]
+<lambdabot>  [["a"],["cde"],["c","de","f"]]
+<ski> jusss : yes. the effect in that case is "possible failure to compute a
+      monadic result"                                                   [10:40]
+<ski> jusss : very roughly (and vaguely) speaking, an "effect" is "any
+      deviation from computing a single result, nothing else"
+<ski> jusss : `Maybe' allows expressing "possibly no result at all"-effects
+                                                                        [10:41]
+<jusss> ski: which means all the monad actions have their own effects?
+<ski> jusss : `Either e' also allows expressing failure like this, except that
+      instead of just having a single ("anonymous") kind of failure, you have
+      failures labelled with values of type `e' ("exceptions")          [10:42]
+<ski> jusss : yes
+<jusss> ski: and `IO'?
+<ski> jusss : `[]' allows expresssing "possibly no result at all, and possibly
+      more than one result"-effects
+<ski> jusss : `return x' (equal to `pure x') always gives an action which
+      actually performs no effects at all. or, if you prefer, only performs
+      the "trivial effect", the "no-op effect"                          [10:43]
+<jusss> ski: next time I meet a monad, I should ask what its effect is first
+<jusss> % :t return
+<yahb> jusss: Monad m => a -> m a
+<jusss> ski: this m a is an action, right?
+<ski> jusss : `IO' is (primarily) for doing Input/Output interaction, with the
+      outside world (from the POV of the Haskell process). however, `IO' tends
+      to be used as a sin-bin, so it also allows expressing local mutable
+      state, and multiple threads of execution (whose synchronization is
+      indeterministic)                                                  [10:45]
+<ski> jusss : no, the *value* of type `m a' is an `m'-action. `m a' itself is
+      the *type* of that action
+<ski> (that may be what you meant. but you didn't say it)               [10:46]
+<maerwald> ski: what do you mean with sin-bin?
+* ski thinks it can help to be an extra bit pedantic, about terminology, when
+  concepts are a bit unclear
+
+<ski> maerwald : a potpourri of different effects, all mixed together in the
+      same monad
+<jusss> ski: m a is the type of m-action, right?
+<maerwald> ski: well, that is exactly what it is for                    [10:48]
+
+<maerwald> since there is no sensible way to separate that multitude of
+           effects
+
+<maerwald> most monad stacks have MonadIO somewhere inside, which blows up the
+           entire purpose
+<ski> well, depends                                                     [10:50]
+<ski> some parts might be like `frob :: Monad m => ... -> T m X'
+<ski> jusss : an `m'-action is a value of type `m a', for some type `a',
+      yes. where `m' is a monad, or an idiom (or maybe sometimes only a
+      functor, but i think it's more common to not say "action"
+      then. sometimes "collection" feels like an appropriate word. can also
+      often be used in the monad and idiom cases)                       [10:52]
+<maerwald> until we have a *proper* effects system, I believe IO is the right
+           choice for anything that has any intersection with real IO
+<arahael> I thought we had one available? (But not in common use) - something
+          similar to what's done in PureScript?                         [10:54]
+<ski> i have used multi-level continuation stack, over `IO' (or `ST s', if
+      preferred)
+<heatsink> Disciple was an experimental haskell dialect with effects    [10:55]
+<ski> (the depth of the stack being determined at run-time)
+<arahael> Something like https://hackage.haskell.org/package/freer-effects
+<maerwald> arahael: yeah, freer is nice, but also very leaky
+<maerwald> but, we have 3+ implementations of it
+<maerwald> and none of them are really used
+<arahael> Leaky?  Blegh. :(
+<maerwald> leaky in terms of API/Types                                  [10:56]
+<maerwald> if you don't understand the implementation, you'll likely not
+           understand the error messages
+<maerwald> mtl isn't that bad when it comes to errors                   [10:57]
+<maerwald> but then you can't even have two readers...
+<ski> dmwit : comment/opinion on the side- / effect story ?
+<jusss> ski: where is your story online?
+<ski> on logs of this channel
+<maerwald> In the end, I'm disappointed by all attempts. Either they are too
+           complicated, leak implementation details or are too weak. So I
+           embrace IO and write atomic functions.                       [10:59]
+* ski might have gone through it at least a dozen times
+<maerwald> ski: have you used freer/e-e in a project?
+<ski> i haven't
+<arahael> maerwald: Blegh. :(  I kind of like it with purescript, but I didn't
+          stick with them for long.  What about manually implementing free
+          monads? (Feels like too much work, though)
+<maerwald> I've only messed with it, but since the ecosystem coverage is
+           non-existent
+<maerwald> how to even try properly                                     [11:00]
+<ski> remind me, can it express composable continuation effects ?
+
+<maerwald> dunno
+* ski str many such attempts failing at that
+<ski> sometimes i'd want an ordered logic of monad class (like
+      `MonadReader',&c.) constraints. also named (so we could scrap the FDs
+      ..)                                                               [11:01]
+<MarcelineVQ> maerwald: any opinion on polysemy?
+<maerwald> arahael: I've always dreamed about effects outside of the type
+           system. Yes, I think effects are misplaced on type level (I don't
+           care how it's *implemented*, that may very well abuse the type
+           system)
+<ski> well, ordered as default. but where some constraints are known to
+      commute with each other
+<maerwald> MarcelineVQ: haven't messed with it, is it worth it?         [11:02]
+<arahael> maerwald: Interesting notion - why don't you think it should be in
+          the type system?
+<MarcelineVQ> No clue but I've not really used effect systems so I'm askin ye
+              :>
+<maerwald> arahael: The same way as exceptions shouldn't
+<ski> maerwald : it would be interesting with an implementation based on
+      composable continuations, along the lines of Andrzej Filinski's monadic
+      reflection
+<maerwald> arahael: yet, there is static knowledge about them (e.g. in java)
+                                                                        [11:03]
+<arahael> maerwald: I'm still making my mind up with exceptions.  I actually
+          think they make perfect sense in Haskell - have them exposed by the
+          monad (eg, as IO exceptions are), or have them handled explicitly -
+          whatever is appropriate to the situation.
+<ski> maerwald : in Clean, uniqueness is expressed in types. in Mercury,
+      uniqueness is expressed in "insts" (instantiation states), and "modes"
+      (which includes insts). perhaps one could have a story along similar
+      lines, for effects                                                [11:04]
+<ski> arahael : "handled explicitly" being ? like `Either e' ?          [11:05]
+<maerwald> arahael: effects shouldn't enclose values, both are separate, that
+           makes it also easier to refactor APIs without losing any guarantees
+<ski> (insts and modes are separate from (but connected to) types)
+<arahael> ski: Depends on what you think of as an exception.
+<arahael> maerwald: So, in a similar way to say, ReactiveX's separation of
+          values and errors?
+<maerwald> arahael: the reason why enclose values in effects is because Monads
+           make it so easy to express this relationship
+<maerwald> I don't think anyone stopped there for a second and thought "wait,
+           should we really do this?", because all alternatives need a new
+           language
+<ski> well, i think of `Either e' as expressing exceptions. also, i don't
+      believe in "exceptions are for exceptional situations" (what even does
+      "exceptional situations" mean ?) .. however, i was wondering what you
+      had in mind
+<maerwald> arahael: yeah, errors should never be values, in a way, you could
+           argue                                                        [11:07]
+<ski> (i have no qualms about using exceptions to express the "normal exit
+      path")
+##############################################################
+
+:t putStrLn
+putStrLn :: String -> IO ()
+give function putStrLn a String, it will return a IO action which has type IO (),
+(->) is the type of function, if there's no ->, then it's not a function
+IO () is a IO action,
+:t getLine
+getLine :: IO String
+so getLine is an IO action, which has type IO String, it's not a function
+
+##########################################
+
+newtype Fix f = MkFix (f (Fix f))
+kotlin:
+sealed class Fix<F>
+data class MkFix<F: Fix<F>> (val x: F): Fix<F>()
+class Foo: Fix<Foo>()
+
+####################################
+#mail
+temporary email receiver
+https://temp-mail.org/
+
+#######################################
+
+newtype Fix f = MkFix (f (Fix f))
+MkFix (Just (MkFix (Just (MkFix Nothing)))) :: Fix Maybe
+MkFix Nothing :: Fix Maybe
+MkFix (Just (MkFix Nothing)) :: Fix Maybe
+MkFix :: f (Fix f) -> Fix f
+################################################
+
+y = Y f = f (Y f)
+f y = y
+Y = \f.(\x.f(x x))(\x.f(x x))
+
+
+#############################################
+
 bmiTell'' :: Double->Double->String
 bmiTell'' weight height
     | bmi <= 18.5 = "You are underweight!"
@@ -154,6 +537,21 @@ runFun (runFun f 1) 2 :: Fun
  <dminuoso> % :t unF (unF (unF f 1) 2) 3 
  <yahb> dminuoso: F
 http://tunes.org/~nef/logs/haskell/19.10.01
+
+data F where MkF :: Int -> F -> F   // data F = MkF (Int -> F)
+unF :: F -> Int -> F
+w :: Int -> F
+unF (MkF w) = w
+
+<EvanR> jusss: the type F seems to be an infinitary branching tree      [10:43]
+<EvanR> (viewing Int as Integers)
+<EvanR> and this tree has no data in it
+<jusss> EvanR: so it's useless in the value level?
+<jusss> EvanR: no value can have that type F?                           [10:48]
+<EvanR> plenty of inhabitants of F
+<EvanR> but i don't see how you can tell the difference between any of them
+<EvanR> it just consumes Ints forever no matter what they are           [10:49]
+<EvanR> it's a /dev/null for Int
 
 
 <jusss`> dminuoso: I suddently understand your `newtyfpe F = MkF { unF :: Int
