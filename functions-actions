@@ -1,0 +1,992 @@
+
+
+
+[周二 10月 15 2019]
+*** You have joined channel #haskell                                    [09:04]
+*** Topic for #haskell: https://www.haskell.org |
+    https://wiki.haskell.org/IRC_channel | Paste code/errors:
+    https://gist.github.com/ | Logs:
+    http://tunes.org/~nef/logs/haskell/?C=M;O=D |
+    https://www.reddit.com/r/haskell | Admin: #haskell-ops | Offtopic:
+    #haskell-offtopic | https://downloads.haskell.org
+*** #haskell: topic set by glguy, 2019-01-05 23:21:52
+*** Users on #haskell: jusss iLoveCodeBro toppler nbloomf olle acarrico
+    macroprep jeltsch tabemann iqubic Igloo sqrt2 Arcaelyx keep_learning
+    ericsagnes dfreedm lagothrix Paks cheater pja doublex ziyourenxiang_ conal
+    raski pavonia poljar jedws xff0x oisdk Synthetica Anthaas Ulrar
+    bmillian[m] pera _ashbreeze_ howdoi novum Lowl3v3l jneira ltriant Kaiepi
+    ChaiTRex Lears justanotheruser o1lo01ol1o milanj dboussetta harry[m]1
+    gabiruh jao kleisli poga hongminhee dansho jcreus
+*** Users on #haskell: nyuszika7h nullifidian_ AndreasK aarvar dale _xor
+    DrAwesomeClaws t7 machinedgod s00pcan Lord_of_Life kupi troydm Chousuke
+    zmv juri_ DTZUZO hipstronaute[m] theorbtwo Wuzzy ddellacosta vascillation
+    bermraj klntsky toure lucasb wpcarro ClaudiusMaximus m1dnight_ horatiohb
+    btbuddha nikivi fiddlerwoaroof aurieeeh_ jonge hpc mounty cchalmers kAworu
+    jakalx jb55 vlad` darjeeling_ davr0s davr0s__ wonko7 dopplergange
+    fnurglewitz thc202 pie__ MindlessDrone
+*** Users on #haskell: markus1189 dddddd phaul cybai gehmehgeh thunderrd
+    teardown xplat ziman reggie_ slomo koz_ day zaquest treehaqr dmiles theDon
+    waskell_ OnkelTem yaroot carldd khisanth_ kish rajivr___ Sparadox sujeet
+    jluttine Sgeo__ bydo atk nthian totte thebnq pikajude inkbottle drewbarbs
+    evanjs alx741 xelxebar moldybits cods patricia[m]1 mulk clog m4lvin obfusk
+    gentauro ad5twoknebor[m] aristid Mesa[m]1 sputny[m] domenkozar[m]
+    alex[m]17 mathyouguy cesar[m] link2xt[m]
+*** Users on #haskell: biox[m] xlogan[m] Orbstheorem[m] aitzol[m] kai10[m]
+    abbe[m] dominicusin[m] thekyriarchy richardax[m] nonlinear[m] iantownsend
+    GregKNicholson[m slrtbtfs[m] alana[m]1 Cloud[m] PotatoRick[m] Undefined[m]
+    greta[m] foxadee[m] fiddeldibu[m] cyclops19[m] adaizen[m] jhgarner[m]
+    hifutakiko[m] carola[m]1 macerbi[m]1 ChrisPenner[m] corin[m] vikraman
+    lerowukta[m] boutil[m] chorhizo[m] tasrev[m] ghastfilms[m] GreenKarm[m]1
+    somni[m] krowlan3[m] wobbol[m] NirvinM[m]
+*** Users on #haskell: nasius[m] jochens[m] midi[F][m] parmesan[m]
+    humanwire[m] masaeedu[m] dikini[m] keith[m] dxml[m] thosgood[m] vpei[m]
+    SamuelH[m] whoops hackeryarn[m] supersweetsweetc aqtusia[m] phanimahesh[m]
+    joachim[m] acowley pdxleif @Sigyn suspense_ hololeap gienah mnrmnaugh
+    SCHAPiE cynick glamas abra0 vimto andreas303 revprez_anzio arianvp
+    fr33domlover kjak jle` essentiality[m] ps-auxw Moyst C-16 avn alanz Randy
+    mupf mountaingoat meck sphalerite PlasmaStar cartwright
+*** Users on #haskell: lnostdal johnw raatiniemi jackhill rosalux unyu
+    thallada andi- xtsee MarcelineVQ suppi NightA mimi_vx sdrodge Jesin m1cl
+    `Guest00000 Natch earthy Dykam hc jwynn6 tombusby jameekim stepnem
+    aliabrar[m] taylskid dTal amiri PragCypher sagax delYsid locallycompact
+    rann jdevlieghere koankeeper travv0 andreabedini jophish Xeyame arkeet
+    zmt01 dustinm- monokrome Mon_Ouie Ekho vin-ivar_ anderson_ amxxxx
+    Philonous dashkal_ crtschin Annihite1 sud0 Ring0`` loc_
+*** Users on #haskell: bendo_ bcoppens mutantmell bitemyap1 nibbling koala_man
+    robogoat_ habbah_ bsima ghoulguy Ckat chivay Nevoic9 rkrishnan_
+    vodkaInf1rno jokester Rudd0^ styledash yahb albel727 tomboy64 Zemyla
+    literallyCrevice c_wraith ctag seanparsons MonkeyNOS__ evelyn qbnk4 srid
+    rotty micro rembo10 abrar zzz p3n jmsx Cale mozzarella nnm MoziM remexre
+    sukbeom DTZUZU tokik rubik ft ion fionnan nckx hiredman monochrom
+    Intensity SquidDev roman2 ahri oats topos prophet stux|RC
+*** Users on #haskell: seventh__ Neuromancer cpape daGrevis LnL pacak cgfbee
+    myme abuss wrengr raoulb Jello_Raptor sandman13 fiatjaf krystianbajno
+    dredozubov zymurgy rodgzilla blackdog lemald relrod vktec eldritch
+    ullbeking nyaomi Cathy AkhILman d3lxa epta affinespaces Robin_Jadoul
+    haskell_enthusia adarshaj crooked Xandaros PHO pharaun dmwit
+    andromeda-galaxy mrus JSharp barrucadu w1gz hodapp jlamothe mmaruseacph2
+    kosmikus Guest31486 Maxdamantus gregberns_ sethetter_ haveo
+*** Users on #haskell: simplegauss_ tumdedum tureba drdo pasukon Tspoon__ mxf_
+    lstdgtfp_ atle_ Kneiva_ TMA kiix1 PierreM_ Entroacceptor dfordiva1 Ke
+    mikolaj__ ybit marble_visions_ nitrix tsahyt_ codedmart bbear_
+    implementation telser- kuttifunk dunningk- w1d3m0d3 theophil97 zekt83
+    keep-learning[m] grag[m] jonge[m] labs[m] lions[m] Richy[m]1
+    Testitunnari[m] betz[m] gentlehelm[m] DenisLehmann[m] edwel[m] matrixyz[m]
+    luminousnine[m] NickHu joe[m]5 georgescratcherd neurocyte[m]
+*** Users on #haskell: ist5shreawf[m] eckt[m] jwaksbaum[m] torkel[m]
+    josiah_sama laniusfnv[m] nolep[m] alice[m]1 absnc fiberpunk[m] olmvnec[m]
+    buggeas40d[m] rihardsk[m] ldesgoui[m] Ekho[m] atopuzov[m] mujx[m]1
+    mssx89m[m] jibby[m]1 jwerner[m] case_ratchet[m] aryaan[m] intellection3to3
+    BaMaung[m] fabianhjr[m] D[m]2 Hanma[m] Bertschneider[m] mmynsted[m]
+    tomtau[m] erasure[m] vsts[m] JakeO[m] Ericson2314 spacekitteh[m]
+    rahduro[m] peter-js[m] xmpln[m] eruvarn[m] PonyDick9000[m]
+*** Users on #haskell: josef[m] eyenx[m] jumzi[m] kaychaks[m] EuAndreh[m]
+    neiluj[m] hans[m]6 twom[m] ppseafield[m] guiraldelli[m] Mitch[m] kupo_[m]
+    Hakan[m] jibby iffsid themsay[m] tuxsoy alephu5[m] seekerus3r[m]
+    pothyurf[m] likliklik hsw[m] dlilja[m] MrAxilus yesided[m] triste[m]
+    markus[m]4 Chromad[m] Ben[m]5 meu76[m] jak[m]1 NickHu1 Soft[m] joenase[m]
+    asonixDogHeThey[ shiroeni[m] fulgjon MichalLaskus[m] blakec[m] imposs[m]
+    pleasesendnudes[ amb007[m] vkleen PrimeSeeker[m]
+*** Users on #haskell: denbrahe[m] alxev[m] fswalker[m] vector[m]1
+    ninjatrappeur[m] hjoest[m] cbg[m] anton-latukha[m] edejong[m] admdch[m]
+    imdoor[m] pietromrtn[m] umachan Batholith phreedom gargawel Cthalupa
+    NinjaTrappeur sw1nn spion mceier ephemera_ feuerbach maralorn sshine
+    uberj_ dolio nemesit|znc dazage calloc quintasan thaumavorio gwern
+    Velpoman JoelMcCracken good2cu defanor_ mjuad hackage insanitea sigmundv_
+    ichor linduxed jdt phadej zfnmxt thyriaen[m] mat8913[m]
+*** Users on #haskell: kylos[m] johanejg[m] k4l1gr4[m] neat72[m] Mougan[m]
+    qasim[m] luisjira[m] jdks[m] xethrog42[m] rainbyte[m] ponette[m]
+    shachiku[m] buster528[m] haskelllisp[m] BoraKaplan[m]1 periapseez[m]
+    gd2398[m] M2ktsre[m] imp0s5ible brevalda[m] kicker22004[m]1 Bimmie[m]
+    mithrandi[m] legowheels[m] Rama[m] danielemarsella[ dl3br[m]
+    M|GNUisnotLinux[ trevortknguyen[m jlorand[m] adziahel[m] afontain[m]
+    mgiagante[m] Alec[m]1 Surgeon[m] Syllo[m] zopsi[m] pschooom[m] patonw[m]
+*** Users on #haskell: thekyriarchy[m]1 maxmaguire[m] cepxuo AkikoHimenokoji[
+    firefly1927[m] jonreeve[m] avocado natmac[m] yi[m] uelen[m] rgh[m]2
+    brandon123[m] MerlinGttlinger[ glothit7ok[m] tkots[m] cal[m] ryemantis[m]
+    bobach[m] nartir[m] texpat[m] dice[m]1 flawr[m] pagoda_5b[m] tmallard[m]
+    sayukimans[m] klaadum[m] ciroyo[m] jay[m]1 Cenion[m] noteventime
+    abc123zzz[m] yur3shmukcik[m] wrunt[m] M0ddba11[m] dustyp[m] cawal[m]
+    Kit[m]2 zorkedon[m] ciet[m] Kenneth[m]
+*** Users on #haskell: ludovicdanjoumad liso[m] tempaccount1[m] AMlivinfree[m]
+    Paavo[m] unrooted[m] actartis[m] deikatsuo[m] heyakyra[m] yrid[m]
+    donnyllionaire[m charliebucket[m] jeeg[m] inkstain[m] contrun[m] unclechu
+    bartholomews[m] midi[m] dude[m]1 GhostofaConsole[ abdolence[m] rowan[m]
+    jak[m] jorge-jbs[m] markalanrichards d0g01[m] grorg[m] alko[m] gkobeaga[m]
+    hoohaw[m] reconmaster[m] Daquilla[m] moats mouse008[m] pqwy[m]
+    pablo-pie[m] snupples[m] zukken[m] JoGoSi[m]
+*** Users on #haskell: GNULizard[m] vorbex[m] nybble41[m] Cele[m] ilmu[m]
+    freu[m] reedhhw[m] ShujaRafi[m] deklund[m] JulesRen-Georges jesusvega[m]
+    kumarbis[m] soaoaig[m] makos999[m] bt[m] provessor[m] arianvp[m]
+    guzmanillo[m] olep[m] Gw3n[m] themadman[m] vigilian[m] bkl[m]
+    Noughtmare[m] aquarial[m] korlaplankton[m] jg[m] odd13[m] Vincent[m]1
+    teaknow[m] gmips[m] Grgoire[m] lapav[m] se224[m] PhilipWhite[m] chris[m]12
+    suppenkasper[m] janustroelsen[m] ovigren vhzr[m] EmilKarlson
+*** Users on #haskell: Rich[m] quiet_laika[m] potato44[m] beaverfever[m]
+    petrolifero[m] ircer[m] akt[m]1 sm[m] corin[m]1 vars[m] lukasubo[m]
+    kinga06[m] apurvapavaskar wildtrees[m] aterius godzilla[m] steamedbun[m]
+    RIOTIM[m] shanesveller[m] lihram kitsune[m] cosson[m] kahuna[m] godva[m]
+    MarquisKurt[m] papazeus[m] triskeon[m] sphalerit M2en[m] arturo[m]
+    oniani[m] Eclipse[m] weebull[m] yoltid[m] dag[m] tet[m] tswett[m] roberth
+    derberg[m] JoelMcCracken[m] asayers[m]1 aquarial
+*** Users on #haskell: jak_wolf[m] hvariant[m] makos[m] pebeto[m] br0p0p[m]
+    SmiVan[m] miseenplace[m] linxnp[m] PoopSick[m] ookfof[m] gandi[m]
+    javjarfer[m] StevenY[m] Jonathan[m]3 cjskaggs[m] kompass[m] dumuzid[m]
+    nh2[m] aruncom2006[m] elosil[m] jennie[m] laith1[m] Kimani[m] gswuichet[m]
+    crvs[m] freeman42x[m] limabeans[m] hkimhvyh[m] popo[m] krangbae[m]
+    danielbmarkham[m max3raza[m] mujx[m5 lmolr[m] luftmensch[m] homebeach[m]1
+    javbit[m] krhubert[m] schum tops[m] pineapple[m]
+*** Users on #haskell: Godslatestgift[m MartinKlimi[m] friedm[m] kaiyou[m]
+    iarp[m] MonsieurArcher[m Brio[m] ChristopherBurg[ sudorebootnowsud
+    tindvik[m] test_f[m] WeiTang[m] mattia[m] xxthatgirlxx[m] coil[m]
+    paulus[m] anarcolepsia[m] wuxianhuiyi[m] bee[m]1 alexfmpe[m] VaNilLa[m]
+    giuseppe[m]1 vk3wtf[m] srid[m] roninkaizen[m] jrozanski noam[m]
+    aloiscochard[m] gmind[m] tejok[m] isair[m] tehidiot[m] kadoban siraben
+    luke-clifton[m] aviD fgaz Videled[m] lierdakil[m] supersven[m]
+*** Users on #haskell: vaibhavsagar coldpress[m] sdicke[m] simbergm peel1
+    ternarysolo boistordu sepp2k hdurer[m] ClownMaster[m] afk[m] sielicki
+    drewr xstill sylvie[m] nurupo Twey tsrt^ NONAME tabaqui liff yumh
+    michaelpj ekleog fliife lowryder lkurusa stzsch ent tlax tsani sellout-
+    acro Kiruwa _deepfire matheus Majiir ixian cp iskander badzergling bgavran
+    mr_yogurt fuzen laxask incertia aesi leah2 a3Dman eyenx dave_uy Chobbes
+    chirpsalot spoonm dequbed arahael Axman6 neildaemond
+*** Users on #haskell: stiell Jonno_FTW Clint anathema Vtec234 Guest82049 urdh
+    srhb coldpress wagle Nickerson datajerk srnty ap5 yitz tinwood PtxDK
+    infinisil mikolaj_ dqd kmelvn shachaf atomi gluegadget verement redcheck
+    copypasteque Unode Tourist andyo bdw Rudd0 Sose TC` tomjaguarpaw lavalike
+    sim590 noexcept gilbertw1 Niamkik subfacto1 jfredett anishathalye militia
+    tms_ Fubar^ fryguybob rootnode kirand valdyn rotaerk ski nesqi tabaqui1
+    kini noan DigitalKiwi forell Foritus Vq
+*** Users on #haskell: strangeglyph Fairy Bergle_1 bgamari cc0k33 ccokee
+    chindy nekomune _Tristan_ elcaro nee` abbe dibblego erikd echoreply APic
+    TemporalShift iomonad lassulus tv gspia int-e lambdabot dxld haasn
+    leothrix jrm jchia1 boj s4msung averell tensorpudding petercommand
+    tessier_ miklcct swater Arguggi Madars devurandom Slothel_ nshepperd2
+    grumble Enigmagic adamCS glowpelt droplet Adeon ereu nuxdie Shun131 auri_
+    landonf sdx23 Ranhir Hijiri MasseR orzo pingu_ Remavas
+*** Users on #haskell: DustyDingo caasih coot dmj` hjozwiak entel statusbot
+    qzo enikar wz1000 lockshaw_ bjobjo joehillen inimino clynamen_ rawles
+    c-rog jzl niklasb_ teehemkay irclogger_com dminuoso johnstein michalisko
+    madnight EvanR dumptruckman nonzen betawaffle deu wadadli apoc asm89
+    freusque samebchase coeus MatrixBot3 vk3wtf sea-gull ammar2 mjrosenb
+    energizer guios dyl_ h32 tristanC klugez zerokarm1left scal_ flebron_
+    dixie_ comboy_ lucas8 hyperfekt vio_ ocharles adamse
+*** Users on #haskell: pierrot devalot jbetz TimWolla daissgr sis7 null_ptr
+    alp mycroftiv dan64 runawayfive adadelta mniip fiQ2 Guillaum peel nlofaro
+    obiwahn carbolymer eagleflo tomku stylewarning Klumben xacktm
+    SolarAquarion TommyC AWizzArd esph cyberlard saurik andjjj23 amosbird johs
+    joeyh komasa bwe ambrosia_ SegFaultAX mikeplus64 arsdragonfly Hotbees
+    idupree2 ab9rf absence silver_needles pong julienXX Taneb stefan hvr Jon
+    polux7 lnx mingc raek ^[ jamestmartin amatecha_
+*** Users on #haskell: dongcarl Orbstheorem darthThorik thi_ phaazon bjs
+    metalrain jesyspa kip ajmcmiddlin ghuntley eacameron xyggos
+    EduardoBautista dani- wildsebastian jackdk J_Arcane boeg tazjin d0liver
+    DrDuck runeks pent gonz_ dsal milessabin typetetris ebutleriv Seich azahi
+    bspar rzmt Athas bandali RecursiveG sm Willis Forkk uniquerockrz
+    Bigcheese_ tdammers statusfailed amuck nil edwtjo hive-mind electrostat
+    raoul pingiun @ChanServ bitonic alunduil iravid Lermex epicallan
+*** Users on #haskell: monad_cat bradparker winny nkaretnikov Nascha dpn`
+    jsatk fredcy- natim87 Blkt banjiewen interruptinuse PyroLagus zabracks
+    ryzokuken feepo unsymbol morgib dukedave Jabbslad sebhoss simony AfC
+    ephemeron fingerzam xnyhps jlpeters Konehaltia jonrh scav alexknvl
+    NemesisD casdr_ Ferdirand paf31_ edmundnoble aib bananagram `slikts
+    mstruebing griddle dgpratt m-renaud sclv jetpack_joe lieven raid
+    mankyKitty lightandlight higherorder ibloom tolt rizary_
+*** Users on #haskell: ProofTechnique spamlessj sebastianrkg integral mjlee
+    nh2_ dexterfoo newhoggy TallerGhostWalt_ ryjm lsix uwap akermu vqrs
+    Geekingfrog twk- t36s lurkless _flow_ solarus kloeri lortabac exferenceBot
+    Deewiant a7250ag seliopou greymalkin xarian wraithm sterni bind rodlogic
+    Mo0O artem jvanbure Firedancer_ bob_twinkles Rembane exarkun Phyx-
+    michalrus gsingh93 gambpang connrs- [df] Aleksejs exio4 geal luigy
+    sssilver avp djanatyn jinblack markhuge iron_houzi
+*** Users on #haskell: joeytwiddle ZoFLo kraem cheshircat divVerent maerwald
+    shadowdaemon DDR noko_ reyu nivpgir_ tstat lpsmith kqr jtcs Squarism
+    connrs_ deni Putonlalla oleks Ornedan Someguy123 jrslepak arw [exa]
+    ByronJohnson Tene wtw charukiewicz Drezil catern qz SlashLife CindyLinz
+    digia shapr Flonk stvc zv rootmos suzu RoguePointer ecx86 flogfr Eliel
+    Nik05 __4matter_ nopf hexagoxel kubrat ManiacTwister S007 beaky deadk
+    aidecoe graingert moobar Adluc srk quaestor petermw
+*** Users on #haskell: rom1504 atraii cbarrett coddinkn puffnfresh diginet
+    restrictedchoice n3t luite nshepperd1 carter kaol cyphase edwardk lally
+    SrPx noctux yushyin i7c dogui sveit ycheng cheers nisstyre peschkaj
+    megaTherion ysangkok angerman scivola gothos bengt_ moocow _ht jix malthe
+    cjay- freeside immae cross oeblink duairc Logio kipras`away Nikotiini
+    saidinwot1 chessai hsiktas aldum vjoki beka Ankhers thoradam
+    elvishjerricco PotatoGim nbouscal glowcoil billstclair
+*** Users on #haskell: Kamuela kyagrd__ liquorice verlet64 rslima___ niko
+    sariyar riatre joshmeredith dolanbatar a3f cocreature hegge dh canta mudri
+    sarahzrf davean PatrickRobotham runde Jaxan enemeth79 ynyounuo dagit agrim
+    aweinstock Deadhand pcoutin trucy teej debugloop benwr_ dcoutts M2tias
+    sobhan lukelau jorj bolverkr kav systemfault lyxia dysfigured dilinger so
+    bbear noCheese parseval bollu magicman cruxeternus evilmonads _janne sivs
+    benl23 Tritlo datapup_ sgraf
+*** Users on #haskell: PoliticsII_ hamishmack spinda linoge mitchellsalad_
+    heyj adius terrorjack__ mpickering Firedancer Peter_Storm joel135
+    lexi-lambda mccoyc kapil_ opqdonut Jacoby6000
+*** #haskell URL: http://www.haskell.org/
+*** #haskell modes: +CLnt
+*** #haskell was created on 2006-11-26 14:42:48
+*** rruizt (~rruizt@83-84-23-124.cable.dynamic.v4.ziggo.nl) has joined channel
+    #haskell
+*** poljar1 (~poljar@93-143-153-250.adsl.net.t-com.hr) has joined channel
+    #haskell
+*** zwarag (~zwarag@80-110-97-183.cgn.dynamic.surfer.at) has joined channel
+    #haskell
+*** poljar (~poljar@78-1-38-62.adsl.net.t-com.hr) has quit: Ping timeout: 265
+    seconds                                                             [09:05]
+* hackage tls-debug 0.4.8 - Set of programs for TLS testing and debugging
+  https://hackage.haskell.org/package/tls-debug-0.4.8 (KazuYamamoto)    [09:06]
+*** dycan (~dycan@101-136-249-182.mobile.dynamic.aptg.com.tw) has joined
+    channel #haskell
+*** pfurla (~pfurla@ool-182ed2e2.dyn.optonline.net) has joined channel
+    #haskell                                                            [09:07]
+*** lprd (~jon@lfbn-1-2729-136.w86-247.abo.wanadoo.fr) has joined channel
+    #haskell                                                            [09:08]
+*** toppler (~user@mtop.default.momentoftop.uk0.bigv.io) has quit: Ping
+    timeout: 240 seconds
+*** wroathe (~wroathe@c-68-54-25-135.hsd1.mn.comcast.net) has joined channel
+    #haskell                                                            [09:09]
+*** zwarag (~zwarag@80-110-97-183.cgn.dynamic.surfer.at) has quit: Ping
+    timeout: 265 seconds
+*** hiroaki (~hiroaki@ip4d16ca01.dynamic.kabel-deutschland.de) has joined
+    channel #haskell                                                    [09:10]
+*** hiroaki_ (~hiroaki@ip4d166aa9.dynamic.kabel-deutschland.de) has joined
+    channel #haskell                                                    [09:12]
+<arahael> koz_: From personal observations, I'd say 12 and 20 cups a day is
+          far too much.  Much harder to determine an exact figure where
+          "sufficient coffee" becomes "too much coffee", but for me, it's past
+          that point when I have 6 cups. :)
+<MarcelineVQ> should really count by grounds ounces :>                  [09:13]
+<arahael> MarcelineVQ: That only helps if the style of preparation and the
+          beans are consistent.
+*** toppler (~user@mtop.default.momentoftop.uk0.bigv.io) has joined channel
+    #haskell
+<arahael> (Eg, I start my day with Turkish coffee).                     [09:14]
+*** wroathe (~wroathe@c-68-54-25-135.hsd1.mn.comcast.net) has quit: Ping
+    timeout: 265 seconds
+*** hiroaki (~hiroaki@ip4d16ca01.dynamic.kabel-deutschland.de) has quit: Ping
+    timeout: 240 seconds
+<arahael> My dad having 12 a day was having "1.5 teaspoons of instant coffee"
+          in each.  And my minister who had 20 a day...  Was using a plunger.
+*** merijn (~merijn@83-160-49-249.ip.xs4all.nl) has joined channel #haskell
+                                                                        [09:15]
+*** UpstreamSalmon (uid12077@gateway/web/irccloud.com/x-rxjexgshvzhplxad) has
+    joined channel #haskell
+*** carldd (~carldd@90-224-49-113-no56.tbcn.telia.com) has quit: Ping timeout:
+    268 seconds
+*** lprd (~jon@lfbn-1-2729-136.w86-247.abo.wanadoo.fr) has quit: Ping timeout:
+    250 seconds                                                         [09:18]
+*** khisanth_ (~Khisanth@pool-108-46-0-241.nycmny.east.verizon.net) has quit:
+    Ping timeout: 240 seconds
+*** khisanth_ (~Khisanth@pool-108-46-0-241.nycmny.east.verizon.net) has joined
+    channel #haskell                                                    [09:19]
+*** toppler (~user@mtop.default.momentoftop.uk0.bigv.io) has quit: Ping
+    timeout: 240 seconds                                                [09:20]
+*** merijn (~merijn@83-160-49-249.ip.xs4all.nl) has quit: Ping timeout: 250
+    seconds
+*** tabemann (~tabemann@rrcs-162-155-170-75.central.biz.rr.com) has quit: Ping
+    timeout: 250 seconds
+*** conal (~conal@198.8.81.228) has quit: Quit: Computer has gone to sleep.
+                                                                        [09:21]
+*** raski (be7326b5@190.115.38.181) has left channel #haskell: #haskell
+*** iLoveCodeBro (~bloodwire@unaffiliated/bloodwire) has quit: Ping timeout:
+    250 seconds                                                         [09:23]
+*** zwarag (~zwarag@80-110-97-183.cgn.dynamic.surfer.at) has joined channel
+    #haskell
+<jle`> huh in my last git commit the first 8 character of the sha were all
+       decimal digits. i wonder if that's a sign
+<sm[m]> I think when that happens you get the next day off              [09:24]
+*** Wuzzy (~Wuzzy@p5B0DFF66.dip0.t-ipconnect.de) has quit: Remote host closed
+    the connection
+<dmwit> > (5/8)**8                                                      [09:25]
+<lambdabot>  2.3283064365386963e-2
+<dmwit> you get a lot of days off
+<dmwit> or you don't make commits very frequently
+*** toppler (~user@mtop.default.momentoftop.uk0.bigv.io) has joined channel
+    #haskell
+<MarcelineVQ> jle`: It's the end times.                                 [09:27]
+*** aarvar (~foewfoiew@c.24.56.239.179.static.broadstripe.net) has quit: Ping
+    timeout: 245 seconds
+*** dboussetta (~dboussett@192-222-252-31.qc.cable.ebox.net) has quit: Ping
+    timeout: 240 seconds
+<arahael> jle`: Have a coffee.                                          [09:28]
+*** jediluke (~jediluke@124.188.238.179) has joined channel #haskell    [09:29]
+*** dale (~dale@unaffiliated/dale) has quit: Read error: Connection reset by
+    peer                                                                [09:30]
+*** nbloomf (~nbloomf@104-183-67-6.lightspeed.fyvlar.sbcglobal.net) has quit:
+    Quit: My MacBook has gone to sleep. ZZZzzz…
+*** dale (~dale@unaffiliated/dale) has joined channel #haskell
+*** toppler (~user@mtop.default.momentoftop.uk0.bigv.io) has quit: Ping
+    timeout: 240 seconds                                                [09:32]
+<dmwit> groupByKey f vs = M.fromListWith (++) [(f v, [v]) | v <- vs] -- useful
+        surprisingly often                                              [09:34]
+*** nbloomf (~nbloomf@2600:1700:83e0:1f40:e9ce:5eab:a029:e864) has joined
+    channel #haskell                                                    [09:35]
+<shapr> For testing my research paper annotation tool, I need a friend to fork
+        this repo: https://github.com/shapr/flmdata (please tell me your
+        github username if I'm not already following you)
+<siraben> Is it possible to write the function with the following spec
+          recursively? (\y -> any (\x -> x == reverse x) (permutations y))
+                                                                        [09:36]
+<siraben> (given a list of things, return True if any permutation of it is a
+          palindrome)
+*** zwarag (~zwarag@80-110-97-183.cgn.dynamic.surfer.at) has quit: Ping
+    timeout: 265 seconds
+<siraben> Imperative solutions often need some sort of hashmap or set to keep
+          track of occurrences of characters.
+<jackdk> I kinda wish the default Monoid instance for map was instance
+         (Semigroup a, Ord k) => Monoid (Map k a)
+*** toppler (~user@mtop.default.momentoftop.uk0.bigv.io) has joined channel
+    #haskell                                                            [09:38]
+*** oisdk (~oisdk@217-183-12-239-dynamic.agg2.dyx.chf-qkr.eircom.net) has
+    quit: Quit: My MacBook has gone to sleep. ZZZzzz…                  [09:40]
+<jle`> jackdk: the struggle :'(
+<jle`> jackdk: i sometimes make a throwaway newtype wrapper just for it
+<jle`> there's a package on hackage that provides a newtype wrapper but it
+       pulls in lens as a dep for some reason
+<jle`> dmwit: thanks for making me feel less special                    [09:41]
+<jle`> i guess i'll save my day off for the 9 digit one
+*** zwarag (~zwarag@80-110-97-183.cgn.dynamic.surfer.at) has joined channel
+    #haskell                                                            [09:42]
+*** carldd (~carldd@90-224-49-113-no56.tbcn.telia.com) has joined channel
+    #haskell
+*** nbloomf (~nbloomf@2600:1700:83e0:1f40:e9ce:5eab:a029:e864) has quit: Quit:
+    My MacBook has gone to sleep. ZZZzzz…                              [09:43]
+<jle`> jackdk: it's especially annoying because the 'keep the first' instance
+       could be easily recovered by wrapping the values in FIrst
+*** lucasb (uid333435@gateway/web/irccloud.com/x-yrtcodhijjidtwgk) has quit:
+    Quit: Connection closed for inactivity
+<Nevoic9> Does anyone here know why this type of function wouldn't be possible
+          to construct in idris? `f : Vect n a -> (m : Nat) -> {auto p: m * 2
+          < n = True} -> (a,a)`
+<jackdk> jle`: monoidal-containers wants lens because it wants to provide
+         FooWithIndex instances for the newtypes, and they can't leave lens
+         for ed-flavoured performance reasons (there are a few closed issues
+         about this)                                                    [09:44]
+*** fizbin (~fizbin@c-98-221-75-24.hsd1.nj.comcast.net) has joined channel
+    #haskell
+*** toppler (~user@mtop.default.momentoftop.uk0.bigv.io) has quit: Ping
+    timeout: 250 seconds                                                [09:45]
+*** deviantfero (~deviantfe@179.51.60.200) has joined channel #haskell
+*** zwarag (~zwarag@80-110-97-183.cgn.dynamic.surfer.at) has quit: Ping
+    timeout: 240 seconds                                                [09:46]
+*** ccokee (~coke@73.red-83-40-207.dynamicip.rima-tde.net) has quit: Ping
+    timeout: 240 seconds                                                [09:47]
+*** cc0k33 (~coke@73.red-83-40-207.dynamicip.rima-tde.net) has quit: Ping
+    timeout: 240 seconds
+*** ccokee (~coke@193.red-83-40-206.dynamicip.rima-tde.net) has joined channel
+    #haskell
+*** cKdeskino (~coke@193.red-83-40-206.dynamicip.rima-tde.net) has joined
+    channel #haskell                                                    [09:48]
+*** ystael (~ystael@209.6.50.55) has joined channel #haskell
+<jackdk> jle`: found: https://github.com/ekmett/lens/issues/258         [09:49]
+*** fizbin (~fizbin@c-98-221-75-24.hsd1.nj.comcast.net) has quit: Ping
+    timeout: 265 seconds
+*** Synthetica (uid199651@gateway/web/irccloud.com/x-llgamuyvbimohlar) has
+    quit: Quit: Connection closed for inactivity
+*** toppler (~user@mtop.default.momentoftop.uk0.bigv.io) has joined channel
+    #haskell                                                            [09:50]
+*** zwarag (~zwarag@80-110-97-183.cgn.dynamic.surfer.at) has joined channel
+    #haskell                                                            [09:52]
+*** t7 (~tommo@2a00:23c5:1284:fc00:b55c:d720:767c:e798) has quit: Quit:
+    Konversation terminated!
+<dmwit> jle`: =(                                                        [09:53]
+*** lprd (~jon@lfbn-1-2729-136.w86-247.abo.wanadoo.fr) has joined channel
+    #haskell
+<dmwit> jle`: I can make you feel even less special if you want...
+*** chrisdotcode (~chrisdotc@unaffiliated/chrisdotcode) has joined channel
+    #haskell                                                            [09:54]
+*** raski (be7326b5@190.115.38.181) has joined channel #haskell
+*** dycan (~dycan@101-136-249-182.mobile.dynamic.aptg.com.tw) has quit: Remote
+    host closed the connection                                          [09:55]
+*** toppler (~user@mtop.default.momentoftop.uk0.bigv.io) has quit: Ping
+    timeout: 240 seconds                                                [09:56]
+*** zwarag (~zwarag@80-110-97-183.cgn.dynamic.surfer.at) has quit: Ping
+    timeout: 240 seconds
+*** nineonine (~nineonine@216-19-190-182.dyn.novuscom.net) has joined channel
+    #haskell                                                            [09:59]
+*** nbloomf (~nbloomf@2600:1700:83e0:1f40:1143:411f:ade0:813c) has joined
+    channel #haskell
+<jusss> dmwit: getLine is not a function, it's a IO action, right?
+<dmwit> siraben: `import qualified Data.MultiSet as MS; null . drop 1 . filter
+        ((>1).snd) . MS.toOccurList . MS.fromList`
+<jusss> % :t getLine
+<yahb> jusss: IO String
+<dmwit> jusss: Right.
+<dmwit> siraben: Sorry, should be `odd.snd`, not `(>1).snd`.            [10:00]
+<jusss> dmwit: can I think action are some operations which may have
+        side-effect?
+*** st8less (~st8less@inet-167-224-197-181.isp.ozarksgo.net) has joined
+    channel #haskell
+<dmwit> Sure.
+* ski . o O ( s/side-effects/effects/ )                                 [10:01]
+<jusss> ski: functions have effects too
+<ski> you might think of an action as "list of instructions", or a "recipe"
+<ski> jusss : not in this sense
+*** toppler (~user@mtop.default.momentoftop.uk0.bigv.io) has joined channel
+    #haskell                                                            [10:02]
+*** rople (~rople@193-114-148-110.tpgi.com.au) has joined channel #haskell
+<jusss> ski: wait a sec, what are monad actions? it means that may have side
+        effects?
+<jusss> or monadic actions?
+<ski> remove "side"                                                     [10:03]
+<jusss> those terms I saw them a lot, when I learned Monad, but I never
+        understood them
+<ski> they're not happening on the side. it's an explicit part of the value
+      (the monadic action)
+*** nineonine (~nineonine@216-19-190-182.dyn.novuscom.net) has quit: Ping
+    timeout: 240 seconds
+<jusss> ski: why ? you don't think funtions have effects? or what you call
+        them?
+<ski> it's not `openFile :: FilePath -> IOMode -> Handle', it's `openFile ::
+      FilePath -> IOMode -> IO Handle'
+*** lprd (~jon@lfbn-1-2729-136.w86-247.abo.wanadoo.fr) has quit: Ping timeout:
+    265 seconds                                                         [10:04]
+*** Saukk (~Saukk@2001:998:fe:2716:f8e9:21fa:72ec:8e8f) has joined channel
+    #haskell
+<ski> the `IO' is an explicit part of the result. the I/O is not happening "on
+      the side"
+<ski> @type lookup
+<lambdabot> Eq a => a -> [(a, b)] -> Maybe b
+<jusss> ski: sorry, I don't get the term of "on the side", it's a metaphor ?
+        or just literally?
+<ski> same thing there, the `Maybe'-effects aren't happening on the side (no
+      exceptions (possibly) implicitly being thrown). failure (`Nothing') is
+      an explicit result                                                [10:05]
+<jusss> ski: and what's happening on the side?                          [10:07]
+*** toppler (~user@mtop.default.momentoftop.uk0.bigv.io) has quit: Ping
+    timeout: 268 seconds
+<ski> when calling `FILE *fopen(const char *path, const char *mode);' in C,
+      like `fopen("/path/to/file","r")', that is an expression of type `FILE
+      *'. the I/O that is happening as a result of the call is not explicitly
+      declared in the result type
+<ski> in Haskell, nothing is happening on the side. no side-effects in Haskell
+                                                                        [10:08]
+*** jedws (~jedws@60.227.169.194) has quit: Quit: My MacBook has gone to
+    sleep. ZZZzzz…
+<jusss> ski: waht?
+*** teardown (~user@unaffiliated/mrush) has quit: Read error: Connection reset
+    by peer
+<jusss> ski: "no side-effects in Haskell" ? then how print somthing, visit
+        files?
+<ski> those are effects, not side-effects, in Haskell                   [10:09]
+<ski> @type print
+<lambdabot> Show a => a -> IO ()
+*** teardown (~user@unaffiliated/mrush) has joined channel #haskell
+<dmwit> I don't think I've ever heard this distinction made before, but I like
+        it a lot.
+<ski> the I/O is part of the result, is explicitly declared in the result type
+<jusss> ski: then functions does have effects?
+<ski> no
+<jusss> ski: aha!                                                       [10:10]
+<ski> calling `print' doesn't cause any I/O to happen
+<ski> *executing* the resulting I/O-action, causes the I/O to happen
+*** zwarag (~zwarag@80-110-97-183.cgn.dynamic.surfer.at) has joined channel
+    #haskell
+<ski> the only way to cause I/O to happen, is by making the `IO'-action part
+      of `main' (or by entering it into the interactor)
+*** chrisdotcode (~chrisdotc@unaffiliated/chrisdotcode) has quit: Quit:
+    chrisdotcode                                                        [10:11]
+*** nineonine (~nineonine@216-19-190-182.dyn.novuscom.net) has joined channel
+    #haskell
+<ski> just calling `print' will "compute what to do", but won't actually do it
+<ski> evaluating expressions (which includes calling functions) can't cause
+      I/O to happen. can't cause `IO'-actions to be executed            [10:12]
+<jusss> ski: then what will cause IO actions to be executed?
+<jusss> ski: put them to `main'?
+<ski> (however, to execute an `IO'-action, one must determine what
+      I/O-operations to perform. iow, one must first evaluate the action. in
+      practice, these two "phases", execution and evaluation of an
+      `IO'-action, are interleaved)
+<ski> yes                                                               [10:13]
+*** toppler (~user@mtop.default.momentoftop.uk0.bigv.io) has joined channel
+    #haskell
+*** jao (~jao@pdpc/supporter/professional/jao) has quit: Remote host closed
+    the connection
+<ski> also, note that it doesn't matter that "it all mutates memory locations,
+      and probably does memory-mapped I/O, or else some I/O machine
+      instructions"
+<ski> (or that it executes C code, when GHC used to compile via C)      [10:14]
+<ski> whether something has side-effects, or merely effects, is a matter of
+      perspective, of which language one's looking from
+<jusss> ski: if we put IO actions into functions, and put functions to `main',
+        this IO actions will be executed?                               [10:15]
+<jusss> % :t putStrLn
+<yahb> jusss: String -> IO ()
+<ski> it's about what reasoning laws one can apply, at the level of the
+      language. how it is implemented is irrelevant
+<jusss> like you see putStrLn is a function, which has an IO action as the
+        result
+<ski> if you write
+<ski>   main = putStrLn =<< getline                                     [10:16]
+*** fphilipe (~phil@2a02:168:f77e:0:b187:1bb4:35:1f8c) has joined channel
+    #haskell
+*** ystael (~ystael@209.6.50.55) has quit: Ping timeout: 265 seconds
+<ski> then this will (evaluate and) execute `getLine', and the resulting
+      monadic result (a `String', call it `s') will be passed to `putStrLn'
+      (calling `putStrLn', like `putStrLn s', call the resulting action `p'),
+      then that action `p' will be executed                             [10:17]
+*** chrisdotcode (~chrisdotc@unaffiliated/chrisdotcode) has joined channel
+    #haskell
+<ski> so, depending on the run-time result of executing `getLine', we'll
+      perform/execute *different* actions (returned by `putStrLn') next
+<jusss> ski: actions can be executed, and actions have effects, functions can
+        be evaluated, and functions don't have effects, that's right?   [10:18]
+<ski> dmwit : hm, i would have assumed you'd heard this story before, given
+      that you've been here some time (can't recall how long ..)
+<ski> functions are called
+<ski> expressions are evaluated                                         [10:19]
+<ski> an expression can be a function call/application
+<jusss> ski: wow,
+*** crestfallen (~crestfall@76.243.126.209) has joined channel #haskell
+<ski> yes "functions don't have effects"
+*** zwarag (~zwarag@80-110-97-183.cgn.dynamic.surfer.at) has quit: Ping
+    timeout: 240 seconds
+<ski> however, as a shorthand, we commonly say "invoke `openFile'", when we
+      mean "call `openFile', and execute the resulting action"          [10:20]
+<jusss> ski: then what's the different between functions and expressions, also
+        function calls and function applications?
+*** toppler (~user@mtop.default.momentoftop.uk0.bigv.io) has quit: Ping
+    timeout: 268 seconds
+<ski> (and, sometimes people say "call `openFile'" when they mean this)
+<crestfallen> https://termbin.com/e5rom hi I don't understand the textbook
+              passage in this paste. what does it mean by "intermediate
+              results?" thanks
+<ski> `2' is an expression. so is `x'
+<ski> neither of those are function calls                               [10:21]
+<ski> `let x = 2 in max x y' is not a function call
+<MarcelineVQ> Nevoic9: There's soo much going on with the == and multiplying
+              Nat for idris to cut through things, recomend you use a
+              predicate type to make things direct. f : Vect n a -> (m : Nat)
+              -> (p : m * 2 `LT` n) -> (a,a)
+*** fphilipe (~phil@2a02:168:f77e:0:b187:1bb4:35:1f8c) has quit: Ping timeout:
+    276 seconds
+<crestfallen> the output is identical
+<dmwit> ski: evaluate/execute I've seen many times. side-effect/effect I've
+        never seen.
+<ski> the output of what is identical to what ?
+<MarcelineVQ> Nevoic9: Now you can case on p to inform the shape of vect
+                                                                        [10:22]
+<ski> dmwit : i drew out the lines of this story, years ago
+<crestfallen> ski those two functions yield identical outputs with identical
+              arguments
+<ski> crestfallen : oh, okay                                            [10:23]
+<ski> crestfallen : hm. i suspect they mean `x' and `y'
+*** nineonine (~nineonine@216-19-190-182.dyn.novuscom.net) has quit: Ping
+    timeout: 265 seconds
+<jusss> ski: then expressions can be executed, expressions don't have effects,
+        expressions can be function calls,                              [10:24]
+<jusss> ski: what's function application?
+<crestfallen> ski I see, I wonder why author calls x and y intermediate
+              results, but there is some sense in it                    [10:25]
+<jusss> this term I saw it a lot, but I don't get it
+*** toppler (~user@mtop.default.momentoftop.uk0.bigv.io) has joined channel
+    #haskell
+<crestfallen> thanks
+<MarcelineVQ> Nevoic9: in other words it's possible to construct but there's a
+              bit of indirection due to Ord's definitions and the fact that m
+              * 2 < n = True doesn't directly say anything about the Nats
+              despite how it looks, it's more of a proof about Bool's, so
+              idris doesn't learn/infer much due to it. A predicate type like
+              LTE (using LT in this case) proves things about the Nats it
+              involves which makes this much more direct.
+<ski> jusss : expressions are syntactic things (things in the program
+      text). functions are really semantic things (things when the program is
+      running). however one can talk about expressions which will evaluate to
+      functions, and often also just call those "functions" as well
+*** thc202 (~thc202@unaffiliated/thc202) has quit: Ping timeout: 264 seconds
+                                                                        [10:26]
+<ski> jusss : `f x' is function application. `f' is a function expression (an
+      expression evaluating to a function), `x' is another expression whose
+      value will be passed to the function
+*** nbloomf (~nbloomf@2600:1700:83e0:1f40:1143:411f:ade0:813c) has quit: Quit:
+    My MacBook has gone to sleep. ZZZzzz…
+<ski> jusss : "function application" is more or less synonymous to "function
+      call". by the former, we typically mean the thing in the program
+      text. by the latter, we often also mean how it behaves, when the program
+      is running                                                        [10:27]
+<jusss> ski: but `f' and `f x' both are expressions?                    [10:28]
+<ski> crestfallen : you can think of "executing a list action" as "selecting
+      an element from the list", which is what `x <- xs' and `y <- ys' do
+<ski> jusss : yes
+<ski> crestfallen : you could also write `do x <- xs; y <- ys; return (x * y)'
+<ski> crestfallen : now, if `xs' and `ys' weren't lists, but `IO'-actions,
+      then you'd have no qualms about calling `x' and `y' intermediate
+      results, right ?                                                  [10:29]
+<ski> jusss : `max x (min y z)' is also a function application. applying `max
+      x' to `min y z'
+<ski> (`f x' is applying `f' to `x')                                    [10:30]
+<jusss> ski: function expressions and function calls are expressions,
+        expressions can be evaluated to functions, and functions don't have
+        effects, actions can be executed, actions have effects, this is right?
+                                                                        [10:31]
+<ski> "expressions can be evaluated to functions" -- in case they have
+      function types, yes                                               [10:32]
+*** toppler (~user@mtop.default.momentoftop.uk0.bigv.io) has quit: Ping
+    timeout: 268 seconds
+*** zwarag (~zwarag@80-110-97-183.cgn.dynamic.surfer.at) has joined channel
+    #haskell
+<ski> by "function expressions" i basically means "expressions of function
+      types"
+<ski> jusss : yes
+<ski> also, the only way to cause `IO'-actions to execute, is by making them
+      part of `main' (or entering them into the interactor)             [10:33]
+<ski> however, you can e.g. execute `Maybe'-actions, without needing to do
+      anything like that                                                [10:34]
+*** tabemann (~tabemann@2600:1700:7990:24e0:8917:1083:1335:ddbe) has joined
+    channel #haskell
+*** chrisdotcode (~chrisdotc@unaffiliated/chrisdotcode) has quit: Quit:
+    chrisdotcode                                                        [10:35]
+<jusss> ski: expressions like `2', function expressions like `f', function
+        applications like `f 2', they all are expressions, but only function
+        expressions and function applications can be evaluated to functions,
+        this is ok?
+*** lprd (~jon@lfbn-1-2729-136.w86-247.abo.wanadoo.fr) has joined channel
+    #haskell
+*** xff0x (~fox@softbank126019085221.bbtec.net) has quit: Read error:
+    Connection reset by peer
+<ski> you can write `let act = do k1 <- lookup k0 env0; v <- lookup k1 env1;
+      guard (pred v); return (frob v) in case act of Nothing -> ...; Just w ->
+      ..w..'
+*** heatsink (~heatsink@2600:1700:bef1:5e10:f43c:4de:2573:d076) has joined
+    channel #haskell
+*** hpc (~juzz@ip98-169-35-13.dc.dc.cox.net) has quit: Ping timeout: 276
+    seconds
+<ski> here, one could argue the `case act of ...' causes the execution of the
+      `Maybe'-action `act'                                              [10:36]
+<ski> jusss : "function applications can be evaluated to functions" sounds
+      confused. a function application does not evaluate to a function, unless
+      the function being applies is a function whose result will also be a
+      function (e.g. if the function is defined in "curried style")     [10:37]
+*** xff0x (~fox@softbank126114186203.bbtec.net) has joined channel #haskell
+*** toppler (~user@mtop.default.momentoftop.uk0.bigv.io) has joined channel
+    #haskell
+*** rople (~rople@193-114-148-110.tpgi.com.au) has quit: Ping timeout: 276
+    seconds
+<ski> the function application `not False' will not evaluate to a function
+      (however, in order to evaluate that application, we first need to
+      evaluate the function expression `not', getting back the function value)
+<crestfallen> ski thanks sorry reading back to your comments
+<ski> otoh, `delete "b"' is a function expression which will evaluate to a
+      function                                                          [10:38]
+<ski> @type delete
+<lambdabot> Eq a => a -> [a] -> [a]
+*** fizbin (~fizbin@c-98-221-75-24.hsd1.nj.comcast.net) has joined channel
+    #haskell
+<jusss> ski: about the monad Maybe action, I still have a little confused
+<jusss> ski: it's an action, so it has an effect                        [10:39]
+*** rople (rople@gateway/vpn/privateinternetaccess/rople) has joined channel
+    #haskell
+<ski> > let f = delete "b" in map f [["a","b"],["b","cde"],["c","de","f"]]
+<lambdabot>  [["a"],["cde"],["c","de","f"]]
+<crestfallen> ski copy that, thanks!
+<ski> jusss : yes. the effect in that case is "possible failure to compute a
+      monadic result"                                                   [10:40]
+<ski> jusss : very roughly (and vaguely) speaking, an "effect" is "any
+      deviation from computing a single result, nothing else"
+<ski> jusss : `Maybe' allows expressing "possibly no result at all"-effects
+                                                                        [10:41]
+<jusss> ski: which means all the monad actions have their own effects?
+<ski> jusss : `Either e' also allows expressing failure like this, except that
+      instead of just having a single ("anonymous") kind of failure, you have
+      failures labelled with values of type `e' ("exceptions")          [10:42]
+<ski> jusss : yes
+<jusss> ski: and `IO'?
+*** zwarag (~zwarag@80-110-97-183.cgn.dynamic.surfer.at) has quit: Ping
+    timeout: 276 seconds
+<ski> jusss : `[]' allows expresssing "possibly no result at all, and possibly
+      more than one result"-effects
+<ski> jusss : `return x' (equal to `pure x') always gives an action which
+      actually performs no effects at all. or, if you prefer, only performs
+      the "trivial effect", the "no-op effect"                          [10:43]
+*** fizbin (~fizbin@c-98-221-75-24.hsd1.nj.comcast.net) has quit: Ping
+    timeout: 250 seconds
+<jusss> ski: next time I meet a monad, I should ask what its effect is first
+*** toppler (~user@mtop.default.momentoftop.uk0.bigv.io) has quit: Ping
+    timeout: 240 seconds                                                [10:44]
+<jusss> % :t return
+<yahb> jusss: Monad m => a -> m a
+*** andi- (~andi-@NixOS/user/andi-) has quit: Remote host closed the
+    connection
+<jusss> ski: this m a is an action, right?
+<ski> jusss : `IO' is (primarily) for doing Input/Output interaction, with the
+      outside world (from the POV of the Haskell process). however, `IO' tends
+      to be used as a sin-bin, so it also allows expressing local mutable
+      state, and multiple threads of execution (whose synchronization is
+      indeterministic)                                                  [10:45]
+<ski> jusss : no, the *value* of type `m a' is an `m'-action. `m a' itself is
+      the *type* of that action
+<ski> (that may be what you meant. but you didn't say it)               [10:46]
+*** lprd (~jon@lfbn-1-2729-136.w86-247.abo.wanadoo.fr) has quit: Ping timeout:
+    265 seconds
+*** theDon (~td@muedsl-82-207-238-248.citykom.de) has quit: Ping timeout: 240
+    seconds
+<maerwald> ski: what do you mean with sin-bin?
+* ski thinks it can help to be an extra bit pedantic, about terminology, when
+  concepts are a bit unclear
+*** zwarag (~zwarag@80-110-97-183.cgn.dynamic.surfer.at) has joined channel
+    #haskell                                                            [10:47]
+<ski> maerwald : a potpourri of different effects, all mixed together in the
+      same monad
+<jusss> ski: m a is the type of m-action, right?
+<maerwald> ski: well, that is exactly what it is for                    [10:48]
+*** theDon (~td@94.134.91.94) has joined channel #haskell
+<maerwald> since there is no sensible way to separate that multitude of
+           effects
+*** toppler (~user@mtop.default.momentoftop.uk0.bigv.io) has joined channel
+    #haskell                                                            [10:49]
+<maerwald> most monad stacks have MonadIO somewhere inside, which blows up the
+           entire purpose
+<ski> well, depends                                                     [10:50]
+<ski> some parts might be like `frob :: Monad m => ... -> T m X'
+*** plutoniix (~q@175.176.222.7) has joined channel #haskell            [10:51]
+<ski> jusss : an `m'-action is a value of type `m a', for some type `a',
+      yes. where `m' is a monad, or an idiom (or maybe sometimes only a
+      functor, but i think it's more common to not say "action"
+      then. sometimes "collection" feels like an appropriate word. can also
+      often be used in the monad and idiom cases)                       [10:52]
+*** st8less (~st8less@inet-167-224-197-181.isp.ozarksgo.net) has quit: Ping
+    timeout: 268 seconds                                                [10:53]
+<maerwald> until we have a *proper* effects system, I believe IO is the right
+           choice for anything that has any intersection with real IO
+*** andi- (~andi-@NixOS/user/andi-) has joined channel #haskell
+<arahael> I thought we had one available? (But not in common use) - something
+          similar to what's done in PureScript?                         [10:54]
+*** lagothrix (~lagothrix@unaffiliated/lagothrix) has quit: Killed
+    (adams.freenode.net (Nickname regained by services))
+*** lagothrix (~lagothrix@unaffiliated/lagothrix) has joined channel #haskell
+<ski> i have used multi-level continuation stack, over `IO' (or `ST s', if
+      preferred)
+<heatsink> Disciple was an experimental haskell dialect with effects    [10:55]
+<ski> (the depth of the stack being determined at run-time)
+<arahael> Something like https://hackage.haskell.org/package/freer-effects
+<maerwald> arahael: yeah, freer is nice, but also very leaky
+<maerwald> but, we have 3+ implementations of it
+<maerwald> and none of them are really used
+<arahael> Leaky?  Blegh. :(
+<maerwald> leaky in terms of API/Types                                  [10:56]
+<maerwald> if you don't understand the implementation, you'll likely not
+           understand the error messages
+*** toppler (~user@mtop.default.momentoftop.uk0.bigv.io) has quit: Ping
+    timeout: 265 seconds
+<maerwald> mtl isn't that bad when it comes to errors                   [10:57]
+<maerwald> but then you can't even have two readers...
+<ski> dmwit : comment/opinion on the side- / effect story ?
+*** Saukk (~Saukk@2001:998:fe:2716:f8e9:21fa:72ec:8e8f) has quit: Remote host
+    closed the connection
+*** crestfallen (~crestfall@76.243.126.209) has quit: Quit: Leaving     [10:58]
+<jusss> ski: where is your story online?
+<ski> on logs of this channel
+<maerwald> In the end, I'm disappointed by all attempts. Either they are too
+           complicated, leak implementation details or are too weak. So I
+           embrace IO and write atomic functions.                       [10:59]
+* ski might have gone through it at least a dozen times
+<maerwald> ski: have you used freer/e-e in a project?
+<ski> i haven't
+<arahael> maerwald: Blegh. :(  I kind of like it with purescript, but I didn't
+          stick with them for long.  What about manually implementing free
+          monads? (Feels like too much work, though)
+<maerwald> I've only messed with it, but since the ecosystem coverage is
+           non-existent
+<maerwald> how to even try properly                                     [11:00]
+<ski> remind me, can it express composable continuation effects ?
+*** dfreedm (~dfreedm@89.238.178.75) has quit: 
+<maerwald> dunno
+* ski str many such attempts failing at that
+<ski> sometimes i'd want an ordered logic of monad class (like
+      `MonadReader',&c.) constraints. also named (so we could scrap the FDs
+      ..)                                                               [11:01]
+<MarcelineVQ> maerwald: any opinion on polysemy?
+<maerwald> arahael: I've always dreamed about effects outside of the type
+           system. Yes, I think effects are misplaced on type level (I don't
+           care how it's *implemented*, that may very well abuse the type
+           system)
+<ski> well, ordered as default. but where some constraints are known to
+      commute with each other
+*** toppler (~user@mtop.default.momentoftop.uk0.bigv.io) has joined channel
+    #haskell
+<maerwald> MarcelineVQ: haven't messed with it, is it worth it?         [11:02]
+<arahael> maerwald: Interesting notion - why don't you think it should be in
+          the type system?
+<MarcelineVQ> No clue but I've not really used effect systems so I'm askin ye
+              :>
+<maerwald> arahael: The same way as exceptions shouldn't
+<ski> maerwald : it would be interesting with an implementation based on
+      composable continuations, along the lines of Andrzej Filinski's monadic
+      reflection
+<maerwald> arahael: yet, there is static knowledge about them (e.g. in java)
+                                                                        [11:03]
+<arahael> maerwald: I'm still making my mind up with exceptions.  I actually
+          think they make perfect sense in Haskell - have them exposed by the
+          monad (eg, as IO exceptions are), or have them handled explicitly -
+          whatever is appropriate to the situation.
+<ski> maerwald : in Clean, uniqueness is expressed in types. in Mercury,
+      uniqueness is expressed in "insts" (instantiation states), and "modes"
+      (which includes insts). perhaps one could have a story along similar
+      lines, for effects                                                [11:04]
+*** zwarag (~zwarag@80-110-97-183.cgn.dynamic.surfer.at) has quit: Ping
+    timeout: 250 seconds
+*** nineonine (~nineonine@216-19-190-182.dyn.novuscom.net) has joined channel
+    #haskell
+*** andgate (49a9bd06@c-73-169-189-6.hsd1.wa.comcast.net) has joined channel
+    #haskell
+<ski> arahael : "handled explicitly" being ? like `Either e' ?          [11:05]
+<maerwald> arahael: effects shouldn't enclose values, both are separate, that
+           makes it also easier to refactor APIs without losing any guarantees
+<ski> (insts and modes are separate from (but connected to) types)
+<arahael> ski: Depends on what you think of as an exception.
+*** dycan (~dycan@101-136-249-182.mobile.dynamic.aptg.com.tw) has joined
+    channel #haskell                                                    [11:06]
+<arahael> maerwald: So, in a similar way to say, ReactiveX's separation of
+          values and errors?
+<maerwald> arahael: the reason why enclose values in effects is because Monads
+           make it so easy to express this relationship
+<maerwald> I don't think anyone stopped there for a second and thought "wait,
+           should we really do this?", because all alternatives need a new
+           language
+<ski> well, i think of `Either e' as expressing exceptions. also, i don't
+      believe in "exceptions are for exceptional situations" (what even does
+      "exceptional situations" mean ?) .. however, i was wondering what you
+      had in mind
+<maerwald> arahael: yeah, errors should never be values, in a way, you could
+           argue                                                        [11:07]
+<ski> (i have no qualms about using exceptions to express the "normal exit
+      path")
+*** deviantfero (~deviantfe@179.51.60.200) has quit: Ping timeout: 240 seconds
+<arahael> ski: I think where the "exception" is an ordinary state, eg, a lost
+          connection when dealing with an http layer, it can make sense to
+          have it sent out through as via an IO exception, but if you're using
+          it as a REST interface, maybe it makes more sense to have it sent
+          out via Either's.
+<maerwald> arahael: because it isn't really a value, it's an error, lol
+                                                                        [11:08]
+<maerwald> that it's represented by the compiler/runtime as a value or
+           whatever should be a hidden implementation detail
+*** toppler (~user@mtop.default.momentoftop.uk0.bigv.io) has quit: Ping
+    timeout: 268 seconds                                                [11:09]
+<ski> arahael : semi-related, i'd like to see more experimentation with
+      something like "restarts" in the condition systems of several Lisps
+<arahael> maerwald: Lets suppose we assume that exceptions always represent
+          actual errors (rather than "not on the happy path...")
+<arahael> ski: That reminds me of STM concepts.
+*** pera (~pera@unaffiliated/pera) has quit: Ping timeout: 265 seconds  [11:10]
+*** dale (~dale@unaffiliated/dale) has quit: Ping timeout: 276 seconds  [11:11]
+<ski> signalling a condition doesn't (necessarily) abort the context that
+      signals it. it (tail-)calls the handler. if the handler can fix the
+      situation, then the signalling context can be resumed
+<arahael> maerwald: Anyway, lets suppose we assume that, then it probably
+          makes sense to make exceptions easy to log and handle, and indeed,
+          as ski suggested, to possibly restart the operation if it makes
+          sense, or to defer it until the situation allows it to be sensibly
+          re-run.
+*** zwarag (~zwarag@80-110-97-183.cgn.dynamic.surfer.at) has joined channel
+    #haskell
+*** dTal (~quassel@dragonbox/users/dtal) has quit: Ping timeout: 265 seconds
+                                                                        [11:12]
+<ski> (also, in an interactive system, as a last resort, the handler can ask
+      the programmer what to do, as an oracle, and the programmer can inspect
+      the context, to determine what to do)
+<maerwald> arahael: absolutely. I think the line is very blurry for
+           programmers. I'm currently dealing with functions that 1. may
+           return (Right Nothing), because there's nothing in the database,
+           2. may return a (Left Text)
+<maerwald> 3. may throw via MonadError, which is used in the middleware to
+           return 500 status 4. may call error in some places where I'm
+           unlucky, 5. may throw a proper io error, because there's MonadIO
+           somewhere
+<arahael> ski: Yeah.  Eg, in the case of a REST call, perhaps the handler can
+          figure out the wifi connectivity or indicate when wifi has
+          re-connected.
+<maerwald> It's impossible to reasonably deal with this complexity
+<maerwald> because you can't even see half of what might go wrong
+<arahael> maerwald: Yeah, that's ugly. :(  In an OOP language, I'd be inclined
+          to re-throw that as a more orderly exception, but even re-throwing a
+          wrapped exception has big problems. :(                        [11:13]
+<maerwald> When you see "m (Either T.Text (Maybe Int))" you might think
+           everything is handled, right?
+<maerwald> But it's a lie
+*** MoarSpaceFi (~Forgot_my@65.155.84.20) has joined channel #haskell
+*** captjakk (~captjakk@174-16-212-40.hlrn.qwest.net) has joined channel
+    #haskell                                                            [11:14]
+*** nullifidian_ (~nullifidi@unaffiliated/nullifidian) is now known as
+    nullifidian
+*** toppler (~user@mtop.default.momentoftop.uk0.bigv.io) has joined channel
+    #haskell
+<ski>
+      <https://mumble.net/~campbell/proposals/restart.text>,<http://www.gnu.org/software/mit-scheme/documentation/mit-scheme-ref/Restarts.html>,<https://www.cs.cmu.edu/Groups/AI/html/cltl/clm/node344.html>,<http://www.gigamonkeys.com/book/beyond-exception-handling-conditions-and-restarts.html>,<https://lisper.in/restarts>,<http://www.nhplace.com/kent/Papers/Condition-Handling-2001.html>
+<maerwald> and all those failures (except the inner maybe) should not be types
+*** zmv (~zmv@unaffiliated/zmv) has quit: Remote host closed the connection
+*** lprd (~jon@lfbn-1-2729-136.w86-247.abo.wanadoo.fr) has joined channel
+    #haskell
+*** dale (~dale@unaffiliated/dale) has joined channel #haskell
+*** dale (~dale@unaffiliated/dale) has quit: Read error: Connection reset by
+    peer                                                                [11:15]
+<ski> (note that the "restart" i was mentioning doesn't necessarily have much
+      to do with the `retry' in `STM')
+<arahael> maerwald: I made that mistake when using Wreq.   It threw Http
+          exceptions, despite giving every indication that it would do
+          otherwise.                                                    [11:16]
+*** dale (~dale@unaffiliated/dale) has joined channel #haskell
+*** zwarag (~zwarag@80-110-97-183.cgn.dynamic.surfer.at) has quit: Ping
+    timeout: 268 seconds
+<arahael> maerwald: I'm not actually sure if exceptions should be a sum type -
+          or a type class.                                              [11:17]
+<maerwald> arahael: yeah and now imagine you do non-atomic operations on a
+           "database". You have to 1. force evaluation of every result and
+           function you call (pure or not), 2. catch io errors (without
+           catching async ones), 3. catch monaderror throws, so the handler
+           doesn't short-circuit, 4 ...
+<maerwald> because if anything short-circuits unexpectedly, good luck   [11:18]
+* masaeedu[m] sent a long message:  <
+  https://matrix.org/_matrix/media/r0/download/matrix.org/uIUnLrurKiEWTOGjVYKsxpmj
+  >
+<ski> (then there's also another issue re exceptions. that there ought to be
+      an efficient operation `catchBind :: Exception e => IO a -> (e -> IO b)
+      -> (a -> IO b) -> IO b'. see paper "exceptional syntax" by Nick Benton
+      and someone else)
+<masaeedu[m]> (the NB is there in the source, not mine)
+*** pera (~pera@unaffiliated/pera) has joined channel #haskell
+<arahael> maerwald: Yes, it's a mess. :(                                [11:19]
+<masaeedu[m]> `MonadZero` is basically `MonadPlus`, you can imagine it to be
+              `type MonadPlus f = (Monad f, Alternative f)`, plus some laws
+              ensuring their compatibility
+*** zwarag (~zwarag@80-110-97-183.cgn.dynamic.surfer.at) has joined channel
+    #haskell
+*** deviantfero (~deviantfe@179.51.60.200) has joined channel #haskell  [11:20]
+*** tromp (~tromp@2a02:a210:1585:3200:71a7:a53b:39d4:8c7e) has joined channel
+    #haskell
+*** cfraz89 (~cfraz89@128.106.212.127) has joined channel #haskell      [11:21]
+*** horatiohb (~horatiohb@167.99.146.163) has quit: Ping timeout: 246 seconds
+*** toppler (~user@mtop.default.momentoftop.uk0.bigv.io) has quit: Ping
+    timeout: 268 seconds
+<masaeedu[m]> edwardk: Being the resident expert on both profunctors and
+              optics, I was wondering if you'd have any insight. I've been
+              trying to get this PR in for a week                       [11:22]
+*** cybai (~cybai@2400:4050:3122:900:e034:69ce:ffa4:8c8c) has quit: Remote
+    host closed the connection                                          [11:23]
+*** cybai (~cybai@2400:4050:3122:900:e034:69ce:ffa4:8c8c) has joined channel
+    #haskell
+<maerwald> arahael: absolutely. This is the difference between an expressive
+           language and a declarative one ;P                            [11:24]
+<maerwald> declarative is really really hard
+*** tromp (~tromp@2a02:a210:1585:3200:71a7:a53b:39d4:8c7e) has quit: Ping
+    timeout: 246 seconds
+*** lprd (~jon@lfbn-1-2729-136.w86-247.abo.wanadoo.fr) has quit: Ping timeout:
+    240 seconds
+<masaeedu[m]> the high level idea is that for profunctorial computations that
+              have an instance of `Cochoice`, we can use a prism backwards to
+              "demote" a computation like `p (Either Int c) (Either String c)`
+              to `p Int String`, with the arrow itself absorbing a failure to
+              match. For `Star`, it therefore makes sense for the `Cochoice`
+              instance to utilize an `MonadPlus` constraint on the `f`
+*** UpstreamSalmon (uid12077@gateway/web/irccloud.com/x-rxjexgshvzhplxad) has
+    quit: Quit: Connection closed for inactivity                        [11:25]
+*** andgate (49a9bd06@c-73-169-189-6.hsd1.wa.comcast.net) has quit: Remote
+    host closed the connection
+*** notzmv (~zmv@unaffiliated/zmv) has joined channel #haskell
+<shachaf> MonadZero (or anything Monad) seems kind of suspicious to me here.
+*** zwarag (~zwarag@80-110-97-183.cgn.dynamic.surfer.at) has quit: Ping
+    timeout: 240 seconds
+*** jusss (~user@unaffiliated/jusss) has quit: Quit: ERC (IRC client for Emacs
+    26.1)                                                               [11:26]
+ERC> 

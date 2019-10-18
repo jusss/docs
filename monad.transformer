@@ -1,0 +1,1780 @@
+
+
+
+[周二 8月 13 2019]
+*** You have joined channel #haskell                                    [14:53]
+*** Topic for #haskell: https://www.haskell.org |
+    https://wiki.haskell.org/IRC_channel | Paste code/errors:
+    https://gist.github.com/ | Logs:
+    http://tunes.org/~nef/logs/haskell/?C=M;O=D |
+    https://www.reddit.com/r/haskell | Admin: #haskell-ops | Offtopic:
+    #haskell-offtopic | https://downloads.haskell.org
+*** #haskell: topic set by glguy, 2019-01-05 23:21:52
+*** Users on #haskell: jusss fizbin heatsink encod3 ralejs guest278776 Vinoth
+    sektor jgt Neo---- zacts linarcx slomo v01d4lph4 vlatkoB_ mountaingoat
+    Ariakenom vosechu bifunctorial acidjnk moei danvet alicemaz rruizt
+    lastmanstanding reactormonk olligobber Nta1e sudorobo[m] Sgeo__ conal
+    pfurla laem khisanth_ nullifidian_ otto_s fjellfras xff0x BoneTone
+    lagothrix plakband jameekim theDon pi___ liberiga s00pcan abhixec eiGHttt
+    d34df00d yaroot freeman42x YongJoon Jesin ktonga
+*** Users on #haskell: kleisli_ jedws_ pyan captjakk hodlwave ziyourenxiang
+    cabowitz forell m1dnight_ justanotheruser crtschin crobbins_ hiroaki
+    aarvar copypasteque pavonia poljar Lord_of_Life sw1nn jwynn6 xplat
+    MarcelineVQ gxt klntsky reggie_ cheshircat theNeuron saml_ gehmehgeh
+    alx741 gienah_ obfusk__ thunderrd cheers lambda dibblego dansho leothrix
+    zargoertzel Lowl3v3l Frobozz tsaka__ underikar xorander mimi_vx ephemera_
+    tumdedum rosalux RecursiveG pingiun tv rann glowcoil
+*** Users on #haskell: carlomagno pie__ kish gabiruh barrenba` megaTherion
+    sm[m] p0lyph3m catsup kuttifunk marek banjiewen saurik bwe ambrosia_
+    SegFaultAX intelux matheus mikeplus64 Forkk milli arsdragonfly Hotbees
+    ericsagnes X_Aftermath amiri revprez_anzio rsoeldner Enigmagic bspar
+    sghir_med[m] NightA lexi-lambda haroldwu Guest39039 nyuszika7h nahra bydo
+    cyjiao__ PoliticsII ajmcmiddlin xyggos mankyKitty verlet64 mujx[m4
+    potato44[m] d1mur4tdj[m] stepnem cepxuo imposs[m]
+*** Users on #haskell: eyenx[m] nshepperd mmynsted[m] dongcarl tejok[m]
+    sellout- nybble41[m] Lermex nlofaro cpup bradparker georgew yrid[m]
+    kumarbis[m] joenase[m] excel_gate[m] Nascha dxtr benwr_ akermu
+    DavidEichmann atbd andreas303 seliopou jdt rainmanjam Taneb tromp_
+    phreedom atk hifutakiko[m] nikivi scheming_around miklcct DTZUZU grumble
+    tnks mkoenig cyphase mpickering maralorn _ashbreeze_ net4all
+    shutdown_-h_now laniusfnv[m] Fairy meck darjeeling_ cods Digit cynick
+*** Users on #haskell: Nikotiini zaquest zmlww[m] markus1189 rajivr___ Klumben
+    yahb gilbertw1 quarters xorpse acro Bigcheese alanz Pete[m] Guy[m]1
+    Lite[m] foxadee[m] GhostofaConsole[ yi[m] adaizen[m] alibabzo kerru[m]
+    jesusvega[m] pqwy[m] hogarth[m] beatricejensen[m afontain[m] gmips[m]
+    charliebucket[m] kylos[m] dustyp[m] matrixyz[m] JoGoSi[m] glowpelt
+    alex[m]14 wrunt[m] jak[m] MerlinGttlinger[ pineapple[m] Grgoire[m]
+    MartinKlimi[m] WeiTang[m] GNULambda[m] alexfmpe[m] bkl[m]
+*** Users on #haskell: jeeg[m] MonsieurArcher[m dag[m] apurvapavaskar Majiir
+    ad5twoknebor[m] spacekitteh[m] atopuzov[m] mobile_x[m] josiah_sama
+    sergiotarxz[m] seventh__ buggeas40d[m] i7c haskelllisp[m] glguy michaelpj
+    angerman interruptinuse gluegadget TimWolla PyroLagus sarahzrf
+    fiddeldibu[m] beaky Adluc zabracks nuxdie a3f Randy jophish stux|RC
+    edwel[m] ryzokuken feepo unsymbol morgib dukedave nbouscal duncan Jabbslad
+    joel135 mingc elvishjerricco sebhoss sgraf simony AfC
+*** Users on #haskell: billstclair DrDuck ephemeron mjuad Remy^ fingerzam
+    rslima___ xnyhps heyj m4lvin datapup_ w1d3m0d3 drewbarbs moldybits mniip
+    steshaw[m] mycroftiv is_null dolio nckx jwaksbaum[m] srnty eof_ dmiles
+    CSP-SOFTWARE clog Fubar^ Vq opqdonut wildlander sqrt2 noexcept seanparsons
+    hegge APic rzmt sicklorkin Rudd0 aesi henriksod irclogger_com [Leary]
+    jchia devopsdeluxe lemmih SCHAPiE keep_learning cocreature Profpatsch
+    sterni _dga dminuoso bind lkurusa ahri
+*** Users on #haskell: vaibhavsagar xalek[m] vikraman tmallard[m] Tom[m]7
+    reconmaster[m] ovigren[m] mattia[m] jochens[m] krhubert[m] jumzi[m]
+    jwerner[m] jhgarner[m] Kenneth[m] vorbex[m] kgadek[m] wildtrees[m]
+    sudorebootsudor4 midi[m] sayukimans[m] sriehl[m] ldesgoui[m] luisjira[m]
+    nartir[m] josef[m] vkleen jibby[m]1 intellection3to3 patonw[m] neat72[m]
+    krowlan3[m] Vincent[m]2 Jonathan[m]2 corin[m]1 somni[m] rowan[m]
+    M|GNUisnotLinux[ lmolr[m] imp0s5ible contrun[m] jonreeve[m]
+*** Users on #haskell: ghastfilms[m] gandi[m] glothit7ok[m] PotatoRick[m]
+    eckt[m] deikatsuo[m] dxml[m] pothyurf[m] godva[m] pschooom[m] dice[m]1
+    arianvp[m] LasEspuelas asayers[m]1 adziahel[m] lapav[m] cbg[m]
+    abc123zzz[m] brandon123[m] cosson[m] corin[m] JoelMcCracken[m] fulgjon
+    Ericson2314 sujeet siraben sielicki jonge[m] stan[m] macerbi[m] maigel[m]
+    simbergm kadoban GregKNicholson[m iceychris[m] lierdakil[m] kaychaks[m]
+    fgaz ClownMaster[m] EuAndreh[m] hdurer[m] domenkozar[m]
+*** Users on #haskell: giuseppe[m] gmind[m] aloiscochard[m] humanwire[m]
+    M0ddba11[m] whoops dequbed jonatan __Myst__ revprez_stg spion Unhammer
+    Ewout teardown xelxebar haasn dennisb RusAlex Anthaas jb55 vk3wtf kori
+    glamas hive-mind Nik05 atraii tomboy64 abra0 winny polman jle`
+    ClaudiusMaximus nicoulaj dqd byorgey metalrain erikd albel727 dTal
+    Chousuke sis7 eyenx ManiacTwister perrier-jouet monochrom ruffy_ dmwit
+    dustinm- laxask Vtec234 sim590 dopplergange verement orion dazage
+*** Users on #haskell: uberj mnrmnaugh divVerent mceier thonkpod riatre jix
+    Twey jlpeters troydm raek higherorder jkachmar drewr cheater entel avn
+    jlamothe MonkeyNOS Firedancer raoulb kAworu kapilp raoul tdammers
+    enragedjam enemeth79 devurandom Saulzar vin-ivar hiptobecubic theorbtwo
+    treehaqr sms bolverkr zmlww nek0 nesqi xcthulhu xstill ftop devalot
+    mikolaj Ornedan maerwald tms_ Foritus abrar kraem dixie_ Robin_Jadoul
+    nitwit amx bbear thaumavorio phaazon Niamkik clynamen_ kav
+*** Users on #haskell: sphalerite Ranhir yitz rom1504 Tourist SquidDev
+    cartwright aplainzetakind duairc moocow_ AWizzArd micro betawaffle
+    andreabedini shadowdaemon srid sdx23 rizary_ Konehaltia jokester dpn`
+    rodlogic jonrh monad_cat hsiktas scav pent eruditass Shun131 coot alexknvl
+    sebastianrkg alunduil NemesisD v0d1ch Neuromancer Folkol bartavelle
+    Bergle_1 Clint bbear_ jfredett hackage DDR UserOO7 tomku daissgr pcoutin
+    niklasb_ ctag tazjin spamlessj vqrs jzl Jaxan_ casdr_
+*** Users on #haskell: carter tsahyt_ sethetter EduardoBautista gonz_ caasih
+    bjs alexelcu iravid spinda alextes jstolarek ixian rotty fionnan rembo10
+    juri_ Remavas joehillen nil defanor Putonlalla Geekingfrog obiwahn sukbeom
+    hvr Ferdirand Someguy123 Blkt strangeglyph nkaretnikov aramiscd coius__
+    Paks mulk NinjaTrappeur kungp ZoFLo J_Arcane jrslepak milessabin
+    Tuplanolla malthe hpc Natch adadelta mccoyc Ring0` Mon_Ouie yorick
+    Entroacceptor _ht jonge Mo0O noko_ Ckat bollu mjlee
+*** Users on #haskell: scinawa fliife artem bendo arw ziman remexre SrPx
+    liquorice cemerick AndreasK d0liver ebutleriv reyu [exa] Arahael bandali
+    fryguybo1 e2 michalisko pingu_ mjrosenb Jacoby6000 wadadli fantasti` Adeon
+    violeta lowryder edwtjo rubik urdh sea-gull dyl_ noCheese gspia dcoutts
+    gregberns paf31_ edmundnoble leah2 MatrixBot3 chirpsalot Chobbes Axman6
+    chin-tastic ap5 infinity0 dan64 systemfault natim87 dave_uy earthy wagle
+    phaul raatiniemi hjozwiak infinisil sdrodge
+*** Users on #haskell: teej flebron reorder_ Sose robogoat nurupo waskell
+    lassulus tinwood styledash trebuh boj datajerk Deadhand bengt_ alp kaol
+    bgamari Seich phlym beka lachenmayer otulp ByronJohnson Tene sandman13
+    andyo Cale monokrome nibbling_ saidinwot1 xtsee abuss bsima rj1 hiredman
+    mtjmullen jdevlieghere brisbin umachan wtw hc statusbot Hijiri vzdraz ion
+    pdxleif dilinger dashkal charukiewicz w1gz nivpgir_ theophil893 polux7
+    xacktm SolarAquarion mudri petermw droplet
+*** Users on #haskell: totte mupf recj tessier_ jrm xante aveltras
+    petercommand hongminhee int-e lambdabot habbah ft swalladge ycheng
+    tomjaguarpaw cp christopher telser jackdk Moyst jesyspa tolt nshepperd1
+    Madars_ cjh` Unode ekleog TMA Tristan-Speccy Jello_Raptor amuck tstat
+    implementation aristid VSpike arkeet aib dsal kip srhb zzz Drezil fiQ2
+    thebnq liff bjobjo stylewarning bitonic averell arianvp quaestor Ke spoonm
+    DustyDingo fredcy- Ulrar mxf TallerGhostWalt lispy a3Dman
+*** Users on #haskell: cjay- Kiruwa qzo topos stilgart lukelau twk- catern
+    no-n jackhill raid lpsmith vjoki pierrot bananagram `slikts myme
+    affinespaces mitchellsalad linduxed typedrat mstruebing nitrix dolanbatar
+    sbrg sud0 rootnode Cathy Netwolf thjread nshepperd2 pong azahi vimto
+    rotaerk kqr ysangkok chindy Ankhers pdgwien madnight dysfigured atomi
+    freeside jol TommyC andromeda-galaxy S007 dexterfoo zerokarmaleft PierreM
+    aldum heath lugh tigerchops jvanbure luite dstolfa
+*** Users on #haskell: swater Kamuela jsatk DigitalKiwi Liskni_si comboy
+    nekomune teehemkay Arguggi qz statusfailed oats Athas linoge Intensity
+    Dykam dmj` wildsebastian amatecha thi newhoggy_ nh2 integral edwardk
+    dumptruckman ibloom roflik tsani asm89 Franciman sm codedmart agrif
+    marble_visions yumh ski e bdw Philonous mikolaj_ winkill thallada _janne
+    daGrevis mrus h30 dxld vktec s4msung MindlessDrone zymurgy SlashLife
+    Patternmaster Logio cyberlard nyaomi epta tristanC
+*** Users on #haskell: fr33domlover Meanirelli ent CindyLinz srk GGMethos
+    canta digia __4matter_ jtcs silverneedle Squarism PlasmaStar tehidiot
+    stiell griddle cpape @Sigyn Firedancer_ tA- Igloo bcmiller
+    restrictedchoice bitemyapp noan tureba hsyl20 zenzike lemald evilmonads
+    AkhILman phadej absence greeny__ deu krystianbajno shapr __name__ gothos
+    klugez gargawel_ aidecoe uwap_ terrorjack__ dgpratt koankeeper Flonk
+    nisstyre mrsbear loc kini wayne Annihitek ynyounuo rkrishnan
+*** Users on #haskell: vodkaInferno bs lyxia zxrf graingert adius @ChanServ
+    ereu benl23 echoreply Heffalump chivay travv0 simon elcaro stefan-__ koz_
+    sigmundv- Maxdamantus johnstein n3t pacak kark Batholith esph wrengr_away
+    akr stvc aweinstock PragCypher bob_twinkles nemesit|znc steell_ Zemyla
+    lavalike cross JSharp drdo kipras`away zv ullbeking jbetz d6e dh freusque
+    apoc andjjj23 Jon rootmos Rembane c_wraith lstdgtfp joeyh m-renaud sclv
+    Nevoic Ekho dfordivam subfacto1 newhoggy
+*** Users on #haskell: kyagrd__ ocharles Guillaum immae nopf kubrat oleks
+    adamse mmaruseacph2 cbarrett lightandlight jetpack_joe pasukon nonzen
+    Sparadox energizer_ yushyin M2tias johs so suzu _guios exarkun orzo
+    apeyroux_ diginet bcoppens RoguePointer ab9rf AJTJ noctux feuerbach Phyx-
+    haveo greymalkin runawayfive MasseR dredozubov c-rog Tspoon__ michalrus
+    gsingh93 ecx86 Peter_Storm jmsx abbe flogfr hodapp mrd scal PHO connrs_
+    Jonno_FTW scivola Eliel locallycompact ammar2
+*** Users on #haskell: blackdog t36s gambpang hexagoxel deni connrs- PtxDK
+    lortabac Reisen exferenceBot lurkless [df] Aleksejs coldpress carbolymer
+    exio4 puffnfresh fiddlerwoaroof sivs _flow_ Deewiant lieven tchakka
+    kosmikus barrucadu rodgzilla koala_man eldritch geal luigy jorj Willis
+    EvanR crooked d3lxa adarshaj eagleflo Xandaros wz1000 fiatjaf pharaun
+    sssilver Kneiva avp _6a68 anderson djanatyn solarus jinblack markhuge
+    idupree DwarfMaster davean furnost adamCS joeytwiddle
+*** Users on #haskell: kloeri wraithm iron_houzi
+*** #haskell URL: http://www.haskell.org/
+*** #haskell modes: +CLnt
+*** #haskell was created on 2006-11-26 14:42:48
+<koz_> Hmm, Int and Word instances of Finitary are going to be an issue.
+                                                                        [14:54]
+*** Cthalupa (~cthulhu@47.186.0.195) has joined channel #haskell
+*** zacts (~zacts@dragora/developer/zacts) has quit: Quit: WeeChat 2.4  [14:55]
+*** heatsink (~heatsink@2600:1700:bef1:5e10:ad20:c840:9d76:b07f) has quit:
+    Ping timeout: 264 seconds                                           [14:56]
+<jle`> koz_: the only way that would make sense might be to have it compile
+       differently for different architectures, unfortunately maybe     [14:57]
+*** fizbin_ (~fizbin@73.112.80.245) has joined channel #haskell
+*** fizbin (~fizbin@73.112.80.75) has quit: Ping timeout: 258 seconds
+<koz_> jle`: Yeah, that's unfortunate. I might punt that one for later.
+                                                                        [14:58]
+<jle`> you could do that using some inline TH splices i think?
+<koz_> jle`: Also, I'm now getting a different kind of issue:
+       https://gist.github.com/kozross/64ec803c0bd2a8e5fe259e3f2081d182
+<jle`> koz_: b could be coercible to more than one other type
+<jle`> so if you coerce it to X, it might have a different 'n' than if you
+       coerce it to Y                                                   [14:59]
+*** Cthalupa (~cthulhu@47.186.0.195) has quit: Ping timeout: 258 seconds
+<koz_> Is this me assuming GHC knows more than it actually does again?
+<jle`> the error here is that it can't infer 'n' from 'b', which is what b ->
+       n means
+<jle`> sort of, but that's not quite how i'd put it
+<jle`> it'd put it as you assuming you know more than you actually do ;)
+<koz_> LOL
+<koz_> Well, I can't think of a case where this instance would fail.
+<jle`> not in terms of general knowledge, but in terms of the guarantees of b
+       -> n                                                             [15:00]
+*** c_wraith (~c_wraith@adjoint.us) has quit: Ping timeout: 264 seconds
+<jle`> okay say i have newtype Blah = Blah Word8
+<jle`> and newtype Floop = Floop Word8
+<jle`> i could define instance Finitary 100 Blah
+<jle`> and instance Finitary 1000 Floop
+<koz_> Oh, I see.
+<jle`> now both Blah and Floop are coercible with Word8                 [15:01]
+<jle`> which instance would this pick?
+<koz_> Hmm, I see.
+<jle`> (assuming we're deriving Word8's instance here)
+<koz_> What would you think would be a good way to 'drag' Finitary instances
+       through newtypes (which is what I really want)?
+<jle`> (so that might have been a bad example)
+*** ralejs (~ralejs@host86-143-245-92.range86-143.btcentralplus.com) has quit:
+    Read error: Connection reset by peer
+*** plutoniix (~q@175.176.222.7) has joined channel #haskell            [15:02]
+*** doublex (~doublex@2601:542:c480:6ee0:4832:7a46:d068:fb88) has joined
+    channel #haskell
+*** linarcx (~linarcx@151.241.55.125) has quit: Quit: WeeChat 2.5
+<jle`> i think the most pragmatic way would be to just define a separate
+       instance for each newtype
+*** linarcx (~linarcx@151.241.55.125) has joined channel #haskell
+<koz_> No, the example makes a valid point - I was assuming people wouldn't
+       inadvertently lie to GHC about the cardinality of their types.
+<jle`> knowing that the Generic construction will auto-derive the bodies of
+       those instances
+*** ralejs (~ralejs@host86-143-245-92.range86-143.btcentralplus.com) has
+    joined channel #haskell
+<koz_> Ah, I guess if we lean on Generic it should be OK.
+<jle`> because also what you have is pretty scary too, it's an `instance
+       Fintary n b`                                                     [15:03]
+<jle`> remember that instance resolution matches on the instance heads, and
+       doesn't really do reliable backtracking normally
+<jle`> so that instance would match on...literally every type
+*** c_wraith (~c_wraith@adjoint.us) has joined channel #haskell
+<jle`> it would make every single instance an overlapping instance
+*** petersen (~petersen@redhat/juhp) has joined channel #haskell
+<koz_> Oh yeah, that's _explosive_.
+<jusss> about Monad transformer, when and what situation I should use it?
+                                                                        [15:04]
+<koz_> jusss: Whenever you want to compose monads.
+<jle`> jusss: i think that depends on the specific trasnformer
+<Axman6> when you need the effects from two or more monads
+<koz_> Although to be fair, you may want to consider mtl rather than 'raw'
+       transformers in many cases.
+<jusss> what is mtl?                                                    [15:05]
+<jle`> but i use it when i want to enhance a monad with some extra sort of
+       effects, like using IO with some environment, or maybe some short
+       circuiting failure
+<Axman6> and want to be explicit about which manad you're using (with the
+         alternative being to use mtl style where you only list constraints
+         about what your monad can do)
+<jle`> mtl provides typeclasses for monads that have different sort of
+       effects, so you can write to all of them polymorphically
+*** fizbin_ (~fizbin@73.112.80.245) has quit: Ping timeout: 245 seconds
+<koz_> So instead of 'forcing' yourself into a specific monad stack, you
+       specify what effects you want, and any stack that can service those
+       effects would do.                                                [15:06]
+<jle`> so monad transformers in specific i use when i want to 'enhance' the
+       effects that a monad has, so to speak
+<Axman6> IT's the difference between foo :: ReaderT Config IO a and foo ::
+         (MonadReader Config m, MonadIO m) => m a
+<jle`> whereas mtl is useful for a program architecture perspective, thinking
+       about how you want to structure the architecture of your application
+                                                                        [15:07]
+<jle`> from a high level view
+<jle`> transformers and mtl sort of solve different problems, i wouldn't mix
+       the two
+*** ___laika (~laika@99-0-83-18.lightspeed.sntcca.sbcglobal.net) has joined
+    channel #haskell
+*** Cthalupa (~cthulhu@47.186.0.195) has joined channel #haskell
+<jusss> what about the simple EitherT, what it's used to ?              [15:08]
+<Axman6> adding exception like behaviour to other monads
+<jle`> one way i usually think of monad transformers is as just newtype
+       wrappers to provide 'alternative' instances for values
+<koz_> I gotta say, Data.Finite gives me a _lot_ of tools for writing Finitary
+       instances.
+<jle`> for example, we have Product and Sum                             [15:09]
+<koz_> For example, the Maybe a (for Finitary n a) instance is like,
+       super-nice.
+<jle`> which lets us pick how Monoid behaves for numbers
+<jle`> > foldMap Product [1..10]
+*** Neo--- (~neo@2a00:ee2:2201:fc00:499a:34f8:edb2:875c) has joined channel
+    #haskell
+<lambdabot>  Product {getProduct = 3628800}
+<jle`> > foldMap Sum [1..10]
+<dminuoso> jle`: Mmm that seems workable.
+<lambdabot>  Sum {getSum = 55}
+*** chele (~chele@2a02:8106:1:f900:faca:b8ff:fe2f:8499) has joined channel
+    #haskell
+<koz_> fromFinite = fmap fromFinite . unshift; toFinite = maybe 0 (shift
+       . toFinite)
+<jle`> the newtype wrapper becomes a hack for selecting what <>, mempty are
+<jle`> so for MaybeT, for example, newtype MaybeT m a = MaybeT (m (Maybe a))
+                                                                        [15:10]
+<jle`> so it provides a lot of new instances for 'm'...for example, it
+       provides an alternative Monad instance, where >>= does something
+       different than it would normally do for 'm'
+<jle`> in particular, >>= is now "aware" of Nothing/Just, so it can choose to
+       short-circuit in case of a Nothing
+*** doublex (~doublex@2601:542:c480:6ee0:4832:7a46:d068:fb88) has quit: Ping
+    timeout: 250 seconds                                                [15:11]
+*** Neo---- (~neo@2a00:ee2:2201:fc00:499a:34f8:edb2:875c) has quit: Ping
+    timeout: 252 seconds
+<jle`> so one way you can look at using MaybeT is, ">>= for IO doesn't do what
+       I want.  it doesn't short circuit when I hit a Nothing.  but if i wrap
+       it in this newtype wrapper, >>= will do what i want it to do"
+<jle`> >>= for MaybeT IO, that is
+<dminuoso> jle`: Its just mildly annoying to have to put the element to
+           scrutenize into a singleton list, otoh list does give me necessary
+           effect.
+<jusss> do I need to implement an new >>= for MaybeT ?                  [15:12]
+*** asheshambasta (~user@217.111.215.151) has joined channel #haskell
+<jle`> jusss: not if you import the MaybeT from transformers :)
+<jle`> it defines it for you
+*** v01d4lph4 (~v01d4lph4@125.16.234.60) has quit: Remote host closed the
+    connection
+<jusss> and where I can import those transformers?
+<dminuoso> jusss: from mtl.
+<jle`> Control.Monad.Trans.Maybe                                        [15:13]
+<dminuoso> jusss: MaybeT is, at the end, just a newtype.
+<jle`> so for example i have `do action1; action2`.  and both of them are `IO
+       (Maybe Int)`
+<jle`> normally for IO, >> will do one, then the other
+<jle`> it won't care if action1 returns Just or Nothing
+<dminuoso> newtype MaybeT m a = MaybeT { runMaybeT :: m (Maybe a) } -- with
+           the implicit understanding that "m" usually has an instance Monad.
+<jusss> dminuoso: jle` can I think it's just a monadic type in another monadic
+        type?                                                           [15:14]
+<dminuoso> jusss: Not quite.
+<jle`> but we want a different >>; we want one that will stop as soon as it
+       sees a Nothing
+<jle`> so you can do MaybeT action1; MaybeT action2, and now this will not
+       perform action2 if action1 returns Nothing
+*** zacts (~zacts@dragora/developer/zacts) has joined channel #haskell
+<jle`> jusss: do you understand the Product/Sum example>
+<jle`> ?
+*** dansho (~dansho4@71-84-161-204.dhcp.astr.or.charter.com) has quit: Ping
+    timeout: 245 seconds                                                [15:15]
+<jle`> i wouldn't call "Sum" a "monoid inside another monoid"
+<jle`> it's just something that imbues a *different* sort of monoid behavior
+       on top of a data type
+<jusss> jle`: no, 
+<jle`> so if i apply MaybeT to IO, then `MaybeT IO` is just a slightly
+       different version of IO with a slightly different Monad instance
+<koz_> jle`: Yo dawg, we heard you like monoids? :P
+*** v01d4lph4 (~v01d4lph4@125.16.234.60) has joined channel #haskell
+<jle`> like a Monad -> Monad type-level function, in a way
+<dminuoso> jusss: The usual monad transformers take a base monad, a precursor
+           monad and then imbue the base monad with the effect of the
+           precursor monad, somehow.
+<jle`> jusss: are you familiar with monoids?                            [15:16]
+*** oo_miguel (~miguel@89-72-186-97.dynamic.chello.pl) has joined channel
+    #haskell
+<dminuoso> jle`: In case of "MaybeT IO" the base monad is IO, and it gets
+           imbued with the effect from Maybe, somehow.
+<jle`> > [1,2,3] <> [4,5,6]
+*** fizbin (~fizbin@73.112.80.59) has joined channel #haskell
+<lambdabot>  [1,2,3,4,5,6]
+<jusss> jle`: actually I have never understand why you people call Either can
+        catch the exceptions,
+<dminuoso> Oops, tab completion mistake.
+<dminuoso> jusss: You can catch an exception by pattern matching on some
+           "Either E T"
+<jle`> jusss:  have you tried writing the Monad instance for `Either e`?
+<jle`> it can be pretty illuminating                                    [15:17]
+<jusss> like python or java they do have try ... except statement for catching
+        exceptions
+<jle`> ah, "exceptions" here is something slightly different
+<lavalike> because when things don't go Right that's what you're Left with
+<jle`> what you are talking about in python or java is exceptions as a
+       language feature
+<koz_> lavalike: That's a nice mnemonic.
+<jle`> and a feature of the runtime
+*** merijn (~merijn@83-160-49-249.ip.xs4all.nl) has joined channel #haskell
+<dminuoso> jusss: By exception we mean the generalized notion of "here we set
+           an error state and shortcircuit any further computation until some
+           "catching" mechanism.
+<jle`> when people talk about Either, we're more talking about the abstract
+       "idea" of an error
+<jle`> and not an actual built-in language feature                      [15:18]
+<jle`> the idea of "something going wrong", as a first-class value
+<jle`> we're implementing a sort of error system "inside" the language, using
+       normal values
+<jle`> instead of relying on built-in features of the language/runtime
+<jle`> that's what haskell does a lot: in a lot of other languages, things
+       that are built in and magical in the language become just normal
+       functions and values you can define and write within haskell
+<jusss> ok, it seems to me like it can be Left a or Right b, because they both
+        have Either a b,                                                [15:19]
+*** MarcelineVQ (~anja@xplr-104-249-247-127.xplornet.com) has quit: Remote
+    host closed the connection
+<jle`> right. now, the behavior of >> is to stop as soon as it sees a Left
+<jle`> > Right 1 >> Right 2 >> Right 3
+<jusss> and it seems there's no type inheritance in haskell, but in kotlin or
+        java, it seems there're type inheritance
+<lambdabot>  Right 3
+<jle`> > Right 1 >> Right 2 >> Right 3 >> Left True >> Right 4
+<lambdabot>  Left True                                                  [15:20]
+<dminuoso> jusss: Right, we dont have the usual concept of inheritance at all.
+*** petersen (~petersen@redhat/juhp) has quit: Ping timeout: 246 seconds
+<jle`> so if there is any Left, >> will pattern match it and return the Left
+*** henriksod (~Thunderbi@90-230-88-164-no148.tbcn.telia.com) has quit: Quit:
+    henriksod
+*** fizbin (~fizbin@73.112.80.59) has quit: Ping timeout: 248 seconds
+<jle`> this is 'short-circuiting', like with Maybe. but you also return the
+       'reason' why it short circuits: the value inside the Left
+*** MarcelineVQ (~anja@xplr-104-249-247-127.xplornet.com) has joined channel
+    #haskell
+<jle`> note nothing is magical here.  >> is defined within haskell and is just
+       a normal haskell function
+<jusss> jle`: yeah, I saw those usage, and some js people turn it to a way to
+        instead of some if-else usage
+<jle`> all that's happening here is normal pattern matching
+<jle`> do you understand that usage?                                    [15:21]
+<jusss> jle`: kind of
+<jle`> so we don't really say "Either can catch the exceptions".  instead, we
+       say that Either can be used to model exception-handling in a
+       first-class value sort of way
+<jle`> we can use Either e and its monad instance to simulate some sort of
+       exception system
+*** cfricke (cfricke@gateway/vpn/mullvad/cfricke) has joined channel #haskell
+<jle`> but this doesn't mean "Either can catch runtime exceptions"
+*** Neo--- (~neo@2a00:ee2:2201:fc00:499a:34f8:edb2:875c) has quit: Remote host
+    closed the connection                                               [15:22]
+<jusss> fine, but that's really weird, 'cause exception in haskell doesn't
+        mean what it means in other languages
+<jle`> fwiw, Haskell actually *does* have a runtime exception system, within
+       IO and its runtime
+*** Neo---- (~neo@2a00:ee2:2201:fc00:499a:34f8:edb2:875c) has joined channel
+    #haskell
+<jle`> and haskell has actual runtime exceptions and a try/catch system like
+       python/java
+<jle`> that system is unrelated to Either
+<jusss> ok, I have read that part yet
+<jusss> havn't
+<jle`> that exception system is similar to what other languages have
+*** kraem (~kraem@85.24.253.45) has quit: Ping timeout: 245 seconds
+<jle`> and is not related to Either
+*** mccoyc (mccoyc@216.151.16.200) has quit: Ping timeout: 272 seconds  [15:23]
+<jle`> that's why i usually don't like to call Left/Either "exceptions"
+*** fphilipe_ (~phil@46-127-142-222.dynamic.hispeed.ch) has joined channel
+    #haskell
+<jle`> because it gets confused with the actual "exceptions" system that is
+       built into Haskell
+<jusss> yeah
+*** Cthalupa (~cthulhu@47.186.0.195) has quit: Ping timeout: 246 seconds
+                                                                        [15:24]
+<jusss> let me guess, Either T should be  newtype EitherT = EitherT a m b?
+* hackage list-witnesses 0.1.2.0 - Witnesses for working with type-level lists
+  https://hackage.haskell.org/package/list-witnesses-0.1.2.0 (jle)      [15:25]
+*** kraem (~kraem@62.63.192.110) has joined channel #haskell
+<jle`> that's not quite valid syntax, but also there isn't really any
+       straightforward way of turning a monad into a monad transformer
+<jle`> that's why i don't really like to think of monad transformers as
+       "combining monads"
+<jle`> i don't think of MaybeT IO as "combining IO and Maybe"
+*** Cthalupa (~cthulhu@47.186.0.195) has joined channel #haskell
+*** ilikeheaps (~sushi@176.120.120.135.telemedia.pl) has joined channel
+    #haskell
+<jusss> and what do you think of it?
+<jle`> MaybeT m is a way of enhancing an 'm' with short-circuiting >>=  [15:26]
+*** mccoyc (mccoyc@216.151.16.200) has joined channel #haskell
+<jle`> the emphasis is on what the 'm' already does, and what it adds to the
+       'm'
+<jle`> and this is a specific statement that isn't ambiguous
+*** lambda (~lambda-11@207.183.239.54) has quit: Quit: Bye
+<jle`> whereas "combining IO and Maybe" is sort of ambiguous and doesn't
+       really mean anything specific
+<jusss> MaybeT is a monad?                                              [15:27]
+*** liberiga (~liberiga@gateway/tor-sasl/liberiga) has quit: Ping timeout: 260
+    seconds
+<jle`> MaybeT is not a monad, but `MaybeT m` is a monad
+<jle`> it takes a monad (m) and returns a new monad (MaybeT m)
+<jusss> aha
+<jle`> just like 'negate' returns a number and returns a new number
+<jusss> wait a sec, but m in `MaybeT m` is already a monad              [15:29]
+*** comerijn (~merijn@145.100.116.8) has joined channel #haskell
+<jle`> right
+<jle`> just like 1 is already a number
+<jle`> 'negate 1' is also a number
+<jle`> (it's a different number)
+<koz_> :t compare                                                       [15:30]
+<jle`> m is a monad, and MaybeT m is a different monad
+<lambdabot> Ord a => a -> a -> Ordering
+<Ariakenom> > negate minBound == (minBound :: Int)
+<lambdabot>  True
+<MarcelineVQ> You've gone mad with power                                [15:31]
+<jusss> jle`: let's assume that m is Either a, so MaybeT Either a is a monad?
+<jle`> MaybeT (Either a) is a monad, yes
+<jackdk> is there a common name for the function with type forall a . a -> (a,
+         a) ?
+<jusss> I forget that kind stuff about monad, 
+<jle`> jackdk: dup?                                                     [15:32]
+<MarcelineVQ> dup
+<jle`> goose
+<lavalike> :t join (,)
+<lambdabot> b -> (b, b)
+<Axman6> MAybeT (Either e) a is a monad
+<Axman6> MaybeT*
+<jusss> and MaybeT (Either a) need a type b so it can be a type?
+<lavalike> :t join (&&&) id
+<lambdabot> a -> (a, a)
+<jle`> well, it's already a type. but you can only have values of type `MaybeT
+       (Either e) a`, for instance
+<Axman6> (uh, well technically MAybeT (Either e) is a monad)            [15:33]
+<jle`> `MaybeT (Either a)` is a monad, so it's kind * -> *
+<comerijn> jusss: It's already a type, it just not a type with kind * (all
+           values have types with kind *)
+<jle`> so it follows all of the kind rules of any other monad
+<jle`> ie, you can't have values of type Maybe, but you can have values of
+       type Maybe Int
+<jusss> wait a sec, what stuff about monad should follow about kind?
+<jusss> *->*?
+<jle`> you can't have values of type MaybeT (Either String), but you can have
+       values of type MaybeT (Either String) Int
+*** merijn (~merijn@83-160-49-249.ip.xs4all.nl) is now known as Guest9893
+*** comerijn (~merijn@145.100.116.8) is now known as merijn
+<jle`> well, all monads are kind * -> *
+<jusss> and Maybe a is ?                                                [15:34]
+<jle`> Maybe, IO, Either e, (->) r, (,) w, etc.
+<jle`> `Maybe a` is kind *
+*** oo_miguel (~miguel@89-72-186-97.dynamic.chello.pl) has quit: Quit: WeeChat
+    1.6
+<merijn> jusss: "Maybe :: * -> *", "Int :: *", so "Maybe Int :: *"
+<jle`> values of type `Maybe a` we often call 'monadic values'
+<jusss> Maybe is ?
+<jle`> Maybe, IO, Either e, (->) r, (,) w, etc. are all * -> *
+*** jchia (~jchia@58.32.33.75) has quit: Quit: Leaving.
+<jle`> :k Maybe
+<lambdabot> * -> *
+<merijn> jle`: Man, you wrote a blogpost against that terminology and now
+         you're using it!
+<jle`> :k MaybeT (Either String)
+<lambdabot> error:
+<lambdabot>     Not in scope: type constructor or class ‘MaybeT’
+<lambdabot>     Perhaps you meant ‘Maybe’ (imported from Data.Maybe)
+*** agander (agander@gateway/vpn/protonvpn/agander) has joined channel
+    #haskell                                                            [15:35]
+<jle`> merijn: i have become the very thing i swore to destroy D:
+*** Neo--- (~neo@2a00:ee2:2201:fc00:499a:34f8:edb2:875c) has joined channel
+    #haskell
+<jusss> so we give a 'a' to Maybe and we get Maybe a, right/
+<jle`> yup
+*** Neo---- (~neo@2a00:ee2:2201:fc00:499a:34f8:edb2:875c) has quit: Remote
+    host closed the connection
+<jle`> merijn: although i don't really know a better name for such values. i
+       like to call them motes
+<jle`> @let import Control.Monad.Trans.Maybe                            [15:36]
+<jusss> and we give a 'b' to MaybeT (Either a) , we get MaybeT (Either a) b,
+        which is also a type, but MaybeT (Either a) is already a type ?
+<lambdabot>  Defined.
+*** pavonia (~user@unaffiliated/siracusa) has quit: Quit: Bye!
+<jle`> :k MaybeT (Either String)
+<lambdabot> * -> *
+<jle`> jusss: MaybeT (Either String) is * -> *
+<jackdk> thanks team. I like the name dup, and it's also dupe in the extra
+         package.
+<MarcelineVQ> jle`: hoho c'mon now that's quite a deep joke, it's so deep​ I'll
+              have to google it myself to explain it
+<jusss> jle`: I have a little confused, is it a type?
+<jusss> MaybeT (Either String) is a type?                               [15:37]
+*** xff0x (~fox@210.57.57.162) has quit: Ping timeout: 258 seconds
+<jle`> some people (including me) call it a type, but it's not a type that can
+       have values
+*** Cthalupa (~cthulhu@47.186.0.195) has quit: Ping timeout: 268 seconds
+<jle`> it's not a *-kinded type
+<jle`> it's not a "fully saturated" type
+<jle`> but, it is a Monad
+*** encod3 (~encod3@89.20.162.146.static.ef-service.nl) has quit: Remote host
+    closed the connection
+<Ariakenom> type is not Type and also not TYPE
+*** henriksod (~Thunderbi@90-230-88-164-no148.tbcn.telia.com) has joined
+    channel #haskell
+*** encod3 (~encod3@89.20.162.146.static.ef-service.nl) has joined channel
+    #haskell                                                            [15:38]
+*** encod3 (~encod3@89.20.162.146.static.ef-service.nl) has quit: Remote host
+    closed the connection
+<koz_> Or tYPe (but that's just trolling).
+*** wroathe (~wroathe@c-68-54-25-135.hsd1.mn.comcast.net) has joined channel
+    #haskell
+<jusss> jle`: then we may shouldn't call it a type...
+<dminuoso> jusss: It is a type.                                         [15:39]
+*** Neo---- (~neo@2a00:ee2:2201:fc00:499a:34f8:edb2:875c) has joined channel
+    #haskell
+<dminuoso> jusss: A type is something that exists on the type level.
+<jusss> dminuoso: then which value can have that type?
+<jusss> values have types
+<dminuoso> jusss: The kind system basically tells you.
+<jle`> jusss: values have types, but not all types can have values
+<dminuoso> jusss: Only types of kind * can be inhabitated.
+<jackdk> yes, but not every type classifies values                      [15:40]
+*** agander (agander@gateway/vpn/protonvpn/agander) has quit: Ping timeout:
+    245 seconds
+<jle`> it's kind of like, squares are rectangles, but not all rectangles are
+       squares
+*** encod3 (~encod3@144.178.76.42.static.ef-service.nl) has joined channel
+    #haskell
+<dminuoso> jusss: Just like the type system classifies values, the kind system
+           classifies types. So by looking at the kind of a type, you can tell
+           whether a type is even inhabitatable.
+<dminuoso> It wont tell you whether it is actually inhabitated for other
+           reasons, but that's a far less interesting topic.
+*** ___laika (~laika@99-0-83-18.lightspeed.sntcca.sbcglobal.net) has quit:
+    Ping timeout: 248 seconds
+<jle`> "squares are rectangles. but this rectangle is not a square. maybe we
+       shouldn't call it a rectangle."                                  [15:41]
+*** Cthalupa (~cthulhu@47.186.0.195) has joined channel #haskell        [15:42]
+*** encod3 (~encod3@144.178.76.42.static.ef-service.nl) has quit: Remote host
+    closed the connection
+*** Neo--- (~neo@2a00:ee2:2201:fc00:499a:34f8:edb2:875c) has quit: Ping
+    timeout: 252 seconds
+*** linarcx (~linarcx@151.241.55.125) has quit: Quit: WeeChat 2.5
+*** encod3_ (~encod3@144.178.76.42.static.ef-service.nl) has joined channel
+    #haskell
+<jle`> some confusion comes from baggage coming from other languages, though.
+       in other languages, the only context in which you hear about types is
+       by how they classify values
+*** ilikeheaps (~sushi@176.120.120.135.telemedia.pl) has quit: Quit:
+    Konversation terminated!
+<jle`> so you start to believe that the only use of types is for classifying
+       values
+<DigitalKiwi> what do you call a rectangle if not a rectangle?
+<jle`> DigitalKiwi: that's my point :)                                  [15:43]
+<mycroftiv> in an pure math sense could there always be an instance of a type
+            for any type? but not every possible abstraction is necessarily
+            bindable to a specific named runtime data structure within
+            haskell?
+<dminuoso> mycroftiv: No.
+<jle`> you could associate a value to any type arbitrarily
+*** linarcx (~linarcx@151.241.55.125) has joined channel #haskell
+<jle`> but that doesn't mean that it'll show up when you do :t (that value) in
+       ghci
+<mycroftiv> dminuoso: what is an example of type with no possible example, in
+            the sense of just mathematical definitions, not code?       [15:44]
+*** wroathe (~wroathe@c-68-54-25-135.hsd1.mn.comcast.net) has quit: Ping
+    timeout: 245 seconds
+<jusss> that's null in jave
+<DigitalKiwi> jle`: you said don't call rectangles rectangles...what do you
+              call them then
+*** freeman42x (~freeman42@2a02:8084:e80:9580:29d2:591a:510e:411f) has quit:
+    Ping timeout: 252 seconds
+<dminuoso> mycroftiv: So if we define the usual infinite tower, and we just
+           define that any type with a kind other than ⌜*⌝ is not
+           inhabitatable...
+<DigitalKiwi> oh, wait, i misread
+<DigitalKiwi> nvrm                                                      [15:45]
+<jle`> mycroftiv: "just mathematical definitions" --- remember that the idea
+       of a type, term, value, etc. aren't universally defined
+<jle`> they only exist within the construct of a type system
+<dminuoso> And even an inhabitatable type can be uninhabitated, if the type
+           system allows for it.                                        [15:46]
+<jle`> and most type systems that support higher-kinded types will restrict
+       inhabitable types in that way
+<jle`> it's not like Integer where there is one canonical 'definition' and
+       behavior within mathematics (with some other fringe nonstandard
+       numerals to the side)
+<jle`> it's more like "identity element" where every monoid has a different
+       identity element, and it doesn't make sense to talk about an identity
+       element without referring to the monoid structure                [15:47]
+*** ralejs_ (~ralejs@host86-143-245-92.range86-143.btcentralplus.com) has
+    joined channel #haskell                                             [15:49]
+<dminuoso> jusss: A motivating example to see how things like (->) and Either
+           themselves are types, is understanding that on the value level not
+           only ⌜1⌝ and ⌜"foobar"⌝ are values, but functions like ⌜\x -> x +
+           10⌝ themselves are values too.                               [15:50]
+*** Guest9893 (~merijn@83-160-49-249.ip.xs4all.nl) has quit: Ping timeout: 245
+    seconds                                                             [15:51]
+<dminuoso> jusss: So on that basis you can also understand (->) and Either as
+           type functions, but that does not preclude them from being types.
+<mycroftiv> hmm, i guess i had thought from studying logic that any consistent
+            structure definable in um first order logic(?) has a model and
+            that would apply to any type definable within a finite axiom
+            schema, but i think im in way over my head talking about this
+<dminuoso> Similarly how "value functions" are functions too.
+<dminuoso> Err how "value functions" are values too. :)                 [15:52]
+*** Vinoth (~Vinoth@180.151.62.182) has quit: Ping timeout: 272 seconds
+*** laem (~laem@unaffiliated/laem) has quit: Ping timeout: 268 seconds
+*** Neo---- (~neo@2a00:ee2:2201:fc00:499a:34f8:edb2:875c) has quit: Remote
+    host closed the connection
+*** ralejs (~ralejs@host86-143-245-92.range86-143.btcentralplus.com) has quit:
+    Ping timeout: 244 seconds
+*** Neo---- (~neo@2a00:ee2:2201:fc00:499a:34f8:edb2:875c) has joined channel
+    #haskell                                                            [15:53]
+<dminuoso> Either is all three: a) a type, b) a type function (that is a
+           function acting on types), and c) a type constructor
+*** fizbin (~fizbin@73.112.80.131) has joined channel #haskell          [15:54]
+<dminuoso> Right is also all three: a) a value, b) a (value-level) function,
+           and c) a data constructor
+<jusss> dminuoso: Either is a type? Either a b is a type                [15:55]
+*** governor (~governor@41.190.31.44) has joined channel #haskell
+*** laem (~laem@unaffiliated/laem) has joined channel #haskell
+<jusss> and also Right b is a value, Right is a value?
+<dminuoso> Yes.
+<dminuoso> jusss: The key part is what jle` said:                       [15:56]
+<dminuoso> 09:42:43        jle` | some confusion comes from baggage coming
+           from other languages, though.  in other languages, the only context
+           in which you hear about types is by how they classify values
+<dminuoso> 09:42:54        jle` | so you start to believe that the only use of
+           types is for classifying values
+<jusss> they're type/value constructor, I can understand, because they need a
+        type or value to consturct an new one
+<dminuoso> jusss: Formally speaking, a type is just something that exists on
+           the type level.
+<dminuoso> jusss: Just like a value is something that exists on the value
+           level.
+<jusss> dminuoso: and 'bout that kind?                                  [15:57]
+<jusss> kind stuff
+<jle`> jusss: 'Right' is a value, right?
+<jle`> do you agree that 'Right' is worth calling a value, as an expression?
+<jusss> jle`: base your story, it is
+<jle`> it's something you can pass to 'id'
+<jle`> or any other higher-order function
+*** sybarite (~vivek@182.71.120.194) has joined channel #haskell
+<jle`> functions are all values in Haskell, because they aren't any different
+       from any other values                                            [15:58]
+<jle`> they obey the same rules that all values have to obey
+<jle`> and you can do with functions what you can do with any other sort of
+       value in haskell
+<dminuoso> jusss: Forget the notion that a "type is something that has
+           values", its a dangerous assumption that holds true for only the
+           simplest type systems. Lets just define the type system as a
+           separate detached universe in which objects are allowed to exist.
+*** fizbin (~fizbin@73.112.80.131) has quit: Ping timeout: 244 seconds  [15:59]
+<jusss> I can pass Right String to function id, but I don't think I can pass
+        Right to id
+<dminuoso> jusss: Elements inside that universe are called types.
+*** Neo--- (~neo@2a00:ee2:2201:fc00:499a:34f8:edb2:875c) has joined channel
+    #haskell
+<jle`> jusss: try :)
+<jle`> :t id Right
+<lambdabot> b -> Either a b
+<jle`> ta dah ~
+<jusss> jle`: no, that's currying
+<jle`> > let f = id Right in f 10
+<dminuoso> jusss: No its not.
+<lambdabot>  Right 10
+<dminuoso> jusss: Its proper function application.
+<jle`> jusss: what is being curried here?
+*** Neo---- (~neo@2a00:ee2:2201:fc00:499a:34f8:edb2:875c) has quit: Remote
+    host closed the connection
+*** qwertytest (~fig314@37.120.6.5) has joined channel #haskell
+<jle`> `id x = x`, and you evaluate that by substituting `id x` with `x`.
+       that's what's going on here: how do you evaluate `id Right`?     [16:00]
+<jusss> wait, I will try it
+<jle`> you look at the rule `id x = x`, so `id Right = Right`
+<jle`> > let f = const Left "hello" in f True
+<lambdabot>  Left True
+<jle`> > let f = const Left Just in f True
+<lambdabot>  Left True
+<jle`> here we pass both Left *and* Just to 'const'
+<jle`> and apply that result to True :)
+<jle`> to evaluate this we, look at the rules of function evaluation for
+       values                                                           [16:01]
+<jle`> `const x y = x`
+<jle`> so `const Left Just = Left`.
+<jusss> ok, f = id Right, it's fine
+<jle`> simple. that's because we don't treat Left any different...it's just
+       like any other value we could pass to 'const'
+*** Cthalupa (~cthulhu@47.186.0.195) has quit: Ping timeout: 258 seconds
+<jusss> Right is a value,
+<dminuoso> jusss: The specialty of Right is just that it's also a data
+           constructor. The relevance of that is merely that you can do
+           pattern matching with it.                                    [16:02]
+<jusss> so can we say monad is a type now?
+<jusss> Maybe is a type?
+<jle`> well, a monad like Maybe is a type
+<jusss> ok then, you guys blow up my mind, I remember some people told me that
+        Maybe is not a type, Maybe a is a type
+<dminuoso> jusss: monad itself is a typeclass now!                      [16:03]
+<merijn> jusss: There's a lot of people using very sloppy terminology,
+         unfortunately
+<jusss> dminuoso: I mean type, not typeclass stuff
+<jle`> honestly i don't think it's a universal consensus and you'll get
+       different people saying different things on whether or not type-level
+       terms can be called types                                        [16:04]
+<jle`> in the end the terminology is a tool to aid in understanding
+<jusss> dminuoso: merijn jle` does this type Maybe has a value?
+<dminuoso> jusss: Nope!
+<jle`> nope, Maybe has no values of that type
+<jusss> or monad can have value?
+<MarcelineVQ> Maybe being a type isn't too contentious. The more common
+              confusion is when someone says Either is a type constructor but
+              Either e isn't
+<jle`> or more importantly, "X is a type" doesn't mean that there are values
+       of type X
+<dminuoso> jusss: Now the interesting part is, you can use the kind system to
+           classify types according to whether they can have inhabitants at
+           all.
+<dminuoso> jusss: Some types can have values, others cant.              [16:05]
+<dminuoso> jusss: We use the kind system to, amongst other things, classify
+           types to say whether/when a type can have inhabitants at all.,
+<jusss> dminuoso: how to use this kind system
+<jle`> MarcelineVQ: i think it's the opposite.  'Either e' definitely is
+       unambigously not a type constructor, but the report is sort of not
+       straightforward on whether non-* kinds are types. it contradicts itself
+*** kritzefitz (~kritzefit@2003:5b:203b:100:6e0b:84ff:feb4:9eaf) has joined
+    channel #haskell
+*** kritzefitz (~kritzefit@2003:5b:203b:100:6e0b:84ff:feb4:9eaf) has quit:
+    Remote host closed the connection
+*** ralejs (~ralejs@2620:10d:c092:180::1:7299) has joined channel #haskell
+                                                                        [16:06]
+*** kritzefitz (~kritzefit@2003:5b:203b:100:6e0b:84ff:feb4:9eaf) has joined
+    channel #haskell
+<dminuoso> jusss: In Haskell its tied into the type system automatically, just
+           like the type system is tied into the value world.
+*** agander (agander@gateway/vpn/protonvpn/agander) has joined channel
+    #haskell
+*** guest278776 (~u@cpc103056-sgyl39-2-0-cust1952.18-2.cable.virginm.net) has
+    quit: Ping timeout: 245 seconds
+<dminuoso> jusss: Your question is like "how to use this type system"   [16:07]
+<dminuoso> jusss: You can use :k in ghci to ask a type for its kind
+<dminuoso> % :k Either
+<yahb> dminuoso: Either :: * -> * -> *
+<jle`> jusss: one basic way to utilize it is that only types of kind * can be
+       inhabited
+<dminuoso> So the kind of Either is "* -> * -> *"
+*** guest278776 (~u@cpc103056-sgyl39-2-0-cust1952.18-2.cable.virginm.net) has
+    joined channel #haskell
+<dminuoso> Since, like jle` just said, only types of kind * can be
+           inhabitated, Either cannot because it does not have kind *.
+*** ralejs_ (~ralejs@host86-143-245-92.range86-143.btcentralplus.com) has
+    quit: Ping timeout: 248 seconds                                     [16:08]
+<jle`> so you can answer your question: "does Maybe have any values of this
+       type", by looking at the kind of Maybe
+<jle`> :D
+<jusss> dminuoso: jle` sorry, is there another word can express this to
+        instead 'inhabited'?  English is not my mother togue
+<dminuoso> jusss: If a type is inhabitated, there exist values of that type.
+<jle`> "can have a type"
+<merijn> jusss: "type Foo is inhabited" = "there is at least one value with
+         type Foo"                                                      [16:09]
+<merijn> jusss: And reversed: "type Foo is uninhabited" = "there are no values
+         with type Foo"
+*** Neo---- (~neo@2a00:ee2:2201:fc00:499a:34f8:edb2:875c) has joined channel
+    #haskell
+<dminuoso> jusss: Note that we also use "inhabitatable" which has a slightly
+           different connotation.
+*** Neo--- (~neo@2a00:ee2:2201:fc00:499a:34f8:edb2:875c) has quit: Remote host
+    closed the connection
+<dminuoso> jusss: We say that types of kind * are inhabitatable, which means
+           that they *could* be inhabitated. (We dont know for sure, but the
+           kind system at least allows for it)                          [16:10]
+<dminuoso> So a type of kind * is, by the rules of the kind system, allowed to
+           have values - but its allowed to have none. Contrarily a type of
+           kind (* -> *) is not allowed to have any values.             [16:12]
+<jusss> so if a type's kind is *, it can have values, otherwise it can't?
+<dminuoso> jusss: Precisely.                                            [16:13]
+*** Cthalupa (~cthulhu@47.186.0.195) has joined channel #haskell
+*** Neo--- (~neo@2a00:ee2:2201:fc00:499a:34f8:edb2:875c) has joined channel
+    #haskell
+<merijn> dminuoso: We do know it's inhabited
+<merijn> dminuoso: Since bottom inhabits every type of kind * :)
+<dminuoso> merijn: If we want to employ pedantry, we could imagine an empty
+           type of kind TYPE UnliftedRep
+*** Neo---- (~neo@2a00:ee2:2201:fc00:499a:34f8:edb2:875c) has quit: Remote
+    host closed the connection
+<dminuoso> Couldn't we?
+*** xff0x (~fox@210.57.57.162) has joined channel #haskell              [16:14]
+<dminuoso> (Im not sure whether GHC in its current state actually allows for
+           that, but surely such a modification would be minor and morally
+           correct)
+<dminuoso> Besides, we should probably ignore bottom :)
+<jusss> wait a sec, [] is *->*
+<dminuoso> jusss: [] is just a bit weird because it has special cased syntax.
+                                                                        [16:15]
+<dminuoso> jusss: You could imagine ⌜[Int]⌝ as just ⌜List Int⌝
+<jusss> [Int] is *
+<tdammers> it sometimes help to think of [] (the type) as an alias for List,
+           and [a] as an alias for List a
+<jusss> but it seems ghci doesn't auto import the type List             [16:16]
+<dminuoso> jusss: For what its worth, you could also write: ([]) Int
+<jusss> :k List got error
+<lambdabot> error: Not in scope: type variable ‘got’
+<lambdabot> error: Not in scope: type variable ‘error’
+<merijn> dminuoso: UnliftedRep doesn't exist in Haskell
+<jusss> :k List
+<dminuoso> jusss: It doesnt actually exist.
+<lambdabot> error:
+<lambdabot>     • Pattern synonym ‘List’ used as a type
+<lambdabot>     • In the type ‘List’
+<dminuoso> jusss: Im just saying imagine that type constructor existed.
+<jusss> dminuoso: ...
+<dminuoso> jusss: My point is, [a] is just special because it has special
+           application syntax.                                          [16:17]
+*** jose_zap (~jose_zap@176.20.96.236) has joined channel #haskell
+<dminuoso> But you could also apply [] to another type via juxtaposition
+<merijn> > [1..5] :: [] Int -- doesn't even need parenthesis
+<dminuoso> % :k [] Int
+<lambdabot>  [1,2,3,4,5]
+<yahb> dminuoso: [] Int :: *
+<dminuoso> jusss: ^- see? You can write "[] Int" just fine. :p
+<dminuoso> jusss: It's just that [Int] means "[] Int" really
+*** Cthalupa (~cthulhu@47.186.0.195) has quit: Ping timeout: 244 seconds
+                                                                        [16:18]
+*** Neo---- (~neo@2a00:ee2:2201:fc00:499a:34f8:edb2:875c) has joined channel
+    #haskell
+<jusss> dminuoso: why not List, people prefer names I think,not symbols
+<dminuoso> jusss: Good question, it was a design decision.
+<dminuoso> jusss: It could have been List just as well, really. But [] won.
+*** Lord_of_Life (~Lord@unaffiliated/lord-of-life/x-0885362) has quit: Ping
+    timeout: 245 seconds
+*** Neo--- (~neo@2a00:ee2:2201:fc00:499a:34f8:edb2:875c) has quit: Remote host
+    closed the connection
+<dminuoso> jusss: Next up, the kind system tells you how application can work
+                                                                        [16:19]
+<dminuoso> jusss: For example
+<jusss> I never found >>= <*> that stuff, I like to call it bind and apply
+<dminuoso> % ;k []
+<yahb> dminuoso: ; <interactive>:341:2: error:; Parse error: module header,
+       import declaration; or top-level declaration expected.
+<dminuoso> % :k []
+<yahb> dminuoso: [] :: * -> *
+<dminuoso> jusss: Do you think [Maybe] is a valid type? Make an arugment for
+           your position.
+*** ktonga (~quassel@gen-119-17-171-125.ptr4.otw.net.au) has quit: Ping
+    timeout: 245 seconds
+<jusss> :t [Maybe]
+<lambdabot> error:
+<lambdabot>     • Data constructor not in scope: Maybe
+<lambdabot>     • Perhaps you meant one of these:
+<dminuoso> jusss: :t operates on value level constructs. So you give :t a
+           value-level expression, and it tells you its type.           [16:20]
+*** Lord_of_Life (~Lord@unaffiliated/lord-of-life/x-0885362) has joined
+    channel #haskell
+<dminuoso> jusss: similarly how :k takes a type-level expression, and it tells
+           you its kind.
+<Axman6> :t undefined :: [Maybe]
+<lambdabot> error:
+<lambdabot>     • Expecting one more argument to ‘Maybe’
+<lambdabot>       Expected a type, but ‘Maybe’ has kind ‘* -> *’
+*** ralejs (~ralejs@2620:10d:c092:180::1:7299) has quit: Read error:
+    Connection reset by peer
+*** keepLearning512 (~keepLearn@49.204.75.26) has joined channel #haskell
+<dminuoso> That kind error is somewhat misleading. :)
+*** ralejs (~ralejs@2620:10d:c092:180::1:7299) has joined channel #haskell
+                                                                        [16:21]
+<jusss> :t [Nothing]
+<lambdabot> [Maybe a]
+*** dramforever (~dramforev@unaffiliated/dramforever) has joined channel
+    #haskell                                                            [16:22]
+*** o1lo01ol1o (~o1lo01ol1@152.80.136.95.rev.vodafone.pt) has joined channel
+    #haskell                                                            [16:23]
+*** sQVe (~sQVe@unaffiliated/sqve) has joined channel #haskell          [16:24]
+<Ariakenom> dminuoso: lesson sabotaged by GHC itself :p                 [16:25]
+*** petersen (petersen@redhat/juhp) has joined channel #haskell         [16:26]
+*** Tesseraction (~Tesseract@unaffiliated/tesseraction) has joined channel
+    #haskell                                                            [16:27]
+<mycroftiv> is there a bit of haskell code that you can feed haskell code into
+            and it will convert f(g(x)) notation into . and/or $ notation?
+<cocreature> @pl \x -> f (g x)                                          [16:28]
+<lambdabot> f . g
+<cocreature> ^ mycroftiv 
+<cocreature> You can query lambdabot in private messages or download the tool
+             standalone
+<plakband> http://pointfree.io/
+*** o1lo01ol1o (~o1lo01ol1@152.80.136.95.rev.vodafone.pt) has quit: Remote
+    host closed the connection
+<Ariakenom> this talk of magichash reminded me of this
+<Ariakenom> % let x = normalFunction undefined in 3
+<yahb> Ariakenom: *** Exception: Prelude.undefined; CallStack (from
+       HasCallStack):; error, called at libraries/base/GHC/Err.hs:78:14 in
+       base:GHC.Err; undefined, called at <interactive>:351:24 in
+       interactive:Ghci127
+<mycroftiv> cool thanks!
+*** o1lo01ol1o (~o1lo01ol1@152.80.136.95.rev.vodafone.pt) has joined channel
+    #haskell
+*** Cthalupa (~cthulhu@47.186.0.195) has joined channel #haskell        [16:29]
+<koz_> @pl is amazing                                                   [16:30]
+<lambdabot> is amazing
+<koz_> You said it lambdabot.
+*** AugustusV (~AugustusV@unaffiliated/augustusv) has joined channel #haskell
+                                                                        [16:31]
+*** ggVGc (~ggVGc@unaffiliated/walt) has joined channel #haskell
+*** ggVGc (~ggVGc@unaffiliated/walt) has quit: Client Quit
+*** nullifidian__ (~nullifidi@unaffiliated/nullifidian) has joined channel
+    #haskell                                                            [16:36]
+*** o1lo01ol1o (~o1lo01ol1@152.80.136.95.rev.vodafone.pt) has quit: Remote
+    host closed the connection
+*** Cthalupa (~cthulhu@47.186.0.195) has quit: Ping timeout: 248 seconds
+*** ggVGc (~ggVGc@unaffiliated/walt) has joined channel #haskell        [16:37]
+*** sybarite (~vivek@182.71.120.194) has quit: Remote host closed the
+    connection                                                          [16:38]
+*** Neo---- (~neo@2a00:ee2:2201:fc00:499a:34f8:edb2:875c) has quit: Remote
+    host closed the connection
+*** Neo---- (~neo@2a00:ee2:2201:fc00:499a:34f8:edb2:875c) has joined channel
+    #haskell
+*** nullifidian_ (~nullifidi@unaffiliated/nullifidian) has quit: Ping timeout:
+    244 seconds                                                         [16:39]
+<mycroftiv> hmm lambdabot is giving me my code back from @pl unchanged: stk2d
+            (pushInputBind (Inputtoken 17, oneplus (tostack (pushInputBind
+            (Inputtoken 16, s2da (pushInputBind (Inputtoken 20, quote (Just
+            [Inputtoken 10], " "))))))))
+<mycroftiv> is it because of the use of tuples in the pipeline?
+<dminuoso> jusss: My point is, the kind system tells you that [] takes a type
+           of kind * and it returns a type of kind *
+*** asymptotically (~quassel@gateway/tor-sasl/asymptotically) has joined
+    channel #haskell                                                    [16:40]
+<dminuoso> jusss: So [] applied to Maybe will not kind check, since [] expects
+           a type of kind *, but Maybe :: * -> *
+*** fendor (~fendor@178.115.131.86.wireless.dyn.drei.com) has joined channel
+    #haskell
+*** henriksod (~Thunderbi@90-230-88-164-no148.tbcn.telia.com) has quit: Quit:
+    henriksod                                                           [16:42]
+<MarcelineVQ> mycroftiv: points are the bindings in an expression "\x y -> x +
+              y" \x y -> are the things @pl (pointless) removes
+<dminuoso> jusss: The kind system is to the type system as the type system is
+           to the value world. Just like the type system classifies values and
+           creates limitations about what you can and cant do in the value
+           world, the kind system classifies types and it creates limitations
+           about what you cant and can do in the type world.            [16:43]
+<dminuoso> jusss: And just like you can do computation in the value world,
+           computation in the type world is possible too.
+<mycroftiv> i see, so it doesnt generally convert continuous function
+            application to . notation, it gets rid of the named pattern
+            matched variables?
+*** thc202 (~thc202@unaffiliated/thc202) has joined channel #haskell    [16:44]
+<jle`> indeed :) but you can trick it into doing that by taking those values
+       as parameters in a function
+<fendor> @pl (\conn -> forM_ mails $ \mail -> sendMail mail conn)
+<lambdabot> forM_ mails . flip sendMail
+*** nschoe (nschoe@gateway/vpn/protonvpn/nschoe) has joined channel #haskell
+                                                                        [16:45]
+*** comerijn (~merijn@83-160-49-249.ip.xs4all.nl) has joined channel #haskell
+                                                                        [16:47]
+<mycroftiv> thanks, ill play around with the tool and renotating stuff.
+                                                                        [16:48]
+*** dmitri (~dima14@cm-27-145-185-129.revip12.asianet.co.th) has joined
+    channel #haskell                                                    [16:49]
+*** libertyprime (~libertypr@101.98.42.91) has joined channel #haskell  [16:50]
+<jusss> dminuoso: and what about Rank-N and higher logic stuff          [16:51]
+<jusss> higher-order logic                                              [16:52]
+<jusss> it's related to kind?
+<dminuoso> jusss: Nope
+<merijn> jusss: RankN isn't really
+<dminuoso> jusss: Its basically about extending where you can put universal
+           quantification in.
+*** jose_zap (~jose_zap@176.20.96.236) has quit: Quit: My MacBook has gone to
+    sleep. ZZZzzz…
+*** o1lo01ol1o (~o1lo01ol1@152.80.136.95.rev.vodafone.pt) has joined channel
+    #haskell                                                            [16:53]
+*** jakobhillerstrom (~jakobhill@188.151.20.98) has joined channel #haskell
+*** heatsink (~heatsink@2600:1700:bef1:5e10:9d33:571:e1a0:5805) has joined
+    channel #haskell
+<merijn> jusss: This is the simplest example of exactly what problem RankN
+         types solve: https://gist.github.com/merijn/77e3fa9757658e59b01d
+<jusss> the latest ghci version did something about the kind system?
+<jusss> or updated?
+*** jose_zap (~jose_zap@176.20.96.236) has joined channel #haskell      [16:54]
+<dminuoso> jusss: In very short terms, RankNTypes is, amongst other things,
+           what allows you to specify "my argument itself must be a
+           polymorphic function"
+<dminuoso> So with rank 1, you can only produce polymorphic things, but you
+           cant demand that your consumer must pass you a polymorphic thing.
+*** Ariakenom (~Ariakenom@h-208-40.A163.corp.bahnhof.se) has quit: Quit:
+    Leaving                                                             [16:55]
+*** Cthalupa (~cthulhu@47.186.0.195) has joined channel #haskell
+<jusss> ok, and higher-order logic?
+<dminuoso> Well that's a logic topic, isn't it? :)                      [16:56]
+<jusss> did we use that stuff in haskell? :)
+*** mint_ (~mint@94.185.83.194) has joined channel #haskell             [16:57]
+<jusss> type for value, kind for type, so what for kind?
+<jusss> kind for kind?
+<dminuoso> jusss: the next layer is called "sort" in haskell, but its blant
+           and boring.
+* hackage backprop 0.2.6.3 - Heterogeneous automatic differentation
+  https://hackage.haskell.org/package/backprop-0.2.6.3 (jle)            [16:58]
+<dminuoso> Its boring because there exists only a single sort called "BOX"
+*** heatsink (~heatsink@2600:1700:bef1:5e10:9d33:571:e1a0:5805) has quit: Ping
+    timeout: 264 seconds
+<dminuoso> So there's no useful classification anymore.
+<jusss> dminuoso: what type system haskell use?
+<dminuoso> jusss: Some other languages have infinite towers.
+*** libertyprime (~libertypr@101.98.42.91) has quit: Quit: leaving      [16:59]
+<jusss> about those type systems, there're differences among them?
+*** Ariakenom (~Ariakenom@h-208-40.A163.corp.bahnhof.se) has joined channel
+    #haskell
+*** vosechu (~vosechu@89.249.74.218) has quit:                          [17:00]
+*** YongJoon (~Thunderbi@121.67.187.140) has quit: Quit: YongJoon
+*** doublex (~doublex@2601:542:c480:6ee0:4832:7a46:d068:fb88) has joined
+    channel #haskell                                                    [17:01]
+<dminuoso> jusss: So in Agda for example you have ⌜Set : Set1⌝, ⌜Set1 : Set2⌝,
+           ⌜Set2 : Set3⌝ and so forth
+<dminuoso> Ad infinitum.
+*** ralejs (~ralejs@2620:10d:c092:180::1:7299) has quit: Ping timeout: 250
+    seconds
+*** petersen (petersen@redhat/juhp) has quit: Quit: petersen
+<dminuoso> jusss: In Haskell however we are making a move to change our type
+           and kind system to do something completely different
+*** zacts (~zacts@dragora/developer/zacts) has quit: Quit: WeeChat 2.4  [17:02]
+<dminuoso> Called TypeInType where we crush the tower of "types, kinds and the
+           rest" into just the "type world"
+<dminuoso> Such that: Type :: Type
+*** petersen (petersen@redhat/juhp) has joined channel #haskell
+<dminuoso> So values have types, and types have a types.
+<Ariakenom> 1 :: Int, Int :: Type, Type :: Type. (Type is same as *)    [17:03]
+<merijn> I don't think introducing TypeInType to beginners is really helpful
+         >.>                                                            [17:04]
+<merijn> Also, TypeInType is an abomination
+<merijn> I'll take stratified universes over it any day
+*** Cthalupa (~cthulhu@47.186.0.195) has quit: Ping timeout: 268 seconds
+*** andreas303 (~andreas@gateway/tor-sasl/andreas303) has quit: Remote host
+    closed the connection                                               [17:06]
+<dminuoso> jusss: Regarding your question "what kind of type system does
+           Haskell have" - I dont think it has a particular name other than
+           "the type system of Haskell/GHC". Some features are inherited, such
+           as inference coming from Hindley Milner.
+<jusss> wow, types have types?
+<dminuoso> jusss: Well yeah. Anyway, you probably best forget it again - it's
+           just what the future holds for us. Until then, types have *kinds*
+                                                                        [17:07]
+<dminuoso> And after kinds there's nothing really.
+<merijn> Sorts!
+*** Neo--- (~neo@2a00:ee2:2201:fc00:499a:34f8:edb2:875c) has joined channel
+    #haskell
+<dminuoso> merijn: I did mention it and point out that it was trivial, so..
+                                                                        [17:08]
+<dminuoso> We might as well pretend that it didnt exist.
+*** andreas303 (~andreas@gateway/tor-sasl/andreas303) has joined channel
+    #haskell                                                            [17:09]
+<dminuoso> jusss: At the end the kind system is very simple, consisting of,
+           essentially, just two primitives. * and (->). A confusing part here
+           is that (->) is a construct that exists in all three worlds. It
+           exists, syntactically at least, in the value world, it exists as a
+           type, and it exists as a kind.
+*** oish (~charlie@host81-130-206-144.in-addr.btopenworld.com) has joined
+    channel #haskell
+<dminuoso> Unlike types which can be much richer since you can have type
+           families and type constructors
+*** Neo---- (~neo@2a00:ee2:2201:fc00:499a:34f8:edb2:875c) has quit: Ping
+    timeout: 252 seconds
+*** fizbin (~fizbin@73.112.80.92) has joined channel #haskell           [17:10]
+*** doublex (~doublex@2601:542:c480:6ee0:4832:7a46:d068:fb88) has quit: Ping
+    timeout: 264 seconds
+*** kish (~oracle@unaffiliated/oracle) has quit: Ping timeout: 258 seconds
+                                                                        [17:11]
+<mycroftiv> is it possible to define a type that is a kind of 'postive
+            version' of russel's barber paradox? aka a function which accepts
+            functions as input, and demands that those functions accept the
+            same kind of input as the function whose type is being defined?
+*** gentauro (~gentauro@151.216.12.2) has joined channel #haskell
+<mycroftiv> oops i should have said 'same type of input' i wasnt trying to
+            reference the kind vs type thing
+<dminuoso> mycroftiv: Well you can implement SKI combinator calculus in the
+           type system... is that enough?                               [17:12]
+<mycroftiv> i have no idea, ill look that up and think about it, thank you for
+            the reference
+*** akr (~akr@144.202.0.62) has left channel #haskell: "WeeChat 2.4"
+*** nowhere_man (~pierre@lfbn-1-16578-183.w86-243.abo.wanadoo.fr) has joined
+    channel #haskell
+*** bvad (~bvad@xb932c03d.cust.hiper.dk) has joined channel #haskell
+*** Cthalupa (~cthulhu@47.186.0.195) has joined channel #haskell        [17:13]
+<jusss> dminuoso: and what that (->) is named? and it's related to Kleisli
+        arrow?                                                          [17:15]
+<dminuoso> jusss: I'd say "function" 
+*** gehmehgeh (~ircuser1@gateway/tor-sasl/gehmehgeh) has quit: Quit: Leaving
+*** fizbin (~fizbin@73.112.80.92) has quit: Ping timeout: 245 seconds
+<dminuoso> So the kind (* -> *) is the kind of all type functions taking a
+           type of kind * and returning a type of kind *                [17:16]
+<dminuoso> Maybe is one inhabitant of that kind.
+<dminuoso> Either Int is another inhabitant of that kind.
+<dminuoso> Const () is yet another.
+<dminuoso> (All three are type functions)
+<dminuoso> Equivalently, the type "Int -> Char" is inhabitated by all the
+           functions taking an Int and returning a Char.                [17:17]
+*** fizbin (~fizbin@73.112.80.248) has joined channel #haskell
+<mycroftiv> dminuso: thanks this is exactly what i was looking for!     [17:18]
+*** dramforever (~dramforev@unaffiliated/dramforever) has quit: Ping timeout:
+    250 seconds
+*** wilkie (~wilkie@185.204.1.185) has joined channel #haskell
+<jusss> dminuoso: and *->*->* is a type function which take two types of kind
+        * and return one type of kind *?                                [17:19]
+*** Cthalupa (~cthulhu@47.186.0.195) has quit: Ping timeout: 244 seconds
+<dminuoso> jusss:  *->*->* is a *kind*
+*** ralejs (~ralejs@185.69.145.218) has joined channel #haskell
+<Ariakenom> % :k Void#                                                  [17:20]
+<yahb> Ariakenom: Void# :: TYPE ('TupleRep '[])
+<dminuoso> jusss: This might sound like pedantry, but being careful about the
+           terminology can save you from confusion. And not exactly actually
+<dminuoso> jusss:  * -> * -> * is the kind of all types, who take something of
+           kind * and return a type of kind * -> *
+*** ___laika (~laika@99-0-83-18.lightspeed.sntcca.sbcglobal.net) has joined
+    channel #haskell
+<dminuoso> Just like in the value level, all type functions take just a single
+           argument.                                                    [17:21]
+<dminuoso> Ariakenom: Shush!
+*** comerijn (~merijn@83-160-49-249.ip.xs4all.nl) has quit: Ping timeout: 245
+    seconds
+* Ariakenom hisses and runs away
+<dminuoso> Ariakenom: Thats interesting though. Is that lifted?
+<jusss> dminuoso: aha, but in the value level, we can say take two parameter
+        and return one value
+<dminuoso> jusss: But its not really two parameters on the value level either.
+<dminuoso> ⌜f :: Int -> Double -> Char⌝ formally takes only a single argument.
+                                                                        [17:22]
+*** fendor (~fendor@178.115.131.86.wireless.dyn.drei.com) has quit: Ping
+    timeout: 248 seconds
+<jusss> dminuoso: it depends what it function definition, not types 
+*** cybai (~cybai@2400:4050:3122:900:4dec:55f9:8824:b748) has joined channel
+    #haskell
+<Ariakenom> dminuoso: it's C's void. Haskell's ()
+<dminuoso> ⌜f 1 10.0⌝ is not "f applied to two arguments", its rather "f
+           applied to 1, producting a new function, which in turn is applied
+           to 10.0"
+<dminuoso> jusss: All functions in Haskell take a single argument.      [17:23]
+<Arahael> Ariakenom: Isn't C's void "int"? ;)
+<Ariakenom> void# :: Void#
+<jusss> dminuoso: that's currying
+<dminuoso> jusss: Currying exists in your head.
+<dminuoso> jusss: But sure, if that helps.
+<jusss> dminuoso: yeah, all functions are unary functions in haskell
+<dminuoso> jusss: Right. Same thing on the type level. :)
+<merijn> jusss: "\x y -> x + y" is just syntactic sugar for "\x -> (\y -> x +
+         y)"
+<jusss> ok                                                              [17:24]
+<dminuoso> jusss: Of course sometimes we employ different mind models.
+<dminuoso> jusss: Once you have completely accepted that functions can take
+           only single arguments, we sometimes pretend that "f :: Int -> Float
+           -> Char" takes two arguments, understanding that its a function
+           that returns a function.                                     [17:25]
+*** fizbin (~fizbin@73.112.80.248) has quit: Ping timeout: 244 seconds
+<dminuoso> jusss: The same holds true on the type level.
+*** ___laika (~laika@99-0-83-18.lightspeed.sntcca.sbcglobal.net) has quit:
+    Ping timeout: 245 seconds
+<jusss> so there're three levels, kind, type and value, right?
+<dminuoso> So we could view Either as a type function taking two arguments, or
+           think of it as a type function that returns a type function.
+<dminuoso> jusss: Right.
+<jusss> and (->) you called function is in all of them                  [17:26]
+*** encod3_ (~encod3@144.178.76.42.static.ef-service.nl) has quit: Remote host
+    closed the connection
+*** petersen (petersen@redhat/juhp) has quit: Ping timeout: 268 seconds
+<jusss> about Either a b = Left a | Right b, how I can think it as a type
+        function?
+*** cybai (~cybai@2400:4050:3122:900:4dec:55f9:8824:b748) has quit: Ping
+    timeout: 250 seconds                                                [17:27]
+<dminuoso> jusss: So the "Either" part is a type function.
+<dminuoso> jusss: It acts a sum/plus if you want. So Either "adds" two types
+           together.
+<jusss> and it takes a type a then?
+<dminuoso> jusss: Sure, so using our previous knowledge, we could say Either
+           takes two types and it "computes/constructs" a new type.     [17:28]
+<jusss> Either adds a and b return Either a b?
+*** nowhere_man (~pierre@lfbn-1-16578-183.w86-243.abo.wanadoo.fr) has quit:
+    Ping timeout: 245 seconds
+*** Cthalupa (~cthulhu@47.186.0.195) has joined channel #haskell
+<jusss> it's interesting about those three levels, to think data Either a b =
+        Left a | Right b again, this `data` connect that type level and value
+        level                                                           [17:29]
+<jusss> use '=' is really interesting part, types are equals to values
+*** encod3 (~encod3@144.178.76.42.static.ef-service.nl) has joined channel
+    #haskell
+*** drbean (~drbean@TC210-63-209-67.static.apol.com.tw) has joined channel
+    #haskell                                                            [17:30]
+*** Neo--- (~neo@2a00:ee2:2201:fc00:499a:34f8:edb2:875c) has quit: Read error:
+    Connection reset by peer
+*** Neo--- (~neo@2a00:ee2:2201:fc00:499a:34f8:edb2:875c) has joined channel
+    #haskell
+<mniip> I think I found a bug in timezone-olson
+<lortabac> jusss: in data declarations '=' does not mean equality       [17:32]
+<jusss> dminuoso: so is there another keyword that connect kind level with
+        type level?
+<dminuoso> jusss: Its the same as type and value level, ::
+<lortabac> it's just a way to introduce the definition of a data type
+<jusss> lortabac: maybe we should use another symbol                    [17:33]
+<dminuoso> jusss: You can use GADTSyntax if you prefer.
+*** ralejs (~ralejs@185.69.145.218) has quit: Ping timeout: 245 seconds
+                                                                        [17:34]
+<dminuoso> data Either a b where Left :: a -> Either a b; Right :: b -> Either
+           a b
+<jusss> dminuoso: the simple ADT is good for me :)
+<jusss> I really don't like record syntax...
+<dminuoso> jusss: Thats not record syntax. Its GADTSyntax.
+<jusss> dminuoso: I know...                                             [17:35]
+<jusss> I mean that {...}
+<dminuoso> jusss: You get used to it.
+<jusss> dminuoso: yeah
+<dminuoso> jusss: Anyhow. The relevant part is not the sum part, that's merely
+           how the new type acts. It's that Either takes two types and it
+           returns another type.                                        [17:36]
+<jusss> dminuoso: what it returns?
+*** ralejs (~ralejs@185.69.145.218) has joined channel #haskell
+*** bolichep (~bolichep@2802:8000:276a:6e00:ca1f:2d85:f696:1ee2) has joined
+    channel #haskell
+*** ubert (~ub@ip5b40e0e2.dynamic.kabel-deutschland.de) has joined channel
+    #haskell
+<jusss> Either a b?
+*** Neo---- (~neo@2a00:ee2:2201:fc00:499a:34f8:edb2:875c) has joined channel
+    #haskell
+<dminuoso> jusss: A new type that doesnt have a name of its own.
+<dminuoso> jusss: We just identify it by the same name how it was constructed.
+                                                                        [17:37]
+<dminuoso> jusss: This is what we mean by "Either is a type constructor"
+<jusss> dminuoso: so what we think about like Int?
+<dminuoso> jusss: What do you mean?                                     [17:38]
+<jusss> Int is a type function?
+<merijn> % :k Int
+<yahb> merijn: Int :: *
+<dminuoso> jusss: No.
+<dminuoso> jusss: ^- what merijn just did :)
+<jusss> Either is a type function which take two parameters
+<jusss> :k Either
+<merijn> % :k Either
+<yahb> merijn: Either :: * -> * -> *
+<lambdabot> * -> * -> *
+<dminuoso> jusss: Note, because I think this is a good fit now, there are
+           other type functions.                                        [17:39]
+<jusss> dminuoso: like what?
+<dminuoso> jusss: type families for example are type functions that return
+           known types!
+*** ralejs (~ralejs@185.69.145.218) has quit: Read error: Connection reset by
+    peer
+<dminuoso> (Rather than constructing new ones, like type constructors)
+*** ralejs (~ralejs@185.69.145.218) has joined channel #haskell
+<jusss> what are type families?
+<dminuoso> You could have a type function First which takes two type arguments
+           and always returns the first type.                           [17:40]
+*** Neo--- (~neo@2a00:ee2:2201:fc00:499a:34f8:edb2:875c) has quit: Ping
+    timeout: 252 seconds
+<dminuoso> jusss: just type functions, where you can say ⌜F Int = Double; F
+           Char = String⌝
+<dminuoso> Such that when you use ⌜F Int⌝ somewhere in the type system, it
+           evaluates to Double.
+<jusss> wow, we can use patter matching in type level?
+<dminuoso> Yes! :)
+<jusss> how we can do that?                                             [17:41]
+<dminuoso> % type family F p
+<yahb> dminuoso: 
+<dminuoso> % type instance F Int = Double
+<yahb> dminuoso: 
+<dminuoso> % type instance F Char = String
+<yahb> dminuoso: 
+<dminuoso> % x :: F Char; x = "foobar"                                  [17:42]
+<yahb> dminuoso: 
+<dminuoso> jusss: There's also a different pattern matching on types, which is
+           implemented by typeclasses.                                  [17:43]
+<jusss> dminuoso: ok, 
+<dminuoso> jusss: Note that F is vastly different from a type
+           constructor. That is, "F Int" is not a new type of its own. Rather,
+           F is applied to Int, computing the type "Double" in its place.
+                                                                        [17:44]
+<dminuoso> jusss: But both type families and type constructors functions are
+           type functions that take some types and return types.        [17:45]
+<maralorn> So, why doesn‘t run TypeInType in all the Russel‘s Paradoxon
+           problems?
+*** drbean (~drbean@TC210-63-209-67.static.apol.com.tw) has quit: Ping
+    timeout: 245 seconds
+<merijn> maralorn: It does
+<merijn> TypeInType isn't consistent
+*** yyy- (~yyy@unaffiliated/tinnotl) has joined channel #haskell
+<dminuoso> maralorn: It does, but the reasoning is that the type system is
+           crapped anyway :)
+*** kuribas (~user@ptr-25vy0ia5ggf9qmklble.18120a2.ip6.access.telenet.be) has
+    joined channel #haskell
+<dminuoso> merijn: So adding TypeInType doesnt lead to additional
+           inconsistency.
+<dminuoso> Err maralorn ^-
+<dminuoso> maralorn: https://www.seas.upenn.edu/~sweirich/papers/fckinds.pdf
+           explains why                                                 [17:46]
+<maralorn> dminuoso: Thx
+<mniip> that's hardly an explanation
+*** dramforever (~dramforev@unaffiliated/dramforever) has joined channel
+    #haskell                                                            [17:47]
+<jusss> since we have value function and type function, so we have kind
+        function too?
+<merijn> jusss: Conceptually you could, but they're not expressible in
+         Haskell+extensions
+<merijn> jusss: There are languages with type systems where such things exist
+<dminuoso> jusss: Note that TypeInType allows you express that idea.    [17:48]
+<jusss> merijn: dminuoso ok
+*** drbean (~drbean@TC210-63-209-22.static.apol.com.tw) has joined channel
+    #haskell
+<dramforever> How do I build documentation for clash-prelude? I tried stack
+              haddock, but it seems like -fplugin isn't honored when building
+              documentation, which leads to failed typechecking.        [17:49]
+<dminuoso> maralorn: The relevant paragraph quoted: "Languages such as Coq and
+           Agda avoid the *:* axiom because it introduces inconsistency, but
+           that is not an issue here. The FCtype language is already
+           inconsistent in the sense that all kinds are inhabited. The type
+           safety property of FC depends on theconsistenc"
+<jusss> those three worlds, kind type and value, change my mind
+<dramforever> I'm using a just cloned clash-compiler repo (81e2350) and the
+              full log of 'stack haddock' is here:
+              https://gist.github.com/dramforever/d9a7b9650074cfd59d91ca14af679a9c
+<dminuoso> Because mniip didn't like me linking an entire paper to answer a
+           simple question, justifiedly. :P
+<dminuoso> Oh gosh, what did weechat do to that paste.
+<mniip> nah it was more of a, the explanation in the paper is not sufficient
+        imo                                                             [17:50]
+*** kuttifunk (~Thunderbi@ppp-188-174-13-155.dynamic.mnet-online.de) has quit:
+    Quit: kuttifunk
+<dramforever> More generally, how do I build documentation for code that
+              require something like {-# OPTIONS_GHC -fplugin
+              GHC.TypeLits.KnownNat.Solver #-} to work?
+*** kuttifunk (~Thunderbi@ppp-188-174-13-155.dynamic.mnet-online.de) has
+    joined channel #haskell
+<kuribas> is there a newtype to reverse a comparison?
+<merijn> kuribas: Down?                                                 [17:51]
+<dminuoso> jusss: Either is still an interesting type constructor because it
+           acts as a "sum" in the sense of addition of types. So "Either Int
+           Char" is the disjoint sum of the Int and Char type. :)
+<kuribas> merijn: thanks
+<kuribas> :t Down
+<merijn> > sort (map Down [1..5])
+<lambdabot> a -> Down a
+<lambdabot>  [Down 5,Down 4,Down 3,Down 2,Down 1]
+*** ralejs (~ralejs@185.69.145.218) has quit: Ping timeout: 245 seconds
+                                                                        [17:52]
+<dminuoso> jusss: Once you get into this business, there's lots of
+           trivialities to discover. Like there is a type with no inhabitants,
+           called Void. So just like "a + 0 = a" you get "Either a Void ~
+           a". You can start to think of ADTs are just adding and multiplying
+           types together. :)
+<dramforever> > sortOn Down [1..5]
+<lambdabot>  [5,4,3,2,1]
+<dminuoso> jusss: (,) takes the role of multipyling two types, with () as its
+           unit. 
+<kuribas> dminuoso: except that every type in haskell is inhabited with bottom
+                                                                        [17:53]
+*** Cthalupa (~cthulhu@47.186.0.195) has quit: Ping timeout: 248 seconds
+<dminuoso> kuribas: I honestly wonder what the point of raising that point is,
+           repeatedly. :p
+*** drbean (~drbean@TC210-63-209-22.static.apol.com.tw) has quit: Ping
+    timeout: 244 seconds
+<jusss> dminuoso: we can do function on type level that is really change my
+        mind about type stuff
+*** ralejs (~ralejs@148.252.129.228) has joined channel #haskell
+*** MarcelineVQ (~anja@xplr-104-249-247-127.xplornet.com) has quit: Read
+    error: Connection reset by peer
+*** ralejs (~ralejs@148.252.129.228) has quit: Client Quit              [17:54]
+<kuribas> dminuoso: ah, I didn't see you already mentioned it...
+<dminuoso> kuribas: No and I didnt intend to, honestly.
+*** MarcelineVQ (~anja@xplr-104-249-247-127.xplornet.com) has joined channel
+    #haskell
+<lortabac> maralorn: probably the simplest explanation of why Type :: Type is
+           not a problem is that Haskell is not meant to be used as a
+           proof-assistant
+<dminuoso> kuribas: Im not sure this "bottom disclaimer" is going to help
+           newcomers.
+*** doublex (~doublex@2601:542:c480:6ee0:4832:7a46:d068:fb88) has joined
+    channel #haskell                                                    [17:55]
+<jusss> dminuoso: is there only two functions on type level? add and multipy?
+<dminuoso> jusss: Well you can make your own type constructors which use them
+           inside.
+<kuribas> dminuoso: because it makes the Void type useless in haskell
+<jusss> dminuoso: for example?
+<MarcelineVQ> can't be that useless, it's occupying space in base       [17:56]
+<dminuoso> jusss: Using a pseudo language you could make "T a b = (a * b) + b"
+           - in actual Haskell that would look: newtype T a b = L a b | R b
+*** Cthalupa (~cthulhu@47.186.0.195) has joined channel #haskell
+<dminuoso> Err, data type of course!                                    [17:57]
+<jusss> dminuoso: yeah, but that's still just multipy and add, any others?
+*** fizbin (~fizbin@73.112.80.95) has joined channel #haskell
+<kuribas> MarcelineVQ: for completeness probably
+<dminuoso> jusss: You can use type families too!
+<dramforever> jusss: you can also throw recursive data types in the mix
+<jusss> dramforever: wow, you mean do recursive in the type function?   [17:58]
+<jusss> that sounds what should I say
+<dramforever> Uhh not really
+<dminuoso> jusss: So for example you could make some ⌜T a b = (Better a b) +
+           b⌝, which would be encoded by : ⌜data T a b = L (Better a b) | R b⌝
+<dminuoso> Where Better is some suitable type function (could be a type family
+           or a type constructor)                                       [17:59]
+<dramforever> But consider data List a = Nil | Cons a (List a)
+<dminuoso> jusss: You can achieve full computational power in the type system,
+           so you can do complicated type computations.
+<dramforever> List *is* of kind * -> *
+<dramforever> I don't know if you consider that a 'type function'
+<dramforever> (The built-in List is called [] in Haskell)               [18:00]
+<dminuoso> dramforever: We've been operating under the assumption that any
+           type of kind ⌜g -> k⌝ for some choices of g and k are type
+           functions.
+<dramforever> Then it is                                                [18:01]
+*** fizbin (~fizbin@73.112.80.95) has quit: Ping timeout: 248 seconds
+*** Neo--- (~neo@2a00:ee2:2201:fc00:499a:34f8:edb2:875c) has joined channel
+    #haskell
+<jusss> about type families, this is an exist term?
+<dminuoso> jusss: I just made one earlier, did I not? :)                [18:02]
+<jusss> dminuoso: I'm not familiar with it yet :(
+*** ub (~ub@ip5b40e0e2.dynamic.kabel-deutschland.de) has joined channel
+    #haskell                                                            [18:03]
+<dminuoso> jusss: A type family is just a "mapping from types to types"
+           basically. This should be familiar, remember how (value) functions
+           are just mappings from values to values?
+*** mint__ (~mint@0x3e2c8757.mobile.telia.dk) has joined channel #haskell
+*** ubert (~ub@ip5b40e0e2.dynamic.kabel-deutschland.de) has quit: Ping
+    timeout: 246 seconds
+<jusss> dminuoso: yeah
+<dminuoso> % type family F x where F Int = Char; f x = Int              [18:04]
+<yahb> dminuoso: ; <interactive>:359:37: error: Malformed head of type or
+       class declaration: f x
+*** OnkelTem (~onkeltem@unaffiliated/fantomas) has joined channel #haskell
+*** dmitri (~dima14@cm-27-145-185-129.revip12.asianet.co.th) has quit: Quit:
+    This computer has gone to sleep
+<dminuoso> % type family F x where F Int = Char; F x = Int
+<yahb> dminuoso: 
+<MarcelineVQ> kuribas: That's not especially compelling, there's plenty of
+              things missing from base, should be put them in there? :>
+              https://www.fpcomplete.com/blog/2017/07/to-void-or-to-void is a
+              reason Void is pretty neat, there's probably more compact
+              examples out there though
+<dminuoso> jusss: ^- this is a simple type family mapping Int to Char, and
+           every other type to Int.
+*** Neo---- (~neo@2a00:ee2:2201:fc00:499a:34f8:edb2:875c) has quit: Ping
+    timeout: 252 seconds
+<jusss> dminuoso: ok                                                    [18:05]
+*** gentauro (~gentauro@151.216.12.2) has quit: Ping timeout: 245 seconds
+*** Neo--- (~neo@2a00:ee2:2201:fc00:499a:34f8:edb2:875c) has quit: Remote host
+    closed the connection
+<dminuoso> jusss: Which type does ⌜F String⌝ evaluate to?
+*** o1lo01ol1o (~o1lo01ol1@152.80.136.95.rev.vodafone.pt) has quit: Remote
+    host closed the connection
+<jusss> Int
+<dminuoso> jusss: And ⌜F Int⌝ ?
+<jusss> dminuoso: Char
+*** Neo-- (~neo@2a00:ee2:2201:fc00:499a:34f8:edb2:875c) has joined channel
+    #haskell
+<dminuoso> jusss: There you go. That's a type family in a nutshell.
+<jusss> dminuoso: ok
+*** eiGHttt (~eiGHttt@115.231.100.106) has quit: Ping timeout: 272 seconds
+                                                                        [18:06]
+*** mint_ (~mint@94.185.83.194) has quit: Ping timeout: 258 seconds
+<kuribas> MarcelineVQ: none of that requires Void
+<MarcelineVQ> All the parts involving Void do, but you don't have to write
+              them how they're written no                               [18:07]
+<dminuoso> kuribas: For what its worth, the usefulness of Void and the
+           usefulness of Void for beginners are different topics.
+*** agander (agander@gateway/vpn/protonvpn/agander) has quit: Ping timeout:
+    245 seconds
+<dminuoso> kuribas: I use Void regularly to represent guaranteed bottoms,
+           since its easier to mentally parse than to encode it with a
+           universal quantification (because you always have to visually parse
+           how/where the quantification happens)                        [18:08]
+<dminuoso> kuribas: otoh much of the reasoning of ADTs disappears if we dont
+           pretend bottom is impossible.
+*** m0rphism (~m0rphism@149.172.82.115) has joined channel #haskell
+<dminuoso> jusss: There's of course further type computation you can do by
+           means of type application.                                   [18:10]
+<jusss> dminuoso: like?                                                 [18:11]
+*** Neo-- (~neo@2a00:ee2:2201:fc00:499a:34f8:edb2:875c) has quit: Disconnected
+    by services
+*** Neo--- (~neo@2a00:ee2:2201:fc00:499a:34f8:edb2:875c) has joined channel
+    #haskell
+<dminuoso> jusss: Phantom types is a very simple example of how one can
+           leverage the type system to produce guarantees.
+<dminuoso> jusss:
+           https://gist.github.com/dminuoso/bb97536e4c38ce7e0040b1b04f69e522
+                                                                        [18:14]
+<dminuoso> jusss: Guaranteeing that no unsanitized input ever goes into the
+           database.
+*** Cthalupa (~cthulhu@47.186.0.195) has quit: Ping timeout: 268 seconds
+                                                                        [18:15]
+*** jose_zap (~jose_zap@176.20.96.236) has quit: Quit: My MacBook has gone to
+    sleep. ZZZzzz…
+*** linarcx (~linarcx@151.241.55.125) has quit: Quit: WeeChat 2.5       [18:16]
+<dminuoso> jusss: Anyway. There's many other ways to express ideas in the type
+           system. 
+<jusss> dminuoso: yeah
+<dminuoso> jusss: Notice how the parameter to Input is completely disregarded?
+           It doesn't correspond to any values.
+<maralorn> What does it mean for a kind to be inhabitate?
+<dminuoso> maralorn: It would mean that it can have types belonging to it.
+                                                                        [18:17]
+*** linarcx (~linarcx@151.241.55.125) has joined channel #haskell
+<dminuoso> maralorn: There is no kind that is not inhabitated by a type.
+*** comerijn (~merijn@83-160-49-249.ip.xs4all.nl) has joined channel #haskell
+<dminuoso> iow every kind is inhabitated by some type
+<dminuoso> *inhabited.                                                  [18:18]
+*** o1lo01ol1o (~o1lo01ol1@152.80.136.95.rev.vodafone.pt) has joined channel
+    #haskell
+<dminuoso> (* -> *) e.g. is inhabited by Maybe, Const (), Either Int etc...
+*** Frobozz (~Frobozz@unaffiliated/frobozz) has quit: Read error: Connection
+    reset by peer
+*** yyy- (~yyy@unaffiliated/tinnotl) has quit: Ping timeout: 244 seconds
+                                                                        [18:19]
+*** xff0x (~fox@210.57.57.162) has quit: Quit: xff0x
+*** Neo---- (~neo@2a00:ee2:2201:fc00:499a:34f8:edb2:875c) has joined channel
+    #haskell
+<maralorn> So I have this strong association Types <-> Sets, Kinds <->
+           Classes. Is there some way to translate "We have a consistency
+           problem if every kind is inhabited" to "we have a consistency
+           problem if all classes …"?
+*** ___laika (~laika@99-0-83-18.lightspeed.sntcca.sbcglobal.net) has joined
+    channel #haskell
+<maralorn> Or am I completely off-road there?                           [18:20]
+*** fizbin (~fizbin@73.112.80.105) has joined channel #haskell
+<maralorn> Alternatively why is it a consistency problem that every Kind is
+           inhabited?
+*** Neo--- (~neo@2a00:ee2:2201:fc00:499a:34f8:edb2:875c) has quit: Ping
+    timeout: 264 seconds                                                [18:21]
+<dminuoso> maralorn: Consider the type system for a moment.             [18:22]
+<maralorn> (ftr I looked at that paper, it’s interesting. Now I just need to
+           learn what those words mean.)
+*** dmitri (~dima14@cm-27-145-185-129.revip12.asianet.co.th) has joined
+    channel #haskell
+<dminuoso> maralorn: If via the curry howard isomorphism types are
+           propositions, and programs are proofs - then if every saturated
+           type is inhabitated, then there's a trivial proof for any
+           proposition.                                                 [18:23]
+<dminuoso> Since you could just write f = undefined regardless of its type.
+<dminuoso> Im not sure whether thats relevant to the TypeInType discussion,
+           but that's what I know.
+<maralorn> dminuoso: Ah, that makes sense.                              [18:24]
+*** ___laika (~laika@99-0-83-18.lightspeed.sntcca.sbcglobal.net) has quit:
+    Ping timeout: 245 seconds
+<dminuoso> maralorn: So haskells value/type system is inconsistens as a logic
+           system.
+*** fizbin (~fizbin@73.112.80.105) has quit: Ping timeout: 248 seconds
+*** AugustusV (~AugustusV@unaffiliated/augustusv) has quit: Quit: Leaving
+                                                                        [18:26]
+<maralorn> dminuoso: So in laymans terms: It doesn‘t matter that TypeInType
+           is inconsistent because when you prove falsity you already have
+           done something where you now that your program will crash?   [18:27]
+<maralorn> *you know
+<dminuoso> maralorn: Id rather you dont ask me.                         [18:28]
+<maralorn> ^^
+<dminuoso> Im just a layman, so Im not qualified to answer that.
+*** The time at hitchcock.freenode.net is Tuesday August 13 2019 -- 10:29:51
+    +00:00                                                              [18:29]
+<mycroftiv> im actually curious how to turn this into actual code, how do i
+            declare an 'inconsistent' or self-contradictory or 'false' type?
+                                                                        [18:30]
+<maralorn> I wonder what an example is of a kind which one wouldn’t want to
+           be inhabited but it is in Haskell anyways.
+<dminuoso> mycroftiv: Void
+<opqdonut> Void is false but not inconsistent of self-contradictory
+*** merijn (~merijn@145.100.116.8) has quit: Ping timeout: 268 seconds
+<dminuoso> % :t absurd
+<yahb> dminuoso: Void -> a
+<opqdonut> but of course once you do "undefined :: Void" you have an
+           inconsistency :)
+<dminuoso> mycroftiv: This is EFQ.                                      [18:31]
+*** fizbin (~fizbin@73.112.80.39) has joined channel #haskell
+*** Cthalupa (~cthulhu@47.186.0.195) has joined channel #haskell
+*** bifunctorial (cb8fafa6@203.143.175.166) has quit: Ping timeout: 260
+    seconds                                                             [18:32]
+<dminuoso> mycroftiv: (Amusingly this primitive has its uses, even in
+           production code...)
+<maralorn> So the "undefined :: Void" example is kinda boring. It’s like:
+           Technically you are right, but this does obviously not matter for
+           writing a working a program.
+<dminuoso> maralorn: The point is, by writing "undefined :: Void" you have
+           created a proof of falsity.                                  [18:33]
+<maralorn> What happens if I exclude "undefined" from Haskell, can I still
+           make it inconsistent?
+<maralorn> dminuoso: I get that.
+<mycroftiv> im looking for what EFQ is and ddg is being unhelpful
+<dminuoso> mycroftiv: From falsity anything follows.
+<dminuoso> mycroftiv: ex falso quodlibet
+<mycroftiv> oh sure
+<mycroftiv> yeah i understand that, i also get how undefined :: Void is a
+            contradiction, im just more interested in encoding liar paradox
+            into type system or somethign                               [18:34]
+<tdammers> maralorn: a Haskell without bottoms could not be Turing-complete
+<maralorn> tdammers: So it‘s the bottoms. I wondered about that.^^     [18:35]
+<dminuoso> mycroftiv: It's enough to implement SKI
+*** fizbin (~fizbin@73.112.80.39) has quit: Ping timeout: 246 seconds
+<dminuoso> maralorn: Once you have that, you can use
+           S(K(SII))(S(S(KS)K)(K(SII)))                                 [18:36]
+<dminuoso> mycroftiv: this gives you the y combinator, giving you general
+           recursion
+<maralorn> I obviously can write a function which diverges in haskell. But I
+           cannot write it in a way that the typechecker let’s me assign Void
+           as return type, can I?                                       [18:37]
+<dminuoso> mycroftiv: dmwit has a good example on stack overflow
+           https://stackoverflow.com/a/34003628
+*** fizbin (~fizbin@73.112.80.164) has joined channel #haskell
+<dminuoso> maralorn: Well I guess the idea is to write a type where type
+           checking diverges.
+*** Cthalupa (~cthulhu@47.186.0.195) has quit: Ping timeout: 245 seconds
+<Taneb> :t let maralorn :: Void; maralorn = maralorn in maralorn        [18:38]
+<lambdabot> Void
+*** Cthalupa (~cthulhu@47.186.0.195) has joined channel #haskell
+* hackage llvm-hs-pretty 0.6.2.0 - A pretty printer for LLVM IR.
+  https://hackage.haskell.org/package/llvm-hs-pretty-0.6.2.0 (sdiehl)   [18:39]
+<mycroftiv> thanks a lot, i figured the SKI recursion stuff would let that
+            happen                                                      [18:40]
+<maralorn> Taneb: I feel false now.
+<maralorn> Taneb: Thx!
+*** NightA (~night@2602:fe19:4::a:bad:1dea) has quit:                   [18:41]
+*** ralejs (~ralejs@2620:10d:c092:200::1:cdf1) has joined channel #haskell
+<maralorn> So when we say any kind is inhabited, I should think of: Well there
+           is always bottom? I mean I know bottom lifes in Types does it life
+           in kinds?                                                    [18:43]
+<mniip> that reminds me of the one trick you can use to evaluate something at
+        "application" time
+<dminuoso> mniip: bottom lives in the value world, actually. :-p
+<dminuoso> ARgh! Tab completion nightmare. maralorn I mean.
+<Taneb> I don't think you can lift a bottom to the type level           [18:44]
+*** fizbin (~fizbin@73.112.80.164) has quit: Ping timeout: 258 seconds
+<dminuoso> Taneb: In the sense of having a type inhabiated by every kind?
+*** NightA (~night@2602:fe19:4::a:bad:1dea) has joined channel #haskell
+                                                                        [18:45]
+* hackage cursor-brick 0.1.0.0 -
+  https://hackage.haskell.org/package/cursor-brick-0.1.0.0 (Norfair)
+<dminuoso> (Or is it "a type inhabiating every kind"?)
+<dminuoso> Its not even inhabiating. Mmm.
+<maralorn> Other question: Is Void the intial and terminal object of the
+           category of all Haskell Types?
+<mniip> wait huh
+<Taneb> maralorn: how fast and loose do you like to reason
+<mniip> did the trick stop working
+<mniip> maralorn, initial not terminal
+<mniip> unless you mean including bottoms                               [18:46]
+<maralorn> Taneb: Not sure, what you mean.
+<maralorn> mniip: That’s exactly what I meant.
+<dminuoso> maralorn: In the category Hask (which is not defined anywhere), in
+           which types form objects and functions form morphisms, the terminal
+           object is () and the initial object is Void.
+*** fizbin (~fizbin@73.112.80.50) has joined channel #haskell
+<mniip> in that case yes
+<dminuoso> maralorn: Interestingly you have Product, Coproduct, and all the
+           usual connections work. 
+<mniip> Void is the zero object
+<mniip> and for any X, Y you have the zero morphism undefined :: X -> Y
+                                                                        [18:47]
+<maralorn> dminuoso: I feel like () is not the terminal object when you regard
+           "undefined :: a -> Void"                                     [18:48]
+<mniip> once you stop being fast and loose though there's several catches to
+        be aware of
+<Taneb> I think if you have bottoms Void isn't initial. Consider "f = const 1"
+        and "g = const 2" :: Void -> Int, if it were the initial object, then
+        f = g and so f _|_ = g _|_ but f _|_ = 1 and g _|_ = 2
+<mniip> e.g. undefined vs const undefined
+<mniip> and f . undefined
+* hackage enumset 0.0.5 - Sets of enumeration values represented by machine
+  words  https://hackage.haskell.org/package/enumset-0.0.5 (HenningThielemann)
+                                                                        [18:49]
+<maralorn> Uh, I forgot that you can recover from a bottom.
+<mniip> nothing
+<mniip> oops
+<Ariakenom> dminuoso: about Void# you said "Thats interesting though. Is that
+            lifted?". It's unlifted but it's not uninhabited, it uses void
+            from C terminology. Why do you ask?                         [18:50]
+<mniip> Void# is the empty unlifted product
+<mniip> it has 1 inhabitant that takes up 0 bytes
+*** asheshambasta (~user@217.111.215.151) has quit: Ping timeout: 245 seconds
+                                                                        [18:51]
+<Ariakenom> basically ()#
+<maralorn> In my "Mathematical Foundations of functional programing" lecture
+           we had a f _|_ = _|_. Which I guess makes sense in strict
+           evaluation mode.
+*** comerijn (~merijn@83-160-49-249.ip.xs4all.nl) has quit: Ping timeout: 272
+    seconds
+<mniip> that equation is the definition of f being strict
+<mniip> haskell allows non-strict functions                             [18:52]
+<Ariakenom> % let x = normalFunction undefined in 3
+<yahb> Ariakenom: *** Exception: Prelude.undefined; CallStack (from
+       HasCallStack):; error, called at libraries/base/GHC/Err.hs:78:14 in
+       base:GHC.Err; undefined, called at <interactive>:369:24 in
+       interactive:Ghci134
+* hackage shell-utility 0.0 - Utility functions for writing command-line
+  programs  https://hackage.haskell.org/package/shell-utility-0.0
+  (HenningThielemann)
+<mniip> ah yes
+<mniip> that was the trick
+<mniip> apparently it doesn't work if you use _ instead of x
+<Ariakenom> mine?
+<Ariakenom> % let _ = normalFunction undefined in 3
+<yahb> Ariakenom: 3
+<Ariakenom> interesting
+<mniip> yes
+<mniip> % :i trick
+<yahb> mniip: trick :: a -> Void# -- Defined at <interactive>:362:1
+<mniip> % :i normalFunction                                             [18:53]
+<yahb> mniip: normalFunction :: t -> Void# -- Defined at <interactive>:349:5
+<mniip> :P
+<Ariakenom> :D
+*** fizbin (~fizbin@73.112.80.50) has quit: Ping timeout: 258 seconds
+*** justanotheruser (justanothe@gateway/vpn/nordvpn/justanotheruser) has quit:
+    Ping timeout: 258 seconds
+<Ariakenom> % const 3 (normalFunction undefined)                        [18:54]
+<yahb> Ariakenom: ; <interactive>:373:10: error:; * Couldn't match a lifted
+       type with an unlifted type; When matching types; b0 :: *; Void# :: TYPE
+       ('TupleRep '[]); * In the second argument of `const', namely
+       `(normalFunction undefined)'; In the expression: const 3
+       (normalFunction undefined); In an equation for `it': it = const 3
+       (normalFunction undefined)
+*** heatsink (~heatsink@2600:1700:bef1:5e10:9d33:571:e1a0:5805) has joined
+    channel #haskell
+*** jusss (~user@unaffiliated/jusss) has quit: Quit: ERC (IRC client for Emacs
+    26.1)                                                               [18:55]

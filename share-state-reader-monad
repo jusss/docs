@@ -1,0 +1,687 @@
+
+
+
+[Sun Jun  9 2019]
+*** You have joined channel #haskell  [22:33]
+*** Topic for #haskell: https://www.haskell.org |
+    https://wiki.haskell.org/IRC_channel | Paste code/errors:
+    https://gist.github.com/ | Logs:
+    http://tunes.org/~nef/logs/haskell/?C=M;O=D |
+    https://www.reddit.com/r/haskell | Admin: #haskell-ops | Offtopic:
+    #haskell-offtopic | https://downloads.haskell.org
+*** #haskell: topic set by glguy, 2019-01-05 23:21:52
+*** Users on #haskell: jusss Jeanne-Kamikaze JimmyRcom wroathe cosimone
+    Lord_of_Life mstruebing rruizt dddddd Deide kark Gurkenglas zincy_
+    jmcarthur knupfer urodna peacememories blackbart machinedgod yyy petersen
+    savolla hiroaki efeuska donotturnoff DTZUZO ktonga marble_visions dukedave
+    halogenandtoast Snircle TommyC tomatopotato poorslave nowhere_man acarrico
+    forgottenone tristah JoeCordingley jgt SCHAPiE plutoniix sfvm
+    UpstreamSalmon [Leary] arachanx21[m] auri_ aurieeeh
+*** Users on #haskell: CSP-SOFTWARE Azel bbear John_Ivan tsaka_ toppler
+    xkapastel m0rphism zhangkaizhao[m] __monty__ zariuq zincy thc202 zerotech
+    tabemann_ catsup leah2 Maxdamantus tlaxkit ashirase fendor_ jeltsch lprd
+    ggole fendor cybai thunderrd_ gentauro Unhammer pong MindlessDrone
+    olligobber Batholith tromp mnrmnaughmnrgle mnrmnaugh poljar wei2912
+    iqubic` gehmehgeh jamm tomku vlatkoB acidjnk giraffe Sgeo_ sarahzrf
+    sukbeom9 libertyprime otto_s_ Vicfred Anthaas pacak pavonia
+*** Users on #haskell: ricekrispie lagothrix dibblego rprije haasn Sose notzmv
+    khisanth_ lkurusa Forkk albertus1 jluttine ziyourenxiang justanotheruser
+    moldybits dmiles hjt DrAwesomeClaws HK416 pfurla michaelsdunn1 cantstanya
+    trevortknguyen[m ekleog_ corinrose[m] Folkol noan DigitalKiwi RedNifre
+    Hanma[m] nfd9001 aldum xintron winny esph monochrom m1dnight_ earldouglas
+    freeman42x Miraris xff0x jchia_1 kipras Xal mbrock datajerk Xeyame jellyb
+    nek0 ralejs raatiniemi ne mniip yahb
+*** Users on #haskell: chin-tastic survove nshepperd Axman6 zaquest
+    sadwqwqe[m] xcthulhu koz_ Athas habbah sawolf dolio divVerent gxt erikd
+    nesqi phaul wrengr_away amlivinfree[m] alyptik alx741 tsrt^ wildlander
+    Stanley00 recj texasmynsted nullifidian sw1nn johnjay NextHendrix Jesin
+    nitrix avn_ akr gienah_ wonko7 bod_ michaelpj_ revprez_anzio taiite stvc
+    arianvp dstolfa aweinstock chaseroycroft[m] ido lachenmayer jwynn6
+    parenthetical ahri jtcs trebuh jzl Salek telser- Offaiah
+*** Users on #haskell: fryguybo1 twk- abrar xorander cyphase spion cynick _ht
+    s00pcan Chousuke cemerick eruditass ryzokuken systemfault dukerutledge
+    bradparker cheers bengt_ flux unlink2 tinwood revprez_ody Seich tms_ jb55
+    wagle MarcelineVQ jokester daGrevis troydm DTZUZU verement Ferdirand vimto
+    dude[m]3 dedgrant kaiyou[m] mulk ndesai Kaivo orion gd2398[m] FliiFe mrus
+    cpup PragCypher nil revprez hc t7 CurryWurst andreas303 aesi niklasl
+    Firedancer_ polman andyo d34df00d digia
+*** Users on #haskell: jchia restrictedchoice hpc stiell croutons catern korzq
+    Foritus clog bgamari tomboy64 bob_twinkles atbd RecursiveG nicoulaj sdx23
+    johnw phreedom mceier drbean potato44[m]1 tpsinnem polmaan shutdown_-h_now
+    dminuoso nickoralias drewr Majiir quarters NightA oberstein jkachmar zzz
+    MonkeyNOS nemesit|znc Fairy bertschneider_ obfusk kwantam revprez_atlanta
+    duplicateusernam steell_ Wamanuz2 petermw Ranhir averell charh ahihi
+    shreyasminocha xelxebar im_not_afraid[m]
+*** Users on #haskell: stux|RC olspookishmagus Cale miklcct asjo tobiasBora
+    powerbit mkoenig OnkelTem armyriad Tuplanolla noexcept PlasmaStar defanor_
+    nikivi carter cheater ion qzo legowheels[m] jvanbure michalisko @ChanServ
+    klugez furnost cyberlard adamCS ruffy_ joeytwiddle sbrg stefan-_ tolt
+    cjay- kloeri abra0 riatre wraithm ryjm[payon] lugh brisbin iron_houzi
+    rinfiyks davean DwarfMaster idupree markhuge jdanforth ezyang jinblack
+    solarus Someguy123 raid xnyhps Jaxan djanatyn
+*** Users on #haskell: anderson asm89 ambrosia _6a68 PyroLagus tureba avp
+    Kneiva ftop lowryder ldlework dyl sssilver Franciman ventonegro makergrl
+    zenzike pharaun fiatjaf HalfEatenPie gilbertw1 duairc wz1000 Xandaros
+    eagleflo ubercow adarshaj Flonk comstar w1gz d3lxa crooked implementation_
+    EvanR aplainzetakind Jacoby6000 maerwald nisstyre Liskni_si ego Willis
+    jorj luigy geal eldritch e koala_man _ceb rodgzilla SlashLife barrucadu
+    adius kosmikus tchakka debugloop paraseba lieven
+*** Users on #haskell: Deewiant _flow_ dqd niklasb_ atomi sivs fiddlerwoaroof
+    akermu puffnfresh dequbed rkrishnan h30 exio4 vin-ivar nibbling_ mulderr
+    ycheng carbolymer coldpress Aleksejs [df] sms bs fiQ2 lurkless beaky canta
+    flebron moocow Guest40074 exferenceBot Kiruwa burp Reisen platz
+    lexi-lambda joel135 luite Ornedan dilinger shapr qz greeny__ pigs
+    owlscientist tigerchops aidecoe deu Unode strangeglyph gargawel mpickering
+    tstat tristanC lortabac vqrs Ulrar vanyaklimenko beka
+*** Users on #haskell: PtxDK shrifbot ynyounuo sebastianrkg connrs- Ring0`
+    deni rootnode_ hexagoxel dumptruckman gambpang t36s mtjmullen Akii bjs
+    saidinwot bitemyap1 earthy Nikotiini aib rzmt blackdog Wojciech_K edwtjo
+    ammar2 _ag_ loc vodkaInf1rno davl cgoldamm1r Logio saurik_ chivay jix
+    andromeda-galaxy alanz wtw polux7 gluegadget srhb raoulb locallycompact
+    Eliel scivola Jabbslad banjiewen nbouscal fingerzam zabracks ebutleriv
+    glowpelt SegFaultAX xtsee DustyDingo sphalerite amx
+*** Users on #haskell: dionyziz TimWolla Nascha ljhms WarzoneCommand Jonno_FTW
+    connrs_ PHO scal Philonous typedrat mikolaj [exa] mrd casdr acowley
+    ranberry__ AndreasK heyj Konehalt1 SrPx Blkt pierrot PoliticsII hodapp
+    flogfr benl23 Hotbees hexo abbe jmsx bananagram Peter_Storm_ ecx86 verite-
+    Firedancer spamlessj iltiades1 bind _ikke_ Nik05 kav tdammers sigmundv_
+    icrainbow ft aramiscd xorpse pwestling gsingh93 zfnmxt michalrus
+    fr33domlover mort `slikts nekomune Tspoon__ diskie
+*** Users on #haskell: chindy c-rog noko_ cyris212 pdgwien Deadhand comboy_
+    remexre thoughtpolice linoge dredozubov cloudhead Hijiri vxe violeta
+    Peppep gaze___ thallada CindyLinz wayne_ MasseR echoreply mccoyc
+    charukiewicz runawayfive greymalkin Taneb iravid Tritlo d0liver absence
+    rdivyanshu kini mupf linduxed mikolaj_ @Sigyn Tourist haveo Phyx-
+    feuerbach lambdabot nurupo noctux AJTJ arkeet uwap S007 grumble Igloo
+    dan64 ab9rf Dykam bolverkr a3f bwe yrid RoguePointer swalladge
+*** Users on #haskell: lassulus usern4m3 nyuszika7h dashkal scinawa TMA nahra
+    darxun yumh Profpatsch alextes affinespaces dcoutts_ RusAlex obiwahn
+    jrslepak sis7 seliopou infinisil m4lvin lpsmith kAworu bcoppens Adluc srk
+    mikeplus64 phlym_ Shockk diginet ManiacTwister madnight Tristan- tA_
+    nilOps_ jlamothe apeyroux_ anry_ tmciver ayako orzo_ exarkun hongminhee
+    jrm raek_ Adeon gothos infinity0_ evilmonads_ _guios Cathy jdevlieghere
+    cgfbee suzu lyxia tv lemald monokrome niko bdw Ke
+*** Users on #haskell: so eikke tessier cpape mou Dabo johs scav unsymbol
+    edmundnoble parseval stylewarning le_jonge i7c M2tias acro yushyin Netwolf
+    AkhILman Bergle_2 energizer_ Mo0O steve Zoddo corvidzz Sparadox hive-mind
+    markus1189 hackage quaestor nonzen bollu bsima coeus_ pasukon jetpack_joe
+    NemesisD bs338 PotatoGim alunduil gonz_ ajmcmiddlin celphi rotaerk
+    lightandlight cbarrett mmaruseacph2 adamse teehemkay spinda leothrix
+    hsyl20 oleks valdyn duckonomy cppxor2arr kubrat
+*** Users on #haskell: Madars SquidDev Cthalupa bartavelle _janne urdh Novitsh
+    roflik jsatk max1 dsal nopf a3Dman mimi_vx jle` tnks atraii chirpsalot
+    Chobbes rom1504 jonatan cow-orker oldnborg xpoqp phadej Natch immae seveg
+    Guillaum swater Mike2_ stilgart typetetris J_Arcane glowcoil Kamuela
+    ghuntley monad_cat meck milessabin Wizek ocharles dani- kyagrd__ wto
+    newhoggy sea-gull_ tjbp _ashbreeze_ srid63908 Putonlalla megaTherion ziman
+    anishathalye gspia StoneToad seizo irdr
+*** Users on #haskell: aloiscochard[m] arsdragonfly[m] alexfmpe[m] bee[m]1
+    kaychaks[m] hdurer[m] giuseppe[m] vk3wtf[m] vkleen kitsune[m]1 sepp2k
+    ejpcmac macerbi[m] jibby[m] kadoban mmynsted[m] nkhodyunya[m] maigel[m]
+    simbergm spherinder[m] vaibhavsagar hgfedcba[m] siraben marijuanafermion
+    sylvie[m] whoops sielicki tet[m] alexshpilkin bb010g Bimmie[m]
+    Noughtmare[m] cosson[m] fiddeldibu[m] capillary_cup[m] bobach[m]
+    alicedebob[m] atgo[m] bdesham[m] NickHu hsw[m] javjarfer[m] bt[m]
+*** Users on #haskell: zocijux[m] unevens[m] Syllo[m] Mesa[m]1 ciet[m]
+    aitzol[m] risorg[m] cawal[m] tmallard[m] jenkee[m] hjoest[m] jhg_0[m]
+    supersweetsweetc limabeans[m] hans[m]4 m1andrew[m] cepxuo buggeas40d[m]
+    pineapple[m] mithrandi[m] ad5twoknebor[m] petrichor hackeryarn[m]
+    deklund[m] fregex kahuna[m] Obscurity[m] hkimhvyh[m] reedhhw[m]
+    haiderkhan[m] actartis[m] vars[m] Warder[m] cr0gs GNULizard[m] iarp[m]
+    runningriot9[m] avocado soaoaig[m] thecodedmessage ShujaRafi[m]
+*** Users on #haskell: WeiTang[m] Cloud[m] enragedjam eeva Frobozz caa51h zxrf
+    subfacto1 sudden dfordivam hiredman boj gmips[m] thaumavorio golergka
+    ClownMaster[m] juri_ glguy Ekho intelux kapilp godzilla[m] hjozwiak
+    jfredett ByronJohnson oak zweimach[m] Anxietyhatesme[m kungp Zialus Tene
+    nighty Nevoic sclv xalek[m] pdxleif fionnan rslima__ m-renaud metalrain
+    datapup_ sebhoss gregberns sujeet rann dongcarl xstill terrorjack__
+    devalot graingert joeyh lstdgtfp seventh__ betawaffle
+*** Users on #haskell: petercommand mingc c_wraith lispy Twey integral micro
+    dpn` Clint adarqui nano- rj1 Rembane billstclair Arguggi dexterfoo LeaChim
+    zymurgy rootmos nshepperd_ tsahyt applecluster[m] yi[m] adaj[m] dfalk[m]
+    codedmart Cenion[m] laniu[m] bohannes[m] kylos[m] mat8913[m] tswett[m]
+    mujx[m6 MarquisKurt[m] popo[m] NickHu1 unrooted[m] periapseez[m]
+    luminousnine[m] tabaqui1 Jon shiroeni[m] ephemeron buster528[m] Videled[m]
+    silverneedle josiah_sama alex[m]10 papazeus[m]
+*** Users on #haskell: wengrow[m] somni[m] tinwood[m] tynanbe fgaz
+    Jello_Raptor vsts[m] AkikoHimenokoji[ joehillen jennie[m] sm[m]
+    luciandesozay[m] nartir[m] godva[m] dysfigured yoltid[m] M0x8badf00d[m]
+    andjjj23 duncan mankyKitty irclogger_com geekosaur mjuad Psybur Niamkik
+    apoc freusque SolarAquarion jp dh nyaomi xacktm Klumben asonixDogHeThey[
+    nuxdie dTal matheus sm solonarv charliebucket[m] Randy keep_learning d6e
+    uptime liff ent nvt jbetz devopsdeluxe higherorder edwardk
+*** Users on #haskell: angerman ullbeking ibloom koankeeper jonrh darthThorik
+    amatecha peel caasih runeks luqui AfC alexknvl ProofTechnique bitonic
+    wildsebastian Remy^ PLPD-Bot mian dontdieych eof EmilKarlson dmwit yorick
+    xplat zmt00 hvr int-e elgot jorge-jbs[m] dannyfrog[m] nckx masaeedu[m]
+    booghost123 TheSpectre yaroot2 hiptobecubic_ xblacky[m] rembo10 pebeto[m]
+    kaol Paks jud klntsky amiri reyu atk bydo mjrosenb Fubar^ Vq treehaqr
+    georgew vk3wtf isacl___ forell APic zv hsiktas
+*** Users on #haskell: contrun[m]1 josef[m]1 kipras`away psydroid lukelau
+    theophil893 Daquilla[m] Adam[m]7 pqwy[m] eckt[m] Tom[10 vladimirp1[m]
+    illandan[m] int-index roninkaizen[m] stan[m] rizary lierdakil[m]
+    humanwire[m] domenkozar[m] Ekho[m] lpvb seanparsons theorbtwo milli myme
+    opqdonut spoonm noCheese mp___664 crtschin jackhill Miroboru cjwelborn
+    stass Moyst simon bspar drewbarbs Ckat PierreM_ wreckingwalla_ totte cybj
+    agrif Geekingfrog Tesseraction Rudd0 alexelcu newhoggy_
+*** Users on #haskell: feepo rodlogic EduardoBautista kicker22004[m] seiz[m]
+    ixian drdo nirvin[m] cyjiao__ cbg[m] dgpratt unclechu kip optmzr aveltras
+    coot __4matter_ dmj` runde tehidiot sppky peschkaj thi nh2 cjskaggs[m]
+    fcse__ geronimogarcia sariyar verlet64 jrozanski kqr Squarism Jonathan[m]2
+    elvishjerricco bandali pent Velpoman JSharp simony mudri dustinm sqrt2
+    shadowdao cross lavalike azahi amuck mitchellsalad pie_ MatrixBot3 fredcy-
+    cocreature interruptinuse srnty_
+*** Users on #haskell: devurandom_ henrik_ tumdedum Zemyla sud0 bjobjo
+    centril3 lantti_ hegge_ soncodi_ raoul maxdeliso[m] JakeO[m] bluefly[m]
+    Ivysaur[m] eyenx[m] alephu5[m] jochens[m] roberth thejonny[m] eayus[m]
+    dustyp[m] lapav[m] alibabzo foxadee[m] M0ddba11[m] shanesveller[m]
+    Mougan[m] mujx[m] qasim[m] rcat[m] sputny[m] dlilja[m] trillpoli[m]
+    GhostofaConsole[ epta MichalLaskus[m] ovigren[m] atopuzov[m] steamedbun[m]
+    rainbyte[m] seeh[m] nybble41[m] vigilian[m] kai10[m]
+*** Users on #haskell: teaknow[m] MerlinGttlinger[ dag[m] nbardiuk joenase[m]
+    olmvnec[m] qxjit[m] zopsi[m] Uma[m] thekyriarchy l8star jerrytgarcia[m]
+    puranjaymohan[m] pimienta[m] exarkun1 etjet[m] el_tejon[m] krhubert[m]
+    io_r_us[m] abbe[m] dxml[m]
+*** #haskell URL: http://www.haskell.org/
+*** #haskell modes: +CLntj 3:5  [22:34]
+*** #haskell was created on 2006-11-26 14:42:48
+*** marco_t (~marco_t@181.231.120.108) has joined channel #haskell
+<jusss> why Just 3 >>= (\x -> Just "!" >>= (\y -> Just (show x ++ y)))
+<jusss> equal to Just 3 >>= \x -> Just "!" >>= \y -> Just (show x ++ y)
+                                                                        [22:35]
+*** halogenandtoast (~halogenan@2601:cd:c480:2b9:1086:c010:d565:3c7e) has
+    quit: Ping timeout: 248 seconds
+*** halogenandtoast (~halogenan@2601:cd:c480:2b9:1086:c010:d565:3c7e) has
+    joined channel #haskell
+*** arahael1 (~arahael@203.221.190.238) has joined channel #haskell  [22:36]
+<nil> how else would you parenthesise it?  [22:39]
+<nil> i suppose it could be  Just 3 >>= (\x -> Just "!") >>= (\y -> Just (show
+      x ++ y))  , but that isn't quite as useful  [22:41]
+<jusss> nil: yours is equal to Just 3 >>= (\x -> Just "!" >>= (\y -> Just
+        (show x ++ y))) ?  [22:42]
+<nil> no  [22:43]
+*** Jeanne-Kamikaze (~Jeanne-Ka@c-73-158-52-126.hsd1.ca.comcast.net) has quit:
+    Quit: Leaving
+<jusss> nil: but in the last lambda, we can get x from the ahead expressions
+                                                                        [22:44]
+*** arahael1 (~arahael@203.221.190.238) has quit: Ping timeout: 248 seconds
+*** poorslave (~poorslave@128.179.18.109.rev.sfr.net) has quit: Quit: WeeChat
+    2.3
+*** Icewing (~Icewing@unaffiliated/icewing) has joined channel #haskell
+                                                                        [22:46]
+*** arahael1 (~arahael@110-174-247-167.static.tpgi.com.au) has joined channel
+    #haskell
+<nil> in your version, yes. in mine, no.
+<jusss> nil is this related with monad's third law?  [22:47]
+<jusss> f >> g >> h  == f >> \x -> g x >> h
+<nil> no  [22:48]
+*** toppler (~user@mtop.default.momentoftop.uk0.bigv.io) has quit: Ping
+    timeout: 272 seconds  [22:49]
+<jusss> nil ok, so in your version, how it can get x? where is x from ?
+<nil> it can't, that's my whole point  [22:50]
+<nil> my version would result in an error, unless x was bound to something
+      else before
+*** rprije
+    (~rprije@206.154.220.203.dial.dynamic.acc01-king-now.comindico.com.au) has
+    quit: Ping timeout: 248 seconds  [22:51]
+<nil> hence "not quite as useful", except for situations where you don't need
+      to reuse variables from previous lambdas in future lambdas
+<jusss> nil I don't get it, your version is look like Just 3 >>= \x -> Just
+        "!" >>= \y -> Just (show x ++ y)  [22:52]
+<jusss> nil but the Just 3 >>= \x -> Just "!" >>= \y -> Just (show x ++ y) got
+        Just "3!"
+*** arahael1 (~arahael@110-174-247-167.static.tpgi.com.au) has quit: Ping
+    timeout: 248 seconds
+*** asymptotically (~quassel@gateway/tor-sasl/asymptotically) has joined
+    channel #haskell
+<jusss> Just 3 >>= \x -> Just "!" >>= \y -> Just (show x ++ y)
+<nil> but it isn't equivalent, because the parenthesisation for that
+      expression is the one you showed
+<jusss> Just 3 >>= (\x -> Just "!") >>= (\y -> Just (show x ++ y))
+<nil> lambda abstractions, if thought of as an operator, have the lowest
+      precedence. they just extend as far as possible to the right  [22:53]
+*** heatsink (~heatsink@107-136-5-69.lightspeed.sntcca.sbcglobal.net) has
+    joined channel #haskell
+<jusss> nil aha, right associate, right?  [22:54]
+*** arahael1 (~arahael@61.68.55.57) has joined channel #haskell
+<nil> not exactly
+<jusss> still confused
+<jusss> so what Just 3 >>= \x -> Just "!" >>= \y -> Just (show x ++ y) equal
+        to ?  [22:55]
+<nil> well, you can think of it like that if it helps you
+<nil> jusss: you know that, it's the core of your original question
+*** toppler (~user@mtop.default.momentoftop.uk0.bigv.io) has joined channel
+    #haskell
+<nil> <jusss> why Just 3 >>= (\x -> Just "!" >>= (\y -> Just (show x ++ y))) 
+<nil> that's what it parenthesises to.
+*** nowhere_man (~pierre@2a01:e35:2fb8:7200:d660:91c8:d729:e155) has quit:
+    Ping timeout: 259 seconds  [22:59]
+*** nowhereman (~pierre@lns-bzn-40-82-251-135-32.adsl.proxad.net) has joined
+    channel #haskell
+*** tomatopotato (~tomatopot@141.98.102.243) has quit:   [23:00]
+*** jgt (~jgt@2a02:a31b:8542:b480:9114:1171:3ed3:59f3) has quit: Ping timeout:
+    252 seconds  [23:01]
+*** wroathe (~wroathe@c-68-54-25-135.hsd1.mn.comcast.net) has quit: Ping
+    timeout: 248 seconds
+*** halogenandtoast (~halogenan@2601:cd:c480:2b9:1086:c010:d565:3c7e) has
+    quit: Ping timeout: 252 seconds  [23:02]
+*** peacememories (~textual@t197-069.demo.tuwien.ac.at) has quit: Quit: My
+    MacBook has gone to sleep. ZZZzzz…
+*** jgt (~jgt@user-5-173-152-29.play-internet.pl) has joined channel #haskell
+                                                                        [23:03]
+<jusss> nil and it equals to Just 3 >>= (\x -> (Just "!" >>= (\y -> Just (show
+        x ++ y)))) ?
+*** halogenandtoast (~halogenan@2601:cd:c480:2b9:1086:c010:d565:3c7e) has
+    joined channel #haskell
+<nil> yes, there's no ambiguity there  [23:04]
+*** Jeanne-Kamikaze (~Jeanne-Ka@c-73-158-52-126.hsd1.ca.comcast.net) has
+    joined channel #haskell
+*** peacememories (~textual@t197-069.demo.tuwien.ac.at) has joined channel
+    #haskell
+<nil> (hm, there is, actually.)
+<nil> but yes.  [23:05]
+<jusss> nil ok it seems right associate in lambda to me   [23:07]
+<jusss> no  [23:08]
+*** ziyourenxiang (~ziyourenx@unaffiliated/ziyourenxiang) has quit: Ping
+    timeout: 246 seconds
+<jusss> nil it's the end of the lambda  [23:09]
+<jusss> if we don't put a ) to close (, then lambda will not end ?
+*** jamm (~jam@unaffiliated/jamm) has quit: Ping timeout: 245 seconds  [23:10]
+<nil> i don't know what you mean.
+*** wroathe (~wroathe@23-30-253-203-static.hfc.comcastbusiness.net) has joined
+    channel #haskell  [23:11]
+<jusss> nil Just 3 >>= \x -> ... >>= \y -> ... >>= \z -> ... equal to Just 3
+        >>= (\x -> ... \z -> ..) ?
+*** Ariakenom (~Ariakenom@h-158-174-187-253.NA.cust.bahnhof.se) has joined
+    channel #haskell
+<jusss> Just 3 >>= (\x -> (... >>= \y -> (... >>= \z -> ...))) ?  [23:12]
+*** knupfer (~Thunderbi@200116b82c6dd800f69634fffef0b45f.dip.versatel-1u1.de)
+    has quit: Ping timeout: 248 seconds  [23:14]
+<[exa]> jusss: open lambda goes all the way to the end of block, so \a ->
+        ... \b -> ... parentheses as (\a -> ... (\b -> ...))  [23:16]
+*** gnu-linuxera (~gnu-linux@84.39.178.133) has joined channel #haskell
+                                                                        [23:17]
+*** blackbar1 (~sv@ool-3f8fec7f.dyn.optonline.net) has joined channel #haskell
+                                                                        [23:19]
+<[exa]> jusss: the other way, ... (\a -> ...) (\b -> ...) is a bit
+        confusing. You can read '\a ->' as abstracting 'a' from now on
+<jusss> [exa]: Just 3 >>= (\x -> Just "!" >>= (\y -> Just (show x ++ y)))
+        equal to Just 3 >>= \x -> Just "!" >>= \y -> Just (show x ++ y) ?
+*** tlaxkit (~gnu-linux@84.39.180.189) has quit: Ping timeout: 248 seconds
+<[exa]> jusss: yeah that should work  [23:20]
+*** arahael1 (~arahael@61.68.55.57) has quit: Ping timeout: 268 seconds
+*** unfixpoint (c3b0703b@gateway/web/freenode/ip.195.176.112.59) has joined
+    channel #haskell  [23:22]
+*** arahael1 (~arahael@14-202-215-136.tpgi.com.au) has joined channel #haskell
+*** blackbart (~sv@ool-3f8fec7f.dyn.optonline.net) has quit: Ping timeout: 268
+    seconds  [23:23]
+*** gnu-linuxera (~gnu-linux@84.39.178.133) has quit: Quit: Saliendo...
+<jusss> [exa]: ok, I miss the scheme's lambda
+<unfixpoint> The Liar paradox "A: This statement (A) is false" is basically
+             the fixpoint of `\a. not a`, right?  [23:24]
+<__monty__> Why? You can include all the parens you want in haskell.
+<[exa]> jusss: do you mean the parentheses?
+<unfixpoint> Or `fix not` really
+<jusss> [exa]: yeah
+<[exa]> jusss: if you become lisp god, parentheses disappear
+*** bachibuzuk (~user@2001:861:3d85:8900:1cc9:68fb:2b2:ecfb) has joined
+    channel #haskell
+<jusss> __monty__: >>= is infix, and scheme is prefix  [23:25]
+<[exa]> :]
+*** Kundry_Wag (~Kundry_Wa@179.209.57.79) has joined channel #haskell
+<cocreature> __monty__: that doesn’t really help given that you will have to
+             read other people’s code :) (not that I personally think that is
+             a problem)
+<jusss> in this complicate lambda nested lambda, I think prefix is better than
+        infix  [23:26]
+<[exa]> unfixpoint: well that's its value if you want to evaluate it
+        boolean-ishly
+<unfixpoint> How to evaluate it differently?
+<unfixpoint> :)
+<[exa]> why not curry-howard it?
+<jusss> OO call is like infix, but function call still like prefix  [23:27]
+<unfixpoint> Curry's paradox?
+*** Kundry_Wag (~Kundry_Wa@179.209.57.79) has quit: Remote host closed the
+    connection
+*** Kundry_Wag (~Kundry_Wa@179.209.57.79) has joined channel #haskell  [23:28]
+<[exa]> unfixpoint: no, translate the sentence into some kind of
+        intuitionistic logic and show there's no program that proves it
+<[exa]> unfixpoint: like here:
+        https://en.wikibooks.org/wiki/Haskell/The_Curry%E2%80%93Howard_isomorphism
+<[exa]> but you'll probably need λμ for saying a self-referential statement
+        simply  [23:29]
+*** Kundry_Wag (~Kundry_Wa@179.209.57.79) has quit: Remote host closed the
+    connection  [23:30]
+<unfixpoint> I see, yeah I meant to work around that by using `fix` :D
+*** blackbar1 (~sv@ool-3f8fec7f.dyn.optonline.net) has quit: Ping timeout: 272
+    seconds
+<jusss> I still have one question, lets forget the reader monad, focus on >>=
+        :: (e->a) -> (a -> (e->b)) -> (e->b) , so (e->a) and (e->b) both are
+        functions, lets assume f x = x+1 , so (f 3) >>= ? and how the >>= is
+        like?
+*** Kundry_Wag (~Kundry_Wa@179.209.57.79) has joined channel #haskell
+*** Kundry_Wag (~Kundry_Wa@179.209.57.79) has quit: Read error: Connection
+    reset by peer
+<jusss> or I should use f >>= ?  [23:31]
+*** Kundry_Wag (~Kundry_Wa@179.209.57.79) has joined channel #haskell
+<jusss> when function contain monad or functor is really confused to me
+*** blackbart (~sv@ool-3f8fec7f.dyn.optonline.net) has joined channel #haskell
+                                                                        [23:32]
+<[exa]> unfixpoint: yes, IIRC you'll arrive at the situation where you will
+        want a term that can not be easily generated using fix
+*** kish (~oracle@unaffiliated/oracle) has joined channel #haskell
+<jusss> Maybe and Either or List, those monads are easy to understand, but
+        this e->a is not
+*** lastmanstanding (~arjoonn@137.97.101.14) has joined channel #haskell
+                                                                        [23:33]
+<unfixpoint> jusss: You can do `succ >>= (+)` applied to 1 gives (2+1)
+<unfixpoint> or try `succ >>= (,)` gives `(2,1)` with 1  [23:34]
+<[exa]> jusss: the problem is that 'f 3' is not of type (e->a)
+*** dfj1 (~dfj@141.98.101.133) has joined channel #haskell
+<jusss> unfixpoint: f >>= g  =  \x -> f (g x) x,  this is really weird 
+<jusss> I know what it equals, but I don't understand the meaning,
+<jusss> why this form  [23:35]
+<unfixpoint> jusss: Yeah, use `(<*>)` ;)
+<unfixpoint> S-combinator
+*** arahael1 (~arahael@14-202-215-136.tpgi.com.au) has quit: Ping timeout: 248
+    seconds  [23:36]
+*** ashirase (~ashirase@modemcable098.166-22-96.mc.videotron.ca) has quit:
+    Quit: ZNC - http://znc.in
+*** heatsink (~heatsink@107-136-5-69.lightspeed.sntcca.sbcglobal.net) has
+    quit: Remote host closed the connection
+<jusss> [exa]: unfixpoint why this f >>= g  =  \x -> f (g x) x, whats this
+        meaning? what it's used for?  [23:37]
+*** perrier-jouet (~perrier-j@modemcable012.251-130-66.mc.videotron.ca) has
+    joined channel #haskell  [23:38]
+*** ithanium (~ithanium@109.163.234.142) has joined channel #haskell
+*** oish (~charlie@228.25.169.217.in-addr.arpa) has joined channel #haskell
+<jusss> and you all call it Reader Monad, and make a form to get the input
+        value, and I don't know why
+*** rruizt (~rruizt@83-84-23-124.cable.dynamic.v4.ziggo.nl) has quit: Ping
+    timeout: 248 seconds
+*** lnostdal (~lnostdal@77.70.119.51) has joined channel #haskell
+<jusss> why when function contain monad and functor, they all get weird
+                                                                        [23:39]
+<lavalike> jusss: do you understand State somewhat?
+*** arahael1 (~arahael@202.125.26.5) has joined channel #haskell
+<jusss> lavalike: I saw State Monad,  s->(r,s) whatever, and I don't  [23:40]
+*** rruizt (~rruizt@83-84-23-124.cable.dynamic.v4.ziggo.nl) has joined channel
+    #haskell
+<unfixpoint> We can have `fix ((&&) <*> not)` for a rough translation
+<jusss> I know there're Stete, Reader, Writer
+<lavalike> jusss: maybe start with that, Reader is almost like half of it,
+           where you can only "get" the state, and never "put" it
+<lavalike> yeah and Writer is the other half, you can only do the reverse, in
+           a sense
+<lavalike> State is simpler to make sense of  [23:41]
+<jusss> lavalike: can we describe this monad e-> without reader moand form ?
+<jusss> just use function to describe
+<jusss> forget reader moand that form or shape whatever you called
+<jusss> why not just use function?  [23:42]
+<lavalike> my point is to try to grok State and then Reader and Writer become
+           easier to grasp
+<jusss> what about flip the sequence, reader writer then state?  [23:43]
+*** theelous3_ (~theelous3@unaffiliated/theelous3) has joined channel #haskell
+<lavalike> that's what you were already doing
+<jusss> lavalike: state is related with e-> ?  [23:44]
+<c_wraith> @unmtl State s a
+<lambdabot> s -> (a, s)
+<jusss> and this (a,s) is a tuple? right? why not a list?  [23:45]
+<c_wraith> because that would be something else
+<jusss> 'cause tuple doesn't have the sequence or order
+<c_wraith> The whole point of State is to package up the idiom of explicit
+           state-passing  [23:46]
+<c_wraith> lists require every element to be the same order
+<jusss> c_wraith: what is that something else? s -> [a,s] is ?
+<lavalike> don't confuse the notation for types for the notation for values
+<c_wraith> that's not a type.  s -> [(a,s)] is a type.
+<lavalike> the type constructor [] takes exactly 1 argument, another type, and
+           gives you a type: the type of lists of the given type, not 2
+<c_wraith> or s -> ([a], s)
+<lavalike> so [] applied to Int, i.e. [] Int, or also [Int] for nicety, is the
+           type of values of lists of `Int's: [] a s or [a,s] is an error as
+           [] only takes 1 type argument  [23:47]
+*** revprez_anzio (~revprez_a@static-173-76-190-156.bstnma.ftas.verizon.net)
+    has quit: Ping timeout: 268 seconds  [23:48]
+*** petersen (~petersen@redhat/juhp) has quit: Quit: petersen
+*** revprez_anzio (~revprez_a@static-173-76-190-156.bstnma.ftas.verizon.net)
+    has joined channel #haskell
+*** Kundry_Wag (~Kundry_Wa@179.209.57.79) has quit: Remote host closed the
+    connection
+<jusss> this is beyond my comprehension...  [23:49]
+<jusss> now
+*** petersen (~petersen@redhat/juhp) has joined channel #haskell  [23:50]
+*** Kundry_Wag (~Kundry_Wa@179.209.57.79) has joined channel #haskell
+*** lastmanstanding (~arjoonn@137.97.101.14) has quit: Ping timeout: 268
+    seconds
+<c_wraith> Then don't worry about it.  The pieces come together eventually.
+<jusss> ok  [23:51]
+<jusss> c_wraith: actually I was wondering how about share state stuff 
+<jusss> and they said something about reader monad   [23:52]
+<jusss> I read them from some articles
+*** gobby (c8075b6d@gateway/web/freenode/ip.200.7.91.109) has joined channel
+    #haskell
+<jusss> I wonder the magic, avoid to create global variable to store a value
+        or state whatever  [23:53]
+<c_wraith> There's no magic involved
+<c_wraith> It's replacing a global variable with just passing a value around
+*** fphilipe (~phil@81.6.34.65) has joined channel #haskell
+*** Kundry_Wag (~Kundry_Wa@179.209.57.79) has quit: Ping timeout: 258 seconds
+<[exa]> jusss: let's go the scheme way, let's say you have (lambda (a) (+ (* 2
+        a) (^ 2 a)))  [23:54]
+*** aarvar (~foewfoiew@50.35.43.250) has joined channel #haskell
+*** DirefulSalt (DirefulSal@gateway/vpn/privateinternetaccess/direfulsalt) has
+    joined channel #haskell
+<[exa]> jusss: in haskell, that's like: (\a -> (+) ((*) 2 4) ((^) 2 4))
+<[exa]> oh noes
+<[exa]> this way: (\a -> (+) ((*) 2 a) ((^) 2 a))
+<[exa]> now, because single-parameter functions are functors (and also
+        applicatives and monads), you can eliminate a bit of manual parameter
+        forwarding and write this:  [23:55]
+<jusss> c_wraith: but hey, global variable can store values and you can visit
+        it any time, but passing a value around ? you only passing it in a
+        chain, you store values in a chain, the outer function still can't get
+        the value unless they join the chain  [23:56]
+<[exa]> jusss: ((+) <$> (2*) <*> (2^))
+<[exa]> % ((+) <$> (2*) <*> (2^)) 5
+<yahb> [exa]: 42
+<c_wraith> jusss: yes, that's a good thing.  It means you need to be
+           *explicit* about what has access to what
+<gobby> I'm confused about this type `type Handler = HandlerT MyApp IO` seen
+        here (https://www.yesodweb.com/book/routing-and-handlers). Why is it
+        not ``type Handler a = HandlerT MyApp IO a`
+<[exa]> jusss: and the functor/applicative/monad framework for singleparameter
+        function just nicely silently passes the argument around  [23:57]
+*** meck (~meck@2a01:7e01::f03c:91ff:fea5:17cd) has quit: Quit: WeeChat 2.4
+*** CSP-SOFTWARE (~uwx@172.245.163.218) has quit: Ping timeout: 268 seconds
+*** meck (~meck@2a01:7e01::f03c:91ff:fea5:17cd) has joined channel #haskell
+*** fphilipe (~phil@81.6.34.65) has quit: Ping timeout: 245 seconds  [23:58]
+*** perrier-jouet (~perrier-j@modemcable012.251-130-66.mc.videotron.ca) has
+    quit: Quit: WeeChat 2.4
+<[exa]> jusss: aaand, if you dig a bit in how that's achieved, you'll
+        eventually find that the rule '(f <*> g) x = f x (g x)' (together with
+        its monadic counterpart) exactly allows all this to happen  [23:59]
+
+[Mon Jun 10 2019]
+<jusss> c_wraith: [exa] and I think to construct that chain will be difficult
+                                                                        [00:00]
+<c_wraith> jusss: constructing the chain automatically is what types like
+           State get you.  [00:01]
+<jusss> c_wraith: [exa] I don't know if you use python or js or scheme,
+        re-assign is really easy to do something
+* hackage lens-regex-pcre 0.1.0.0 -
+  https://hackage.haskell.org/package/lens-regex-pcre-0.1.0.0 (ChrisPenner)
+<[exa]> jusss: reassign is also an easy way to make your language intractable
+        to static analysis
+*** CSP-SOFTWARE (~uwx@172.245.163.218) has joined channel #haskell  [00:02]
+*** John_Ivan (~John_Ivan@unaffiliated/john-ivan/x-3287162) has quit: Read
+    error: Connection reset by peer
+*** ktonga (~quassel@58.173.163.144) has quit: Ping timeout: 248 seconds
+                                                                        [00:03]
+<jusss> [exa]: but reassign can make you to store values, and you can visit
+        those values any time, but in a chain? you can't visit it from outside
+        and any time, you can only visit it if you put the visitor in the
+        chain  [00:04]
+*** perrier-jouet (~perrier-j@modemcable012.251-130-66.mc.videotron.ca) has
+    joined channel #haskell  [00:05]
+<cocreature> you can use actual mutable state in Haskell which is important
+             for concurrency
+<c_wraith> But that's rare to actually need.
+<jusss> I don't know to construct that chain how long it will take, maybe it's
+        a long time
+<[exa]> jusss: have you seen the do-notation?  [00:06]
+<c_wraith> For the programmer or the computer?
+<jusss> [exa]: yep
+<jusss> c_wraith: for the programmer 
+<cocreature> c_wraith: well I’d say concurrency is quite common in Haskell
+             and then mutable state in the form of MVars/TVars/… is quite
+             common
+*** forgottenone (~forgotten@176.88.98.200) has quit: Ping timeout: 272
+    seconds
+<[exa]> jusss: it looks just like python, even with assignments and
+        everything, right?
+<cocreature> but yeah it’s definitely less common than in other languages
+                                                                        [00:07]
+<unfixpoint> I usually use unsafePerformIO to write/read from files, Haskell's
+             pretty annoying at at times
+*** heatsink (~heatsink@2600:1700:bef1:5e10:99f5:2569:f682:e775) has joined
+    channel #haskell
+*** vlatkoB_ (~IRC_clien@unaffiliated/vlatkob) has joined channel #haskell
+<cocreature> that is not a good idea
+<c_wraith> unfixpoint: cool
+<[exa]> unfixpoint: oh noes!
+<__monty__> unfixpoint: Sounds like you're afraid of the IO monad.
+<__monty__> Or just IO, let's drop the monad.
+<jusss> [exa]: I haven't tried it, maybe I should, construct a chain is the
+        right way to avoid global variable?   [00:08]
+<[exa]> jusss: 'do' basically constructs the chain for you
+<jusss> [exa]: but other languages don't have do notation... unless we
+        implement it in others  [00:09]
+<c_wraith> jusss: other languages *really wish* they had do notation.  Have
+           you noticed how many times it gets reinvented?
+*** fphilipe (~phil@2a02:168:f6c3:0:d58b:961c:819f:2b38) has joined channel
+    #haskell
+<c_wraith> async/await, null coalescing operators, etc  [00:10]
+<[exa]> jusss: taken to extreme, 'do' notation is just about having a
+        polymorphic, overloadable code-block construct
+<c_wraith> all special cases of do notation
+*** vlatkoB (~IRC_clien@unaffiliated/vlatkob) has quit: Ping timeout: 248
+    seconds
+<[exa]> jusss: in C, all commands in blocks separated by semicolons can be
+        though as do-blocks of IO operations
+<[exa]> jusss: similarly in python, js, etc.  [00:11]
+<gobby> I'm confused about this type `type Handler = HandlerT MyApp IO` seen
+        here (https://www.yesodweb.com/book/routing-and-handlers). Why is it
+        not ``type Handler a = HandlerT MyApp IO a`
+<[exa]> jusss: you might notice a similarity with Scheme's (begin), although
+        'do' does a bit more work in carrying some extra information between
+        the "commands"
+*** jgt1 (~jgt@2a02:a31b:8542:b480:3c94:c7a6:4e91:de6a) has joined channel
+    #haskell  [00:13]
+<jusss> c_wraith: [exa] but the books always use 'let' to explain do-notation
+<[exa]> which books?
+* hackage hw-excess 0.2.2.0 - Excess
+  https://hackage.haskell.org/package/hw-excess-0.2.2.0 (haskellworks)  [00:14]
+*** halogenandtoast (~halogenan@2601:cd:c480:2b9:1086:c010:d565:3c7e) has
+    quit: Ping timeout: 252 seconds
+<unfixpoint> gobby: `type Lsit = []` `:t map :: (a->b) -> Lsit a -> Lsit b`
+                                                                        [00:15]
+<jusss> [exa]: ghci> let x = 3; y = "!" in show x ++ y   from
+        http://learnyouahaskell.com/a-fistful-of-monads
+<unfixpoint> same as `type Lsit a = [a]`
+*** nineonine (~nineonine@64-46-10-64.dyn.novuscom.net) has joined channel
+    #haskell
+*** jgt (~jgt@user-5-173-152-29.play-internet.pl) has quit: Ping timeout: 272
+    seconds  [00:16]
+<gobby> unfixpoint: so it's implicit in the definition
+<gobby> in the type synonymn*
+<unfixpoint> Yes  [00:17]
+*** halogenandtoast (~halogenan@2601:cd:c480:2b9:1086:c010:d565:3c7e) has
+    joined channel #haskell
+<[exa]> jusss: there's no "do" yet, they're just showing what happens if you
+        run the monadic computation manually without having the extra Maybe
+        around (for handling failures)
+<[exa]> jusss: the magic comes 2 samples lower, right next to the owl picture
+* hackage imm 1.6.0.0 - Execute arbitrary callbacks for each element of
+  RSS/Atom feeds  https://hackage.haskell.org/package/imm-1.6.0.0 (koral)
+*** Kundry_Wag (~Kundry_Wa@179.209.57.79) has joined channel #haskell  [00:18]
+<gobby> unfixpoint: Thanks  [00:20]
+*** perrier-jouet (~perrier-j@modemcable012.251-130-66.mc.videotron.ca) has
+    quit: Quit: WeeChat 2.4
+*** perrier-jouet (~perrier-j@modemcable012.251-130-66.mc.videotron.ca) has
+    joined channel #haskell  [00:22]
+*** noddy (~self@anon-40-119.vpn.ipredator.se) has joined channel #haskell
+                                                                        [00:23]
+*** arachanx21[m] (chandramau@gateway/shell/matrix.org/x-yqcfgtpkpbvsjkeq) has
+    left channel #haskell: "User left"  [00:25]
+*** Offaiah (~Offaiah@97e072d4.skybroadband.com) has quit: Ping timeout: 258
+    seconds
+* hackage haskell-gi 0.22.3 - Generate Haskell bindings for GObject
+  Introspection capable libraries
+  https://hackage.haskell.org/package/haskell-gi-0.22.3 (inaki)
+<jusss> [exa]: ok, maybe I should keep do-notation in mind and use it to
+        construct the chain then write it on the paper with bind form
+*** gobby (c8075b6d@gateway/web/freenode/ip.200.7.91.109) has quit: Quit: Page
+    closed
+<jusss> [exa]: I haven't implement do-notation in other languages yet, but I
+        implemented bind  [00:26]
+*** howdoi (uid224@gateway/web/irccloud.com/x-urwwflovgoqtxalz) has joined
+    channel #haskell
+*** peacememories (~textual@t197-069.demo.tuwien.ac.at) has quit: Quit: My
+    MacBook has gone to sleep. ZZZzzz…
+*** ithanium_ (~ithanium@86.105.9.116) has joined channel #haskell  [00:27]
+*** UpstreamSalmon (uid12077@gateway/web/irccloud.com/x-miamgeiahuozqkuv) has
+    quit: Quit: Connection closed for inactivity  [00:29]
+<[exa]> jusss: do notation is just syntactic sugar for bind, nothing more
+*** ithanium (~ithanium@109.163.234.142) has quit: Read error: Connection
+    reset by peer
+*** perrier-jouet (~perrier-j@modemcable012.251-130-66.mc.videotron.ca) has
+    quit: Quit: WeeChat 2.4  [00:31]
+*** oo_miguel (~miguel@89-72-186-97.dynamic.chello.pl) has joined channel
+    #haskell
+*** perrier-jouet (~perrier-j@modemcable012.251-130-66.mc.videotron.ca) has
+    joined channel #haskell  [00:32]
+*** oish (~charlie@228.25.169.217.in-addr.arpa) has quit: Ping timeout: 258
+    seconds  [00:33]
+*** cods (~fred@tuxee.net) has joined channel #haskell  [00:34]
+*** unyu (~user@unaffiliated/pyon) has joined channel #haskell
+*** cods (~fred@tuxee.net) has quit: Changing host  [00:35]
+*** cods (~fred@unaffiliated/cods) has joined channel #haskell
+*** oish (~charlie@109.248.149.134) has joined channel #haskell
+*** kostas (5b8ae57f@gateway/web/freenode/ip.91.138.229.127) has joined
+    channel #haskell  [00:38]
+*** u0_a144 (~user@2603:9000:a005:8e00:41ec:2caf:f784:63d2) has joined channel
+    #haskell
+*** lnostdal (~lnostdal@77.70.119.51) has quit: Quit: "Fascism, Nazism,
+    Communism and Socialism are only superficial variations of the same
+    monstrous theme—collectivism." -- Ayn Rand
+*** Kundry_Wag_ (~Kundry_Wa@179.209.57.79) has joined channel #haskell  [00:39]
+*** lnostdal (~lnostdal@77.70.119.51) has joined channel #haskell
+*** Unhammer (~Unhammer@gateway/tor-sasl/unhammer) has quit: Ping timeout: 256
+    seconds  [00:41]
+*** Kundry_Wag (~Kundry_Wa@179.209.57.79) has quit: Ping timeout: 246 seconds
+*** wroathe (~wroathe@23-30-253-203-static.hfc.comcastbusiness.net) has quit:
+    Read error: Connection reset by peer  [00:42]
+*** iqubic` (~user@c-24-17-224-222.hsd1.wa.comcast.net) is now known as iqubic
+*** Berengal (5858c28f@gateway/web/freenode/ip.88.88.194.143) has joined
+    channel #haskell  [00:45]
+*** Unhammer (~Unhammer@gateway/tor-sasl/unhammer) has joined channel #haskell
+                                                                        [00:46]
+<Berengal> In emacs using haskell-mode, how do I get it to work properly when
+           working on tests in a stack project?
+*** nineonine (~nineonine@64-46-10-64.dyn.novuscom.net) has quit: Remote host
+    closed the connection
+<Berengal> It not using the test parameters for the package
+*** nineonine (~nineonine@test-vpn.calabrio.com) has joined channel #haskell
+*** peacememories (~textual@t197-069.demo.tuwien.ac.at) has joined channel
+    #haskell  [00:47]
+*** ddellacosta (~dd@ool-43536529.dyn.optonline.net) has joined channel
+    #haskell  [00:48]
+*** kish (~oracle@unaffiliated/oracle) has quit: Remote host closed the
+    connection
+*** kish (~oracle@unaffiliated/oracle) has joined channel #haskell
+*** petersen (~petersen@redhat/juhp) has quit: Quit: petersen
+*** petersen (~petersen@redhat/juhp) has joined channel #haskell  [00:49]
+*** jusss (~user@unaffiliated/jusss) has quit: Quit: ERC (IRC client for Emacs
+    26.2)  [00:50]
+ERC> 

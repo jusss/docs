@@ -1,0 +1,1990 @@
+
+
+
+[周三 9月 18 2019]
+*** You have joined channel #haskell                                    [09:10]
+*** Topic for #haskell: https://www.haskell.org |
+    https://wiki.haskell.org/IRC_channel | Paste code/errors:
+    https://gist.github.com/ | Logs:
+    http://tunes.org/~nef/logs/haskell/?C=M;O=D |
+    https://www.reddit.com/r/haskell | Admin: #haskell-ops | Offtopic:
+    #haskell-offtopic | https://downloads.haskell.org
+*** #haskell: topic set by glguy, 2019-01-05 23:21:52
+*** Users on #haskell: jusss heatsink mkoenig pera aarvar eiGHttt tabemann
+    howdoi zincy_ jmp-TOK tom__ ddellacosta Frobozz leothrix captjakk rruizt
+    freeman42x jedws buddyboi420 hololeap turab jose_zap ziyourenxiang vonfry
+    agnki pie_ catsup ph88^ ryan2215 nullifidian__ argent0 falafel cheater
+    dbyte pfurla ketralnis zzz day inkbottle Ulrar poljar johs ItalGuy troydm
+    theophil9 emptyflask crobbins gxt Anthaas auri_ jud klntsky xkapastel
+    phreedom dansho kupi notzmv gienah_ dazage kish
+*** Users on #haskell: SoundLogic APic mkla pavonia Natch Lord_of_Life joeyh
+    TommyC arahael3 ephemeral carlomagno pgib petersen Gurkenglas lmln evanjs
+    haroldwu machinedgod komasa dale p0lyph3m xff0x OnkelTem slrtbtfs[m]
+    ystael rootnode lastmanstanding yoja dddddd YongJoon Sheilong Wuzzy
+    martin4 Sgeo__ dhaemon haasn justanotheruser tromp sagax Amras sicklorkin
+    sw1nn jakalx housecarpenter m0rphism xplat CurryWurst tnks cynick Nevoic
+    palo sektor alicemaz Fairy Guest72170 teardown
+*** Users on #haskell: mjrosenb felixfoertsch iqubic trevortknguyen[m tms_
+    Takahiro bwe ambrosia_ SegFaultAX matheus mikeplus64 arsdragonfly Hotbees
+    idupree2 ab9rf dumptruckman absence Kiruwa silver_needles pong julienXX
+    Taneb zukken[m] actartis[m] alko[m] deikatsuo[m] Richy[m] Paavo[m]
+    hkimhvyh[m] jwerner[m] kumarbis[m] alana[m] ovigren[m] olep[m] nybble41[m]
+    94KAAJI8R pqwy[m] than1133[m] Surgeon[m] xalek[m]1 xethrog42[m] yi[m]
+    xlogan[m] vector[m]1 vorbex[m] Vincent[m]1
+*** Users on #haskell: unrooted[m] vigilian[m] unitymember[m] vars[m]
+    vespuccy[m] vhzr[m] themadman[m] torkel[m] tmallard[m] triste[m] Syllo[m]
+    testacc3[m] teaknow[m] tarigo[m] supersweetsweetc tempaccount1[m]
+    SmiVan[m] soaoaig[m] steamedbun[m] corin[m]1 Rich[m] rowan[m]
+    sayukimans[m] shachiku[m] shanesveller[m] rgh[m]2 zorkedon[m] Rama[m]
+    rgamma[m] zmlww[m]1 yur3shmukcik[m] yoltid[m] zopsi[m] rainbyte[m]
+    rahduro[m] rinor[m] yrid[m] wrunt[m] TheD6[m] coil[m] wobbol[m]
+*** Users on #haskell: wuxianhuiyi[m] xxthatgirlxx[m] qasim[m] popo[m]
+    Wizek[m] pietromrtn[m] wildtrees[m] ppseafield[m] vpei[m] weebull[m]
+    vsts[m] peter-js[m] vikraman periapseez[m] petrolifero[m] vancha112[m]
+    Chromad[m] patonw[m] contrun[m] MarquisKurt[m] uelen[m] twom[m] tuxsoy
+    triskeon[m] markus[m]4 unclechu tswett[m] tops[m] odd13[m] papazeus[m]
+    PoopSick[m] themsay[m] tkots[m] thosgood[m] thekyriarchy moats mouse008[m]
+    tindvik[m] mssx89m[m] nalix[m] neat72[m] texpat[m]
+*** Users on #haskell: talvdav[m] thekyriarchy[m]1 suppenkasper[m] midi[m]
+    meu76[m] sriehl[m] Mougan[m] neiluj[m] sphalerit sudorebootnowsud
+    mat8913[m] sputny[m] maxmaguire[m] MichalLaskus[m] max3raza[m]
+    spacekitteh[m] snupples[m] souldev[m] WeiTang[m] ShujaRafi[m] Lite[m]
+    lmolr[m] ludovicdanjoumad limabeans[m] somni[m] sm[m] luisjira[m] cepxuo
+    schum sergiotarxz[m] seekerus3r[m] SFL[m] shiroeni[m] runningriot9[m]
+    lukasubo[m] markalanrichards ldesgoui[m] Orbstheorem[m] roberth
+*** Users on #haskell: lihram rihardsk[m] laith1[m] reedhhw[m] quiet_laika[m]
+    reconmaster[m] avocado kupo_[m] kxra[m] kylos[m] laniusfnv[m] provessor[m]
+    pschooom[m] pleasesendnudes[ PotatoRick[m] pothyurf[m] potato44[m]
+    kerru[m] PhilipWhite[m] phanimahesh[m] kicker22004[m] kinga06[m]
+    korlaplankton[m] Kimani[m] kompass[m] joe[m]3 Jonathan[m]3
+    MonsieurArcher[m pineapple[m] keith[m] paulus[m] pebeto[m] ookfof[m]
+    pagoda_5b[m] JulesRen-Georges kai10[m] jumzi[m] k4l1gr4[m] chris[m]11
+*** Users on #haskell: jdks[m] jennie[m] AGmotive[m] oniani[m] noteventime
+    nonlinear[m] olmvnec[m] ninjatrappeur[m] mujx[m4 nolep[m] NickHu1
+    johanejg[m] jochens[m] JakeO[m] jlvvlj[m] nartir[m] natmac[m] neurocyte[m]
+    NickHu joenase[m] jorge-jbs[m] n0ma_d[m] nh2[m] MerlinGttlinger[ jg[m]
+    miseenplace[m] Mitch[m] mithrandi[m] mattia[m] jhgarner[m] jesusvega[m]
+    masaeedu[m] alex[m]16 Testitunnari[m] hogarth[m] hovgaard[m] imp0s5ible
+    luminousnine[m] matrixyz[m] inflationova[m]
+*** Users on #haskell: intellection3to3 imdoor[m] luftmensch[m] link2xt[m]
+    lions[m] GNULizard[m] Hakan[m] grorg[m] haskelllisp[m] heyakyra[m]
+    likliklik gswuichet[m] hifutakiko[m] lapav[m] gd2398[m] gmips[m]
+    Grgoire[m] godzilla[m] georgescratcherd PonyLoop1000[m] kyleondy[m]
+    LasEspuelas Kenneth[m] labs[m] erasure[m] foxadee[m] krowlan3[m]
+    entropi[m] GhostofaConsole[ firefly1927[m] fswalker[m] krhubert[m]
+    kitsune[m] freeman42x[m] dxml[m] Kit[m] kahuna[m] kaster[m] kaiyou[m]
+    Cloud[m]
+*** Users on #haskell: dlilja[m] AkikoHimenokoji[ dice[m]1 edwel[m]
+    josiah_sama MartinKlimi[m] jwaksbaum[m] danielbmarkham[m danielemarsella[
+    cjskaggs[m] josef[m] deklund[m] jonreeve[m] JoGoSi[m] imposs[m] bt[m]
+    cbg[m] Cele[m] jlorand[m] Godslatestgift[m jibby javjarfer[m] StevenY[m]
+    charliebucket[m] jay[m] javbit[m] buster528[m] cale[m] ciroyo[m]
+    EmilKarlson jeeg[m] jak[m]1 jak[m] blake_rain[m] brevalda[m] ircer[m]
+    biox[m] bobach[m] ist5shreawf[m] blackspider76[m] ilmu[m]
+*** Users on #haskell: benzoid[m] brandon123[m] M|GNUisnotLinux[ homebeach[m]1
+    hsw[m] iffsid hjoest[m] iantownsend iarp[m] AaronWeiss[m] aquarial[m]
+    beatricejensen[m hr[m] hans[m]4 asayers[m] aruncom2006[m] beaverfever[m]
+    hamechi[m] gspia[m] guiraldelli[m] grag[m] godva[m] Godel[m] amerocu[m]
+    alibabzo Alec[m]1 gkobeaga[m] gentlehelm[m] glothit7ok[m] gandi[m]
+    ghastfilms[m] adaizen[m] abc123zzz[m] Mesa[m]1 aitzol[m] admdch[m]
+    abdolence[m] freu[m] eyenx[m] fiddeldibu[m] friedm[m]
+*** Users on #haskell: afontain[m] absnc fiberpunk[m] M31violet13[m]
+    GreenKarm[m] ChrisPenner[m] PrimeSeeker[m] Ben[m]4 Eclipse[m] dustyp[m]
+    eckt[m] M2en[m] DenisLehmann[m] dumuzid[m] dude[m]1 derberg[m]1
+    cyclops19[m] GNULambda[m] corin[m] davex32[m] dag[m] cosson[m] Cenion[m]
+    Brio[m] cawal[m] cesar[m] ciet[m] cabalcorp[m] buggeas40d[m] boutil[m]
+    blakec[m] boistordu bkl[m] betz[m]2 Bimmie[m] BaMaung[m] asonixDogHeThey[
+    Artifth[m] atpotts arturo[m] aquarial anton-latukha[m]
+*** Users on #haskell: AMlivinfree[m] arianvp[m] amb007[m] apurvapavaskar
+    aqtusia[m] alxev[m] alephu5[m] ajirx[m] akt[m] aearnus[m] hackeryarn[m]
+    adziahel[m] ad5twoknebor[m] abbe[m] JoelMcCracken[m] Noughtmare[m]
+    Ericson2314 Hanma[m] fulgjon Ekho[m] ChristopherBurg[ steshaw[m] sielicki
+    khisanth_ jluttine tejok[m] tehidiot[m] bee[m]1 srid[m] vkleen
+    roninkaizen[m] vk3wtf[m] luke-clifton[m] jrozanski jibby[m]1 m00n[m]
+    giuseppe[m]1 mujx[m] Bertschneider[m] VaNilLa[m] dominicusin[m]
+*** Users on #haskell: alexfmpe[m] Videled[m] sylvie[m] supersven[m] siraben
+    tomtau[m] whoops afk[m] vaibhavsagar ternarysolo peel sepp2k pigmej[m]
+    keep-learning[m] maigel[m] macerbi[m] lierdakil[m] stan[m] simbergm
+    mmynsted[m] denbrahe[m] kaychaks[m] iceychris[m] GregKNicholson[m
+    hdurer[m] jonge[m] kadoban atopuzov[m] EuAndreh[m] dppes[m] fgaz aviD
+    ClownMaster[m] coldpress[m] domenkozar[m] humanwire[m] aloiscochard[m] pi2
+    buhman ephemera__ M0ddba11[m] lagothrix theDon mearnsh
+*** Users on #haskell: carldd dxld ericsagnes perrier-jouet nekomune jchia
+    stepnem Tesseraction_e stefan jstolarek alx741 TemporalShift andi-
+    pikajude s00pcan laem bcoppens hc zaquest jb55 hvr saml darjeeling_ MoziM
+    abrar Jon hyperfekt ps-auxw wonko7 kunningdruger Kaivo gabiruh kjak
+    Niamkik aurieeeh insanitea meck polux7 chirpsalot dTal dmiles Bergle_1
+    maralorn cp lnx miklcct unyu xelxebar gentauro jle` nshepperd telser mingc
+    bydo atk Tuplanolla andreas303 raek zxcvbnm7358 dennisb
+*** Users on #haskell: moldybits ziman CSP-SOFTWARE acarrico mnrmnaugh
+    m1dnight1 mozzarella ctag markus1189 chin-tastic Neuromancer nesqi phlym
+    ^[ Cthalupa Jesin duncan glguy tsahyt jamestmartin andreabedini amosbird
+    amatecha_ dongcarl thonkpod Shun131 Orbstheorem darthThorik thi_ phaazon
+    mjuad bjs nlofaro_ metalrain sis7 jesyspa kip caasih ajmcmiddlin ghuntley
+    eacameron xyggos EduardoBautista dani- s94a84d2e coot wildsebastian jackdk
+    J_Arcane boeg tazjin teehemkay d0liver Majiir
+*** Users on #haskell: DrDuck runeks pent gonz_ dsal noan milessabin
+    typetetris ebutleriv Seich Enigmagic azahi bspar rzmt dqd Athas Netwolf
+    papna unlink_ bandali forell MonkeyNOS__ Lears delYsid RecursiveG NightA
+    infinity0 Xandaros keep_learning ekleog sm bgamari TMA sujeet jwynn6
+    Willis Forkk SCHAPiE elimirks billb ClaudiusMaximus arianvp yumh
+    uniquerockrz srnty_ seveg Bigcheese_ tabaqui dmwit tdammers johnw
+    _deepfire DTZUZU rotaerk cartwright tomboy64 statusfailed saurik_ nikivi
+*** Users on #haskell: amuck juri_ shachaf tensorpudding Sose thunderrd nil
+    daissgr_ tabaqui2 linduxed shutdown_-h_now Guest50768 Paks datajerk
+    MindlessDrone p3n andyo edwtjo remexre tinwood hive-mind electrostat raoul
+    Proteus Wamanuz fionnan pingiun jrm vimto @ChanServ bitonic alunduil
+    iravid Lermex tehidiot epicallan monad_cat alexelcu bradparker winny
+    nkaretnikov Nascha entel dpn` jsatk fredcy- glowpelt natim87 rubik
+    sphalerite Remy^ Blkt feuerbach banjiewen rajivr___ michaelpj
+*** Users on #haskell: interruptinuse PyroLagus zabracks ryzokuken feepo
+    unsymbol morgib dukedave Jabbslad sebhoss simony AfC ephemeron fingerzam
+    xnyhps jlpeters raoulb Konehaltia jonrh scav alexknvl NemesisD casdr_
+    Ferdirand paf31_ edmundnoble aib bananagram `slikts mstruebing griddle
+    dgpratt bs zxrf m-renaud sclv jetpack_joe abbe lieven _6a68 robogoat
+    bitemyapp koala_man Annihitek mrd jdt monokrome noexcept_ crtschin_
+    arkeet` gilbertw1 aesi irclogger_com Twey enragedjam vin-ivar
+*** Users on #haskell: Ranhir aplainzetakind joehillen Ring0` Mon_Ouie
+    lachenmayer nibbling_ mtjmullen brisbin Hijiri pdxleif dashkal habbah
+    thallada stiell cpape lemald loc rkrishnan vodkaInferno chivay MasseR raid
+    mankyKitty lightandlight higherorder ibloom tolt AndreasK cyjiao__ rizary_
+    ProofTechnique spamlessj sebastianrkg integral mjlee nh2_ dexterfoo
+    newhoggy liff TallerGhostWalt_ ryjm lsix uwap copypasteque akermu dequbed
+    vqrs defanor Geekingfrog fiQ2 twk- t36s lurkless
+*** Users on #haskell: _flow_ solarus kloeri relrod jameekim Tspoon_ PierreM
+    Kneiva mrus lowryder gregberns atle w1d3m0d3 micro int-e lambdabot cjh`
+    topos myme nitrix Cathy andromeda-galaxy codedmart vktec zymurgy epta
+    Igloo tureba krystianbajno JSharp drdo ullbeking dfordivam pasukon haveo
+    hodapp blackdog fiddlerwoaroof kosmikus pharaun fiatjaf wz1000 adarshaj
+    d3lxa crooked lortabac exferenceBot Deewiant adamCS ft a7250ag seliopou
+    greymalkin mniip xarian wraithm sterni bind
+*** Users on #haskell: rodlogic Mo0O artem e2 hjozwiak otulp ion jvanbure
+    Arguggi Firedancer_ Heffalump sshine bob_twinkles Rembane exarkun Phyx-
+    michalrus gsingh93 gambpang connrs- [df] Aleksejs coldpress exio4 geal
+    luigy sssilver avp djanatyn jinblack markhuge iron_houzi joeytwiddle acro
+    DwarfMaster sqrt2 UserOO7 niklasb_ jzl Remavas jonge michalisko sea-gull
+    flebron xtsee bsima statusbot Jello_Raptor implementation_ thebnq a3Dman
+    chindy madnight zerokarmaleft heath Intensity
+*** Users on #haskell: tsani asm89 bdw tristanC fr33domlover bcmiller deu
+    wayne johnstein jbetz lstdgtfp ocharles adamse nonzen Sparadox energizer
+    _guios apeyroux dredozubov c-rog PHO ammar2 ZoFLo kraem koankeeper PtxDK
+    cheshircat divVerent maerwald SquidDev shadowdaemon DDR noko_ reyu
+    jdevlieghere nivpgir_ mupf tstat lpsmith kqr jtcs Squarism travv0
+    sigmundv- Batholith connrs_ locallycompact deni cchalmers Putonlalla oleks
+    thjread uberj Ornedan Someguy123 jrslepak arw [exa]
+*** Users on #haskell: ByronJohnson Tene wtw charukiewicz Drezil catern swater
+    qz SlashLife CindyLinz digia shapr gargawel_ Flonk pacak stvc zv rootmos
+    suzu RoguePointer ecx86 flogfr Eliel Nik05 Jonno_FTW ski __4matter_ nopf
+    hexagoxel kubrat pdgwien ManiacTwister S007 beaky e nyuszika7h w1gz
+    aidecoe graingert moobar SolarAquarion xacktm Klumben Adluc srk zekt scal
+    violeta quaestor petermw TimWolla rom1504 atraii cbarrett coddinkn
+    puffnfresh marble_visions fliife devalot Fubar^
+*** Users on #haskell: hiptobecubic diginet restrictedchoice totte daGrevis
+    n3t luite JoelMcCracken nshepperd1 mceier orzo droplet atomi carter kaol
+    Guest93722 jokester EvanR echoreply cyphase edwardk esph DigitalKiwi
+    samebchase mikolaj lally dibblego SrPx boj noctux yushyin i7c dogui @Sigyn
+    suppi srhb rodgzilla sveit nckx roflik ycheng amx MatrixBot3 Randy cheers
+    nisstyre peschkaj sandman13 wrengr_away raduom megaTherion Philonous
+    hongminhee hiredman hsyl20 ysangkok pingu_ recj
+*** Users on #haskell: tlax Clint DustyDingo dixie klugez_ comboy sud0
+    angerman andjjj23 earthy tomjaguarpaw h30 mrsbear obiwahn raatiniemi
+    scivola zenzike hackage gothos c_wraith bengt_ moocow drewbarbs adadelta
+    bendo _ht petercommand Vtec234 barrucadu Chousuke Zemyla subfacto1 ereu
+    jix Maxdamantus Robin_Jadoul lavalike malthe cjay- mmaruseacph2 freeside
+    immae aetherfreak Entroacceptor cross oeblink duairc Logio kipras`away
+    runawayfive abuss kini Nikotiini saidinwot1 sdrodge
+*** Users on #haskell: nyaomi Tourist chessai averell nshepperd2 hsiktas
+    vk3wtf sukbeom kark Ekho jfredett dminuoso aldum vjoki albel727 beka
+    strangeglyph abra0 laxask Ankhers thoradam stylewarning elvishjerricco
+    PotatoGim nbouscal glowcoil no-n billstclair Kamuela kyagrd__ liquorice
+    spoonm verlet64 rslima___ umachan bjobjo parsnip niko sariyar tv lassulus
+    Ke ixian lkurusa riatre yitz Slothel kAworu joshmeredith dolanbatar
+    thaumavorio infinisil a3f PragCypher mimi_vx mxf cocreature
+*** Users on #haskell: hegge jonatan dh canta Adeon mudri sarahzrf devurandom
+    eagleflo dan64 nemesit|znc jackhill Chobbes davean glamas bbear_ mulk
+    dave_uy toppler RusAlex fantasti` Axman6 mycroftiv obfusk__
+    PatrickRobotham runde Jaxan freusque enemeth79 tessier_ ynyounuo stux|RC
+    sdx23 dagit monochrom stilgart Unode agrif tumdedum aweinstock Deadhand
+    wagle PlasmaStar cyberlard pcoutin jol wadadli trucy teej debugloop
+    pierrot kiix reorder_ xstill benwr_ qzo phadej dcoutts
+*** Users on #haskell: texasmynsted AkhILman dstolfa_ M2tias AWizzArd mikolaj_
+    carbolymer Ckat sobhan apoc eldritch anderson Guillaum alp amiri equivrel
+    lukelau simplegauss jorj betawaffle nahra rosalux m4lvin zfnmxt bolverkr
+    kav Madars systemfault clog cods lyxia rotty dyl dysfigured dilinger
+    scheming_around alanz so hpc Thra11 acowley clynamen elcaro styledash
+    bbear ent nurupo noCheese NinjaTrappeur tomku haskell_enthusia sim590
+    Moyst parseval ap5 bollu theorbtwo Rudd0 Foritus
+*** Users on #haskell: jmsx magicman cgfbee sellout- I93 dolio _ashbreeze_
+    verement cruxeternus jlamothe mountaingoat koz_ rembo10 evilmonads
+    eruditass Xeyame Vq _janne sivs Lowl3v3l anishathalye yahb gspia benl23
+    gluegadget nuxdie Tritlo srid affinespaces datapup_ sethetter rann sgraf
+    PoliticsII_ hamishmack spinda linoge mitchellsalad_ heyj adius
+    terrorjack__ mpickering Firedancer Peter_Storm joel135 dmj` lexi-lambda
+    coeus seventh__ spion mccoyc kapil_ opqdonut valdyn kuttifunk
+*** Users on #haskell: Jacoby6000 drewr reggie_ seanparsons grumble leah2
+    dustinm Cale urdh
+*** #haskell URL: http://www.haskell.org/
+*** #haskell modes: +CLnt
+*** #haskell was created on 2006-11-26 14:42:48
+<lyxia> in the resulting program can you have nested lets,  let ... = ... let
+        ... = ... in ... in ...                                         [09:12]
+<lyxia> as opposed to let ... in let ... in
+<turab> Nope                                                            [09:13]
+*** heatsink (~heatsink@2600:1700:bef1:5e10:48f0:b58c:59aa:e8d8) has quit:
+    Ping timeout: 245 seconds                                           [09:14]
+<turab> The idea is to make it similar to a C like language so it can be
+        compiled easily
+<lyxia> Ok then I think the continuation-passing is actually a distraction and
+        all you're really doing is building up a stack of "let"s        [09:15]
+*** carldd (~carldd@90-224-49-113-no56.tbcn.telia.com) has quit: Ping timeout:
+    240 seconds
+*** tabemann (~tabemann@rrcs-162-155-170-75.central.biz.rr.com) has quit: Ping
+    timeout: 258 seconds                                                [09:16]
+*** pera (~pera@unaffiliated/pera) has quit: Ping timeout: 276 seconds
+<turab> Back when I wrote this, I couldn't think of an easy way to achieve
+        this without passing around a continuation
+*** pera (~pera@unaffiliated/pera) has joined channel #haskell          [09:17]
+*** tom_ (~tom@2a01:4c8:141d:90ab:45af:76d:bc3a:5ad8) has joined channel
+    #haskell                                                            [09:18]
+<lyxia> a stack of Let is equivalent to a list [(Var, Exp)]  (where Var = Text
+        in your code)
+<turab> Ah so get a assoc list and then convert it to a let?
+<turab> an assoc*                                                       [09:19]
+<lyxia> Yeah. you can also represent it as a (Exp -> Exp), that's a bit
+        simpler to fold back to an Exp at the end.                      [09:20]
+*** mkla (~em@CPE9050cad5b993-CM9050cad5b990.cpe.net.cable.rogers.com) has
+    quit: Quit: Lost terminal
+<lyxia> but the point is to move away from Cont and instead put the stack in
+        the state.                                                      [09:21]
+*** zincy_ (~tom@2a01:4c8:141d:90ab:45af:76d:bc3a:5ad8) has quit: Ping
+    timeout: 276 seconds
+*** tom__ (~tom@2a01:4c8:141d:90ab:45af:76d:bc3a:5ad8) has quit: Ping timeout:
+    276 seconds
+<lyxia> does that make sense
+*** zincy_ (~tom@2a01:4c8:141d:90ab:45af:76d:bc3a:5ad8) has joined channel
+    #haskell
+<turab> I will definitely try to write more solutions when I have more time.
+                                                                        [09:22]
+<turab> I thought about that too I think
+<turab> Unless I am misunderstanding you. What exactly do you mean by
+        "represent it" when you mentioned (Exp -> Exp)
+<lyxia> I mean a function like   (\e -> Let (x,e1) $ Let (y,e2) $ Let (z,e3) $
+        e)                                                              [09:23]
+<turab> Isn't that what I am doing currently?                           [09:24]
+<lyxia> kind of but in a roundabout way.                                [09:25]
+*** jedws (~jedws@2001:8003:9113:de01:681b:3da6:38c3:feba) has quit: Quit: My
+    MacBook has gone to sleep. ZZZzzz…                                 [09:26]
+*** conal (~conal@64.71.133.70) has joined channel #haskell
+*** falafel (~falafel@81.red-83-58-132.dynamicip.rima-tde.net) has quit: Ping
+    timeout: 245 seconds                                                [09:27]
+<turab> Could you show a non-roundabout way?
+<lyxia> It's quite subjective, but to me it seems to mix concerns
+<lyxia> one sec                                                         [09:29]
+<c_wraith> I feel like doing dumb GADT tricks to prevent illegal nesting of
+           expressions in the output format, and then letting the type checker
+           force you to get it right.                                   [09:30]
+<c_wraith> this is not actually a useful way to solve the problem in
+           production code, but it sure forces you to get it right once. 
+                                                                        [09:31]
+*** cybai (~cybai@fs276ecffa.tkyc512.ap.nuro.jp) has joined channel #haskell
+                                                                        [09:32]
+<iqubic> dumb GADT tricks are the best.                                 [09:33]
+<lyxia> turab: https://gist.github.com/Lysxia/07e70b382adc3f295c36dee96f2060c9
+                                                                        [09:34]
+*** forecho (~forecho@58.250.18.130) has joined channel #haskell        [09:35]
+<masaeedu[m]> how do i model functor composition for generalized functors?
+*** olligobber (olligobber@gateway/vpn/privateinternetaccess/olligobber) has
+    joined channel #haskell
+<masaeedu[m]> by generalized functors i mean                            [09:36]
+<turab> lyxia: This is spicy! Thanks a lot
+* masaeedu[m] sent a long message:  <
+  https://matrix.org/_matrix/media/v1/download/matrix.org/NpSmnTNfwZBlbtasogaJyKlx
+  >                                                                     [09:37]
+*** forecho (~forecho@58.250.18.130) has quit: Remote host closed the
+    connection
+*** libertyprime (~libertypr@71.87.69.111.dynamic.snap.net.nz) has joined
+    channel #haskell
+*** forecho (~forecho@218.17.157.47) has joined channel #haskell
+<iqubic> That looks like similar to bifunctor.
+<masaeedu[m]> it can be                                                 [09:38]
+<masaeedu[m]> it can also just be your standard `Functor`
+<masaeedu[m]> it all depends on what the kinds `c` and `d` are
+*** forecho (~forecho@218.17.157.47) has quit: Remote host closed the
+    connection                                                          [09:39]
+*** forecho (~forecho@58.250.18.130) has joined channel #haskell
+<lyxia> with this definition the problem is that you can't write (f (g x)) as
+        some (fg x)                                                     [09:40]
+* masaeedu[m] sent a long message:  <
+  https://matrix.org/_matrix/media/v1/download/matrix.org/BsoBQCoAzPUJnekvEGCrzBDd
+  >
+<lyxia> defunctionalize!
+<masaeedu[m]> i.e. there's that `*` in there
+<masaeedu[m]> i knew you'd say that
+<masaeedu[m]> but it's so inconvenient
+<masaeedu[m]> all the existing structures you'd want to witness become barely
+              recognizable by the time you're finished wrapping and unwrapping
+              them                                                      [09:41]
+<masaeedu[m]> i managed to do the thing from yesterday with GFix btw, but it's
+              really ugly
+*** carldd (~carldd@90-224-49-113-no56.tbcn.telia.com) has joined channel
+    #haskell                                                            [09:42]
+*** merijn (~merijn@83-160-49-249.ip.xs4all.nl) has joined channel #haskell
+<lyxia> that's the price for doing category theory in Haskell...        [09:43]
+*** unlink_ (~unlink2@p5B088D5C.dip0.t-ipconnect.de) has quit: Ping timeout:
+    258 seconds
+<masaeedu[m]> i should just go back to doing category theory in JS
+*** ryan2215 (~ryan2215@98.207.153.158) has quit: Remote host closed the
+    connection
+*** unlink2 (~unlink2@p200300EBCBCBCB0074EC59F8DD39FDD6.dip0.t-ipconnect.de)
+    has joined channel #haskell                                         [09:44]
+<lyxia> how ugly does it actually get in this case though
+* masaeedu[m] sent a long message:  <
+  https://matrix.org/_matrix/media/v1/download/matrix.org/GFmcpFscxzZcNaSAIqOVoPMG
+  >                                                                     [09:45]
+<masaeedu[m]> the common things from haskell just unify straightforwardly with
+              the general versions
+*** xkapastel (uid17782@gateway/web/irccloud.com/x-ouuychlmeucopvpv) has quit:
+    Quit: Connection closed for inactivity
+<masaeedu[m]> in the case of the compose thing i'm trying to witness
+              compositions of adjoint functors that various monads are
+              representationally equivalent to                          [09:46]
+<masaeedu[m]> and to write the general purpose monad and comonad instance for
+              those adjunctions
+<masaeedu[m]> i'm already only barely grasping this stuff by the skin of my
+              teeth, it gets really hard to manage when there's so many layers
+              of wrapping and unwrapping that writing code is like swimming
+              through molasses                                          [09:47]
+*** merijn (~merijn@83-160-49-249.ip.xs4all.nl) has quit: Ping timeout: 276
+    seconds                                                             [09:48]
+<lyxia> https://gist.github.com/Lysxia/96c9dd35601f41bf385309dffb1bbfec
+*** ryan2215 (~ryan2215@98.207.153.158) has joined channel #haskell
+<masaeedu[m]> see i don't really get what's going on there              [09:49]
+<masaeedu[m]> what is `@@`                                              [09:50]
+<lyxia> it's fcf application
+*** ddere (uid110888@gateway/web/irccloud.com/x-ilqfycyuzqazmoqh) has joined
+    channel #haskell
+<lyxia> If you know first-class-families, you can guess what @@ does from the
+        kinds of f, x and q.                                            [09:51]
+* dsal is making orphans
+<masaeedu[m]> what is the general pattern for defunctionalizing appropriately?
+              should i be doing `Exp (c -> d)` or `c -> Exp d`
+<lyxia> c -> Exp d                                                      [09:52]
+<masaeedu[m]> in general, should i be replacing all kind level `->`s with `->
+              Exp`s?                                                    [09:53]
+<lyxia> if you have more than one argument it's a tougher call between c -> d
+        -> Exp e  or  c -> Exp (d -> Exp e)                             [09:54]
+<lyxia> if you have any reason to believe you are going to need partial
+        application go for the latter, i.e., replace all -> with -> Exp
+*** slack1256 (~slack1256@186-78-92-74.baf.movistar.cl) has joined channel
+    #haskell                                                            [09:55]
+*** ketralnis (~ketralnis@reddit/admins/ketralnis) has quit: Quit: My MacBook
+    has gone to sleep. ZZZzzz…                                         [09:57]
+<masaeedu[m]> aggghhhhhh
+<masaeedu[m]> ok, fine
+<masaeedu[m]> thanks
+<masaeedu[m]> why can't it just work the nice way
+<lyxia> if you don't want to defunctionalize, then I suspect there is a way by
+        wrapping p and q somehow in the "Compose" instance (where you won't be
+        using Compose because that's the wrong kind)                    [09:58]
+<masaeedu[m]> i actually don't get what feature would even be needed in the
+              language to be able to define something like `Compose` without
+              defunctionalization                                       [09:59]
+<lyxia> but you are going to need wrapping because (c -> d) is more structured
+        than "functions from c to d"
+*** antsmartian (~antsmarti@117.96.197.210) has joined channel #haskell
+                                                                        [10:02]
+*** jedws (~jedws@pa49-196-167-222.pa.vic.optusnet.com.au) has joined channel
+    #haskell
+<lyxia> proper type-level functions would be a good start, though it's
+        probably a bit more than required                               [10:03]
+*** dbyte (~dbyte@209.6.44.25) has quit: Read error: Connection reset by peer
+*** bsima (~bsima@simatime.com) has quit: Quit: ZNC 1.7.2 - https://znc.in
+*** dbyte (~dbyte@209.6.44.25) has joined channel #haskell
+*** pera (~pera@unaffiliated/pera) has quit: Quit: leaving
+<lyxia> and also not sufficient if you care about type class resolution
+<masaeedu[m]> does the matchable families stuff get us any of the way towards
+              that?                                                     [10:04]
+<sicklorkin> what does `default` do? e.g. `import qualified Data.Text as T;
+             default (T.Text)`
+*** bgamari (~bgamari@2001:470:e438::1) has quit: Ping timeout: 246 seconds
+<masaeedu[m]> in particular, could i declare things like instances with
+              respect to `Compose f g` if `Compose` was a type famiy (with the
+              new stuff)?                                               [10:05]
+<lyxia> masaeedu[m]: it does, but I haven't played with it yet
+*** bsima (~bsima@simatime.com) has joined channel #haskell
+<iqubic> We don't yet have unsaturated type families, but I hear they are
+         coming soon.
+<masaeedu[m]> there's a branch with an implementation of the proposal   [10:06]
+*** jose_zap (~jose_zap@ihgmanagement27.i.subnet.rcn.com) has quit: Quit: My
+    MacBook has gone to sleep. ZZZzzz…
+<sicklorkin> ahh default is giving a hint that all default constrains need to
+             use Test
+<sicklorkin> *Text                                                      [10:07]
+*** bgamari (~bgamari@72.65.102.93) has joined channel #haskell
+*** stzsch (~quassel@2804:14d:4cd1:947b:5604:a6ff:fe8e:d858) has joined
+    channel #haskell                                                    [10:08]
+<lyxia> sicklorkin: ExtendedDefaultRules
+        https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/ghci.html#extension-ExtendedDefaultRules
+* hackage hs-ix 0.1.0.0 - Indexed monads
+  https://hackage.haskell.org/package/hs-ix-0.1.0.0 (MatthewFarkasDyck)
+<sicklorkin> lyxia: ty                                                  [10:09]
+* hackage ix 0.1.0.0 - Indexed monads
+  https://hackage.haskell.org/package/ix-0.1.0.0 (MatthewFarkasDyck)
+*** heatsink (~heatsink@2600:1700:bef1:5e10:48f0:b58c:59aa:e8d8) has joined
+    channel #haskell                                                    [10:10]
+*** argent0 (~argent0@191.81.207.129) has quit: Ping timeout: 258 seconds
+                                                                        [10:11]
+*** housecarpenter (uid306022@gateway/web/irccloud.com/x-bdggnevnetlwtxmu) has
+    quit: Quit: Connection closed for inactivity                        [10:12]
+*** xff0x (~fox@softbank126015132197.bbtec.net) has quit: Quit: xff0x   [10:15]
+*** heatsink (~heatsink@2600:1700:bef1:5e10:48f0:b58c:59aa:e8d8) has quit:
+    Ping timeout: 245 seconds
+*** theDon (~td@muedsl-82-207-238-156.citykom.de) has quit: Ping timeout: 245
+    seconds                                                             [10:17]
+*** jmcarthur (~jmcarthur@2601:86:100:1620::1) has joined channel #haskell
+                                                                        [10:18]
+*** petersen (~petersen@redhat/juhp) has quit: Ping timeout: 265 seconds
+                                                                        [10:19]
+*** theDon (~td@94.134.91.46) has joined channel #haskell
+*** chrisdotcode (~chrisdotc@unaffiliated/chrisdotcode) has joined channel
+    #haskell                                                            [10:20]
+*** lagothrix (~lagothrix@unaffiliated/lagothrix) is now known as Guest40431
+*** Guest40431 (~lagothrix@unaffiliated/lagothrix) has quit: Killed
+    (adams.freenode.net (Nickname regained by services))
+*** lagothrix (~lagothrix@unaffiliated/lagothrix) has joined channel #haskell
+*** zincy_ (~tom@2a01:4c8:141d:90ab:45af:76d:bc3a:5ad8) has quit: Read error:
+    Connection reset by peer                                            [10:22]
+*** tom_ (~tom@2a01:4c8:141d:90ab:45af:76d:bc3a:5ad8) has quit: Read error:
+    Connection reset by peer
+*** pi4 (~pi@dslb-094-221-114-163.094.221.pools.vodafone-ip.de) has joined
+    channel #haskell                                                    [10:34]
+*** ephemeral (~daemon@127.51-175-198.customer.lyse.net) has quit: Remote host
+    closed the connection                                               [10:35]
+*** heatsink (~heatsink@2600:1700:bef1:5e10:48f0:b58c:59aa:e8d8) has joined
+    channel #haskell
+*** noumenon (~daemon@127.51-175-198.customer.lyse.net) has joined channel
+    #haskell
+*** pi2 (~pi@dslb-088-077-218-203.088.077.pools.vodafone-ip.de) has quit: Ping
+    timeout: 240 seconds                                                [10:37]
+*** plutoniix (~q@175.176.222.7) has joined channel #haskell            [10:38]
+*** haskell_enthusia (~twain@168.61.46.105) has quit: Ping timeout: 268
+    seconds
+*** tabemann (~tabemann@2600:1700:7990:24e0:80fa:39ed:a7d0:c852) has joined
+    channel #haskell
+*** antsmartian (~antsmarti@117.96.197.210) has quit: Remote host closed the
+    connection
+*** ravenous_
+    (~ravenousm@ptr-cud5aqfe2unjl1u4u9w.18120a2.ip6.access.telenet.be) has
+    joined channel #haskell                                             [10:40]
+*** felixfoertsch23 (~felixfoer@2001:16b8:50c2:2a00:957b:4e43:3e0e:4fa5) has
+    joined channel #haskell
+*** felixfoertsch (~felixfoer@92.117.44.105) has quit: Ping timeout: 276
+    seconds
+*** haskell_enthusia (~twain@168.61.46.105) has joined channel #haskell
+*** jedws (~jedws@pa49-196-167-222.pa.vic.optusnet.com.au) has quit: Quit: My
+    MacBook has gone to sleep. ZZZzzz…                                 [10:42]
+*** ntsrtoh^ (~hph@ip98-186-247-88.mc.at.cox.net) has joined channel #haskell
+                                                                        [10:43]
+*** ravenous_
+    (~ravenousm@ptr-cud5aqfe2unjl1u4u9w.18120a2.ip6.access.telenet.be) has
+    quit: Ping timeout: 246 seconds                                     [10:44]
+*** tomjaguarpaw (~tom@li367-225.members.linode.com) has quit: Quit: Lost
+    terminal
+*** argent0 (~argent0@191.81.207.129) has joined channel #haskell       [10:45]
+*** Amras (~Amras@unaffiliated/amras0000) has quit: Read error: Connection
+    reset by peer
+*** libertyprime (~libertypr@71.87.69.111.dynamic.snap.net.nz) has quit: Ping
+    timeout: 276 seconds                                                [10:46]
+*** nullifidian__ (~nullifidi@unaffiliated/nullifidian) has quit: Read error:
+    Connection reset by peer                                            [10:47]
+*** nullifidian (~nullifidi@unaffiliated/nullifidian) has joined channel
+    #haskell
+*** Frobozz (~Frobozz@unaffiliated/frobozz) has quit: Ping timeout: 276
+    seconds                                                             [10:49]
+<dsal> I'm generating a bunch of C++ code.  Being pretty hacky, but I'm
+       wondering if there's something that might make this slightly easier
+       without a lot of overhead.                                       [10:52]
+*** ntsrtoh^ (~hph@ip98-186-247-88.mc.at.cox.net) has left channel #haskell:
+    #haskell                                                            [10:53]
+*** ncrth^ (~hph@ip98-186-247-88.mc.at.cox.net) has joined channel #haskell
+                                                                        [10:54]
+<dibblego> dsal: I know someone else who has been doing this, for quite some
+           time, but they are not on this channel                       [10:56]
+<dsal> I'm just gonna keep hacking.  This is still far easier than writing the
+       actual C++ code.
+<iqubic> I feel the same way about Java                                 [10:57]
+*** ddellacosta (~dd@193.148.18.212) has quit: Ping timeout: 245 seconds
+                                                                        [10:58]
+*** jmp-TOK (~jmp-TOK@139.28.218.198) has quit:                         [11:00]
+*** mac10688 (~mac10688@c-76-115-116-76.hsd1.or.comcast.net) has joined
+    channel #haskell                                                    [11:02]
+*** kish (~oracle@unaffiliated/oracle) has quit: Ping timeout: 240 seconds
+                                                                        [11:03]
+*** Wuzzy (~Wuzzy@p5790EDDD.dip0.t-ipconnect.de) has quit: Quit: Wuzzy  [11:08]
+*** ravenous_
+    (~ravenousm@ptr-cud5aqfe2unjl1u4u9w.18120a2.ip6.access.telenet.be) has
+    joined channel #haskell                                             [11:10]
+*** jmcarthur (~jmcarthur@2601:86:100:1620::1) has quit: Ping timeout: 246
+    seconds                                                             [11:11]
+*** petersen (~petersen@redhat/juhp) has joined channel #haskell
+*** ravenous_
+    (~ravenousm@ptr-cud5aqfe2unjl1u4u9w.18120a2.ip6.access.telenet.be) has
+    quit: Ping timeout: 276 seconds                                     [11:15]
+*** DARKNE55 (~DARKNE55@141.98.102.235) has joined channel #haskell     [11:16]
+*** acdimalev (~jamin@cpe-23-241-155-6.socal.res.rr.com) has joined channel
+    #haskell
+<Nevoic> Can wreq not do patch requests?                                [11:24]
+<Nevoic> I see get/post/put/delete.
+<Nevoic> I tried doing a put instead of a patch but I'm getting an error back
+         from the server "METHOD NOT ALLOWED" so it seems I need to send it as
+         a patch.
+<Nevoic> oh actually found "customMethod"                               [11:25]
+*** merijn (~merijn@83-160-49-249.ip.xs4all.nl) has joined channel #haskell
+                                                                        [11:26]
+*** Saukk (~Saukk@2001:998:e1:c965:1c59:9bb5:b94c:3) has joined channel
+    #haskell
+*** m0rphism (~m0rphism@149.172.82.115) has quit: Ping timeout: 245 seconds
+                                                                        [11:28]
+*** Kartha (~Kartha@112.133.237.2) has joined channel #haskell          [11:29]
+*** yoja (~yoel.jaco@77.137.149.144) has quit: Ping timeout: 268 seconds
+                                                                        [11:30]
+*** merijn (~merijn@83-160-49-249.ip.xs4all.nl) has quit: Ping timeout: 265
+    seconds                                                             [11:31]
+*** conal (~conal@64.71.133.70) has quit: Quit: Computer has gone to sleep.
+                                                                        [11:33]
+*** ryan2215 (~ryan2215@98.207.153.158) has quit: Remote host closed the
+    connection                                                          [11:41]
+<rajivr___> I am new to Haskell. In `fmap` composition, `(fmap . fmap) ::
+            (Functor f1, Functor f2) => (a -> b) -> f1 (f2 a) -> f1 (f2 b)`,
+            would I be right in understanding the kind of  `f1 (f2 a)` is `(*
+            -> *) -> *` ?                                               [11:44]
+<shachaf> The kind of f1 (f2 a) is *
+*** Gurkenglas (~Gurkengla@unaffiliated/gurkenglas) has quit: Ping timeout:
+    276 seconds                                                         [11:45]
+<rajivr___> When fully inhabited, but in order to inhabit it, it would need
+            `(* -> *) -> *`, I cannot for example inhabit it `*`
+*** conal (~conal@64.71.133.70) has joined channel #haskell             [11:46]
+<shachaf> I don't know what you mean by "fully inhabited", but that's just
+          always the kind of f1 (f2 a).
+<shachaf> Maybe it would be easier to see if you used concrete f1 and f2. fmap
+          . fmap :: (a -> b) -> Maybe [a] -> Maybe [b]
+*** machinedgod
+    (~machinedg@hlfxns018gw-47-54-39-131.dhcp-dynamic.fibreop.ns.bellaliant.net)
+    has quit: Ping timeout: 265 seconds                                 [11:48]
+<rajivr___> Yes, that's a better way to think about it. Thanks for the
+            example. What I was trying to get at is that I cannot construct a
+            mapping `(a -> b) -> Maybe [a] -> Char`. That would not be a `fmap
+            . fmap`
+<rajivr___> The return value has to be something like `Maybe( [] x)`    [11:49]
+<shachaf> Yes, because Char isn't f1 (f2 b)
+<rajivr___> Thanks. That's want I wanted to confirm.                    [11:50]
+*** ryan2215 (~ryan2215@98.207.153.158) has joined channel #haskell
+*** conal (~conal@64.71.133.70) has quit: Client Quit
+*** theDon (~td@94.134.91.46) has quit: Ping timeout: 240 seconds       [11:51]
+*** vonfry (~vonfry@2001:da8:801b:201:f68e:38ff:fe94:4e62) has quit: Quit:
+    WeeChat 2.4
+*** theDon (~td@94.134.91.46) has joined channel #haskell
+*** conal (~conal@64.71.133.70) has joined channel #haskell             [11:52]
+<rajivr___> Is it correct to say `f1 (f2 a)` has the structure `(* -> *) ->
+            *`?                                                         [11:55]
+*** ryan2215 (~ryan2215@98.207.153.158) has quit: Ping timeout: 276 seconds
+*** Saukk (~Saukk@2001:998:e1:c965:1c59:9bb5:b94c:3) has quit: Remote host
+    closed the connection                                               [11:56]
+<slack1256> rajivr___: I don't think so, `f2 a :: *` ie is fully saturated, so
+            `f1 :: * -> *`
+<shachaf> I don't think it means anything, so it's probably not correct.
+<shachaf> It's certainly not correct to say it has that kind, which I said
+          above.
+*** dddddd (~dddddd@unaffiliated/dddddd) has quit: Remote host closed the
+    connection
+*** conal (~conal@64.71.133.70) has quit: Ping timeout: 265 seconds     [11:57]
+<rotaerk> hmm why aren't false asserts triggering?
+<rotaerk> well, wait maybe I'm not checking all the appropriate places for
+          flags...                                                      [11:58]
+<rotaerk> I don't have -O or -fignore-asserts in my .cabal file, nor in my
+          cabal.project file                                            [11:59]
+*** fragamus (~michaelgo@c-98-244-6-56.hsd1.ca.comcast.net) has joined channel
+    #haskell
+*** lastmanstanding (~arjoonn@111.92.49.15) has quit: Ping timeout: 258
+    seconds                                                             [12:00]
+*** Lycurgus (~niemand@98.4.103.219) has joined channel #haskell        [12:02]
+*** libertyprime (~libertypr@71.87.69.111.dynamic.snap.net.nz) has joined
+    channel #haskell                                                    [12:03]
+<rotaerk> meh, maybe the defaults have changed; I'll just add
+          -fno-ignore-asserts
+*** heatsink_ (~heatsink@107-136-5-69.lightspeed.sntcca.sbcglobal.net) has
+    joined channel #haskell                                             [12:04]
+*** chin-tastic (~chin-tast@c-73-137-102-244.hsd1.ga.comcast.net) has quit:
+    Ping timeout: 265 seconds
+<turab> lyxia: Thanks again, I tried to use the idea you showed and it looks
+        really cool!
+*** heatsink (~heatsink@2600:1700:bef1:5e10:48f0:b58c:59aa:e8d8) has quit:
+    Ping timeout: 245 seconds                                           [12:06]
+<rajivr___> Thanks shachaf  slack1256 . Is my use of the terminology correct?
+            A Type is inhabited by values. A Kind is saturated by types?
+                                                                        [12:08]
+<shachaf> No, just say "inhabited".                                     [12:10]
+<shachaf> Presumably "saturated" means "fully applied" here, but it's not very
+          important.
+<shachaf> You probably don't need to worry about kinds at all, but if you do,
+          you should be fine with saying things like "a :: *" if you want to
+          be explicit.
+*** ravenous_
+    (~ravenousm@ptr-cud5aqfe2unjl1u4u9w.18120a2.ip6.access.telenet.be) has
+    joined channel #haskell                                             [12:11]
+*** piyush-kurur (~user@14.139.174.50) has joined channel #haskell      [12:12]
+<rajivr___> Thanks again. shachaf . :-)                                 [12:14]
+*** ravenous_
+    (~ravenousm@ptr-cud5aqfe2unjl1u4u9w.18120a2.ip6.access.telenet.be) has
+    quit: Ping timeout: 246 seconds                                     [12:15]
+*** ryan2215 (~ryan2215@98.207.153.158) has joined channel #haskell     [12:20]
+*** forecho (~forecho@58.250.18.130) has quit: Remote host closed the
+    connection
+*** laem (~laem@unaffiliated/laem) has quit: Ping timeout: 276 seconds  [12:22]
+*** laem (~laem@unaffiliated/laem) has joined channel #haskell          [12:23]
+*** rruizt (~rruizt@83-84-23-124.cable.dynamic.v4.ziggo.nl) has quit: Ping
+    timeout: 258 seconds                                                [12:26]
+*** rmeis (~rolf@ipbcc3f776.dynamic.kabel-deutschland.de) has joined channel
+    #haskell                                                            [12:28]
+*** rruizt (~rruizt@83-84-23-124.cable.dynamic.v4.ziggo.nl) has joined channel
+    #haskell                                                            [12:30]
+*** forecho (~forecho@58.250.18.130) has joined channel #haskell
+*** conal (~conal@64.71.133.70) has joined channel #haskell             [12:31]
+*** jlamothe (~jlamothe@dev.jlamothe.net) has quit: Quit: leaving
+*** ht_ (~Thunderbi@2a02:a210:9501:ad80:853:a56e:c836:72bd) has joined channel
+    #haskell                                                            [12:33]
+*** forecho (~forecho@58.250.18.130) has quit: Ping timeout: 276 seconds
+                                                                        [12:35]
+*** hc (~ircd@unaffiliated/hc) has quit: Ping timeout: 245 seconds      [12:36]
+*** conal (~conal@64.71.133.70) has quit: Ping timeout: 258 seconds
+*** Lord_of_Life (~Lord@unaffiliated/lord-of-life/x-0885362) has quit: Ping
+    timeout: 265 seconds
+*** forecho (~forecho@58.250.18.130) has joined channel #haskell        [12:37]
+*** Frobozz (~Frobozz@unaffiliated/frobozz) has joined channel #haskell
+                                                                        [12:38]
+*** hc (~ircd@unaffiliated/hc) has joined channel #haskell
+*** Lord_of_Life (~Lord@unaffiliated/lord-of-life/x-0885362) has joined
+    channel #haskell
+*** slack1256 (~slack1256@186-78-92-74.baf.movistar.cl) has quit: Remote host
+    closed the connection                                               [12:40]
+*** forecho (~forecho@58.250.18.130) has quit: Ping timeout: 245 seconds
+                                                                        [12:42]
+*** dbyte (~dbyte@209.6.44.25) has quit: Read error: Connection reset by peer
+                                                                        [12:45]
+*** dbyte (~dbyte@209.6.44.25) has joined channel #haskell              [12:46]
+*** ryan2215 (~ryan2215@98.207.153.158) has quit: Remote host closed the
+    connection                                                          [12:47]
+<iqubic> A type is inhabited by values. A kind is inhabited by types
+*** chin-tastic (~chin-tast@c-73-137-102-244.hsd1.ga.comcast.net) has joined
+    channel #haskell                                                    [12:48]
+*** rmeis (~rolf@ipbcc3f776.dynamic.kabel-deutschland.de) has quit: Ping
+    timeout: 265 seconds                                                [12:49]
+*** day__ (~Unknown@unaffiliated/day) has joined channel #haskell
+*** stepnem_ (~stepnem@185.112.167.114) has joined channel #haskell     [12:50]
+*** felixfoertsch23 (~felixfoer@2001:16b8:50c2:2a00:957b:4e43:3e0e:4fa5) has
+    quit: Quit: ZNC 1.7.3 - https://znc.in                              [12:51]
+*** stepnem (~stepnem@185.112.167.114) has quit: Ping timeout: 245 seconds
+*** felixfoertsch (~felixfoer@109.250.105.154) has joined channel #haskell
+*** jluttine (~jluttine@109.204.147.177) has quit: Ping timeout: 265 seconds
+*** jlamothe (~jlamothe@dev.jlamothe.net) has joined channel #haskell
+*** cdepillabout (~cdepillab@2409:13:9000:a000:e8db:7afd:dd25:7f38) has joined
+    channel #haskell                                                    [12:52]
+*** day (~Unknown@unaffiliated/day) has quit: Ping timeout: 265 seconds
+*** day__ (~Unknown@unaffiliated/day) is now known as day
+*** lastmanstanding (~arjoonn@137.97.41.160) has joined channel #haskell
+*** vonfry (~vonfry@2001:da8:801b:201:f68e:38ff:fe94:4e62) has joined channel
+    #haskell                                                            [12:53]
+*** ryan2215 (~ryan2215@98.207.153.158) has joined channel #haskell     [12:55]
+*** d12frosted (~d12froste@95.67.25.188) has joined channel #haskell    [12:58]
+*** cybai (~cybai@fs276ecffa.tkyc512.ap.nuro.jp) has quit: Read error:
+    Connection reset by peer
+*** cybai_ (~cybai@240d:1b:42:7800:5142:bc24:7210:b2d6) has joined channel
+    #haskell
+*** ryan2215 (~ryan2215@98.207.153.158) has quit: Ping timeout: 265 seconds
+                                                                        [13:00]
+<mozzarella> iqubic: what's a higher kinded type?
+<iqubic> Not sure.
+<iqubic> I'd have to look that up.                                      [13:01]
+*** Lowl3v3l (~Lowl3v3l@dslb-002-203-233-130.002.203.pools.vodafone-ip.de) has
+    quit: Ping timeout: 240 seconds
+* Lycurgus guesses kinds of kinds
+*** forecho (~forecho@218.17.157.47) has joined channel #haskell
+*** amosbird_ (~amosbird@2a01:111:f102:8001::1761:4cf8) has joined channel
+    #haskell
+<iqubic> Lycurgus:ly
+<iqubic> Actually, that would be a sort.                                [13:02]
+<Lycurgus> i c
+*** amosbird (~amosbird@40.83.99.220) has quit: Ping timeout: 265 seconds
+*** vivekramaswamy (~vivekrama@165.225.104.98) has joined channel #haskell
+                                                                        [13:03]
+<heatsink_> A higher kinded type is like a higher order function        [13:04]
+<heatsink_> It takes type constructors as arguments                     [13:05]
+*** ht_ (~Thunderbi@2a02:a210:9501:ad80:853:a56e:c836:72bd) has quit: Quit:
+    ht_
+<heatsink_> For example, Fix :: (* -> *) -> * is a higher kinded type
+*** jluttine (~jluttine@109.204.147.177) has joined channel #haskell    [13:08]
+<c_wraith> it's a bit more liberal.  Maybe :: * -> * is usually called
+           higher-kinded.
+*** kupi (uid212005@gateway/web/irccloud.com/x-bcnvttskjlkyitwe) has quit:
+    Quit: Connection closed for inactivity                              [13:09]
+<shachaf> Hm, I don't think so?
+<shachaf> But really words like these don't matter very much.
+<shachaf> Seems the past half hour has been mostly people using complicated
+          words. It's better to communicate clearly.                    [13:10]
+*** Foritus (~buggery@cpc91334-watf11-2-0-cust153.15-2.cable.virginm.net) has
+    quit: Read error: Connection reset by peer
+<jle`> hm, i don't think people would normally consider Maybe higher-kinded,
+       but abstractions over Maybe wouild be considered higher-kinded
+<jle`> like Functor
+*** ryan2215 (~ryan2215@98.207.153.158) has joined channel #haskell     [13:11]
+*** Foritus (~buggery@cpc91334-watf11-2-0-cust153.15-2.cable.virginm.net) has
+    joined channel #haskell
+<jle`> but i suppose there is some ambiguity                            [13:12]
+*** jluttine (~jluttine@109.204.147.177) has quit: Ping timeout: 240 seconds
+*** cdepillabout (~cdepillab@2409:13:9000:a000:e8db:7afd:dd25:7f38) has quit:
+    Quit: Leaving                                                       [13:15]
+<EvanR> simple english haskell, or xkcd haskell
+<heatsink_> higher kinds are ways in which types of things can be made using
+            ways of making types of things                              [13:16]
+*** ryan2215 (~ryan2215@98.207.153.158) has quit: Ping timeout: 276 seconds
+*** mariatsji (~mariatsji@vpn-managed.schibsted.no) has joined channel
+    #haskell                                                            [13:18]
+<jle`> bring me a higher-kinded love
+*** forecho (~forecho@218.17.157.47) has quit: Remote host closed the
+    connection                                                          [13:22]
+*** forecho (~forecho@58.250.18.130) has joined channel #haskell        [13:23]
+<monochrom> newtype Love m a = MkLove{beloved :: m (Either (a -> Void) a)}
+                                                                        [13:24]
+*** d12frosted (~d12froste@95.67.25.188) has quit: Ping timeout: 268 seconds
+                                                                        [13:26]
+<monochrom> higher-kinded Love that models wondering about "he loves me; he
+            loves me not".
+*** ryan2215 (~ryan2215@98.207.153.158) has joined channel #haskell     [13:27]
+*** forecho (~forecho@58.250.18.130) has quit: Ping timeout: 245 seconds
+<iqubic> I love it                                                      [13:29]
+*** MoarSpaceFi (~Forgot_my@65.155.84.20) has joined channel #haskell   [13:31]
+*** olligobber (olligobber@gateway/vpn/privateinternetaccess/olligobber) has
+    quit: Read error: Connection reset by peer
+*** ryan2215 (~ryan2215@98.207.153.158) has quit: Ping timeout: 240 seconds
+*** petersen_ (~petersen@redhat/juhp) has joined channel #haskell       [13:32]
+*** petersen (~petersen@redhat/juhp) has quit: Ping timeout: 265 seconds
+                                                                        [13:33]
+*** petersen_ (~petersen@redhat/juhp) is now known as petersen
+<jlamothe> I'm having a brain failure.  Is there a function in base that
+           checks if some string is contained in another.  This feels like the
+           soft of thing that should exist, but I"m not finding it.     [13:34]
+<monochrom> isInfixOf
+*** SoundLogic (~SoundLogi@75-134-16-17.dhcp.mdsn.wi.charter.com) has quit:
+    Ping timeout: 276 seconds
+<monochrom> in Data.List
+<jlamothe> Riiiiiiiiight.                                               [13:35]
+<jlamothe> I was expecing it to be in Data.String, but that makes sense.
+<jlamothe> Thanks.
+*** d12frosted (~d12froste@95.67.25.188) has joined channel #haskell    [13:37]
+*** Sgeo_ (~Sgeo@ool-18b98995.dyn.optonline.net) has joined channel #haskell
+*** fjellfras (~fjellfras@49.248.13.74) has joined channel #haskell     [13:39]
+*** Synthetica (uid199651@gateway/web/irccloud.com/x-aetigfldcutdqyyt) has
+    joined channel #haskell                                             [13:40]
+*** Nta1e (~Nta1e@h42.n1.ips.mtn.co.ug) has joined channel #haskell     [13:41]
+*** Sgeo__ (~Sgeo@ool-18b98995.dyn.optonline.net) has quit: Ping timeout: 246
+    seconds
+*** d12frosted (~d12froste@95.67.25.188) has quit: Ping timeout: 258 seconds
+*** fragamus (~michaelgo@c-98-244-6-56.hsd1.ca.comcast.net) has quit: Ping
+    timeout: 240 seconds                                                [13:42]
+*** ryan2215 (~ryan2215@98.207.153.158) has joined channel #haskell     [13:43]
+*** Nta1e (~Nta1e@h42.n1.ips.mtn.co.ug) has quit: Read error: Connection reset
+    by peer                                                             [13:45]
+*** Kartha (~Kartha@112.133.237.2) has quit: Changing host              [13:46]
+*** Kartha (~Kartha@unaffiliated/kartha) has joined channel #haskell
+<dminuoso> iqubic: Heh, it was actually a GADT style definition in my code
+           that I unplugged and didn't modify correctly.                [13:47]
+<dminuoso> iqubic: Anyway, the point was to convince yourself that this is
+           indeed not Applicative or Monad.                             [13:48]
+<dminuoso> iqubic: Let's just focus on the Comonad instance.
+*** ryan2215 (~ryan2215@98.207.153.158) has quit: Ping timeout: 276 seconds
+*** Superhanz (~Superhanz@dyn099029.shef.ac.uk) has joined channel #haskell
+*** palo1 (~weechat@c-base/crew/palo) has joined channel #haskell       [13:49]
+<iqubic> http://dpaste.com/1PE7F8B
+<iqubic> This is what I have.
+<dminuoso> iqubic: Now the interesting part is the `experiment`
+           implementation. It can be shown, that experiment fully
+           characterizes Store.                                         [13:50]
+<dminuoso> iqubic: Drop the Applicative/Monad instances.
+<iqubic> I will.
+*** chrisdotcode (~chrisdotc@unaffiliated/chrisdotcode) has quit: Quit:
+    chrisdotcode
+<dminuoso> iqubic: To do that, enable RankNTypes, and rewrite `Functor,
+           Comonad and ComonadStore` for this new data type             [13:51]
+<dminuoso> iqubic: newtype Pretext s a = Pretext { runPretext :: forall
+           f. Functor f => (s -> f s) -> f a }
+*** palo (~weechat@c-base/crew/palo) has quit: Ping timeout: 245 seconds
+*** palo1 (~weechat@c-base/crew/palo) is now known as palo
+<dminuoso> (This can be thought of as `experiment partially applied to some
+           store`)                                                      [13:52]
+<iqubic> So I should create Functor, Comonad and ComonadStore for this?
+<dminuoso> iqubic: Right.
+*** turab (~turab@149-160-240-247.dhcp-bl.indiana.edu) has quit: Quit: WeeChat
+    2.5
+<iqubic> I'll be back in a bit.
+*** cdepillabout (~illabout@2409:13:9000:a000:e8db:7afd:dd25:7f38) has joined
+    channel #haskell
+*** qhong (~user@18.20.250.61) has joined channel #haskell              [13:56]
+<iqubic> Pretext only takes one argument?
+<iqubic> dminuoso: Is that right?
+*** vivekramaswamy (~vivekrama@165.225.104.98) has quit: Remote host closed
+    the connection
+<dminuoso> iqubic: Yes.                                                 [13:57]
+*** lastmanstanding (~arjoonn@137.97.41.160) has quit: Ping timeout: 268
+    seconds
+<iqubic> Weird.
+*** YongJoon1 (~Thunderbi@121.67.187.140) has joined channel #haskell
+<iqubic> Writing fmap is stumping me.
+*** vivekramaswamy (~vivekrama@165.225.104.81) has joined channel #haskell
+                                                                        [13:58]
+<iqubic> I have this: "fmap f (Pretext g) = Pretext _ "
+<jle`> remember the mechanical construction of a Functor instance
+*** qhong (~user@18.20.250.61) has quit: Client Quit
+<jle`> if your type has form Blah (f a), and f is a Functor, then you can
+       write fmap by fmapping over f
+<iqubic> Right. Right.                                                  [13:59]
+*** ryan2215 (~ryan2215@98.207.153.158) has joined channel #haskell
+*** YongJoon (~Thunderbi@121.67.187.140) has quit: Ping timeout: 258 seconds
+*** YongJoon1 (~Thunderbi@121.67.187.140) is now known as YongJoon
+*** slomo (~slomo@unaffiliated/slomo) has joined channel #haskell
+<jle`> it might help to look at `(s -> f s) -> f a` as a specific functor on a
+*** DARKNE55 (~DARKNE55@141.98.102.235) has quit:                       [14:00]
+<iqubic> Right.
+<jle`> which unfortunately requires some point-free trickery maybe to do it
+       mechanically
+<iqubic> Right.
+<jle`> or maybe not. the -> being infix obscures it
+*** olligobber (olligobber@gateway/vpn/privateinternetaccess/olligobber) has
+    joined channel #haskell                                             [14:01]
+<iqubic> I'm a bit lost here.                                           [14:02]
+<dminuoso> iqubic: Sit back, relax, and look at what you have.
+<dminuoso> iqubic: Look at what you need to produce, and consider that you
+           have a very very limited amount of things in your hands.     [14:03]
+*** ryan2215 (~ryan2215@98.207.153.158) has quit: Ping timeout: 240 seconds
+<iqubic> I have an 'a -> b' and an '(s -> f s) -> f a'                  [14:04]
+<jle`> spoilers don't read: (s -> f s) -> f a is ReaderT (s -> f s) f a
+<dminuoso> iqubic: not quite!
+<iqubic> Why not?
+<dminuoso> iqubic: There's additional quantificatoin in there.          [14:05]
+<iqubic> I know that f is a functor.
+<dminuoso> iqubic: You have something of type `forall f. Functor f => (s -> f
+           s) -> f a`
+<dminuoso> This is important.
+<iqubic> So if I can get access to that f a, then I can fmap over it and get
+         the f b.
+<jle`> you also have something else                                     [14:06]
+<iqubic> What do I have?
+<jle`> fmap f (Pretext g) = Pretect $ \h -> ...
+<jle`> *Pretext
+<jle`> you have h :)
+<iqubic> Oh.
+*** kubek2k (~Jakub_Jan@213-241-3-97.static.ip.netia.com.pl) has joined
+    channel #haskell
+*** dTal (~quassel@dragonbox/users/dtal) has quit: Ping timeout: 246 seconds
+<iqubic> I got it.                                                      [14:07]
+<iqubic> "fmap f (Pretext g) = Pretext (\h -> f <$> g h)"
+<dminuoso> iqubic: Does it type check?
+<iqubic> Yes.
+<jle`> my other hint was that because (s -> f s) -> f a is ReaderT (s -> f s)
+       f a, you can also write fmap f (Pretext g) = Pretext $ (fmap . fmap) f
+       g                                                                [14:08]
+<iqubic> And hlint tells me I can rewrite it as:   "fmap f (Pretext g) =
+         Pretext $ fmap f . g"
+<dminuoso> iqubic: ^- look at jle`s hint, this strick can be useful later on.
+<jle`> or rather ((->) (s -> f s) :.: f) a, not necessarily reader      [14:09]
+<iqubic> How does the "Pretext $ (fmap . fmap) f g" work?
+<jle`> iqubic: note (s -> f s) -> f a is taking f through "two layers" of
+       functors
+<dminuoso> iqubic: `(->) a` is a Functor.
+<jle`> first a is applied to the 'f' Functor
+<jle`> then it is applied to the (->) (s -> f s) Functor
+*** mariatsji (~mariatsji@vpn-managed.schibsted.no) has quit: Ping timeout:
+    276 seconds                                                         [14:10]
+<iqubic> I see.
+<jle`> so (fmap . fmap): first lift through (->) (s -> f s) functor
+<jle`> then lift through 'f' Functor
+<iqubic> I see.
+<iqubic> Time to make a comonad for this.
+<jle`> although i think the first way you wrote it is the most readable
+*** YongJoon1 (~Thunderbi@121.67.187.140) has joined channel #haskell
+<dminuoso> iqubic: So. Now the Comonad and ComonadStore instances are the
+           really tricky ones.
+<dminuoso> iqubic: Take your time on these. :)
+*** Ariakenom (~Ariakenom@h-158-174-186-219.NA.cust.bahnhof.se) has joined
+    channel #haskell                                                    [14:11]
+*** conal (~conal@64.71.133.70) has joined channel #haskell
+<iqubic> I will.
+*** YongJoon (~Thunderbi@121.67.187.140) has quit: Ping timeout: 276 seconds
+*** YongJoon1 (~Thunderbi@121.67.187.140) is now known as YongJoon
+*** Sk01 (~sky3@ce3f.wls.metu.edu.tr) has joined channel #haskell       [14:12]
+<iqubic> extract :: Pretext s a -> a
+*** sQVe (~sQVe@unaffiliated/sqve) has joined channel #haskell
+*** Lycurgus (~niemand@98.4.103.219) has quit: Quit: Exeunt             [14:13]
+<iqubic> I have a function of type 'forall f. Functor f => (s -> f s) -> f a'
+         And I need to extract an 'a'?!?!
+<iqubic> I don't think that is possible.
+<dminuoso> iqubic: Yes.
+<dminuoso> iqubic: I guarantee: You can write these instances and they will be
+           lawful.
+<iqubic> How do I extract the a?
+<dminuoso> iqubic: And I furthermore guarantee that Pretext is isomorphic to
+           Store.
+*** marrrk (~textual@46.114.39.183) has joined channel #haskell
+<dminuoso> iqubic: Well that's the challenge..                          [14:14]
+*** emptyflask (~jon@66.64.40.21) has quit: Ping timeout: 276 seconds
+<iqubic> I don't even know where to begin.
+*** fragamus (~michaelgo@c-98-244-6-56.hsd1.ca.comcast.net) has joined channel
+    #haskell
+<jle`> iqubic: here's a hint -- this thing works for all Functors
+<jle`> so the trick is picking exactly a Functor that will give you exactly
+       what you want                                                    [14:15]
+<jle`> usually you can even make one "from scratch" contrived to do exactly
+       that
+*** forecho (~forecho@58.250.18.130) has joined channel #haskell
+<iqubic> How?
+*** ryan2215 (~ryan2215@98.207.153.158) has joined channel #haskell
+<dminuoso> iqubic: Ponder about it for a while.
+<jle`> my strategy usually is: look at the reuslt, 'f a'
+<jle`> and the thing you want is 'a'
+<dminuoso> iqubic: If something is in a negative position, you need to supply
+           something.
+<iqubic> Right. And it works forall f.
+<jle`> so you have to pick some 'f' you want to use (maybe even make it from
+       scratch) so that 'f a' is exactly f
+<jle`> er sorry, that 'f a' is exactly 'a'                              [14:16]
+*** heatsink_ (~heatsink@107-136-5-69.lightspeed.sntcca.sbcglobal.net) has
+    quit: Remote host closed the connection
+<iqubic> Isn't that just Identity?
+<dminuoso> iqubic: I dont know, is it?
+<jle`> if you suspect Identity, then try using it with f ~ Identity
+*** conal (~conal@64.71.133.70) has quit: Ping timeout: 268 seconds
+*** acidjnk_new (~acid@200116b8676b630061478b9c30964fb1.dip.versatel-1u1.de)
+    has joined channel #haskell
+<iqubic> Will I need to import Identity?
+<jle`> that would be very convenient, because the 'f a' you get from the
+       function is 'Identity a', which is just 'a'                      [14:17]
+<dminuoso> iqubic: Sure, or write it on the spot. Whatever you prefer.
+<jle`> very convenient indeed
+*** d12frosted (~d12froste@95.67.25.188) has joined channel #haskell    [14:18]
+*** vlatkoB (~IRC_clien@unaffiliated/vlatkob) has joined channel #haskell
+<jle`> this strategy works in general: "i need to get X", so you need to find
+       a functor F where 'F a' is X                                     [14:19]
+*** jgt1 (~jgt@2a02:a31b:8542:b480:d1d4:e272:f672:1622) has joined channel
+    #haskell
+*** ryan2215 (~ryan2215@98.207.153.158) has quit: Ping timeout: 245 seconds
+<jle`> and usually the easiest way is `data MyFunctor a = MyFunctor X`, just
+       make it up on-the-spot
+<dminuoso> iqubic: So here's two lines of thought. The forall quantification
+           lets *you* pick the functor, that's the weight of that `forall`
+*** atralheaven (~atralheav@37.48.90.208) has joined channel #haskell
+<iqubic> I didn't realize that.
+<dminuoso> iqubic: And if something is in negative position, you can/have to
+           supply it.
+<jle`> if sometimes you recognize it as a common functor that already exists,
+       you can use that too if you are super clever
+*** marrrk (~textual@46.114.39.183) has quit: Quit: My MacBook has gone to
+    sleep. ZZZzzz…                                                     [14:20]
+*** fragamus (~michaelgo@c-98-244-6-56.hsd1.ca.comcast.net) has quit: Ping
+    timeout: 276 seconds
+<dminuoso> iqubic: So if you hold something of type `Pretext s a`, it means
+           you can pry it open, supply some function `s -> f s` for whatever
+           functor you like, and you get some `f a` back
+<dminuoso> iqubic: so the only way to obtain something back, is by supplying
+           such a function. recall how I said that Pretext is just experiment
+           partially applied to a store? You have to supply the experiment
+           function now to get anything out of it.                      [14:21]
+*** lastmanstanding (~arjoonn@103.79.223.74) has joined channel #haskell
+*** sQVe (~sQVe@unaffiliated/sqve) has quit: Quit: Bye!
+<iqubic> Alright: (s -> f s) is going to be (\x -> Identity x), I think.
+<iqubic> Or literally just Identity.
+<dminuoso> :-)
+<atralheaven> Hi, I'm not a haskell programmer, but I'm trying to understand
+              functional programming.                                   [14:22]
+<dminuoso> Hi atralheaven. :)
+<dminuoso> iqubic: Or in other words: the only thing you can do with your
+           Pretext, is run some experiment on the (internal) Store.     [14:23]
+*** marrrk (~textual@46.114.39.183) has joined channel #haskell
+<atralheaven> In haskell, everything is not a function, right? it's imperative
+              programming + functions?
+<dminuoso> atralheaven: Nope.
+<dminuoso> atralheaven: Or.. well. Yes. Not sure how one would correctly
+           answer this in English heh.                                  [14:24]
+<dminuoso> atralheaven: Not everything is a Function, correct.
+<dminuoso> atralheaven: Haskell is foremost declarative, rather than
+           imperative. But we can model imperative programming using function
+           tricks.
+<atralheaven> dminuoso: I guess it would be no, and yes!
+*** mariatsji (~mariatsji@vpn-managed.schibsted.no) has joined channel
+    #haskell                                                            [14:25]
+<no-n> True
+<monochrom> "xyz" is a string not a function.
+<dminuoso> atralheaven: One important part is that when we talk about
+           functions, we mean it in the original mathematical sense.
+*** marrrk (~textual@46.114.39.183) has quit: Client Quit               [14:26]
+<iqubic> I can't make this work.
+<dminuoso> iqubic: It took me an evening to wrap my head around it.
+<atralheaven> and functions cannot have side effects, by design, or they can
+              but programmers avoid it?
+<dminuoso> atralheaven: they cannot
+*** lprd (~jon@lfbn-1-886-87.w86-247.abo.wanadoo.fr) has joined channel
+    #haskell                                                            [14:27]
+<jle`> atralheaven: in haskell, eveything is a value
+<iqubic> "extract (Pretext g) = getIdentity $ (fmap . fmap) _ _"
+<atralheaven> dminuoso: I almost know nothing about math, I see functions as
+              input >> do something to input >> output
+<jle`> atralheaven: in traditional imperative languages, you have values and
+       statements
+<dminuoso> iqubic: Start by implementing the `experiment` method of
+           ComonadStore.
+<jle`> atralheaven: so what haskell does is eliminate statements (at least,
+       those built into the language/syntax)
+<dminuoso> iqubic: This is just for added elegance, it avoids some of the
+           unnecessary unwrapping.                                      [14:28]
+<dminuoso> iqubic: And then write the rest in terms of `experiment`
+<iqubic> dminuoso: Is that easier than this?
+<jle`> iqubic: try going about extract (Pretext g) = _ $ g Identity
+<jle`> since you know you want to give g 'Identity', the s -> f s
+<dminuoso> atralheaven: We dont "do something"
+*** petersen_ (~petersen@redhat/juhp) has joined channel #haskell       [14:29]
+*** takuan (~takuan@d8d86bea6.access.telenet.be) has joined channel #haskell
+*** graf_blutwurst (~user@178.197.235.87) has joined channel #haskell
+<dminuoso> atralheaven: That is, a function is a mapping of values, not a
+           sequence of commands to be executed. Its sadly a term some
+           imperative programming languages have used wrongly.
+<atralheaven> jle`: how can it not have any statements? may you tell me what
+              an statement is here?
+*** argent0 (~argent0@191.81.207.129) has quit: Remote host closed the
+    connection
+<jle`> atralheaven: sure; a statement is something that, when control reaches
+       it, executes some effect
+*** petersen (~petersen@redhat/juhp) has quit: Ping timeout: 276 seconds
+                                                                        [14:30]
+*** petersen_ (~petersen@redhat/juhp) is now known as petersen
+<jle`> atralheaven: in other languages, statements are things like x = 3
+       (assign 3 to the box x), print "hello", read a file, etc.
+<jle`> atralheaven: so how control flow works is: proceed from statement to
+       statement
+<jle`> and execute the effect that each statement represents
+<atralheaven> jle`: right
+<iqubic> What the hell???                                               [14:31]
+<jle`> contrast that to values: values are things that represent ... well,
+       values
+<dminuoso> iqubic: I'd say say.
+<iqubic> "experiment f (Pretext g) = g f"
+<dminuoso> iqubic: I told you. Pretext is just experiment partially applied to
+           a Store.
+<dminuoso> :-)
+*** ryan2215 (~ryan2215@98.207.153.158) has joined channel #haskell
+<jle`> atralheaven: they represent concepts and things you can manipulate
+       within the language, like 3, True, "hello", etc.
+*** vivekramaswamy (~vivekrama@165.225.104.81) has quit: Remote host closed
+    the connection
+<jle`> atralheaven: so in other languages, the concept of a statement and of a
+       value are sort of muddled together, but there is a rough distinction
+       between the two, conceptually
+<jle`> atralheaven: in Haskell we only have values, no statements (at least
+       not built into the syntax)                                       [14:32]
+<dminuoso> iqubic: (What experiment buys you, is just avoiding pattern
+           matching on Pretext)
+<dminuoso> It gets a bit cleaner.                                       [14:33]
+<dminuoso> And it emphasizes that all you do here, is running experiments on
+           some Store
+<iqubic> "extract g = getIdentity $ fmap _ _"
+<jle`> iqubic: well, you don't know you need getIdentity, and you don't know
+       you need fmap
+<jle`> iqubic: all you know is that you want to apply your (s -> f s) to g,
+       right?
+<jle`> so start there
+<jle`> extract (Pretext g) = _ $ g Identity                             [14:34]
+<jle`> since Identity is your s -> f s that you decided on
+*** marrrk (~textual@46.114.39.183) has joined channel #haskell
+<jle`> the only thing you *know* you have to have is `g Identity`
+<dminuoso> atralheaven: The important bit here though is to understand that
+           the lack of statements built into the language is not limiting,
+           it's actually a liberating factor.
+<shachaf> I suggest taking the Pretext conversation to #haskell-overflow.
+                                                                        [14:35]
+<jle`> so no use adding getIdentity/fmap _ _/etc. just because you 'feel' like
+       it
+<shachaf> It's been going on for almost an hour and it's drowning out other
+          conversations.
+<iqubic> "extract g = getIdentity $ experiment Identity g"
+<atralheaven> jle`: so, there are values, and functions. can values be
+              functions too? like giving a function as input to another
+              function?
+<dminuoso> atralheaven: Yes. Functions are just values.
+<dminuoso> atralheaven: And indeed.
+<jle`> atralheaven: yup :)
+*** CurryWurst (~CurryWurs@2001:1b48:203::2:1000) has quit: Read error:
+    Connection reset by peer
+<jle`> that is what is meant by "everything is a value"
+<dminuoso> atralheaven: We can pass functions as arguments, or produce
+           functions as result values.                                  [14:36]
+*** ryan2215 (~ryan2215@98.207.153.158) has quit: Ping timeout: 276 seconds
+<jle`> in particular, it's a way of saying that functions are values, as well 
+<iqubic> dminuoso: I have made extract.
+*** tom_ (~tom@95.151.84.226) has joined channel #haskell
+*** zincy_ (~tom@95.151.84.226) has joined channel #haskell
+<dminuoso> iqubic: Let's follow shachaf's suggestion and take it to
+           #haskell-overflow
+<atralheaven> sorry I don't know why but I can't scroll to old messages, you
+              said functions map what to vales?                         [14:37]
+<dminuoso> atralheaven: values to values.
+<dminuoso> atralheaven: A function is just something where you ask "what's the
+           corresponding value to x"
+*** marrrk (~textual@46.114.39.183) has quit: Client Quit
+*** kubek2k (~Jakub_Jan@213-241-3-97.static.ip.netia.com.pl) has quit: Ping
+    timeout: 268 seconds
+<dminuoso> That's what I meant by "we have functions in the mathematical
+           sense"
+<atralheaven> I remembered something from school, like f(x) = y or
+              something...                                              [14:38]
+<dminuoso> atralheaven: Yes, and we write functions pretty much like that.
+<dminuoso> We just dont bother writing the parens.
+<atralheaven> so where the manipulation happens?
+*** kubek2k (~Jakub_Jan@213-241-3-97.static.ip.netia.com.pl) has joined
+    channel #haskell                                                    [14:39]
+<dminuoso> atralheaven: Manipulation of what? :)
+<atralheaven> values?
+<atralheaven> like, you want to remove a character from string
+<jle`> that's what haskell-the-language gives you: a way to specify how your
+       outputs relate to your inputs
+<jle`> for example: addTwo x = x + 2
+<jle`> atralheaven: for that you would refer to the API of the string type you
+       are using
+<jle`> it might provide a function to remove a given cahracter from your
+       string, like Char -> StringType -> StringType, and you can use that
+       with `removerCharacter 'a'` or something                         [14:40]
+<jle`> it's probably not as magical as you might think it is :)
+*** jluttine (~jluttine@109.204.147.177) has joined channel #haskell
+<dminuoso> atralheaven: The point is, a function cannot *manipulate* a value.
+*** fjellfras (~fjellfras@49.248.13.74) has quit: Quit: Leaving
+<jle`> ah yeah, your function would take a string and return a new string,
+       with that character removed                                      [14:41]
+<atralheaven> I mean, how can you remove the character only with mapping
+              values to each other?
+<jle`> atralheaven: think of the map conceptually
+<jle`> removing all a's would map "hello" to "hello"
+<jle`> it would map "ball" to "bll"
+<jle`> "backpack" to "bckpck"
+<atralheaven> yes                                                       [14:42]
+<jle`> are you asking how you would *define* such a function, maybe?
+<atralheaven> but how do you write it? how you tell the program to do so?
+<atralheaven> yes
+<jle`> if that's what you are asking, the answer depends on what your string
+       type is
+<jle`> the structure of your type determines how you write functions on it
+<dminuoso> _ashbreeze_: you could write this as:
+<dminuoso> dropFirstElem (x:xs) = xs
+<dminuoso> err atralheaven ^- :)
+<jle`> with 'String' for example, you would write:                      [14:43]
+<jle`> removeAllAs = filter (/= 'a')
+<jle`> where filter is the function that takes a predicate and removes all
+       matching items from a list
+*** sQVe (~sQVe@unaffiliated/sqve) has joined channel #haskell
+<atralheaven> well, how many string types do we have? we only have one in
+              python :D
+<jle`> > filter (/= 'a') "backpack"
+<lambdabot>  "bckpck"
+<jle`> > filter (/= 'b') "backpack"
+<lambdabot>  "ackpack"
+*** martijnV2 (martijn@gateway/vpn/mullvad/martijnv2) has joined channel
+    #haskell
+<jle`> atralheaven: well, my point is that how you define the function depends
+       on the type you are working with, and its API                    [14:44]
+<jle`> and its structure
+<jle`> atralheaven: it isn't something that is universal that we can talk
+       about while ignoring the structure/specific type :)
+<jle`> but yeah, for String in the base libraries, we have the 'filter'
+       function which allows us to filter out characters matching or not
+       matching a given condition
+<jle`> filter is actually one of the functions you were thinking about earlier
+       --- it's a function that takes a function as input 
+<jle`> > filter isAlpha "hello world"                                   [14:45]
+<lambdabot>  "helloworld"
+<jusss> :t amb
+<lambdabot> error: Variable not in scope: amb
+*** tom__ (~tom@2a01:4c8:141d:90ab:45af:76d:bc3a:5ad8) has joined channel
+    #haskell
+<jle`> > filter isDigit "h3ll0 w0rld"
+<jusss> is there an amb function in haskell?
+<lambdabot>  "300"
+<jle`> atralheaven: so if i wanted to write a function to remove all a's from
+       my string, i'd write `filter (/= 'a')`                           [14:46]
+<atralheaven> I understand what you mean by function and map here, but I still
+              don't understand what you mean by not having manipulation 
+<jle`> or "filter for only items that aren't 'a'"
+*** oish (~charlie@228.25.169.217.in-addr.arpa) has joined channel #haskell
+<jle`> i think maybe the intent was to say that functions cannot mutate values
+<jle`> i'm not really sure what it would mean to say 'functions cannot
+       manipulate values' either                                        [14:47]
+<atralheaven> well, they return new values, it's fine
+*** tom_ (~tom@95.151.84.226) has quit: Ping timeout: 245 seconds
+*** zincy_ (~tom@95.151.84.226) has quit: Ping timeout: 245 seconds
+<jle`> indeed :) it's a relationship. filter (/= 'a') takes a string and
+       returns a string that has all a's removed
+*** zincy_ (~tom@2a01:4c8:141d:90ab:45af:76d:bc3a:5ad8) has joined channel
+    #haskell                                                            [14:48]
+*** danvet (~Daniel@212-51-149-96.fiber7.init7.net) has joined channel
+    #haskell
+*** Ariakenom (~Ariakenom@h-158-174-186-219.NA.cust.bahnhof.se) has quit: Ping
+    timeout: 276 seconds                                                [14:49]
+*** fragamus (~michaelgo@c-98-244-6-56.hsd1.ca.comcast.net) has joined channel
+    #haskell
+*** ryan2215 (~ryan2215@98.207.153.158) has joined channel #haskell
+*** chele (~chele@2a02:8106:1:f900:faca:b8ff:fe2f:8499) has joined channel
+    #haskell
+<jgt1> jusss: https://www.rosettacode.org/wiki/Amb#Haskell
+*** buhman (~rewt@c-73-231-171-137.hsd1.ca.comcast.net) has quit: Ping
+    timeout: 240 seconds                                                [14:50]
+<atralheaven> That's actually intresting, but it's a little hard to understand
+              how would you do what we're used to do in languages like python
+<atralheaven> imperative languages
+<jle`> atralheaven: yeah, a lot of times it involves looking at the problem in
+       a new way, and focusing on the goal instead of the specific solution
+<dminuoso> atralheaven: Note here too, that memory manipulation still exists
+           in Haskell.
+<jle`> atralheaven: so for example people might experience a vertigo when they
+       see that there are no "for loops" in the python sense            [14:51]
+<dminuoso> atralheaven: We have an entire toolset for writing highly
+           imperative code, for writing mutable state, manipulating memory and
+           all. So these restrictions are not limiting to how we write code.
+*** jamm (~jam@i219-167-238-246.s42.a013.ap.plala.or.jp) has joined channel
+    #haskell
+*** jamm (~jam@i219-167-238-246.s42.a013.ap.plala.or.jp) has quit: Changing
+    host
+*** jamm (~jam@unaffiliated/jamm) has joined channel #haskell
+<jle`> atralheaven: "but then how will i write for loops?" is a common
+       question
+<atralheaven> with map?
+<jle`> atralheaven: but in the end the thing is that the things you would use
+       for loops for in python are things that you would use different things
+       for in haskell
+<jle`> yeah, higher-order functions like map are one way                [14:52]
+<atralheaven> what about conditions?
+<jle`> > if 3 > 5 then "hi" else "bye"
+<lambdabot>  "bye"
+<atralheaven> so we do have ifs here
+<jle`> yeah, except if is also just an expression representing a value  [14:53]
+<jle`> and not a statement for conditional execution/control flow
+*** DavidEichmann (~david@2a02:120b:7f0:bd90:d8a0:476:fd6c:3f95) has joined
+    channel #haskell
+*** jgt1 (~jgt@2a02:a31b:8542:b480:d1d4:e272:f672:1622) is now known as jgt
+<jle`> `if True then x else y` can be replaced with x, and `if False then x
+       else y` can be replaced with y
+<jle`> s/can be replaced with/evaluates to
+*** marrrk (~textual@185.85.220.198) has joined channel #haskell
+*** ryan2215 (~ryan2215@98.207.153.158) has quit: Ping timeout: 240 seconds
+                                                                        [14:54]
+<jle`> but again, the things you would use conditionals for in python are
+       pretty wide
+<jle`> and the exact thing you would replace them with in haskell might not
+       necessarily "exist"
+*** libertyprime (~libertypr@71.87.69.111.dynamic.snap.net.nz) has quit: Ping
+    timeout: 245 seconds
+<atralheaven> what does an expression mean here?
+<jle`> but in the end you might end up approaching the problem from another
+       angle
+<jle`> an expression is syntax for denoting a value
+<jle`> so `if True then x else y` is an expression that denotes the value x
+                                                                        [14:55]
+*** vivekramaswamy (~vivekrama@165.225.104.75) has joined channel #haskell
+*** fragamus (~michaelgo@c-98-244-6-56.hsd1.ca.comcast.net) has quit: Ping
+    timeout: 265 seconds
+<jle`> or well, `if True then 1 else 2` is an expression that denotes the
+       value representing the number one
+<jle`> similarly `filter (/= 'a')` is an expression that denotes the function
+       filtering out a from a string
+<jle`> other languages have a similar notion of expression vs. statement as
+       well
+<jle`> but i guess the important thing is that expressions are syntax   [14:56]
+<jle`> `if x then y else z` is in the same syntactical "group" of things as
+       True, [1,2,3], "hello", etc.                                     [14:57]
+<jle`> in fact `if True then "hello" else "goodbye"` can be replaced in a
+       program with "hello" and it would be fine, syntactically and
+       semantically
+<jle`> that's what i meant to convey --- it exists on the same "level" as
+       other expressions like True/"hello"/[1,2,3]/etc.                 [14:58]
+<jle`> contrast this to in python where if/then/else is a statement for
+       control flow
+*** ggole (~ggole@2001:8003:8119:7200:cc3d:1355:2fe9:98bf) has joined channel
+    #haskell
+<atralheaven> yes, but only when the condition doesn't change, but it does
+              change, that's why we use ifs
+<jle`> in python, if/then/else is a statement: it controls what effects are
+       executed, not what values are being denoted                      [14:59]
+<atralheaven> yes
+<sicklorkin> Not sure if anyone has much experience using esqueleto, but I'm
+             trying to write a join `on (f.^FooId :: Key Foo ==. b.^FooId ::
+             Int)`
+<sicklorkin> i'm almost convinced this is not possible 'cause of how
+             PersistValue converts from/to Key but just wanted to see if I'm
+             wrong                                                      [15:00]
+<atralheaven> jle`: how would you have control flow in haskell?         [15:01]
+*** dale (~dale@unaffiliated/dale) has quit: Quit: My computer has gone to
+    sleep
+<jle`> control flow in haskell can...look a lot different. but it manifests in
+       a lot of different ways                                          [15:02]
+<jle`> for pure values we have control driven by evaluation
+*** rruizt (~rruizt@83-84-23-124.cable.dynamic.v4.ziggo.nl) has quit: Ping
+    timeout: 245 seconds
+*** cur8or (~cur8or@2c0f:fbe1:3:30:d542:8fdf:7828:24e2) has joined channel
+    #haskell
+<jle`> when we write IO and talk about control flow for IO effects, then we
+       have first-class control flow
+<jle`> since in Haskell we can have values that represent IO actions, we can
+       combine these values in a way that respects the control flow we want
+                                                                        [15:03]
+*** fphilipe (~phil@80.251.178.106) has joined channel #haskell
+<jle`> it's...not something that can be easily explained quickly without going
+       deeper into haskell, i think                                     [15:04]
+<dminuoso> atralheaven: An `if/then/else` is rather in the sense of
+           `isPositive x | x > 0 = True; isPositive x | otherwise = False
+                                                                        [15:05]
+*** Ulrar (~Ulrar@althea.ulrar.net) has quit: Ping timeout: 276 seconds
+*** Ulrar (~Ulrar@althea.ulrar.net) has joined channel #haskell         [15:06]
+*** vivekramaswamy (~vivekrama@165.225.104.75) has quit: Remote host closed
+    the connection
+*** libertyprime (~libertypr@202.49.0.34) has joined channel #haskell
+*** rruizt (~rruizt@83-84-23-124.cable.dynamic.v4.ziggo.nl) has joined channel
+    #haskell                                                            [15:07]
+*** asheshambasta
+    (~user@ptr-e1lysaxn3usztgiv1bs.18120a2.ip6.access.telenet.be) has joined
+    channel #haskell
+*** Spiff (~AdminUser@102.160.197.21) has joined channel #haskell       [15:08]
+*** vivekramaswamy (~vivekrama@165.225.104.75) has joined channel #haskell
+                                                                        [15:09]
+*** raichoo (~raichoo@office02.saltation.de) has joined channel #haskell
+                                                                        [15:11]
+<atralheaven> to my understanding, FP is a totally different way to problem
+              solving, it sees the problem solving process very differently 
+<jle`> atralheaven: i think that is a popular sentiment yes :)          [15:14]
+<jle`> i think ultimately in the end a lot of the high-level ways end up being
+       very similar
+<jle`> but it's hard to see these similarities until you understand what is
+       different
+<jle`> that's a part of the magic of the journey i think                [15:15]
+<jle`> everything is different until all of a sudden everything is similar, in
+       a way you didn't expect
+*** heatsink (~heatsink@107-136-5-69.lightspeed.sntcca.sbcglobal.net) has
+    joined channel #haskell                                             [15:16]
+<atralheaven> it's not a long time that I got somehow good at python
+              programming, I liked somethings that were from FP world, and I
+              tried to use them in my works                             [15:17]
+<atralheaven> jle`: I guess I understand that, it's different ways to same
+              goals                                                     [15:18]
+<dminuoso> atralheaven: They are not so different, really.
+*** toblorone (~toblorone@46.189.28.53) has joined channel #haskell     [15:19]
+*** Ulrar (~Ulrar@althea.ulrar.net) has quit: Ping timeout: 276 seconds
+<atralheaven> I really like python, but I'm not sure if I can have more FP in
+              python, I mean, applying the FP mindset to python codes that I
+              write
+*** Ulrar (~Ulrar@althea.ulrar.net) has joined channel #haskell         [15:20]
+*** heatsink (~heatsink@107-136-5-69.lightspeed.sntcca.sbcglobal.net) has
+    quit: Ping timeout: 265 seconds                                     [15:21]
+*** ryan2215 (~ryan2215@98.207.153.158) has joined channel #haskell
+<[exa]> atralheaven: there are various functional tricks that you may enjoy in
+        python as well (mostly related to function composition and various
+        list-crunching idioms)
+<[exa]> atralheaven: OTOH 80% of haskell is taking these tricks and putting
+        them on generic steroids using the type system, which you're probably
+        not going to be able to enjoy very much in Python               [15:22]
+<atralheaven> I wanted good things from both worlds, but apparently most of FP
+              is not possible to have in python                         [15:23]
+<[exa]> and, well, laziness
+<sshine> has anyone here experienced Emacs haskell-mode hang when typing out a
+         quasi-quoted expression like [r||], placing the cursor between the
+         pipes and typing '['?
+<[exa]> atralheaven: btw you're welcome to ask here about any particular
+        tricks and porting them to .py :]                               [15:24]
+<atralheaven> [exa]: Thank you ^^                                       [15:25]
+<sshine> there is another situation where haskell-mode also hangs. I think it
+         also relates to an opening bracket or brace somewhere.
+*** ryan2215 (~ryan2215@98.207.153.158) has quit: Ping timeout: 240 seconds
+*** oo_miguel (~miguel@89-67-252-80.dynamic.chello.pl) has joined channel
+    #haskell
+*** fragamus (~michaelgo@c-98-244-6-56.hsd1.ca.comcast.net) has joined channel
+    #haskell
+<jle`> atralheaven: i think the main thing to worry about is how much the
+       language helps or hinders your programming in a certain style    [15:27]
+<atralheaven> do you think haskell is good choice for me as a FP language? I'm
+              mostly working with data, I've heard of clojure and elixir too,
+              but I'm not familiar with them
+<jle`> atralheaven: while it's possible to program functionally in python, the
+       language itself is not going to help you in any way -- and often times
+       it'll get in your way
+<atralheaven> jle`: exactly                                             [15:28]
+<[exa]> atralheaven: do try. :] (After some common initial struggle, there is
+        no way back)
+<atralheaven> I did try haskell tutorials but honestly the syntax was so weird
+              to me that I didn't understand even very basic things :D  [15:30]
+*** fragamus (~michaelgo@c-98-244-6-56.hsd1.ca.comcast.net) has quit: Ping
+    timeout: 258 seconds
+<atralheaven> I think I should have come here and ask
+*** o1lo01ol1o (~o1lo01ol1@152.80.136.95.rev.vodafone.pt) has joined channel
+    #haskell
+<[exa]> yes, that's what #haskell is good for :]                        [15:31]
+*** phaul (~phaul@sdd.hu) has joined channel #haskell
+<atralheaven> this channel seems very firendly :)
+*** cyberlard (~cyberlard@unaffiliated/jludwig) has quit: Ping timeout: 244
+    seconds                                                             [15:32]
+*** andjjj23 (~irc@107.170.228.47) has quit: Ping timeout: 244 seconds
+*** saurik_ (saurik@carrier.saurik.com) has quit: Ping timeout: 240 seconds
+<atralheaven> do you know about clojure and elixir?
+<jusss> I just heard them                                               [15:33]
+*** esph (~weechat@unaffiliated/esph) has quit: Ping timeout: 245 seconds
+*** andjjj23 (~irc@107.170.228.47) has joined channel #haskell
+<jusss> clojure is a scheme dialect on jvm                              [15:34]
+*** saurik (saurik@carrier.saurik.com) has joined channel #haskell
+<[exa]> asheshambasta: clojure is scheme for java VM, elixir is like Caml on
+        erlang VM
+<jusss> [exa]: do you know CPS?
+*** cyberlard (~cyberlard@unaffiliated/jludwig) has joined channel #haskell
+                                                                        [15:35]
+<[exa]> CPS?
+<sshine> I thought Elixir was more like Ruby on Erlang VM.
+<sshine> continuation-passing style
+<[exa]> yes
+<jusss> I took two days to see some articles about CPS, still don't get it
+*** cdepillabout (~illabout@2409:13:9000:a000:e8db:7afd:dd25:7f38) has quit:
+    Quit: Konversation terminated!
+<sshine> jusss, there's not a lot to get, I think.                      [15:36]
+<jusss> so what is the definition about "continuation" at first?
+<[exa]> jusss: let's have a small code example and you will try to rewrite it
+        without a return statement, okay?
+*** Superhanz (~Superhanz@dyn099029.shef.ac.uk) has quit: Quit: Leaving
+<jusss> sshine: but I lack comprehension
+*** oish (~charlie@228.25.169.217.in-addr.arpa) has quit: Ping timeout: 258
+    seconds
+<jusss> [exa]: ok
+*** ryan2215 (~ryan2215@98.207.153.158) has joined channel #haskell     [15:37]
+<[exa]> jusss: https://pastebin.com/wqjM8jpR
+*** d12frosted (~d12froste@95.67.25.188) has quit: Ping timeout: 240 seconds
+                                                                        [15:38]
+<[exa]> the aim is to rewrite the code so that it does the same thing, but you
+        can never 'return' from any function
+<jusss> [exa]: ok, I'll try it
+<[exa]> (don't mind any semantic details of the pseudolanguage, I just made it
+        up)
+*** oish (~charlie@228.25.169.217.in-addr.arpa) has joined channel #haskell
+                                                                        [15:39]
+*** libertyprime (~libertypr@202.49.0.34) has quit: Ping timeout: 240 seconds
+<[exa]> you can assume that someone will call main() from outside, just like
+        in C's and haskells.
+*** stepnem_ (~stepnem@185.112.167.114) has quit: Ping timeout: 258 seconds
+*** ryan2215 (~ryan2215@98.207.153.158) has quit: Ping timeout: 265 seconds
+                                                                        [15:42]
+<sshine> jusss, there are some examples in JavaScript here:
+         http://matt.might.net/articles/by-example-continuation-passing-style/
+<jusss> [exa]: https://pastebin.com/j93R8XdN
+<[exa]> jusss: btw I don't want to give hints if they are not necessary but
+        ask if you get stuck anyhow
+<jgt> atralheaven: spread the word; we're a friendly bunch              [15:43]
+<atralheaven> Rust also seems intresting, do you know how capable it is for
+              FP?
+<atralheaven> jgt: sure :D
+*** vivekramaswamy (~vivekrama@165.225.104.75) has quit: Remote host closed
+    the connection
+<[exa]> rust is barely capable of C++ :D
+<jusss> FP is bound to Static Type languages?
+*** stepnem (~stepnem@185.112.167.114) has joined channel #haskell
+<jgt> atralheaven: re: rust
+      https://lobste.rs/s/2cw6ov/say_something_you_dislike_about_language#c_o7v9ud
+                                                                        [15:44]
+<[exa]> jusss: ok that's one possibility, you've inlined half of the main
+        function to somefun(). What if main() was tragically long?
+<[exa]> jusss: hint: try splitting main in 2 halves, before and after the call
+*** ggVGc (~ggVGc@unaffiliated/walt) has joined channel #haskell        [15:46]
+<jusss> [exa]: https://pastebin.com/bcgRvzYr
+<jusss> [exa]: is this what you want?                                   [15:47]
+<sshine> jusss, FP != statically typed languages. Lisp is the classic example
+         of a dynamically typed FP language.
+*** kunningd (~kunningdr@unaffiliated/kunningdruger) has joined channel
+    #haskell                                                            [15:48]
+*** pepito18 (1f04f105@31.4.241.5) has joined channel #haskell
+*** kunningd (~kunningdr@unaffiliated/kunningdruger) has quit: Max SendQ
+    exceeded
+<jusss> sshine: and Lisp is not a pure FP language
+<pepito18>  how to remove all warnings?  (hi)
+<[exa]> jusss: getting closer. Let me modify the assignment a bit
+*** esph (~weechat@unaffiliated/esph) has joined channel #haskell       [15:49]
+<[exa]> jusss: https://pastebin.com/jByiCNqT
+<sshine> jusss, and it isn't named after a mathematician, either.       [15:50]
+<jgt> pepito18: why would you want to do that?
+*** kunningd (~kunningdr@unaffiliated/kunningdruger) has joined channel
+    #haskell
+<[exa]> jusss: ok sorry, simpler version first: https://pastebin.com/jWTmAmMD
+                                                                        [15:51]
+<sshine> pepito18, the best way is to fix the things that the compiler warns
+         about. ;-)
+<[exa]> (you don't need to care about 'a' there)
+*** ggVGc (~ggVGc@unaffiliated/walt) has quit: Ping timeout: 258 seconds
+*** forecho (~forecho@58.250.18.130) has quit: Remote host closed the
+    connection
+* hackage sequenceTools 1.4.0.4 - A package with tools for processing DNA
+  sequencing data  https://hackage.haskell.org/package/sequenceTools-1.4.0.4
+  (stephan_schiffels)                                                   [15:52]
+<sshine> pepito18, otherwise, -fno-warn-...
+<pepito18> sshine at least how to remove deprection warnings. the network
+           library produces a lot of then and I have no intention to upgrade
+           the version                                                  [15:53]
+*** acdimalev (~jamin@cpe-23-241-155-6.socal.res.rr.com) has quit: Quit: .
+<pepito18> sshine thanks !                                              [15:55]
+<jgt> wouldn't that involve disabling those warnings for that library?
+      i.e. not in your own cabal file?
+*** ggVGc (~ggVGc@unaffiliated/walt) has joined channel #haskell        [15:56]
+*** esp32_prog (~esp32_pro@250-131-190-109.isp.overthebox.ovh) has joined
+    channel #haskell
+<[exa]> jusss: (hint: keep the code modifications as small and as local as
+        possible; CPS is kindof meant to be simplistic
+<jusss> [exa]: y                                                        [15:57]
+<jusss> [exa]: https://pastebin.com/csDVBuef                         [15:58]
+<jusss> https://pastebin.com/csDVBuef
+<[exa]> jusss: cool
+<[exa]> notice you can just take 'k' out of main and it will still work
+<jusss> [exa]: yeah, and?                                               [15:59]
+<[exa]> after that, the code is basically in the same language as before, but
+        uses no returns, and CPS is done, and that's it :]              [16:00]
+*** e2 (e2@gateway/shell/suchznc/x-rjqppihprmwhaocp) has quit: Ping timeout:
+    244 seconds
+*** ggVGc (~ggVGc@unaffiliated/walt) has quit: Ping timeout: 258 seconds
+<[exa]> jusss: Q: what is it good for? A1: You don't need the underlying
+        system to remember "return addresses" itself, so e.g. tail recursion
+        is much easier to implement                                     [16:01]
+<jusss> [exa]: and A2?
+<[exa]> jusss: A2: you've got 'goto' for free in a nicely looking functional
+        language
+*** ggVGc (~ggVGc@unaffiliated/walt) has joined channel #haskell        [16:02]
+*** Synthetica (uid199651@gateway/web/irccloud.com/x-aetigfldcutdqyyt) has
+    quit: Quit: Connection closed for inactivity
+<[exa]> let's try exceptions for example: Instead of calling 'somefun(x,y,k)',
+        you would call 'somefun(x,y,k,e)' where 'e' is the landing point for
+        whenever something goes wrong. No other language modifications needed.
+                                                                        [16:03]
+*** forecho (~forecho@58.250.18.130) has joined channel #haskell
+<jusss> ok
+<[exa]> jusss: in short, the whole point of CPS is 'tremendous jumping power
+        with no underlying system required'                             [16:04]
+<[exa]> s/no/minimal/
+<jusss> [exa]: I hate to say the word, "context", is it shows up here again?
+                                                                        [16:05]
+*** krangbae[m] (krangbaech@gateway/shell/matrix.org/x-ktewrqjmgyogftwq) has
+    joined channel #haskell
+<jusss> s/is/
+<[exa]> context?
+<jusss> jumping with context
+<[exa]> hm what do you mean by context now?                             [16:06]
+<jusss> [exa]: the stack stuff? 
+<[exa]> ooh so
+<jusss> [exa]: environment stuff? name space?
+<[exa]> the thing is that you actually don't need stack for this because the
+        main purpose of stack (return addresses) are now handled directly by
+        the code                                                        [16:07]
+*** kritzefitz (~kritzefit@2003:5b:203b:100:6e0b:84ff:feb4:9eaf) has joined
+    channel #haskell
+<[exa]> (with the extra cool possibility of them getting optimized out, which
+        is nice for getting some speed)                                 [16:08]
+<jusss> [exa]: and can it jump back?
+*** kritzefitz (~kritzefit@2003:5b:203b:100:6e0b:84ff:feb4:9eaf) has quit:
+    Client Quit
+<[exa]> yes, if it gets the continuation that gets back
+<jusss> [exa]: through function call?
+*** chin-tastic (~chin-tast@c-73-137-102-244.hsd1.ga.comcast.net) has quit:
+    Ping timeout: 265 seconds                                           [16:09]
+<[exa]> ofcourse in a normal language you'd get stack overflow by calling too
+        much functions in each other, but there's no stack and tail calls get
+        eliminated (converted to actual jumps)
+*** cur8or (~cur8or@2c0f:fbe1:3:30:d542:8fdf:7828:24e2) has quit: Quit: My
+    MacBook has gone to sleep. ZZZzzz…
+<jusss> [exa]: I remember other languages use trampoline to do stack overflow
+        if they don't support TCO                                       [16:10]
+<jusss> is that trampoline stuff related to CPS?
+*** ryan2215 (~ryan2215@98.207.153.158) has joined channel #haskell
+*** chin-tastic (~chin-tast@c-73-137-102-244.hsd1.ga.comcast.net) has joined
+    channel #haskell
+*** kunningd (~kunningdr@unaffiliated/kunningdruger) has quit: Ping timeout:
+    246 seconds
+*** nullifidian_ (~nullifidi@unaffiliated/nullifidian) has joined channel
+    #haskell                                                            [16:12]
+*** david_ (~david@217.11.127.176.dynamic.wline.res.cust.swisscom.ch) has
+    joined channel #haskell
+*** DavidEichmann (~david@2a02:120b:7f0:bd90:d8a0:476:fd6c:3f95) has quit:
+    Remote host closed the connection
+*** danvet_ (~danvet@212-51-149-96.fiber7.init7.net) has joined channel
+    #haskell
+<[exa]> jusss: https://pastebin.com/pZM1tRt5  this is CPS with recursion
+                                                                        [16:13]
+*** merijn (~merijn@145.100.116.162) has joined channel #haskell        [16:14]
+<[exa]> I used _ to make a lambda (advantage of thinking up your languages)
+<[exa]> jusss: anyway trampolines are usually low-level primitives for
+        handling far jumps, syscalls, interrupts and whatnot, but generally
+        there's a lot of jumping too
+<[exa]> jusss: if you have a particular language where it's used I guess I can
+        have a look                                                     [16:15]
+*** ryan2215 (~ryan2215@98.207.153.158) has quit: Ping timeout: 276 seconds
+*** Wolfy87 (~Wolfy87@195.206.169.238) has joined channel #haskell
+*** nullifidian (~nullifidi@unaffiliated/nullifidian) has quit: Ping timeout:
+    240 seconds
+*** dansho (~dansho4@71-84-161-204.dhcp.astr.or.charter.com) has quit: Quit:
+    Leaving                                                             [16:16]
+<jusss> [exa]: haha, scheme
+<[exa]> oh they call 'trampoline' a thing that repeatedly calls thunk
+        evaluation                                                      [16:17]
+*** kunningd (~kunningdr@unaffiliated/kunningdruger) has joined channel
+    #haskell
+<jusss> [exa]: sorry, scheme support TCO, 
+<[exa]> this is probably what you meant?
+        https://stackoverflow.com/questions/189725/what-is-a-trampoline-function#489860
+*** heatsink (~heatsink@107-136-5-69.lightspeed.sntcca.sbcglobal.net) has
+    joined channel #haskell                                             [16:18]
+*** cur8or (~cur8or@72canterbury.cybersmart.co.za) has joined channel #haskell
+*** Neo-- (~neo@internet-188-198-18-45.narocnik.mobitel.si) has joined channel
+    #haskell
+*** toblorone (~toblorone@46.189.28.53) has quit: Remote host closed the
+    connection                                                          [16:19]
+<jusss> [exa]: https://pastebin.com/C5pp9b1c
+<[exa]> yes, basically an engine for evaluating whatever gets returned again
+        and again until there's an actual value
+<jusss> [exa]: is this CPS?                                             [16:20]
+<[exa]> no, but CPS makes this pretty simple -- after CPS there is no stack,
+        so you don't need to keep any intermediate "state" of the functions
+        being evaluated
+<[exa]> but still you can perfectly "interrupt" them                    [16:21]
+<tdammers> the basic idea is simple. instead of making a recursive call and
+           returning its value, you return the equivalent continuation, and
+           then you have a "trampoline" function at the top level that calls
+           your function, and keeps calling the return value until it is not a
+           continuation anymore
+<jusss> [exa]: so how to do this if it uses CPS?
+*** oish (~charlie@228.25.169.217.in-addr.arpa) has quit: Ping timeout: 245
+    seconds
+<merijn> jusss: You give f an extra argument which is the function that will
+         use the result of f                                            [16:22]
+* hackage prometheus-proc 0.1.2.0 - Export metrics from /proc for the current
+  process  https://hackage.haskell.org/package/prometheus-proc-0.1.2.0
+  (OliverCharles)
+<jusss> merijn: code?
+*** heatsink (~heatsink@107-136-5-69.lightspeed.sntcca.sbcglobal.net) has
+    quit: Ping timeout: 276 seconds                                     [16:23]
+<[exa]> jusss: mind if we switch to haskell?
+*** jao (~jao@pdpc/supporter/professional/jao) has joined channel #haskell
+                                                                        [16:24]
+*** Neo-- (~neo@internet-188-198-18-45.narocnik.mobitel.si) has quit: Ping
+    timeout: 276 seconds
+<jusss> [exa]: I'm afraid it may take me more time to read it in
+        haskell... and of cource you can
+*** dunningk (~kunningdr@unaffiliated/kunningdruger) has joined channel
+    #haskell
+<jusss> and I heard there's call/cc in haskell
+<merijn> jusss: Something like: https://paste.debian.net/1101388/       [16:25]
+*** raichoo (~raichoo@office02.saltation.de) has quit: Quit: Lost terminal
+<merijn> jusss: So instead of "result = f(0); print(result)" you'd simply do
+         "f(0, print)"                                                  [16:26]
+*** vivekramaswamy (~vivekrama@165.225.104.75) has joined channel #haskell
+<merijn> jusss: Note that at not point do you actually need to "return" so the
+         code can continue, because you're explicitly passing the "continue"
+         as argument
+*** ddere (uid110888@gateway/web/irccloud.com/x-ilqfycyuzqazmoqh) has quit:
+    Quit: Connection closed for inactivity
+*** e3 (e2@gateway/shell/suchznc/x-dseaooyhaqnvnoto) has joined channel
+    #haskell                                                            [16:27]
+<merijn> jusss: If you never have to return, then you don't have to remember
+         where to return to, and if you don't have to remember where to return
+         to, you don't need a function call stack
+<merijn> (which, of course, means you can't overflow your function call stack
+         either!)
+<jusss> merijn: wow!
+*** kunningd (~kunningdr@unaffiliated/kunningdruger) has quit: Ping timeout:
+    276 seconds
+*** raichoo (~raichoo@office02.saltation.de) has joined channel #haskell
+                                                                        [16:28]
+*** d12frosted (~d12froste@91.193.69.71) has joined channel #haskell    [16:29]
+*** yoneda (~mike@193.206.102.236) has joined channel #haskell          [16:30]
+<merijn> jusss: Now imagine your entire program is just a giant expression
+         (like Haskell programs effectively are) you can always just pass in a
+         continuation that is "the rest of the program" which means you never
+         have to "return" and, indeed, GHC compiles function calls to assembly
+         jumps, rather than assembly calls
+<merijn> jusss: Even compiler in imperative languages secretly do this
+         internally
+*** hololeap (~hololeap@unaffiliated/hololeap) has quit: Ping timeout: 265
+    seconds                                                             [16:31]
+<merijn> jusss: A common compiler technique is to turn imperative code into
+         "Static Single Assignment" form, where each variable is only ever
+         assigned once (which makes code much easier to optimise/simplify),
+         which has basically the same effect
+<koz_> I think there was even a paper saying that SSA is CPS in disguise.
+                                                                        [16:32]
+<merijn> koz_: It's not even really in disguise
+<merijn> CPS and SSA are quite obviously "the same thing from a slightly
+         different viewpoint"
+*** Ariakenom (~Ariakenom@h-158-174-186-219.NA.cust.bahnhof.se) has joined
+    channel #haskell                                                    [16:33]
+*** vivekramaswamy (~vivekrama@165.225.104.75) has quit: Remote host closed
+    the connection
+<merijn> jusss: The wikipedia page on SSA seems to have some ok examples (for
+         as far as I can tell from quickly skimming)                    [16:34]
+*** vivekramaswamy (~vivekrama@2409:4071:2118:4eff:1cfd:15eb:6182:a32) has
+    joined channel #haskell
+*** kuribas (~user@ip-188-118-57-242.reverse.destiny.be) has joined channel
+    #haskell
+<jusss> merijn: ok
+* hackage amqp-utils 0.3.7.1 - Generic Haskell AMQP tools
+  https://hackage.haskell.org/package/amqp-utils-0.3.7.1 (woffs)        [16:35]
+*** Myhlamaeus (~Myhlamaeu@ip-109-41-67-76.web.vodafone.de) has joined channel
+    #haskell                                                            [16:38]
+*** danvet_ (~danvet@212-51-149-96.fiber7.init7.net) has quit: Ping timeout:
+    258 seconds                                                         [16:40]
+*** thc202 (~thc202@unaffiliated/thc202) has joined channel #haskell
+*** fragamus (~michaelgo@c-98-244-6-56.hsd1.ca.comcast.net) has joined channel
+    #haskell
+*** ryan2215 (~ryan2215@98.207.153.158) has joined channel #haskell     [16:42]
+*** jao (~jao@pdpc/supporter/professional/jao) has quit: Ping timeout: 276
+    seconds
+*** zariuq (~zar@78-63-16-157.static.zebra.lt) has joined channel #haskell
+                                                                        [16:44]
+*** fragamus (~michaelgo@c-98-244-6-56.hsd1.ca.comcast.net) has quit: Ping
+    timeout: 250 seconds                                                [16:45]
+*** buhman (~rewt@c-73-231-171-137.hsd1.ca.comcast.net) has joined channel
+    #haskell
+*** vyorkin (~vyorkin@ppp91-76-116-124.pppoe.mtu-net.ru) has joined channel
+    #haskell
+*** vyorkin (~vyorkin@ppp91-76-116-124.pppoe.mtu-net.ru) has quit: Client Quit
+*** vyorkin (~user@ppp91-76-116-124.pppoe.mtu-net.ru) has joined channel
+    #haskell                                                            [16:46]
+*** ryan2215 (~ryan2215@98.207.153.158) has quit: Ping timeout: 265 seconds
+*** vivekram_ (~vivekrama@2409:4071:2118:4eff:3cc4:c42c:21f9:16d9) has joined
+    channel #haskell                                                    [16:50]
+*** encod3 (~encod3@89.20.162.146.static.ef-service.nl) has joined channel
+    #haskell
+*** Ariakenom (~Ariakenom@h-158-174-186-219.NA.cust.bahnhof.se) has quit: Ping
+    timeout: 240 seconds                                                [16:52]
+*** kori (~kori@2804:14c:85a3:81b8::1000) has joined channel #haskell
+*** kori (~kori@2804:14c:85a3:81b8::1000) has quit: Changing host
+*** kori (~kori@arrowheads/kori) has joined channel #haskell
+*** Sheilong (uid293653@gateway/web/irccloud.com/x-hgjmylhafsattvvg) has quit:
+    Quit: Connection closed for inactivity
+*** vivekramaswamy (~vivekrama@2409:4071:2118:4eff:1cfd:15eb:6182:a32) has
+    quit: Ping timeout: 264 seconds                                     [16:54]
+*** raichoo (~raichoo@office02.saltation.de) has quit: Quit: Lost terminal
+                                                                        [16:56]
+*** Wuzzy (~Wuzzy@p5790EDDD.dip0.t-ipconnect.de) has joined channel #haskell
+*** dunningk (~kunningdr@unaffiliated/kunningdruger) has quit: Remote host
+    closed the connection
+*** raichoo (~raichoo@office02.saltation.de) has joined channel #haskell
+                                                                        [16:57]
+<kuribas> tdammers: I uploaded another (unfinished) orchestration piece of the
+          opera: http://kuribas.hcoop.net/apollonide11.mp3              [16:58]
+<kuribas> tdammers: comments welcome :)
+*** ryan2215 (~ryan2215@98.207.153.158) has joined channel #haskell
+*** Wuzzy (~Wuzzy@p5790EDDD.dip0.t-ipconnect.de) has quit: Remote host closed
+    the connection
+*** zariuq (~zar@78-63-16-157.static.zebra.lt) has quit: Ping timeout: 245
+    seconds
+<jusss> merijn: I run your code https://paste.debian.net/1101388/  and
+        "RuntimeError: maximum recursion depth exceeded"
+<merijn> jusss: Right, because python use a callstack for call because it
+         can't tell it's not needed there                               [16:59]
+*** cgfbee (~bot@oc1.itim-cj.ro) has quit: Remote host closed the connection
+<kuribas> tdammers: sorry, meant for off-topic...
+*** nschoe (nschoe@gateway/vpn/protonvpn/nschoe) has joined channel #haskell
+*** Wolfy87 (~Wolfy87@195.206.169.238) has quit:                        [17:00]
+*** kunningd (~kunningdr@unaffiliated/kunningdruger) has joined channel
+    #haskell
+*** kunningd (~kunningdr@unaffiliated/kunningdruger) has quit: Max SendQ
+    exceeded
+*** oish (~charlie@host81-130-206-144.in-addr.btopenworld.com) has joined
+    channel #haskell                                                    [17:02]
+*** ryan2215 (~ryan2215@98.207.153.158) has quit: Ping timeout: 265 seconds
+*** Myhlamaeus (~Myhlamaeu@ip-109-41-67-76.web.vodafone.de) has quit: Ping
+    timeout: 264 seconds                                                [17:03]
+*** ggVGc (~ggVGc@unaffiliated/walt) has quit: Ping timeout: 268 seconds
+*** sivteck (~sivteck@unaffiliated/sivteck) has joined channel #haskell
+*** sivteck (~sivteck@unaffiliated/sivteck) has quit: Client Quit
+*** mac10688 (~mac10688@c-76-115-116-76.hsd1.or.comcast.net) has quit: Ping
+    timeout: 268 seconds
+*** __monty__ (~toonn@unaffiliated/toonn) has joined channel #haskell   [17:04]
+*** MoarSpaceFi (~Forgot_my@65.155.84.20) has quit: Quit: Leaving
+<Kartha> merijn, is call stack part of a heap?
+*** ggVGc (~ggVGc@unaffiliated/walt) has joined channel #haskell
+*** cybai (~cybai@240d:1b:42:7800:58cb:2f7e:24c:7252) has joined channel
+    #haskell                                                            [17:05]
+*** marrrk (~textual@185.85.220.198) has quit: Quit: My MacBook has gone to
+    sleep. ZZZzzz…
+<merijn> Kartha: "Yes, no, maybe, it depends"
+*** mac10688 (~mac10688@c-76-115-116-76.hsd1.or.comcast.net) has joined
+    channel #haskell
+<__monty__> On the language or even in GHC haskell?                     [17:06]
+*** vivekram_ (~vivekrama@2409:4071:2118:4eff:3cc4:c42c:21f9:16d9) has quit:
+    Remote host closed the connection
+<merijn> __monty__: Well, GHC Haskell doesn't have a call stack, so :)
+*** vivekramaswamy (~vivekrama@2409:4071:2118:4eff:3cc4:c42c:21f9:16d9) has
+    joined channel #haskell
+<__monty__> I was thinking of the stacktrace functionality.
+*** YongJoon (~Thunderbi@121.67.187.140) has quit: Ping timeout: 265 seconds
+                                                                        [17:07]
+*** cybai_ (~cybai@240d:1b:42:7800:5142:bc24:7210:b2d6) has quit: Ping
+    timeout: 245 seconds
+<merijn> __monty__: Well, that exists only by explicitly creating it (or by
+         the RTS "simulating" one in profiling mode)
+*** vivekram_ (~vivekrama@157.45.43.207) has joined channel #haskell    [17:09]
+*** vivekram_ (~vivekrama@157.45.43.207) has quit: Read error: Connection
+    reset by peer
+*** Wuzzy (~Wuzzy@p5790EDDD.dip0.t-ipconnect.de) has joined channel #haskell
+                                                                        [17:10]
+*** vivekramaswamy (~vivekrama@2409:4071:2118:4eff:3cc4:c42c:21f9:16d9) has
+    quit: Ping timeout: 276 seconds                                     [17:12]
+*** ryan2215 (~ryan2215@98.207.153.158) has joined channel #haskell     [17:14]
+*** marrrk (~textual@185.85.220.198) has joined channel #haskell        [17:17]
+* hackage secp256k1-legacy 0.5.5 - fork of secp256k1
+  https://hackage.haskell.org/package/secp256k1-legacy-0.5.5 (fommil)
+*** marrrk (~textual@185.85.220.198) has quit: Client Quit
+*** vivekramaswamy (~vivekrama@2409:4071:2118:4eff:202c:516a:f5f2:492a) has
+    joined channel #haskell
+*** jeltsch (~wolfgang@c997-c4de-5f2d-ec8f-3e80-82b2-07d0-2001.dyn.estpak.ee)
+    has joined channel #haskell                                         [17:18]
+*** KeyJoo (~KeyJoo@46.249.13.35) has joined channel #haskell
+*** dTal (~quassel@dragonbox/users/dtal) has joined channel #haskell
+*** ryan2215 (~ryan2215@98.207.153.158) has quit: Ping timeout: 245 seconds
+*** marrrk (~textual@185.85.220.198) has joined channel #haskell        [17:19]
+*** ravenous_
+    (~ravenousm@ptr-cud5aqfe2unjl1u4u9w.18120a2.ip6.access.telenet.be) has
+    joined channel #haskell
+*** ph88_ (~ph88@2001:1c05:240e:f400:2d55:4294:cbb0:1b68) has joined channel
+    #haskell                                                            [17:20]
+*** vivekram_ (~vivekrama@165.225.104.75) has joined channel #haskell   [17:21]
+*** rruizt (~rruizt@83-84-23-124.cable.dynamic.v4.ziggo.nl) has quit: Ping
+    timeout: 268 seconds
+*** rruizt (~rruizt@83-84-23-124.cable.dynamic.v4.ziggo.nl) has joined channel
+    #haskell                                                            [17:22]
+*** vivekramaswamy (~vivekrama@2409:4071:2118:4eff:202c:516a:f5f2:492a) has
+    quit: Ping timeout: 245 seconds                                     [17:24]
+*** ph88^ (~ph88@2001:1c05:240e:f400:80e5:2f3f:e070:b743) has quit: Ping
+    timeout: 264 seconds
+*** Ariakenom (~Ariakenom@h-158-174-186-219.NA.cust.bahnhof.se) has joined
+    channel #haskell
+*** Myhlamaeus (~Myhlamaeu@ip-109-41-67-76.web.vodafone.de) has joined channel
+    #haskell                                                            [17:25]
+*** forecho (~forecho@58.250.18.130) has quit: Remote host closed the
+    connection                                                          [17:27]
+*** lemmih (~lemmih@202.133.195.149) has joined channel #haskell
+*** forecho (~forecho@58.250.18.130) has joined channel #haskell
+*** xff0x (~fox@210.57.57.162) has joined channel #haskell              [17:29]
+*** forecho (~forecho@58.250.18.130) has quit: Remote host closed the
+    connection
+*** forecho (~forecho@218.17.157.47) has joined channel #haskell
+*** kimpa (5a8dc159@gateway/web/cgi-irc/kiwiirc.com/ip.90.141.193.89) has
+    joined channel #haskell                                             [17:31]
+*** ph88 (~ph88@2001:1c05:240e:f400:2d55:4294:cbb0:1b68) has joined channel
+    #haskell
+*** m0rphism (~m0rphism@149.172.82.115) has joined channel #haskell     [17:32]
+*** ph88_ (~ph88@2001:1c05:240e:f400:2d55:4294:cbb0:1b68) has quit: Ping
+    timeout: 245 seconds                                                [17:34]
+*** cosimone (~cosimone@2001:b07:ae5:db26:73a:8101:bd0:2ff9) has joined
+    channel #haskell                                                    [17:35]
+*** yoneda (~mike@193.206.102.236) has quit: Quit: leaving
+*** vivekram_ (~vivekrama@165.225.104.75) has quit: Remote host closed the
+    connection                                                          [17:36]
+*** gxt (~gxt@gateway/tor-sasl/gxt) has quit: Ping timeout: 260 seconds
+                                                                        [17:37]
+*** vivekramaswamy (~vivekrama@165.225.104.75) has joined channel #haskell
+                                                                        [17:38]
+*** pepito18 (1f04f105@31.4.241.5) has quit: Ping timeout: 260 seconds  [17:39]
+*** involans (~involans@cpc108959-cmbg20-2-0-cust162.5-4.cable.virginm.net)
+    has joined channel #haskell                                         [17:40]
+*** Gurkenglas (~Gurkengla@unaffiliated/gurkenglas) has joined channel
+    #haskell                                                            [17:41]
+*** ph88^ (~ph88@2001:1c05:240e:f400:2d55:4294:cbb0:1b68) has joined channel
+    #haskell
+*** forecho (~forecho@218.17.157.47) has quit: Remote host closed the
+    connection                                                          [17:42]
+*** cgfbee (~bot@oc1.itim-cj.ro) has joined channel #haskell            [17:43]
+*** vyorkin (~user@ppp91-76-116-124.pppoe.mtu-net.ru) has quit: Remote host
+    closed the connection                                               [17:44]
+*** forecho (~forecho@218.17.157.47) has joined channel #haskell
+*** ph88 (~ph88@2001:1c05:240e:f400:2d55:4294:cbb0:1b68) has quit: Ping
+    timeout: 264 seconds
+*** vyorkin (~user@ppp91-76-116-124.pppoe.mtu-net.ru) has joined channel
+    #haskell
+*** logzet (~quassel@unaffiliated/logzet) has joined channel #haskell   [17:45]
+*** kimpa (5a8dc159@gateway/web/cgi-irc/kiwiirc.com/ip.90.141.193.89) has
+    quit: Ping timeout: 268 seconds
+*** fragamus (~michaelgo@c-98-244-6-56.hsd1.ca.comcast.net) has joined channel
+    #haskell                                                            [17:46]
+*** laem (~laem@unaffiliated/laem) has quit: Ping timeout: 258 seconds
+*** kunningd (~kunningdr@unaffiliated/kunningdruger) has joined channel
+    #haskell
+*** bugbot1 (~bugbot@192.145.126.115) has joined channel #haskell       [17:47]
+*** laem (~laem@unaffiliated/laem) has joined channel #haskell
+*** Ariakenom (~Ariakenom@h-158-174-186-219.NA.cust.bahnhof.se) has quit:
+    Remote host closed the connection
+*** ryan2215 (~ryan2215@98.207.153.158) has joined channel #haskell     [17:49]
+*** kimpa (4d48e2dd@gateway/web/cgi-irc/kiwiirc.com/ip.77.72.226.221) has
+    joined channel #haskell                                             [17:50]
+*** fragamus (~michaelgo@c-98-244-6-56.hsd1.ca.comcast.net) has quit: Ping
+    timeout: 265 seconds                                                [17:51]
+*** cdepillabout (~illabout@pl107332.ag1001.nttpc.ne.jp) has joined channel
+    #haskell                                                            [17:53]
+*** ryan2215 (~ryan2215@98.207.153.158) has quit: Ping timeout: 265 seconds
+                                                                        [17:54]
+*** martijnV2 (martijn@gateway/vpn/mullvad/martijnv2) has quit: Quit: leaving
+                                                                        [17:55]
+*** jeltsch (~wolfgang@c997-c4de-5f2d-ec8f-3e80-82b2-07d0-2001.dyn.estpak.ee)
+    has left channel #haskell: #haskell
+*** vivekramaswamy (~vivekrama@165.225.104.75) has quit: Remote host closed
+    the connection                                                      [17:58]
+*** jeltsch (~wolfgang@08b6-c216-3d9e-ed09-3e80-82b2-07d0-2001.dyn.estpak.ee)
+    has joined channel #haskell                                         [18:01]
+*** kubek2k (~Jakub_Jan@213-241-3-97.static.ip.netia.com.pl) has quit: Ping
+    timeout: 245 seconds                                                [18:02]
+*** eiGHttt (~eiGHttt@157.119.232.29) has quit: Ping timeout: 258 seconds
+                                                                        [18:04]
+*** inkbottle (~inkbottle@aaubervilliers-654-1-6-168.w83-200.abo.wanadoo.fr)
+    has quit: Ping timeout: 245 seconds                                 [18:05]
+*** xff0x (~fox@210.57.57.162) has quit: Quit: xff0x
+*** ryan2215 (~ryan2215@98.207.153.158) has joined channel #haskell
+*** inkbottle (~inkbottle@aaubervilliers-654-1-98-67.w86-212.abo.wanadoo.fr)
+    has joined channel #haskell
+*** ryan2215 (~ryan2215@98.207.153.158) has quit: Ping timeout: 240 seconds
+                                                                        [18:10]
+*** PonyLoop1000[m] (laaksoanmo@gateway/shell/matrix.org/x-gdxyosbabniazfei)
+    is now known as PonyDuck3000[m]                                     [18:11]
+*** mariatsji (~mariatsji@vpn-managed.schibsted.no) has quit: Ping timeout:
+    240 seconds                                                         [18:14]
+*** conal (~conal@64.71.133.70) has joined channel #haskell             [18:15]
+*** Amras (~Amras@unaffiliated/amras0000) has joined channel #haskell   [18:16]
+*** dycan (~dycan@101-137-151-131.mobile.dynamic.aptg.com.tw) has joined
+    channel #haskell                                                    [18:17]
+*** ravenous_
+    (~ravenousm@ptr-cud5aqfe2unjl1u4u9w.18120a2.ip6.access.telenet.be) has
+    quit: Ping timeout: 276 seconds
+*** marrrk (~textual@185.85.220.198) has quit: Quit: My MacBook has gone to
+    sleep. ZZZzzz…                                                     [18:19]
+*** heatsink (~heatsink@107-136-5-69.lightspeed.sntcca.sbcglobal.net) has
+    joined channel #haskell
+*** conal (~conal@64.71.133.70) has quit: Ping timeout: 265 seconds     [18:20]
+*** vivekramaswamy (~vivekrama@165.225.104.75) has joined channel #haskell
+                                                                        [18:21]
+*** ryan2215 (~ryan2215@98.207.153.158) has joined channel #haskell
+*** libertyprime (~libertypr@71.87.69.111.dynamic.snap.net.nz) has joined
+    channel #haskell                                                    [18:22]
+*** carthago (~Kartha@112.133.248.111) has joined channel #haskell      [18:23]
+*** kubek2k (~Jakub_Jan@213-241-3-97.static.ip.netia.com.pl) has joined
+    channel #haskell
+*** KeyJoo (~KeyJoo@46.249.13.35) has quit: Ping timeout: 265 seconds
+*** heatsink (~heatsink@107-136-5-69.lightspeed.sntcca.sbcglobal.net) has
+    quit: Ping timeout: 240 seconds                                     [18:24]
+*** fragamus (~michaelgo@c-98-244-6-56.hsd1.ca.comcast.net) has joined channel
+    #haskell
+*** Kartha (~Kartha@unaffiliated/kartha) has quit: Ping timeout: 265 seconds
+*** vivekramaswamy (~vivekrama@165.225.104.75) has quit: Ping timeout: 265
+    seconds                                                             [18:25]
+*** ryan2215 (~ryan2215@98.207.153.158) has quit: Ping timeout: 240 seconds
+                                                                        [18:26]
+*** cybai (~cybai@240d:1b:42:7800:58cb:2f7e:24c:7252) has quit: Remote host
+    closed the connection
+ERC> /quit
