@@ -1,4 +1,225 @@
 
+haskell turn off line buffer
+put this
+`hSetBuffering stdout NoBuffering' into do-block
+
+-- module ReverseInput where, comment this line will link to a binary file via `ghc --make ReverseInput.hs', uncomment this line will not compile to a binary file, it will be used as a module file
+
+import Control.Monad
+import Data.Char
+import System.IO
+
+main = do
+     -- turn off line buffer
+     hSetBuffering stdout NoBuffering
+     putStr "Give me some input: "
+     l <- getLine
+     if null l
+        then return ()
+        else do
+                -- putStrLn $ map toUpper l        
+                putStrLn $ reverse l
+                main
+
+-- main = do
+--      -- turn off line buffer
+--      hSetBuffering stdout NoBuffering
+--      putStr "Give me some input: "
+--      l <- getLine
+--      -- putStrLn $ map toUpper l        
+--      putStrLn $ reverse l
+--      when (not (null l)) main
+
+##############################################################
+#do-notation
+
+'bout do-notation, we can put actions into it, but not only actions, like do True,
+do-notation can combine those actions into one action,
+and main is one IO action, main :: IO ()
+monadic actions have effects
+all the actions are monadic actions, all the monadic actions have effects
+actions only can be executed if we combine them into one action and name it to `main'
+main :: IO ()
+main = do
+     ...
+ghc will run with `main' this one IO action
+<jle`> jusss: `do x; y` is sugar for x >> y
+
+#############################################################
+
+<dminuoso> jusss: do-notation is just syntax sugar for Monad, and we tend to
+           think of Monads as modelling effects, so values of some type `m a`
+           for some choice of M can usually be thought of as actions.   [15:43]
+<jle`> action is not a formal term, but in this context we refer to it as a
+       value of type `m a` for some m and a
+<jusss> jle`: aha, so it means, we can only put monadic actions into do-block?
+<dminuoso> jusss: Sure. You could say that.
+<jle`> jusss: in a single-line do block, not necessarily
+<jle`> jusss: but as soon as you have more than one line, you need >> or >>=
+<jle`> which requires a Monad instance, and to have type 'm a'          [15:44]
+<jle`> that's because `do x` is desugared as `x`
+<dminuoso> Well the way the question was phrased "we can only put monadic
+           actions into do-block?" juss is right.
+<jle`> but `do x; y` is desugared as `x >> y`
+<dminuoso> You cannot put non-monad things into do-blocks (unless you enable
+           ApplicativeDo).
+<jle`> > do True
+<lambdabot>  True
+<dminuoso> Oh.
+<dminuoso> TIL.
+<dminuoso> I did not expect that. :-)
+<jle`> do blocks can contain anything, but as soon as you string multiple
+       lines together, you connect them with >> or >>=, so that's when the
+       'monadic action requirement' starts happening                    [15:45]
+<jle`> dminuoso: back in the day we used to use this trick to get rid of $'s
+       or parentheses :)
+<jle`> > 1 * do 3 + 4
+<lambdabot>  7
+<jle`> whoops, bad example
+<jle`> > 2 * do 3 + 4                                                   [15:46]
+<lambdabot>  14
+<jusss> dminuoso: can we think putStrLn return an action, and that action will
+        be executed? all the actions will be executed immediately when it
+        shows up?
+<jusss> % :t putStrLn
+<yahb> jusss: String -> IO ()
+<jle`> jusss: actions aren't really "executed" in Haskell evaluation of
+       values, we just define them
+<jle`> jusss: saying `main = putStrLn "hi"` means that we are defining 'main'
+       as the IO action that puts "hi"
+<jle`> we're *describing* an IO action
+<jle`> then later when we compile the code, we are really compiling an IO
+       action into bytestring, like an IO () -> Binary code             [15:47]
+<jle`> *function
+<jle`> GHC takes the IO action that describe and name 'main', and translates
+       it into bytecode
+<jle`> *the IO action that you describe, that is named 'main'           [15:48]
+<jusss> jle`: oh, I forget that, actions only be executed when put them into
+        `main'
+<jle`> jusss: so note if you had a file like `main = putStrLn "hi";
+       myOtherThing = putStrLn "bye"`, if you compile it, GHC will compile
+       'putStrLn "hi"`, the IO action
+<jle`> it has to pick one action to compile, so it uses the one you name
+       'main', arbitrarily
+<jle`> you really could imagine that it could turn main into your binary, or
+       it could turn myOtherThing into your binary. it just chooses main
+       because that's what we agree upon
+<jusss> jle`: but if we put those actions into do-block, we pass main = do
+        ... we can run more actions?
+<jle`> jusss: not quite; main is always a single IO action
+<jle`> but, we can use the IO API in ghc to create complex IO actions out of
+       simpler ones
+<jle`> for example, (>>) :: IO a -> IO b -> IO b                        [15:50]
+<jle`> (>>) takes two IO actions and returns a new one
+<jle`> so it would take `putStrLn "hi"` and `putStrLn "bye"`, and it would
+       return `putStrLn "hi\nbye"`
+<jle`> so main is a single IO action, but we can 'construct' IO actions by
+       combining them using the functions ghc gives us                  [15:51]
+<jusss> jle`: will `do' notation combine them to one?
+<jle`> jusss: `do x; y` is sugar for x >> y
+<jle`> yes, essentially. it combines them into one single IO action, which is
+       all of its lines done sequentially
+<jle`> so it's like myList = [1,2,3] ++ [4,5,6].  myList is a single list, but
+       we can construct myList by appending together several simpler lists
+<jusss> jle`: then what `sequence' is used for?                         [15:52]
+<jle`> main is a single IO action, but we can construct that IO action by
+       'appending' (or 'sequencing') together several simpler IO actions
+<jle`> jusss: sequence [x,y,z] = x >> y >> z
+<jle`> so it can be convenient if you have a list of IO actions, and you want
+       to turn it into one big IO action
+<koz_> So basically we get one gigantic IO action, which main will execute.
+<jle`> sequence :: [IO ()] -> IO ()
+<jusss> jle`: `sequence' can combine actions into one like `do' ?
+<jle`> actually that's one of the benefits of IO-as-data, I think.  because
+       you can think of many ways you could write [IO ()] -> IO ()      [15:53]
+<jle`> you could create a new action that does all of the items in a sequence
+<jle`> or you could create one that does them all in parallel
+<jle`> jusss: yeah, in the end the main mechanism is (>>)
+<jle`> do x; y; z  == x >> y >> z
+<jle`> sequence_ [x,y,z]  == x >> y >> z
+<jle`> both are basically wrapping around usage of >>
+<jle`> but do blocks are a bit more powerful because you can do more than just
+       >> with them                                                     [15:54]
+<jusss> jle`: is that all the actions are monadic actions? which means all the
+        actions contain monad?                                          [15:55]
+<jle`> well it just means that they have an instance of Monad m         [15:56]
+<jle`> because:
+<jle`> :t (>>)
+<lambdabot> Monad m => m a -> m b -> m b
+<jle`> so you could technically write do True; False; True, but then that
+       would desugar to True >> False >> True, and that's a type error
+<jle`> so it's really just back to normal typechecking rules, nothing super
+       special
+<jusss> jle`: this >> is look like const
+<jusss> :t const
+<lambdabot> a -> b -> a
+<jle`> indeed the type is similar
+<jle`> but because we have some constraints, we get some more interesting
+       functions
+<jle`> > Just 3 *> Just 10
+<lambdabot>  Just 10
+<jle`> > Nothing *> Just 10
+<lambdabot>  Nothing
+<jle`> but yeah, (>>) can be defined as `liftA2 (flip const)`
+<jle`> so that's the similarity you are seeing
+<jle`> :t liftA2 const
+<lambdabot> Applicative f => f c -> f b -> f c
+<jle`> :t liftA2 (flip const)
+<lambdabot> Applicative f => f b -> f c -> f c
+<jusss> jle`: what its name of >> ?
+<jle`> some people like to call it 'andThen' or 'then'                  [15:59]
+<jle`> maybe you can say 'sequenced with'
+#####################################################
+#haskell-mode #indentation
+ghc --make a.hs , lots of dependent files missing,
+it needs the pacakge `ghc-static' in archlinux, 
+
+about auto indentation
+
+(electric-indent-mode 1)
+(add-hook 'haskell-mode-hook
+	  (lambda () (local-set-key (kbd "<f5>") 'my-haskell-compile)
+      (haskell-indentation-mode -1)
+      ;;; (haskell-indent-mode 1) just won't work, I don't know why
+     ))
+;;; http://haskell.github.io/haskell-mode/manual/latest/Indentation.html#Indentation
+(add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
+
+####################################################
+higher-kinded types
+
+<jusss> what is the higer-kind type?
+<sarahzrf> jusss: a type with a function kind, usually                  [12:19]
+
+:k Maybe
+Maybe :: * -> *
+
+<jusss> dmwit: Maybe is a type?
+<jusss> or Maybe is a function?
+<ghoulguy> Yes, both
+<jusss> ghoulguy: Maybe is a higher-kinded type?                        [12:37]
+<ghoulguy> jusss: Maybe is a type that has kind * -> *
+<ghoulguy> Because it has an arrow kind it can be applied to other types,
+           specificaly those types with kind *
+<masaeedu[m]> ghoulguy: i don't get it. how is `Maybe` a function?
+<ghoulguy> masaeedu[m]: Functions are things you apply, Maybe Int is Maybe
+           applied to Int                                               [12:44]
+
+<jusss````> ok,  3 and 5 are not same on value level, but 3 and 5 are same on
+            type level
+<jusss````> so Int and Int -> Int are not same on type level, but they're same
+            on kind level?
+<dminuoso> jusss````: Right.
+<jusss````> dminuoso: -> in the kind level, does it still mean function? or
+            what else?                                                  [16:23]
+<jusss````> 'cause value and type levels both have function ->
+<dminuoso> jusss````: and sort of yes, (->) in the kinds generates kinds for
+           function types!
+<jusss````> dminuoso: if type Int :: *, and Int -> Int :: *,  (->) Int Int ::
+            *, (->) * * :: *, (->) :: * -> * -> *                    [16:26]
+<jusss````> oh, it's (->) * * :: *,                                     [16:28]            
+############################################################
+
 #expressions #functions #actions #effects #side-effects #monadic actions
 
 monadic actions have effects!
