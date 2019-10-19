@@ -1,4 +1,5 @@
-
+the package ghc need another package ghc-static to help compiling on archlinux
+################################
 
 #GADTs
 {-#LANGUAGE GADTs #-}
