@@ -1,0 +1,9 @@
+pacman -S cabal-install
+for i in $(pacman -Ss haskell|grep 'community/haskell-'|grep -v 'installed'); do sudo pacman -S $i --noconfirm; done;
+
+mkdir ~/.cabal/store/ghc-8.6.5/package.db
+cabal v2-update
+cabal install slack-api
+
+ghc need static libraries, but archlinux only contain dynamic libraries,
+so ghc won't work on archlinux, and cabal can't install slack-api 
