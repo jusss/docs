@@ -1,0 +1,12 @@
+root@moon:~# bash linuxqq_2.0.0-b1-1024_x86_64.sh 
+installing /usr/share/applications/qq.desktop
+installing /usr/share/tencent-qq/res.db
+installing /usr/share/tencent-qq/crashpad_handler
+installing /usr/share/tencent-qq/qq.bmp
+installing /usr/share/tencent-qq/qq.png
+installing /usr/share/tencent-qq/qq
+root@moon:~# /usr/share/tencent-qq/qq
+
+only login with phone qr scanner
+
+download https://im.qq.com/linuxqq/download.html
