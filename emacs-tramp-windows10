@@ -1,0 +1,6 @@
+1. download plink from https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html
+https://the.earth.li/~sgtatham/putty/0.73/w64/plink.exe
+2. put plink.exe to your Path
+3. (setq tramp-default-method "plink")
+4. C-x C-f /plink:root@localhost:/root/path/file
+5. about stunnel, plink use port 22, so make sure stunnel listen on localhost:22
