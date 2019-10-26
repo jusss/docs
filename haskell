@@ -1,3 +1,13 @@
+import Control.Concurrent -- forkIO is used for multi-threading
+
+ forkIO (forever $ do
+        msg <- recv socket 1024  -- msg :: ByteString
+        case D.isPrefixOf (C.pack "PING") msg of
+             True -> sendAll socket $ D.map (\i -> if (i == 73) then 79 else i) msg
+             False -> sendMsg chatId (En.decodeUtf8 msg) token manager)
+
+###############################################
+import Control.Concurrent.Async -- from async package
 
 <nshepperd> jusss: async doBlockingAction >>= (\h -> do { ... poll h ... })
 <nshepperd> or: 'async doBlockingAction >>= (\h -> do { ... wait h ... })' if
