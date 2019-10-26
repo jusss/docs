@@ -1,3 +1,7 @@
+git log  # get the commit id
+git reset --hard commit-id # reset to that version
+git push -f code bla2 # push to remote
+---------------------------------------
 mkdir docs
 cd docs
 git init
