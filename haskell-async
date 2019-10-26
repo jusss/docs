@@ -1,0 +1,26 @@
+
+import Control.Concurrent -- forkIO is used for multi-threading
+
+ forkIO (forever $ do
+        msg <- recv socket 1024  -- msg :: ByteString
+        case D.isPrefixOf (C.pack "PING") msg of
+             True -> sendAll socket $ D.map (\i -> if (i == 73) then 79 else i) msg
+             False -> sendMsg chatId (En.decodeUtf8 msg) token manager)
+
+###############################################
+import Control.Concurrent.Async -- from async package
+
+<nshepperd> jusss: async doBlockingAction >>= (\h -> do { ... poll h ... })
+<nshepperd> or: 'async doBlockingAction >>= (\h -> do { ... wait h ... })' if
+            you want to start the action (or several actions) now and then
+            wait for it to finish later
+<lambdabot> do { a <- async doBlockingAction; (\ h -> do { x <- poll h; return
+            x}) a}
+<nshepperd> do { h <- async (recv socket 1024); do some other stuff; answer <-
+            wait h ; do stuff with answer }
+<nshepperd> jusss: dunno. probably. read through
+            https://hackage.haskell.org/package/async  [00:09]
+<nshepperd> if nothing else you can do timer <- async (threadDelay 1000000)
+            and then waitEither timer h  [00:10]
+<dsal> jusss:
+       http://hackage.haskell.org/package/base-4.12.0.0/docs/System-Timeout.html
