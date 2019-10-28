@@ -1,4 +1,503 @@
 
+module SplitAlistWithAlist where
+
+-- (cons 1 2) == 1: [2]
+-- (car '(1)) == head [1]
+-- (cdr '(1)) == tail [1]
+
+splitWithList :: (Eq a) => [a] -> [a] -> [a] -> Int -> [[a]]
+splitWithList = \alist blist before n ->
+              if (null alist) then
+                  (if (null blist) then (reverse $ removeN before n): [alist] else [])
+                  else if (null blist) then
+                       (reverse $ removeN before n): [alist]
+                       else if ((head alist) /= (head blist)) then
+                            splitWithList (tail alist) blist ((head alist): before) n
+                            else
+                            splitWithList (tail alist) (tail blist) ((head alist): before) n
+
+removeN :: [a] -> Int -> [a]
+removeN = \alist n ->
+        if (n == 0) then
+           alist
+           else
+           removeN (tail alist) (n - 1)
+
+splitListWithList alist blist =
+                  splitWithList alist blist [] $ lengthList blist
+
+-- lengthN :: (Eq a) => [a] -> Int -> Int
+-- lengthN = 
+--        \x n -> if (null x) then
+--            n
+--            else lengthN (tail x) (n+1)
+-- 
+-- lengthList alist = lengthN alist 0
+
+lengthList :: [a] -> Int
+lengthList alist = f alist 0
+           where
+                f [] n = n
+                f (x:xs) n = f xs (n+1)
+
+
+-- main = 
+--       putStrLn $ show $ splitListWithList [1,2,3,4,5] [3]
+-- import SplitAlistWithAlist
+-- splitListWithList [1,2,3] [2]  will be  [[1],[3]]
+-- splitListWithList [1,2,3] [5]  will be  []
+-- splitListWithList [1,2,3] [3]  will be  [[1,2],[]]
+-- splitListWithList [1,2,3] [1]  will be  [[],[2,3]]
+
+
+---------------------------------------------------------------------------
+
+let ... in and where
+
+let ... in put the definition before the expression,
+where put the definition after the expression.
+
+x where x = y
+let x = y in x
+
+" Things in the where clause can refer only to the parameters of
+   the function f (there are none) and things in outer scopes." from
+    https://stackoverflow.com/questions/4362328/haskell-where-vs-let
+
+x where x = y is wrong
+but f x = y where y = x is right
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define split-with-N (lambda (alist a before)
+                             (if (eq? alist '()) '()
+                                 (if (eq? (car alist) a)
+                                 (cons (reverse before) (cons (cdr alist) '()))
+                                 (split-with-N (cdr alist) a (cons (car alist) before))))))
+;;; (split-with-N (list 1 2 3) 2 '())
+
+;;; http://matt.might.net/articles/cps-conversion/
+(define (split-on a xs k)
+  (cond ((null? xs) (k '() '()))
+        ((eqv? a (car xs))
+         (k '() (cdr xs)))
+        (else
+         (split-on a (cdr xs) (lambda (bs as)
+                                (k (cons (car xs) bs) as))))))
+;;; (split-on 3 (list 1 2 3 4 5) list)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define split-with-list
+  (lambda (alist blist before n)
+    (if (eq? alist '()) '()
+        (if (eq? blist '()) (cons (reverse (remove-n before n)) (cons alist '()))
+            (if (not (eq? (car alist) (car blist)))
+                (split-with-list (cdr alist) blist (cons (car alist) before) n)
+                (split-with-list (cdr alist) (cdr blist) (cons (car alist) before) n))))))
+
+(define remove-n
+  (lambda (alist n)
+    (if (eq? n 0)
+        alist
+        (remove-n (cdr alist) (- n 1)))))
+
+(define (split-list-with-list alist blist) (split-with-list alist blist '() (length blist)))
+
+;;; > (split-list-with-list '(1 2 3 4 5 6) '(3 4))
+;;; '((1 2) (5 6))
+;;; > (split-list-with-list '(1 2 3 4 5 6) '(5 6))
+;;; '()
+;;; > (split-list-with-list '(1 2 3 4 5 6) '(4 5))
+;;; '((1 2 3) (6))
+;;; > (split-list-with-list '(1 2 3 4 5 6) '(9))
+;;; '()
+;;; > (split-list-with-list '(1 2 3 4 5 6) '(3))
+;;; '((1 2) (4 5 6))
+
+###########################################################
+
+1. download plink from https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html
+https://the.earth.li/~sgtatham/putty/0.73/w64/plink.exe
+2. put plink.exe to your Path
+3. (setq tramp-default-method "plink")
+4. C-x C-f /plink:root@localhost:/root/path/file
+5. about stunnel, plink use port 22, so make sure stunnel listen on localhost:22
+
+############################################################
+
+#cabal #merge #projects #link #install  #combine
+
+they need to share the `dist' directory, 'cause cabal v2-install will write into that directory.
+so ircbot should be into haskell-telegram-api directory
+
+ircbot and haskell-telegram-api, two projects,
+but rememer , haskell-telegram-api's name is
+`telegram-api' , get the name from its .cabal file
+
+cd into haskell-telegram-api, then
+
+git clone that ircbot, then cd into it, get the package name from its .cabal,
+cd back to haskell-telegram-api,
+cabal v2-install `ircbot'
+
+ vim .cabal, append `ircbot' into build-depends
+, cabal v2-build, do care the version to see if the package is from local or hackage,
+then cabal v2-repl, you can import both modules from the two projects
+in the haskell-telegram-api directory.
+
+otherwise it will pull from hackage
+
+https://stackoverflow.com/questions/18085363/link-cabal-to-local-library
+
+just get `ircbot' into `haskell-telegram-api' directory, then `cabal v2-install ircbot' in `haskell-telegram-api' directory, then write `ircbot' into telegram-api.cabal's build-depends,
+`cabal v2-build' will be fine.
+
+#############################################
+
+Network.Socket isn't came with ghc
+aptitude install libghc-network-dev
+
+########################################
+
+<jusss> main :: IO()
+<jusss> main = do
+<jusss>   Just 3 >>= \i -> Just i
+<jusss> or we switch that context Maybe to IO ? turn Just 3 to IO 3
+<__monty__> Why would bind suddenly get a different type?               [17:49]
+<jusss> if we use return in `Just 3 >>= \i -> return i' what this i will bind
+        with? IO or Maybe
+<__monty__> Well it's a type error. >>= has type IO () -> (a -> IO ()) -> IO
+            () in your context.                                         [17:51]
+<__monty__> Just 3 doesn't have type IO ().
+<jusss> oh
+<jusss> but IO (Just 3) >>= \i -> return i ?                            [17:52]
+<__monty__> IO's not a constructor.
+<jusss> wait, I forget there's no IO transformer
+<jusss> but there's IoT
+<__monty__> You could do something like: return (Just 3 >>= return). That
+            inner >>= and return would use the monad instance for Maybe.
+                                                                        [17:54]
+<jusss> ok                                                              [17:55]
+
+##########################################################
+
+#import #module #haskell #ghc #qualified
+
+there's `reverse' in Prelude, Data.Text, and Data.List,
+if we just want to use Data.Text.reverse
+
+just do `import qualified Data.Text as T', and use T.reverse
+if you want to import data Text from Data.Text
+then `import Data.Text (Text)' if other module don't have data Text
+or all the stuff within data Text
+`import Data.Text (Text(..))
+
+#1
+`import Data.Text' that would import all the stuff from Data.Text,
+but that would still be confilicted with others reverse when you have `import Data.List'
+'cause import Data.List will also import reverse,
+#2
+import Data.Text (reverse)
+import Data.List
+that's still confilicted
+
+#3
+import Data.Text (reverse)
+import Data.List hiding (reverse)
+ok, this will be confilicted with Prelude,
+
+#4
+import qualified Data.Text as T
+this will make T as Data.Text, and this won't import all the stuff of Data.Text
+so T.reverse equal to Data.Text.reverse
+this is ok
+
+#5
+import qualified Data.Text (reverse)
+import Data.List
+still confilict
+
+#6
+import Data.Text as T
+this still will import all the stuff from Data.Text, that will clash with Prelude
+you can use T.pack also pack, but ghc still don't know reverse come from Data.Text or Prelude
+
+
+<jusss> jle`: I wonder why `import qulified Data.Text (reverse)' won't work,
+        ghc steel don't know it's Data.Text.reverse not Prelude or Data.IO
+<jusss> Data.List
+<int-e> jusss: https://hackage.haskell.org/package/async is an extra package
+<jle`> jusss: you'd have to use Data.Text.reverse in that case
+<jusss> int-e: ok
+<jle`> jusss: import qualified My.Module (blah), would import blah as
+       My.Module.blah
+<jusss> jle`: yes, that' what I did
+<jle`> Prelude also exports 'reverse'                                   [13:36]
+<int-e> "won't work" -- what did you expect it to do?
+<jusss> jle`: what about `import Data.Text.reverse as reverse'?         [13:37]
+<jle`> that's not valid syntax
+<jusss> import reverse as Data.Text.reverse , is?
+<jle`> what happens when you try? :)                                    [13:38]
+<jusss> int-e: expect ghc will take reverse from Data.Text, not others
+<int-e> jusss: import Data.Text (reverse)  does make `reverse` available as a
+        plain name in principle. But you have to hide the one from Prelude
+        somehow. For example, `import Prelude hiding (reverse)` would do the
+        trick. I'd not recommend it though!
+<jusss> int-e: yeah, and I have to hide that reverse in Data.List       [13:39]
+<Axman6> import qualified Data.Text; ... Data.Text.reverse should work
+<int-e> The thing is (and this has already been said), Data.Text is designed
+        to be imported qualified, and the standard way to avoid typing
+        "Data.Text." all over again is to rename the module to something
+        shorter, as in import qualified Data.Text as T.
+<Axman6> the usual way to do this is import qualified Data.Text as T and use
+         T.reverse; this is the style this is used most commonly
+<jusss> can I remove that `qualified' ?
+<jle`> jusss: note that module imports don't 'affect' the other -- having one
+       doesn't affect the other. so importing reverse from Data.Text doesn't
+       affect how you would import reverse from Prelude as well
+<jle`> i think it would be more confusing if it did
+<jle`> jusss: what happens when you try?                                [13:40]
+<int-e> If you remove the `qualified` you'll get extra unqualified imports
+        that will clash with Prelude.
+<int-e> Back to square one...
+<jusss> import Data.Text as T,   T.reverse
+<Axman6> if you do than then it imports everything in Data.Text
+<Axman6> which means that if you use map, or null, or anything else from
+         PRelude which is also in Data.Text you will keep getting these errors
+                                                                        [13:41]
+<jusss> ok
+<jle`> jusss: if you did import Data.Text as T, then you can use both 'T.pack'
+       and 'pack', without qualification
+<Axman6> just do import qualified Data.Text as T
+<jle`> jusss: but yeah, all lines in a module import list are 'additive'
+                                                                        [13:42]
+<Axman6> the full pattern people often use is import qualified Data.Text as T;
+         import Data.Text (Text), so you don't need to write T.Text everywhere
+<jle`> jusss: adding new lines to an import list only ever brings in new
+       imported things
+<jle`> jusss: it doesn't ever 'subtract' or negate other imports, if you add
+       another import
+<jle`> jusss: so if i write `import XXXXX` then later add `import YYYYY`, that
+       second line will never 'remove' any imports that the import XXXXX
+       brought in                                                       [13:43]
+<jle`> it can only add to the items in scope
+<jle`> not subtract
+<int-e> The only exception is that if you import Prelude explicitly, it will
+        not be imported implicitly.                                     [13:44]
+<jusss> jle`: ok, I will use `import qualified Data.Text as T' then T.reverse
+<jle`> jusss: so if you write import Data.List, then later write import
+       Data.Text (reverse), it won't 'subtract' any imports from Data.List
+<jle`> no imports from Data.List will be "removed" from the namespace
+<jle`> no matter what you import later
+<jle`> there is no import you can add later that would "delete" Data.List
+       (reverse) from the namespace
+<sicklorkin> jusss:
+             https://stackoverflow.com/questions/3175583/proper-way-to-import-things-already-defined-in-the-prelude-in-haskell
+<Axman6> jle`: this is starting to feel like it will end like
+         https://stackoverflow.com/questions/1732348/regex-match-open-tags-except-xhtml-self-contained-tags/#answer-1732454
+<sicklorkin> Axman6: that's a great answer                              [13:48]
+<Axman6> it's one of the classics
+
+####################################
+
+<> is more general to the most type,
+Data.Text don't have ++, but there's <>
+(pack "a") <> (pack "b")
+[1] <> [2]
+"a" <> "b"
+
+
+Data.List
+
+union [1,2] [2,3]  == [1,2,3]
+intersect [1,2] [2,3] == [2]
+[1,2,3] \\ [1,2] == [3]
+[2,3] \\ [1,2] == [3]
+[2] \\ [] == [2]
+
+############################################################
+
+if there's data P defined in A.hs, we can through `import qualified A (P)' to import
+to the current Main.hs, or `import qualified A (P, T(..))', this will import all data T
+
+'cause there're lots same names of functions, we need to point which is what we want,
+use `import qualified Data.Text.IO (getLine)' to declare that getLine is for Data.Text.IO,
+not from Prelude or System.IO
+
+if some types are instaces of typeclass Show, which means they implement
+the function `show', but show is a function which has no effect, it won't put
+something on screen, but we have print
+<EvanR> print is a library routine that uses show                       [15:57]
+<lambdabot> print x = putStrLn (show x)
+<ammar2> :t show
+<lambdabot> Show a => a -> String
+<jusss> :t print                                                        [16:02]
+<lambdabot> Show a => a -> IO ()
+
+
+#################################################
+
+#recordSyntax #record 
+
+data P = P { i :: Int, ii :: String }
+the form P i ii has the type P, not the form P {i ii}, but you can say P {i=3, ii="3"}
+P 3 "3" :: P
+i (P 3 "3") = 3
+i is a field, also an accessor, i (P x y) = x
+
+this i is no difference with others like runMkWhat where data MkWhat = MkWhat {runMkWhat :: What }
+runMkWhat (MkWhat w) = w  -- which w :: What
+
+newtype Foo a = Foo { runFoo :: a }
+newtype Foo a = Foo a;
+runFoo :: Foo a -> a
+runFoo (Foo a) = a
+
+also I think we can call this runFoo as a function, 'cause there's a (->) in its type
+#####################################################
+
+#emacs #focus #inputMethod
+
+emacs focus issue with Chinese Input Method
+when you select a section text in the browser with mouse, and don't release it,
+then in emacs, you would find you can't input a whole character to get what you
+want, 'cause the input method will only take one character then pop up the one
+Chinese character which is not what you want, or just lost the focuse, so you can't
+input any more,
+this happend on archlinux/debian and windows 10, I think it's related to the focus
+
+###################################################
+
+git clone https://github.com/klappvisor/haskell-telegram-api.git
+cd haskell-telegram-api
+cabal build  -- if it's on archlinux, use cabal v2-build, 'cause cabal v3 won't installed on archlinux successful via `cabal install Cabal cabal-install'
+cabal repl   -- append http-client-tls in the dpendent pacakges section
+
+create a bot from BotFather
+t.me/monoid_bot
+token HTTP API: 9
+https://api.telegram.org/bot9
+
+get your chatid 7 from telegram via add chatid_echo_bot
+
+remember the token is "bot9" for haskell-telegram-api
+
+the token is "9" for telegram-bot-simple
+
+cd haskell-telegram-api
+cd src
+vim Main.hs
+{-# LANGUAGE OverloadedStrings #-}
+
+import           Network.HTTP.Client      (newManager)
+import           Network.HTTP.Client.TLS  (tlsManagerSettings)
+import           Web.Telegram.API.Bot
+
+main :: IO ()
+main = do
+  manager <- newManager tlsManagerSettings
+  let request = sendMessageRequest chatId message
+  res <- sendMessage token request manager
+  case res of
+    Left e -> do
+      putStrLn "Request failed"
+      print e
+    Right Response { result = m } -> do
+      putStrLn "Request succeded"
+      print $ message_id m
+      print $ text m
+  where token = Token "bot9"
+        chatId = ChatId 776050087
+        message = "hi"
+
+ghc --make Main.hs
+./Main.hs
+#############################################################
+
+https://mirrors.tuna.tsinghua.edu.cn/help/hackage/
+
+debian sid
+apt install cabal-install
+cabal init
+vim .cabal/config
+repository mirrors.tuna.tsinghua.edu.cn
+  url: http://mirrors.tuna.tsinghua.edu.cn/hackage
+
+cabal update
+cabal install Cabal cabal-install
+aptitude install libghc-zlib-dev
+aptitude purge cabal-install
+export PATH=$PATH:/home/john/.cabal/bin
+
+cabal install slack-api --installdir="/home/john/.cabal/packages"
+
+mkdir MyRobot
+cd MyRobot
+cabal init
+vim MyRobot.cabal
+build-depends: base >=4.12 && <4.13, slack-api
+hs-source-dirs: /home/john/MyRobot/src
+mkdir src
+touch src/Main.hs
+cabal repl # now you can import Web.Slack
+cabal build # build the code which is in src/Main.hs, then it will outputs in dist-newstyle/build
+
+there's an example file for config
+https://hackage.haskell.org/package/hw-kafka-client-3.0.0/hw-kafka-client.cabal
+
+you even don't need to install slack-api, just config it in the MyRobot.cabal
+and cabal will install it for your MyRobot project
+
+you even don't need to run `cabal init' in the homedir
+<sclv> you run it in a project dir to init a project
+<sclv> and you can run update anywhere whenever
+<sclv> and it just fetches the latest package list from hackage and caches it
+
+`cabal build' will output an `mostly static' binary file by default.
+if you want to fully static builds, you need to google it
+<sclv> the fully static one links in at link time
+<sclv> that's what static is!
+<sclv> dynamic is when it uses the system lib :-)
+<sclv> it links everything statically at link time into a single file   [11:57]
+<sclv> but its only "mostly" static without work, because it dylinks standard
+       things like glibc
+<sclv> you can also `strip` to cut them down a bit
+<sclv> i don't know how to do fully static builds. its hard
+<sclv> you can google it
+<jusss> ok
+<sclv> you get "mostly static" by default
+<fraktor> I'm working on two different machines that use Debian.  I should be
+          able to build an artifact on one and move it to the other, right?
+          Since they both have similar versions of glibc and so on.     [12:02]
+<sclv> yes          
+
+<jusss> pikajude: which tool you prefer? cabal or stack                 [12:11]
+<sclv> you install ghc and cabal seperately
+<sclv> you can manage installing both with the ghcup tool if you want   [12:12]
+<jusss> sclv: but there're some issues on archlinux
+<maerwald> jusss: like what
+<jusss> sclv: the package ghc and cabal-install 
+<sclv> yes. the issue is the archlinux maintainers are awful
+<sclv> yes don't use their stuff
+<sclv> the maintainers are obstinate and terrible                       [12:13]
+<sclv> and refuse to listen to the entire haskell dev ecosystem screaming at
+       them
+<sclv> just use ghcup
+<jusss> maerwald: use cabal to install pacakge there're lots of versions issue
+        of package
+<maerwald> ah, I thought there is an issue with ghcup on arch
+<jusss> they just maintain dynamic libs
+<jusss> and ghc mostly use static libs, which is the problem            [12:14]
+<jusss> sclv: ghcup works well on archlinux?                            [12:15]
+<jusss> now I have to chroot into a debian sid on archlinux for using cabal
+<sclv> jusss: afaik ghcup should work. If it doesn’t then  the maintainers
+       would be interested to know                                      [12:25]
+<sclv> it may need a little messing about to make sure you have tinfo compat
+       etc                                                              [12:26]
+<pikajude> stack also downloads and installs GHC
+<pikajude> if you use it to build projects
+#####################################################
+
 haskell turn off line buffer
 put this
 `hSetBuffering stdout NoBuffering' into do-block
