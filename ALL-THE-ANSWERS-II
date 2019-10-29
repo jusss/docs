@@ -1,4 +1,46 @@
 
+#############################################################
+
+module SplitList where
+-- main = print $ splitList [1,2,3,2,4,5] [4,5] 
+-- [1,2,3,2,4,5] [3,4] == []
+-- [1,2,3,2,4,5] [1,2] == [[],[3,2,4,5]]
+-- [1,2,3,2,4,5] [4,5] == [[1,2,3,2],[]]
+splitList listA listB = f listA listB [] 0
+      where
+           lengthB = lengthList listB
+           copyB = listB
+           
+           f (x:listA) [] before counter =
+                     if (counter == lengthB) then (reverse $ removeN before lengthB):(x:listA):[]
+                     else f listA copyB (x:before) 0
+
+           f [] listB before counter =
+                   if (null listB) && (counter == lengthB) then (reverse $removeN before lengthB):[]:[]
+                   else []
+                   
+           f (x:listA) (y:listB) before counter =
+                         if (x == y) then f listA listB (x:before) (counter+1)
+                         else f listA copyB (x:before) 0
+                     
+removeN :: [a] -> Int -> [a]
+removeN = \alist n ->
+        if (n == 0) then
+           alist
+           else
+           removeN (tail alist) (n - 1)
+
+lengthList :: [a] -> Int
+lengthList alist = f alist 0
+           where
+                f [] n = n
+                f (x:xs) n = f xs (n+1)
+
+
+  
+
+##############################################################
+
 module SplitAlistWithAlist where
 
 -- (cons 1 2) == 1: [2]
@@ -376,7 +418,7 @@ cabal repl   -- append http-client-tls in the dpendent pacakges section
 create a bot from BotFather
 t.me/monoid_bot
 token HTTP API: 9
-https://api.telegram.org/bot9
+https://api.telegram.org/bot9/POST
 
 get your chatid 7 from telegram via add chatid_echo_bot
 
@@ -407,7 +449,7 @@ main = do
       print $ message_id m
       print $ text m
   where token = Token "bot9"
-        chatId = ChatId 776050087
+        chatId = ChatId 7
         message = "hi"
 
 ghc --make Main.hs
