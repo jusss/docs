@@ -1,0 +1,29 @@
+debootstrap --arch amd64 --foreign sid  ./sid/ http://mirrors.aliyun.com/debian
+cd ./sid
+chroot . /bin/bash
+/debootstrap/debootstrap --second-stage
+export PATH=$PATH:/bin:/usr/bin
+
+exit the chroot env, then
+cp mount.chroot.share.X.sh ./sid
+cd sid; ./mount.chroot.share.X.sh
+source source.me
+
+amd64 is for 64 bit, i386 is for 32 bit
+
+mount.chroot.share.X.sh
+sudo mount -t proc proc ./proc
+sudo mount -t sysfs sysfs ./sys
+sudo mount --make-rslave  ./sys
+sudo mount -t devtmpfs devtmpfs ./dev
+sudo mount --make-rslave  ./dev
+sudo mount -t tmpfs tmpfs ./dev/shm
+sudo mount -t devpts devpts ./dev/pts
+xauth extract - $DISPLAY | sudo tee ./root/.Xauthority
+sudo mount -t tmpfs tmpfs ./tmp
+sudo mount --make-rslave ./tmp
+sudo chroot . /bin/bash
+
+source.me
+#!/bin/bash
+export PATH=/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/home/john/.cabal/bin
