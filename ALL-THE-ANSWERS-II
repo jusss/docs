@@ -1,4 +1,869 @@
 
+#ADT #data type #sum type #product type
+#scotty #yesod #servant #wai #warp
+<jusss> what's the different between scotty , yesod, servent?           [16:51]
+<dminuoso> jusss: yesod is an opinionated feature-rich web framework with all
+           batteries included. HTML templating, JavaScript, build pipeline,
+           database models, everything. :)                              [16:53]
+<dminuoso> jusss: servant is a family of libraries designed around type-driven
+           HTTP APIs which is really great if you want to write both a server
+           and some clients sharing the same API. Scotty is just a miniature
+           web framework for simple web tasks.                          [16:54]
+<maerwald> scotty is simple, servant is elegant, yesod is complex       [16:55]
+<dminuoso> The differences are not in complexity, they are rather in the
+           problem domain.
+<maerwald> Of course there are differences in complexity. Some of those
+           *might* be related to the problem domain, some might not     [16:57]
+<jusss> dminuoso: and wai, warp?                                        [16:58]
+<maerwald> Also note that most of complexity in software is not essential, but
+           accidential complexity
+<dminuoso> jusss: wai is a standard/specification how a web application should
+           be exposed, such that you can separate the http server from the
+           application running on it.                                   [16:59]
+<dminuoso> jusss: warp is a http server capable of running wai applications.
+<jusss> dminuoso: what's the diffrent between the term "type" and "data type"
+        ?
+<dminuoso> jusss: It probably depends on the context.
+<dminuoso> jusss: "data type" is an expression I would try and avoid.
+<jusss> dminuoso: I still have no idea about ADT and what it's used for
+<dminuoso> jusss: An ADT is just the simple idea that you can create data
+           types with a) multiple constructors and/or b) multiple fields in a
+           given constructor. Nothing more.
+<dminuoso> THat's it. :)
+<dminuoso> jusss: Having "multiple constructors" is sometimes called "a sum
+           type" and having "multiple fields in a constructor" is sometimes
+           called a "product type". There's really nothing more to it. :)
+                                                                        [17:16]
+<merijn> Well, there's a lot more to it, but all that is mostly unnecessary
+         for programming :p                                             [17:17]
+<jusss> ok                                                              [17:18]
+<dminuoso> jusss: In school you most likely learned elementary algebra in
+           which you can add numbers... multiply numbers... so in the same
+           sense the name "algebraic data types" is just derived from the fact
+           that you can "add and multiply types together"               [17:19]
+<dminuoso> jusss: (In truth there's more to it like merijn' hinted at, but
+           this is sufficient for Haskell)                              [17:21]
+
+<jusss> dminuoso: "add and multiply types together" is related to type family?
+<dminuoso> jusss: No.
+<dminuoso> jusss: `data F = F Bool Int` can be thought of as "F is Bool * Int"
+           (multiple fields is called multiplication"
+<dminuoso> jusss: Or `data G = R Int | L Bool` can be thought of as "G is Int
+           + Bool"                                                      [17:22]
+<jusss> dminuoso: and we can ignore those type consturctors?
+<dminuoso> jusss: It's just a choice of words, really.
+<jusss> dminuoso: ok                                                    [17:23]
+<dminuoso> `data F = F Bool Int` is considered to be a product type. A product
+           is what you get when you multiply things - and the things
+           multiplied here are `Bool` and `Int`.
+<dminuoso> Like I said
+<dminuoso> 10:14:53        dminuoso | jusss: An ADT is just the simple idea
+           that you can create data types with a) multiple constructors and/or
+           b) multiple fields in a given constructor. Nothing more.
+<dminuoso> If you have multiple constructors, you are "summing these things"
+           and if you have multiple fields you are "multiplying these things"
+<jusss> ok                                                              [17:24]
+<ChaiTRex> jusss: If you look at it with Bool, product types multiply the
+           number of possible values of each to get the number of values your
+           type can hold. A Bool Bool Bool Bool can hold 2*2*2*2 different
+           values. Similarly, sum types sum the number of values: A Bool | B
+           Bool has 2+2 different values.
+<dminuoso> `data F = G Int Char | H Bool` can be considered `(Int * Char) +
+           Bool`
+<phadej> anding and orring is more understandable then multiplying and adding
+<jusss> dminuoso: what is this used for ?                               [17:25]
+<jusss> type sum or multipy
+<merijn> jusss: When you're just starting, nothing really
+<jusss> on the value level?
+<dminuoso> jusss: It's just a different name for what you know.
+<merijn> jusss: It's like preschooler being able to do arithmetic without
+         understanding groups and monoids
+<dminuoso> jusss: You call it "this data type has two data constructors". I
+           call it "its a sum type". You say "this data constructor has two
+           fields". I say "its a product type"                          [17:26]
+<dminuoso> Just different names for the same idea.
+<merijn> jusss: The fact that basic arithmetic forms groups and monoids is
+         interesting and you can invent some pretty cool things using that
+         knowledge, but when all you wanna do is arithmetic the underlying
+         theory is rather redundant
+<dminuoso> jusss: So when someone says "oh this is a sum type" it just means
+           "the type has two or more data constructors". Or when someone says
+           "this is a product type" it just means "it has multiple fields"
+<jusss> the type world is still misterioso to me, type inference, dependent
+        type, polymorphic type, type in type, infinite type, recursive type,
+        type application, type function, type family, type class, kind, sort,
+        what else? :)                                                   [17:28]
+<jusss> and that type system
+<merijn> jusss: Dependent types are not really relevant when learning Haskell,
+         they might become interesting once you're already comfortable with
+         Haskell                                                        [17:29]
+<jusss> I heard that scala has a different type system to haskell
+<merijn> type families and type functions are the same thing and again, only
+         really interesting when you're already comfortable with Haskell
+<jusss> merijn: I heard rust will have that 
+<dminuoso> jusss: Agreed, there's a lot of topics you encounter in Haskell -
+           but thats not because Haskell is complicated, but rather because
+           there's lots of advanced people doing interesting things with
+           Haskell - and that's what you primarily read on blogs or this
+           channel.
+<dminuoso> jusss: Most of them are irrelevant to becoming a proficient Haskell
+           programmer.
+<dminuoso> Where's that "haskell pyramid" blog entry?                   [17:30]
+<merijn> dminuoso: Just google haskell pyramid :p
+<dminuoso> Oh
+<dminuoso> jusss: https://patrickmn.com/software/the-haskell-pyramid/
+<dminuoso> jusss: So ADT just means "You can have multiple fields and/or
+           constructors for a data type". :)                            [17:31]
+<jusss> dminuoso: ok, 
+<mycroftiv> i think the slippery slope is real, but its a good thing. you
+            start out just wanting to sort some strings into an array, and in
+            about 5 easy connections you are lost in some arxiv paper looking
+            at list sorting as a topological restructuring of some vector
+            space                                                       [17:32]
+<jusss> can I describe "data type" is a relation between type and value?
+<mycroftiv> but hopefully its a fun and exciting discovery and chance to learn
+            something new
+<dminuoso> jusss: I'd say a data type is a type introduced using the keyword
+           data.                                                        [17:33]
+<jusss> dminuoso: why people use data to instead of value like value
+        constructor, people will say data constructor                   [17:34]
+
+<jusss> but value is a more easier to understand word
+<merijn> Is it?
+<merijn> Why?
+<jusss> type and value, you never say data and type
+
+<jusss> 3 is a value
+<jusss> 3 is a value which has Int type                                 [17:36]
+<tdammers> 3 is polymorphic, so it may not be the best example          [17:40]
+<tdammers> but anyway, I think a better way of phrasing it is that 3 is a
+           value that inhabits the Int type
+<tdammers> you can think of types as sets of values; so it's not so much that
+           the type is an inherent property of the value, but rather, that
+           there is a "member-of" relationship between values and types
+<f-a> I smile                                                           [17:43]
+<f-a> I wonder if I inhabit the "old people" set or I am just old
+####################################################################
+
+aptitude install libghc-wai-middleware-static-dev libghc-scotty-dev
+
+#web server
+
+Main.hs
+import Web.Scotty
+import Network.Wai.Middleware.Static
+
+main = scotty 80 $ do
+  middleware $ staticPolicy (noDots >-> addBase "static") -- use ./static/ for files
+
+  get "/" $ do
+    -- html "Hello World!"
+    -- text "20191101"
+    file "./static/signature"  -- then you can change this file to update the page without restart web server
+
+  get "/update" $ do
+    file "./static/update"  -- visit yourDomain/update will point to ./static/update
+  notFound $ do
+    text "there is no such route"
+
+aptitude install python python-requests
+
+#check the signature
+import requests
+r=requests.get('yourDomain')
+r.content
+
+#download the file
+import urllib2
+updateFile = urllib2.urlopen('http://yourDomain/update')
+with open("update", "wb") as handle:
+  result = updateFile.read()
+  handle.write(result)
+
+
+
+
+########################################
+
+type application in haskell, assert in python, contract in racket
+
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeApplications #-}
+import Data.Maybe
+main = do
+     l <- return $  (Just 2) >>= (\i -> Just (i+1))
+     print l
+
+#############################################
+
+GET method- that would delete pages. When search engines started crawling these sites, they could wipe out all the content.
+
+In many web frameworks, you write one handler function per resource. In Yesod, the default is to have a separate handler function for each request method.
+
+ HTTP spec
+ GET    Read-only requests. Assuming no other changes occur on the server, calling a GET request multiple times should result in the same response
+ POST    A general mutating request. A POST request should never be submitted twice by the user. 
+ PUT    Create a new resource on the server, or replace an existing one. 
+ PATCH  Updates the resource partially on the server. When you want to update one or more field of the resource, this method should be preferred.
+ DELETE   Just like it sounds: wipe out a resource on the server. Calling multiple times should be OK.
+
+perhaps /person/michael.html, /person/michael.json,
+in Yesod, all of these would be accessed from /person/michael.
+
+HTTP Accept header: it gives a prioritized list of content types the client is expecting
+
+ shamlet (a.k.a. simple Hamlet) produces an Html value, 
+
+object generates a JSON value, which implies the mime type application/json. TypedContent is a data type provided by Yesod for some raw content with an attached mime type.
+
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes       #-}
+{-# LANGUAGE TemplateHaskell   #-}
+{-# LANGUAGE TypeFamilies      #-}
+import           Data.Text (Text)
+import           Yesod
+
+data App = App
+
+mkYesod "App" [parseRoutes|
+/ HomeR GET
+|]
+
+instance Yesod App
+
+getHomeR :: Handler TypedContent
+getHomeR = selectRep $ do
+    provideRep $ return
+        [shamlet|
+            <p>Hello, my name is #{name} and I am #{age} years old.
+        |]
+    provideRep $ return $ object
+        [ "name" .= name
+        , "age" .= age
+        ]
+  where
+    name = "Michael" :: Text
+    age = 28 :: Int
+
+main :: IO ()
+main = warp 3000 App
+
+curl http://localhost:3000 --header "accept: application/json"
+will get {"name":"Michael","age":28}
+
+curl http://localhost:3000 --header "accept: text/html
+will get  <p>Hello, my name is Michael and I am 28 years old.</p>
+
+curl http://localhost:3000
+will get <p>Hello, my name is Michael and I am 28 years old.</p>
+
+even you can visit http://localhost:3000/?_accept=application/json via your browser
+
+and the address is http://localhost:3000 witout index.html
+'cause there's no index.html in the yesod server
+
+ghc index.hs will generate a binary file index, then run the index binary file will
+run the web server
+
+https://www.yesodweb.com/book/restful-content
+
+-- so we can create {"version":20191031, "address":"/path/file"}
+
+
+
+    Dispatch based on file name. This is how PHP and ASP work, for example.
+
+    Have a centralized routing function that parses routes based on regular expressions. Django and Rails follow this approach.
+
+Instead of using regular expressions, Yesod matches on pieces of a route.
+
+such as /page/faq FaqR. In this case, the handler function must be named handleFaqR.
+/person/#String PersonR GET POST DELETE. In this case, you would need to define three handler functions: getPersonR, postPersonR and deletePersonR.
+
+The most commonly used subsite is the static subsite, which serves static files for your application. In order to serve static files from /static, you would need a resource line like:
+
+/static StaticR Static getStatic
+
+/etc/apt/sources.list
+deb https://mirrors.tuna.tsinghua.edu.cn/debian sid main contrib non-free
+deb http://mirrors.aliyun.com/debian sid main
+
+aptitude install libghc-yesod-static-dev
+
+
+
+############################################
+
+<jle`> liftIO lifts *from* IO, not *to* IO
+<jle`> jusss: in any case, you can't really say that the fact that 'liftIO'
+       exists means that IOT exists; liftIO is actually backwards from the
+       type you would need for IOT to exist                             [11:26]
+<dmwit> IOT m a definitely can't be m (IO a), or else we would have e.g. \x f
+        -> Just x >>= f :: IO a -> (a -> Maybe (IO b)) -> Maybe (IO b). This
+        would be bad, because it would mean we could observe whether the
+        function returned Just or Nothing without doing any IO.
+
+liftIO will lifts the value of the IO into a monad, then lift the monad into IO,
+so IO is still at the bottom of the stack
+
+<Axman6> % :t runExceptT (liftIO (print True) :: ExceptT String IO ())
+<yahb> Axman6: IO (Either String ())
+
+import Control.Monad.Trans.Maybe (runMaybeT)
+import Control.Monad.IO.Class (liftIO)
+
+:t runMaybeT (liftIO (print True) :: MaybeT IO ())
+runMaybeT (liftIO (print True) :: MaybeT IO ()) :: IO (Maybe ())
+
+fmap (\() -> "3") (print 3)
+3
+"3"
+
+#######################################################
+<jusss> % :t fmap (\x -> ()) (pure @IO (Just ()))
+<yahb> jusss: IO ()
+
+:set -XTypeApplications
+f = const @Int @String
+f 3 "3" == 3
+
+there is no IO transformer,
+<Axman6> basically IO has to be the bottom of your stack
+-- which means IO only can be the outsider, it can't be m (IO a), only be IO (m a)
+
+IO is a type? IO a is a type?
+
+IO is a type constructor, IO is a type function.
+
+<jusss> dmwit: then why not IOT?                                        [10:05]
+<Axman6> jusss: you're not supposed to (and don't need to) know how IO is
+         defined. you are given hundreds of functions which work in IO, and
+         know that it is a Functor, Applicative and Monad, which lets you
+         combine these functions together into programs
+<jusss> Axman6: ok, what about that IO lift function ? 
+<dmwit> jusss: The question is a bit strange, I think. First you have to say
+        what IOT would be if it existed. And "IOT is a transformer version of
+        IO" isn't enough. You have to say what behavior it would have, what
+        its (>>=) would do. Then I can answer why not that.
+<jusss> I heard there's a function has to do with IO about other monads, I
+        forget that function name                                       [10:09]
+<jusss> liftIO
+<dmwit> You heard correctly. There is, indeed, a function named liftIO.
+                                                                        [10:10]
+<Axman6> :t liftIO
+<lambdabot> MonadIO m => IO a -> m a
+<Axman6> liftIO lets you take something in the IO monad and embed it into
+         another monad - one which will eventually (probably) be unwrapped
+         into IO in your main function                                  [10:11]
+<Axman6> % liftIO (print True) :: EitherT String IO Bool
+<yahb> Axman6: ; <interactive>:44:24: error:; Not in scope: type constructor
+       or class `EitherT'; Perhaps you meant `Either' (imported from Prelude)
+<jusss> how I can lift the value from IO to Maybe?
+<dmwit> You cannot.
+<Axman6> % runExceptT (liftIO (print True) :: ExceptT String IO Bool)   [10:12]
+<yahb> Axman6: ; <interactive>:45:13: error:; * Couldn't match type `()' with
+       `Bool'; Expected type: ExceptT String IO Bool; Actual type: ExceptT
+       String IO (); * In the first argument of `runExceptT', namely `(liftIO
+       (print True) :: ExceptT String IO Bool)'; In the expression: runExceptT
+       (liftIO (print True) :: ExceptT String IO Bool); In an equation for
+       `it': it = runExceptT (liftIO (
+<Axman6> % runExceptT (liftIO (print True) :: ExceptT String IO ())
+<yahb> Axman6: True; Right ()
+<Axman6> % :t runExceptT (liftIO (print True) :: ExceptT String IO ())
+<yahb> Axman6: IO (Either String ())
+<jusss> Axman6: I see, liftIO can lift the value into another monad, but the
+        another monad still in IO ?                                     [10:13]
+<jusss> lift other monad into the IO monad                              [10:14]
+<dmwit> All the instances of MonadIO I know of are transformer stacks with IO
+        at the bottom of the stack.
+<nshepperd> the existence of a monad transformer is something which deserves
+            more justification than its nonexistence
+
+<jusss> dmwit: can I lift Mayber Monad's value into an Either Monad?
+<dmwit> Sometimes.
+<jusss> dmwit: example?                                                 [10:16]
+<dmwit> Well. Let's be very careful.
+<dmwit> Either is not a Monad.
+<jusss> Either a
+<dmwit> It has the wrong kind.
+<dmwit> Yes. So now my answer is: sometimes.
+<jusss> dmwit: Reader
+<dmwit> Specifically: when a is inhabited.
+<jusss> dmwit: I just want to know if it's not IO,  can we lift the value of a
+        monad from the monad to another monad?
+<dmwit> If `x :: a`, then `maybe (Left x) Right` lifts a `Maybe b` into
+        `Either a b`.                                                   [10:17]
+<dmwit> Sometimes.
+<dmwit> :t \x -> maybe (Left x) Right                                   [10:18]
+
+<lambdabot> a -> Maybe b -> Either a b
+
+<jusss> :t maybe
+<nshepperd> there's nothing special to Monads that enables lifting
+<lambdabot> b -> (a -> b) -> Maybe a -> b
+
+<dmwit> (Indeed, given that the answer to the more specific question of "can I
+        lift Maybe to Either a" is "sometimes", the answer to "can I lift a
+        value from one monad into another" *has to be* "sometimes". No other
+        answer can be correct.)                                         [10:19]
+<shachaf> It could also be "never, since the word lift is meaningless".
+<nshepperd> generally, 'lifting' is just turning type a into type b. the
+            answer to whether you can do that is 'it depends on a and b'
+* dmwit slaps shachaf over the head with a copy of the Gricean axioms
+<nshepperd> the MonadTrans typeclass provides one concept of 'lifting' that
+            works for some types                                        [10:21]
+<maerwald> would have been too easy to call it MonadLift                [10:24]
+<dmwit> I don't think it's unreasonable for the class name and the method name
+        to differ.
+<dmwit> The class name describes the type. The method name describes the
+        action.                                                         [10:25]
+<maerwald> MonadBaseControl is even worse... it sounds like a joke, not a
+           typeclass
+<maerwald> can never get used to it :P
+<maerwald> it all started with autobots...
+<maerwald> and now we have funny names everywhere
+<nshepperd> even haskell programmers need a base of control sometimes   [10:26]
+<mniip> monadbasecontrol
+<wejetheman> dmwit are you one of the guys who was explaining about the
+             efficiency of my toBinary function the other night?
+<mniip> ah er that was the joke
+<EvanR> or was it the performance lads                                  [10:27]
+<wejetheman> Im asking if he was one of said lads.                      [10:28]
+
+<maerwald>
+           https://hackage.haskell.org/package/wizard-0.1.1/docs/Wizard.html#v:leviosa
+                                                                        [10:30]
+<maerwald> better name than lift
+<dmwit> wejetheman: I believe no. But I suspect I could answer a question if
+        you had one.                                                    [10:31]
+
+<koz_> 'The performance lads' LOL                                       [10:35]
+<wejetheman> the meme would be better if i could remember who they were 
+<dmwit> the slow is bad lads                                            [10:36]
+<dsal> Base control to monad Tom
+
+<jusss> Axman6: how i can create a value has IO (Maybe ()) ?
+<Axman6> :t pure (Just ())
+<dsal> > pure (Just ()) :: IO (Maybe ())
+<jusss> % :t fmap (\x -> ()) (pure @IO (Just ()))
+<yahb> jusss: IO ()
+<Axman6> jusss: that's just one of an infinite number of ways to make a value
+         of type IO (Maybe ()) though
+<Axman6> :t readLn
+<lambdabot> Read a => IO a
+<Axman6> readLn will ask for a line from stdin and try to parse it as the type
+         a which you've specified
+<jusss> Axman6: 'cause there's IOT, so Maybe (IO ()) doesn't exist?     [11:43]
+
+<Axman6> well, Maybe (IO ()) exists, it's just not really useful in the same
+         way that other monad transformers are                          [11:44]
+<jusss> ...
+
+<Axman6> @unmtl ReaderT Config (ExceptT Error IO) ()
+<lambdabot> Config -> ExceptT Error IO ()
+<Axman6> @unmtl ReaderT Config (ErrorT Error IO) ()
+<lambdabot> Config -> IO (Either Error ())
+<Axman6> that's the type that  ReaderT Config (ErrorT Error IO) () is under
+         the hood - it's functions which accept Config and execute some IO
+         whose result might fail                                        [11:45]
+<jle`> jusss: fmap (\_ -> ()) is pretty common, it's given a name, 'void'
+                                                                        [11:47]
+<jle`> :t void
+<lambdabot> Functor f => f a -> f ()
+<jle`> void = fmap (const ())                                           [11:48]
+<jusss> Axman6: IO is a monad, IO a is a type, IO is a type?
+<dmwit> > let f c '1' = reverse c; f c _ = c in map ('1':) . concat . iterate
+        (("01">>=) . liftA2 (<$>) (:) . f) $ [""]
+<lambdabot>
+            ["1","10","11","100","101","111","110","1000","1001","1011","1010","1110","1...
+<jle`> jusss: under the typical reckoning, yes
+<Axman6> IO is a type constructor - it has kind * -> *; it needs another type
+         to produce a type                                              [11:50]
+<jusss> Axman6: so IO is not a type
+<Axman6> just like Just isn't a value of type Maybe a, it'sd a function when
+         when given an a returns something of tyoe May e a              [11:51]
+<Axman6> Maybe a*
+<jusss> jle`: the whole IO stuff is really weird to me
+<Axman6> no
+<jle`> but, Just is a value
+<jusss> wait, jle` Just is a value?
+<Axman6> yes, the analigy isn't very good
+<jle`> yes, it is a value of type a -> Maybe a
+<Axman6> analogy*
+<jusss> Just is value constructor
+<jusss> Just is a function
+<jle`> Just, the "J-u-s-t" token thing you type into a text file, is the type
+       constructor                                                      [11:52]
+<Axman6> IO is a type construction
+<jle`> it *denotes* a value
+<Axman6> constructor*
+<dmwit> IO is a type.
+<dmwit> It is also a type constructor.
+<dmwit> It is also a type of arrow kind, which is probably what Axman6 means
+        when he says type constructor.
+<jusss> aha, argue began
+<jle`> typically you'd say IO is a type too.  It is a type that is denoted by
+       the "I-O" symbols you type into a text editor
+<dmwit> Not an important argument. Just a terminology argument.
+<Axman6> we're not really arguing at all, I'm just not being as clear as I
+         should be                                                      [11:53]
+
+<dmwit> Just is a data constructor, not a type constructor. (Without
+        extensions, this is true.)
+<jle`> a lot of it is just the distinction between the letters you type into
+       the text editor, vs. the things that they represent              [11:54]
+<dmwit> Type constructors are the types that are not applications and not
+        variables.
+<dmwit> Maybe, IO, Int, Either, Bool are type constructors.
+<dmwit> Either Int is not a type constructor, because it is an application; x
+        is not a type constructor because it is a variable.             [11:55]
+<Axman6> People oftern make a distinction between "values" and "functions" -
+         in Haskell functions are also values, but only functions can be
+         applied to other values. f with type a -> b is a value, but f a is
+         also a value. In the same way, type constructors are also types, but
+         only type constructors can be applied t other types - IO has _kind_ *
+         -> *, which means it can be applied to something of kind * to produce
+         something of kind *                                            [11:56]
+<jusss> IO is a type function?                                          [11:57]
+<dmwit> (Axman6 and I are using different definitions of the phrase "type
+        constructor".)
+* Axman6 should probably leave tthis to others who're better at explaining
+  this
+
+<dmwit> (For Axman6, "type constructor" means "type with arrow kind". For me
+        it means what I said above.)
+
+                                                                        [11:58]
+<jle`> "types" are just the things you can play with at the type level to
+       construct the things denoting what you want to mean
+<jle`> so you can use IO, you can use Int, you can put them together to get IO
+       Int, etc.
+<jle`> each is useful in different situations
+<jle`> they all have different roles, every type is useful
+<jle`> otherwise we wouldn't care enough to talk about them :)
+
+<jle`> IO is useful for some situations, Int is useful for some other
+       situations, IO Int is useful for still even other situations
+<dmwit> I think "IO is a type function" is basically right.
+<jusss> dmwit: and IO is a type?
+<jle`> indeed i don't think there is anything wrong with it
+<dmwit> I like "IO is a type".                                          [12:00]
+<jusss> is ther a 'but'?
+<jusss> jle`: IO is a type?
+<dmwit> Yes; some people use "type" to mean something different than me.
+<jle`> yeah, it's a type. just not a "capital-T" Type                   [12:01]
+<jusss> can we say Maybe is a type? Maybe is a type function, which kind is *
+        -> *
+<jusss> Maybe Int is a type
+<dmwit> I like all of those sentences.
+<jle`> yeah. Just is a value. Just is a value function, which has type a ->
+       Maybe a
+<jle`> `Just True` is a value                                           [12:02]
+<jusss> :t print Just
+<lambdabot> error:
+<lambdabot>     • No instance for (Typeable a0) arising from a use of ‘print’
+<lambdabot>     • In the expression: print Just
+
+<jusss> % :t print Just
+
+<yahb> jusss: ; <interactive>:1:1: error:; * No instance for (Show (a0 ->
+       Maybe a0)) arising from a use of `print'; (maybe you haven't applied a
+       function to enough arguments?); * In the expression: print Just
+
+<jle`> not all values have a Show instance                              [12:03]
+<jusss> % :t print (Just 3)
+<yahb> jusss: IO ()
+
+<Axman6> % print (Just True)                                            [12:05]
+<yahb> Axman6: Just True
+
+<koz_> Why did GHC decide on Type :: Type versus the 'Type tower' that Idris
+       and Agda have?
+<dsal> koz_: tower?
+
+<Axman6> (what yahbis showing is what is printed to stdout, which the result
+         of applying show to Just True and then writing that string to stdout)
+<c_wraith> koz_: because it's simpler to implement with the semantics GHC
+           already has
+<koz_> dsal: In Idris, Type :: Type1, Type1 :: Type2, and so on.        [12:07]
+<koz_> (I may not be getting the names right)
+<dsal> I don't know idris.  I have a passing familiarity  with agda.
+<koz_> dsal: I believe Agda also does this, with possibly different names.
+
+<mycroftiv> i think its convienience vs consistency, haskell isnt committed to
+            being logically consistent in the way a proof oriented language
+            like agda is                                                [12:09]
+<EvanR> a cumulative (or not) hierarchy of type universes
+<koz_> Also, is it incorrect to understand Type1 as being 'Kind'?
+
+<EvanR> what's Kind
+<koz_> All kinds?
+<EvanR> heh
+<EvanR> BOX ?                                                           [12:10]
+<koz_> EvanR: Wut.
+<EvanR> the type of kinds
+
+<koz_> Good to know. So is BOX the same as Type1, then, or is my understanding
+       off?                                                             [12:11]
+
+<EvanR> i don't understand the problems that Type :: Type potentially poses
+<koz_> EvanR: It's inconsistent, but apparently this isn't an issue for GHC. I
+       am unsure of why.                                                [12:14]
+<mycroftiv> the barber paradox                                          [12:15]
+<koz_> mycroftiv: Or, as I prefer to call it, Russel's Paradox.
+<koz_> s/Russel/Russell/
+<heatsink> It isn't an issue for GHC because GHC evaluates coercions strictly.
+<jle`> koz_: values, types, kinds, sorts
+<koz_> heatsink: Could you elaborate on that? Specifically, how evaluating
+       coercions strictly helps dodge Russell's Paradox?                [12:16]
+<mycroftiv> in another way it 'isnt an issue' because most languages
+            deliberately allow you to express broken constructions. whether or
+            not the ease of expression is worth losing safety is a big can of
+            worms
+<koz_> jle`: Are those all Type1?
+
+<jle`> that's the 'hierarchy'
+<heatsink> Paradoxes are effectively nonterminating loops that promise to
+           provide evidence that x ~ y, but never deliver a result
+
+<jle`> values have types, types have kinds, kinds have sorts
+<jle`> above that i don't know if there are specific names
+<koz_> jle`: Ah, I see.
+<koz_> I think I saw a few people mention them, but the names got too
+       ridiculous to remember. :P
+<heatsink> So, a paradox will loop forever and not actually let you do
+           something unsafe                                             [12:18]
+<jle`> kind of like the displacement, velocity, acceleration, jerk ... then
+       according to some, snap, crackle, pop...and above that no other names
+       really
+                                                                        [12:19]
+<jle`> even though the tenth derivative of displacement exists as a concept,
+       nobody has bothered to give it a name
+
+<EvanR> koz_: the paradox is Girard's paradox and I haven't been able to grok
+        it nearly as easily as Russell's                                [12:20]
+
+* hackage emd 0.2.0.0 - Empirical Mode Decomposition and Hilbert-Huang
+  Transform  https://hackage.haskell.org/package/emd-0.2.0.0 (jle)
+
+<EvanR> or how to avoid it, i.e. what needs to be in what universe      [12:22]
+<slack1256> EvanR: I used to think that restrict "inter-level comunication"
+            was enough, so values can depend on other values and types on
+            other types. The I discovered dependent typing and became confused
+            again.                                                      [12:31]
+<EvanR> in which family of types indexed by values is totally the point
+                                                                        [12:32]
+<slack1256> Yep                                                         [12:33]
+<EvanR> the details get nontrivial fast ime                             [12:34]
+                                                                        [12:47]
+<koz_> Agreed.
+<koz_> That be where the devil lives, yo.                               [12:48]
+#########################################
+import Data.Maybe
+
+maybe defaultValue func x =
+      case x of
+           Nothing -> defaultValue
+           Just a -> func a
+
+fromJust (Just x) = x
+
+import Control.Exception (throw)
+https://wiki.haskell.org/Handling_errors_in_Haskell
+
+##############################################
+
+pip change sources
+on linux  ~/.pip/pip.conf
+[global]
+index-url = https://pypi.tuna.tsinghua.edu.cn/simple
+
+on windows, visit  %APPDATA% via file explorer
+create pip/pip.ini
+[global]
+timeout = 6000
+index-url = https://pypi.tuna.tsinghua.edu.cn/simple
+trusted-host = pypi.tuna.tsinghua.edu.cn
+
+######################################
+
+debootstrap --arch amd64 --foreign sid  ./sid/ http://mirrors.aliyun.com/debian
+cd ./sid
+chroot . /bin/bash
+/debootstrap/debootstrap --second-stage
+export PATH=$PATH:/bin:/usr/bin
+
+exit the chroot env, then
+cp mount.chroot.share.X.sh ./sid
+cd sid; ./mount.chroot.share.X.sh
+source source.me
+
+amd64 is for 64 bit, i386 is for 32 bit
+
+##################################################
+
+in ghci :set -XTypeApplications
+
+Prelude> print @Int 3
+3
+
+We use type annotations to avoid ambiguity. Type applications can be used for the same purpose. For example
+
+x :: Num a => a
+x = 5
+
+main :: IO ()
+main = print x
+
+This code has an ambiguity error. We know that a has a Num instance, and in order to print it we know it needs a Show instance. This could work if a was, for example, an Int, so to fix the error we can add a type annotation
+
+main = print (x :: Int)
+
+Another solution using type applications would look like this
+
+main = print @Int x
+
+To understand what this means we need to look at the type signature of print.
+
+print :: Show a => a -> IO ()
+
+The function takes one parameter of type a, but another way to look at it is that it actually takes two parameters. The first one is a type parameter, the second one is a value whose type is the first parameter.
+
+The main difference between value parameters and the type parameters is that the latter ones are implicitly provided to functions when we call them. Who provides them? The type inference algorithm! What TypeApplications let us do is give those type parameters explicitly. This is especially useful when the type inference can't determine the correct type.
+
+So to break down the above example
+
+print :: Show a => a -> IO ()
+print @Int :: Int -> IO ()
+print @Int x :: IO ()
+
+https://riptutorial.com/haskell/example/32285/avoiding-type-annotations
+#####################################
+
+#dependent type #polymorphic types  #type family #type application #type inference
+
+<jusss> what is `dependent type' ?                                      [13:35]
+<Axman6> a type which is determined by values at the value level.       [13:36]
+related to type inference?
+<koz_> It's related to type inference by being impossible for it. :P    [13:55]
+<dminuoso> jusss: Polymorphic types are (value-levels) terms that can bind a
+           type, dependent types are types that can bind a (value-level)
+           term. :)                                                     [13:56]
+
+<dminuoso> jusss: For example "Vec 10 Int" is the *type* of a vector
+           containing 10 integers. :)
+<jusss> dminuoso: ... but 10 is a value, and 10::Int, Int is a type not a
+        value,                                                          [14:04]
+<dminuoso> jusss: Yup!
+<dminuoso> jusss: And dependent types is about mixing these levels
+           intentoinally this way.
+<jusss> dminuoso: so "Vec 10 Int" is a type or a value?
+<MarcelineVQ> That's why it's called dependent type, a type depending on a
+              value.
+<dminuoso> jusss: Its a type!
+<jusss> dminuoso: oh, I see
+<jusss> MarcelineVQ: it should call dependent-on-value type             [14:05]
+<dminuoso> jusss: People are lazy and like short terms. :)
+<dminuoso> jusss: Which is why fancy mathy people call them Pi types.   [14:06]
+<dminuoso> jusss: Do note, that in Haskell we mix type and value too.
+<MarcelineVQ> Π types if you're too fancy
+<dminuoso> jusss: But for us its the other way around. In dependent types you
+           can apply types to values, in GHC we can apply values to types.
+<dminuoso> % :t id
+<dminuoso> % :t id @Int
+<yahb> dminuoso: a -> a
+<yahb> dminuoso: Int -> Int
+<dminuoso> This is called "polymorphic types"
+<Axman6> %\Pi types% if you've extra fancy
+<ammar2> now that's a pie I can get behind
+<MarcelineVQ> dminuoso: did you accidently flip that?  @ is called a Type
+              Application after all
+<dminuoso> MarcelineVQ: Flip what exactly?
+<MarcelineVQ> "In dependent types you can apply types to values, in GHC we can
+              apply values to types."
+<dminuoso> MarcelineVQ: The term "type applications" is mixed up.
+<dminuoso> MarcelineVQ: Functions are applied to arguments.
+<dminuoso> (Oh that pun in "the term ..." was not intentional)          [14:09]
+<MarcelineVQ> When writing  @Int  you're calling Int a value?
+<dminuoso> MarcelineVQ: Another way to put it "polymorphic types are terms
+           binding types and dependent types are types binding terms"
+<jusss> dminuoso: this @ symbol, I saw it once, and someone send me a link
+        about it, I foreget it... it's a article about something 's created in
+        2015           
+<dminuoso> No? It's a type.
+<MarcelineVQ> I don't understand what "in GHC we can apply values to types"
+              means then followed by your id example                    [14:13]
+<Axman6> id @Int is applying id ('s type) to @Int
+<ammar2> jusss: it's called visible type application, basically when we have
+         `id: a -> a` it really means that `id: for any type a, a -> a`, when
+         we do `id @Int`, we fill that "any type" with `Int` explicitly to
+         make `Int -> Int`                                              [14:14]
+<Axman6> if :: forall a. a -> a is basically a fancy type level lambda: \\a
+         --> (a -> a)
+<dminuoso> jusss: In a perfect world we could imagine it wasn't there.
+<dminuoso> jusss: So try and squint a bit and ignore the @ symbol. :)
+<dminuoso> MarcelineVQ: `f 1` is f applied to 1. `f @Int` is f applied to Int.
+<dminuoso> MarcelineVQ: Just like in the sense of System F....
+<Axman6> (making up syntax for what type level lambdas could look like
+<dminuoso> 07:15:01          Axman6 | if :: forall a. a -> a is basically a
+           fancy type level lambda: \\a --> (a -> a)
+<dminuoso> No!
+<dminuoso> That's just false.
+* Axman6 ducks
+<dminuoso> Axman6: type families are type level lambda                  [14:16]
+<dminuoso> Or non-nullary type constructors
+<dminuoso> Consider:
+<dminuoso>  /\t.\x^t. x : ∀r. r
+<jle`>  > type families are a type level lambda                         [14:17]
+<dminuoso> The lambda abstraction you are thinking of really exists on the
+           value world.
+<jle`> [doubt]
+<dminuoso> jle`: In what sense
+<jle`> aren't lambdas anonymous?
+<jle`> but all type families must have names
+<dminuoso> jle`: Heh.
+<Axman6> type families are type level functions, sure
+<dminuoso> It's a fair point.
+<dminuoso> Axman6: But really the point is, the binding happens in the *value*
+           world.
+<jle`> anonymity is the defining characteristic of lambda-ness
+<MarcelineVQ> "<dminuoso> MarcelineVQ: `f 1` is f applied to 1. `f @Int` is f
+              applied to Int." should probably be a line in the manual
+<Axman6> you could argue that f 1 is f applied implicitly to Int and applied
+         to the value 1                                                 [14:19]
+<dminuoso> MarcelineVQ: The really weird thing is how ScopedTypeVariables
+           visually binds from a type signature, as opposed to something like:
+           f :: ∀x. x -> x; f @t = id @t
+<dminuoso> MarcelineVQ: ^- this would be more honest to how we have system fc
+           in core.
+           
+####################
+
+#fmap #foldl #filter
+
+map, reduce and filter
+fmap, foldl  and filter
+
+map (+1) [1..5] == [2, 3, 4, 5, 6]
+
+foldl (+) 10 [1..5] == 25
+
+filter (>5) [1..10] == [6, 7, 8, 9, 10]
+
+http://www.cse.unsw.edu.au/~en1000/haskell/hof.html
+############################
+
+#global variable #haskell
+
+there's no global variable in haskell, all the variable is immutable in haskell,
+so add a parameter and change the parameter in the recursive function to do that!
+if several functions need to visit that parameter, then put them into one function
+or connect them or chain them
+that's why we have Reader, Writer and State monad
+#################################
+
+{-# LANGUAGE OverloadedStrings #-}
+so you can make "String" has ByteString, String and Text type
 #############################################################
 
 module SplitList where
@@ -6,6 +871,7 @@ module SplitList where
 -- [1,2,3,2,4,5] [3,4] == []
 -- [1,2,3,2,4,5] [1,2] == [[],[3,2,4,5]]
 -- [1,2,3,2,4,5] [4,5] == [[1,2,3,2],[]]
+-- also there's a split package on hackage, Data.List.Split.splitOn to do the same thing
 splitList listA listB = f listA listB [] 0
       where
            lengthB = lengthList listB
