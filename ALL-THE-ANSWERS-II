@@ -1,4 +1,826 @@
 
+#Reader #Writer #State
+
+import Control.Monad.Writer
+data Writer w a = Writer { runWriter :: (a, w) }
+half :: Int -> Writer String Int
+half x = do
+     tell ("halved " <> (show x) <> ",")
+     return (x `div` 2)  -- context is Writer ( ,String)
+
+runWriter (half 8 >>= half)  == (2,"halved 8,halved 4,")
+
+also >>= :: Writer w a -> (a -> Writer w b) -> Writer w b
+so half :: a -> Writer w b
+and half a :: Writer w b
+
+Writer String is m, Int is a, its value form is Writer (Int, String),
+its context is Writer ( ,String)
+`tell' can change the String in ( ,String)
+runWriter can get the (Int, String)
+
+import Control.Monad.Reader
+data Reader r a = Reader { runReader :: r -> a }
+greeter :: Reader String String
+greeter = do
+        name <- ask
+        return ("hello, " <> name <> ",")  -- context is Reader r in Reader r a, so `return' will get Reader name -> ("hello, ...), then runReader greeter get name -> ("hello"...) , give the value of name and get ("hello...)
+
+`ask' get r from Reader r a
+
+(runReader greeter) "Joe" == "hello, Joe,"
+
+runReader (greeter >>= \x -> do c <- ask; return (c, x)) "Joe"   == ("Joe","hello, Joe,")
+the context is "Joe", and x is the result, is a in Reader r a
+
+it needs runReader to get the function from `Reader function', so we can apply something on the function, if in the do-notation or >>=, we can get the context Reader r, so after we apply something on the function, then get the result, we can use `return' to make a new Reader r a, and the result is a.
+
+runReader (greeter >>= \x -> return $ (runReader greeter) x) "Jesse"
+== "hello, hello, Jesse,,"
+
+runReader (greeter >>= \x -> do c <- ask; return $ c <> x) "Jesse"
+== "Jessehello, Jesse,"
+
+import Control.Monad.State
+data State s a = State { runState :: s -> (a, s) }
+greeter2 :: State String String
+greeter2 = do
+        name <- get  -- get a from State s -> (a, s)
+        put "tintin"  -- set the s
+        return ("hello, " <> name <> ",")  -- context is State s-> ( ,s)
+
+runState greeter2 $ "Joe"  == ("hello, Joe,","tintin")
+
+`get' get the a in State s->(a,s)
+`put' set the s in State s->(a,s)
+
+m a, m is the context, in the value form, remove the a, the rest is the m, is the context
+with Reader constructor, the context is Reader r, but if without Reader, just function,
+then the paramerter of first function is the context.
+return a in do-notation or >>=, it will get m a.
+
+>>= :: State s a -> (a -> State s b) -> State s b
+runState (greeter2 >>= \a -> return $reverse a) "Joe"  == (",eoJ ,olleh","tintin")
+
+(greeter2 >>= \a -> return $reverse a) this is a new State Monad,
+'cause we need to get the function inside of it to apply something on it
+so runState (greeter2 ...) get the function s->(a,s) then apply "Joe" on it
+get the (a,s)
+
+this three monads have call form  like `runMonad monadic-action parameter'
+runState (greeter2 >>= \a -> return $reverse a) "Joe"
+runState greeter2 "Joe"
+(runReader greeter) "Joe" == "hello, Joe,"
+runReader (greeter >>= \x -> return $ (runReader greeter) x) "Jesse"
+runWriter (half 8 >>= half)  == (2,"halved 8,halved 4,")
+runWriter $ half 8
+
+all the computation is in the monadic-action
+reference http://adit.io/posts/2013-06-10-three-useful-monads.html#the-state-monad
+
+#######################################################
+
+all monads are about effects
+Maybe Monad, the context is Just or Nothing, the form is Just a or Nothing
+Maybe, Just in Just a
+Reader Monad, the context is the e in e->a, Reader r in Reader r a
+Writer Monad, the context is Writer ( ,x::Monoid) in Writer (a,x)
+State Monad, the context m is State s -> ( ,s) in State s -> (a, s)
+
+data Reader r a = Reader { runReader :: r -> a }
+data State s a = State { runState :: s -> (a, s) }
+data Writer w a = Writer { runWriter :: (a, w) }
+
+effects:
+Reader , a is read only, pass a read-only parameter
+Writer, (a,s) s is log, log the message
+State, a can be changed also s can be log, pass a read-write parameter also log the message
+
+Reader id :: Reader a a
+ask get r from Reader (r-> a) :: Reader r a,
+runReader on f :: Reader r a, will get r->a
+runReader f (x::r) :: a
+also runWriter and runState
+
+runReader (do x <- ask; return (x+x)) 42 will be 84
+
+runState (x::State s a) :: s -> (a, s)
+runState (x::State s a) (_::s) :: (a, s)
+
+runWriter (x::Writer w a) :: (a, w)
+
+there's no Reader, Writer and State type defined in Control.Monad.*
+we use functions to generate they value has that type
+
+we call it a `smart constructor'
+<jle`> reader :: (r -> a) -> Reader r a
+<jle`> there's also 'ask'
+<jle`> asks :: (r -> a) -> Reader r a
+<jle`> two ways to create a Reader from a function
+<jle`> Writer and State as data constructors do not exist in transformers
+<jle`> but we have:
+<jle`> writer :: (a, w) -> Writer w a    -- why isn't this curried? we may
+       never know
+<jle`> state :: (s -> (a, s)) -> State s a
+<int-e> This is isomorphic to the type we're discussing, but there is no
+        actual `Reader` data constructor.
+<int-e> But `reader` generalizes that data constructor, so no functionality is
+        lost.
+        
+reader writer and state to constructor that value have that Reader Writer State type
+`ask' for reader
+`tell' for writer
+and `modify' 'get' for state
+
+<jle`> jusss: i was saying, we usually don't use reader/writer/state in
+       practice
+<jle`> we usually use 'ask' for reader                                  [15:07]
+<jle`> 'tell' for Writer
+<jle`> and 'modify' and 'get' for State
+<jusss> and `put'?
+<jle`> ask :: Reader r r
+<jle`> tell :: w -> Writer w ()
+<jle`> modify :: (s -> s) -> State s ()
+<jle`> get :: State s s
+<jle`> those are sort of the canonical "abstract interface" of reader, writer,
+       and state                                                        [15:08]
+<jle`> so you build complex reader/writer/state actions by sequencing calls to
+       ask, tell, and modify
+<dminuoso_> Similarly, how `putStrLn`, `getLine`, etc. form the "abstract
+            interface" of IO.
+<jle`> > execWriter $ do tell "hi"; tell "bye"                          [15:10]
+<lambdabot>  "hibye"
+<jle`> > execState (do modify (+1); modify (*10); modify negate) 3
+<lambdabot>  -40
+<jle`> > runReader (do x <- ask; y <- ask; pure (x+y)) 7                [15:11]
+<lambdabot>  14
+<jle`> so the person who gave us the IO type also gave us things to make
+       'simple IO actions', like putStrLn, getLine.  we can use those simple
+       Io actions to build more complex and interesting ones, by sequencing
+       them and stuff like that                                         [15:12]
+<jle`> the person who gave us the State s type also gives us things to make
+       'simple State actions', like modify, put, get.  we use those simple
+       State actions to build more complex and interesting State actions, by
+       sequencing them with >>/do notation and stuff like that
+<jle`> it's rare to actually use 'state', but we can define it in terms of
+       modify and get: `state f = do s <- get; let (x, s') = f s; put s';
+       return x`                                                        [15:13]
+<jle`> likewise it's rare to actually use 'writer', but we can define it in
+       terms of tell: `writer (x, w) = do tell w; return x`
+<monochrom> You don't need an abstract constructor (or abstract type) if you
+            have nothing to hide.                                       [15:21]
+<int-e> pattern Reader :: (r -> a) -> Reader r a; pattern Reader f <-
+        ((runIdentity .) . runReaderT -> f) where Reader f = reader f --
+        somehow, pattern synonyms are not beautiful.                    [15:24]
+        
+#############################################
+
+Maybe is a type, Maybe a is a type
+Maybe is a type has kind *->*,  Maybe a is a type has kind *
+
+type T = Maybe
+type MyMonad = MaybeT IO
+type MyMonadIO = MaybeT IO
+##########################################
+
+lsp-mode company-mode bot need extra language servers as backends
+autocomplete mode doesn't
+
+download sublimetext
+https://www.sublimetext.com/3
+install package control
+https://packagecontrol.io/installation
+install sublimehaskell, but sublimehaskell need ghc-mod or hsdev as backends
+use cabal install hsdev
+
+intellij idea, intellij-haskell only has stack,
+haskforce has stack and cabal, but it nees stylish-haskell, hlint and ghc-mod
+
+sublimetext need hsdev or ghc-mod as backends
+
+#################################################
+
+;;; unicode characters
+;;;(set-default-font "Microsoft YaHei UI Bold-10")
+;;;(set-fontset-font "fontset-default"  
+;;;                  'gb18030' ("Microsoft YaHei UI Bold" . "unicode-bmp"))
+(require 'unicode-fonts)
+(unicode-fonts-setup)
+;;;(set-default-font "微软雅黑 Bold-10")
+(set-default-font "Arial Bold-10")
+
+########################################################
+
+<jusss``> jle`: now I meet a typeclass, I ask three questions, laws, functions
+          and used for                                                  [15:10]
+<jusss``> or about
+<jusss``> maybe I should append the kind
+<jle`> the thing is that, what a typeclass is 'used for' is often not that
+       useful                                                           [15:11]
+<jle`> that a *type* is used for -- that's definitely very useful
+<jle`> learn what Maybe is used for. what IO is used for
+<jusss``> jle`: but that `used for' is we really use it to do
+<jle`> right, but when do you actually 'use' a typeclass?
+<jle`> usually you're using the types
+<jle`> not the 'typeclass' as an abstraction                            [15:12]
+
+<jle`> 90% of the time you use >>=, <$>, etc., you're using specific
+       types. you're not using Monad the abstraction, Functor the abstraction,
+       etc.
+<jle`> so it doesn't matter what Monad is used for. it matters what the
+       specific type you are using is used for
+<jusss``> jle`: yeah, the typeclass's laws and implented functions, and the
+          type instances of it, the type is used for, or about ?
+<jle`> learning about laws and methods of a typeclass and what they 'mean' in
+       the abstract sense is usually not very useful                    [15:13]
+<jusss``> jle`: wait a sec, typeclass is not type, typeclass don't have kind?
+<jle`> well, it can be in some situations. but it's never going to be the
+       first thing you learn.
+########################################
+
+there're seven typeclasses,
+Semigroup, Monoid, Functor, Applicative, Monad, MonadIO and MonadTrans.
+type and typeclass both have kind, types are instances of typeclasses,
+MonadTrans has kind (*->*) -> (*->*)
+the others have kind * -> *
+Semigroup Monoid instances are *
+it means things of kind *
+like Int, Bool, String, Double
+but not Maybe, IO, Either, MaybeT
+(Int -> Int) has kind *, it could be an instance of Semigroup and Monoid if
+someone wrote an instance for it
+
+`lift' lift m a into t m a
+`liftIO' lift IO a into m a, m is a MonadIO instance
+some Monads are MonadIO, some aren't,
+MonadIO isn't related to MonadTrans,
+`return' to lift a into m a,
+`join' to lift m a from m (m a),
+there's no general way to get a from m a,
+see `maybe' `either'
+
+###########################################################
+
+<jle`> if seeing monad transformers is confusing, maybe look at a simpler
+       MonadIO instance, like `newtype WithArgs a = WithArgs { runWithArgs ::
+       String -> IO a }`                                                [14:23]
+<jle`> er, `newtype WithArgs a = WithArgs { runWithArgs :: [String] -> IO a }`
+
+<jle`> WithArgs a is [String] -> IO a, it's an IO a that has access to a
+       [String], the command line arguments
+<jle`> we can write an instance of Functor
+<jle`> instance Functor WithArgs where fmap f (WithArgs x) = WithArgs (fmap f
+       . x)
+<jle`> we can write an instance of Applicative, which i'll only give 'pure'
+       here:
+<jle`> instance Applicative WithArgs where pure x = WithArgs $ \_ -> pure x
+                                                                        [14:25]
+<jle`> and we can write an instance of Monad (exercise left to reader)
+<jle`> and we can write an instance of MonadIO:
+<jle`> instance MonadIO WithArgs where liftIO x = WithArgs $ \_ -> x
+<jle`> so that's an example of a Functor that is also an Applicative that is
+       also a Monad that is also a MonadIO
+<jusss``> jle`: MonadIO a is MT IO a, the value is like MT IO (M a) ?   MT
+          mean monad transformer type constructor
+<jle`> no, not necessarily                                              [14:26]
+<jle`> look above where i gave an instance of MonadIO that doesn't involve any
+       monad transformer applied to IO
+<jle`> here the `WithArgs` type i defined above is an instance of (1) Functor,
+       (2) Applicative, (3) Monad, (4) MonadIO                          [14:27]       
+<jle`> but there are no monad transformers involved
+<jle`> the purest form of a MonadIO
+
+###########################################
+
+we use `return' to lift a Maybe Int into IO (Maybe Int)
+remember MonadTrans has the same type constructor and value constructor
+
+newtype MaybeT IO a = MaybeT IO (Maybe a)
+<jusss`> newtype MaybeT m a = MaybeT { runMaybeT :: m (Maybe a) }
+
+<jle`> another simple instance is MaybeT IO, liftIO x = MaybeT (Just <$> x)
+<jle`> in that type, liftIO :: IO a -> MaybeT IO a
+
+<jle`> lift :: MonadTrans t => m a -> t m a
+<jle`> liftIO :: MonadIO m => IO a -> m a
+
+<jusss``> jle`: MonadIO is a typeclass, and MaybeT IO is an instance of
+          MonadIO, also MaybeT IO is an instance of Monad?              [14:19]
+
+data T = V   maybe we should call this V as Value form,
+data Maybe Int = Nothing | Just Int,   Just Int is not a value, Just 3 is a value
+Int need to be defined, but Just Int is a form of Just 3
+
+`lift' will lift an m a into a MonadTrans, which MonadTrans depends you give the type
+`liftIO' will lift an IO a into a MonadIO
+MonadTrans has kind (*->*) -> (*->*)
+MonadIO has kind *->*
+Int -> Int has kind *
+Semigroup and Monoid's instance is *
+Functor Applicative Monad and MonadIO has *->*
+some Monads are MonadIO, some aren't, MonadIO is a sub class of Monad
+there're seven typeclass Semigroup, Monoid, Functor, Applicative, Monad, MonadIO
+and MonadTrans
+type and typeclass both have kind
+type are instances of typeclass
+typeclass has laws and implementd functions, the type instances of typeclass are what used for, and about
+
+MaybeT IO is an instance of Monad and  MonadIO,
+
+<evocatus> jusss`: liftIO can take IO actions and turn them into actions in
+           any monad `m`, so long as that monad `m` instances
+           `MonadIO`... it's useful for when you're deep in a stack of monad
+           transformers and want to perform IO actions within the stack
+<Axman6> class Monad m => MonadIO m where liftIO :: IO a -> m a
+<jle`> MonadIO makes no claim about how the type is structured          [12:24]
+<jle`> just that it has to support IO a -> MyMonadIO a
+<jle`> it's really as simple as just the typeclass here                 [12:26]
+<jle`> it has a single method, liftIO :: MonadIO m => IO a -> m a
+<jle`> i don't think MonadIO has anything to do with monad transformers in
+       particular ... because no monad transformers are MonadIO instances
+<jle`> MonadIO instances are monads
+<jle`> not monad tnnasformers
+<jle`> the simplest MonadIO instance is IO                              [12:28]
+<jle`> instance MonadIO IO where
+<f-a> the trick is mostly useful (or taught) as a way to fish IO from a stack
+<jle`>   liftIO = id
+<jle`> i think that's a narrow way of looking at it...a MonadIO instance
+       doesn't even have to be a part of a 'stack'
+<jle`> it's just something that "supports IO"
+<Axman6> I think you'll find that MonadIO m => MonadIO (MaybeT m) is the
+         instance
+<Axman6> as long as MaybeT wraps something which can run IO actions, it can
+         also run IO actions
+<jle`> jusss`: well, is there a way to write an IO a -> MaybeT m a ?
+<jle`> jusss`: if yes, then it's a MonadIO instance
+<jle`> in this case, we can write one:
+<jle`> liftIOMaybe :: MonadIO m => IO a -> MaybeT m a
+<jle`> liftIOMaybe x = MaybeT (Just <$> liftIO x)
+<jusss`> newtype MaybeT m a = MaybeT { runMaybeT :: m (Maybe a) }
+<jle`> it's possible, so it's an instance ... just as simple as that
+<jle`> maybe looking more concretely, can you write IO a -> MaybeT IO a ?
+<jusss`> jle`: f :: IO a -> MaybeT IO a;  f x = runMaybeT (liftIO x) ?  [13:38]
+<Axman6> no, but it will let you rejoin all the returned sections with one of
+         the combinators which adds a soft line
+<Axman6> jusss`: does that type check?
+<Axman6> that doesn't look like it matches the type you've given
+<Axman6> jusss`: if you have an IO a, and you need an IO (Maybe a) how can you
+         do that?
+<jusss`> Axman6: get a from IO a, then  return Maybe , then return IO   [13:40]
+<jusss`> Axman6: but this will switch contexts
+<Axman6> that matches the type, but it's not as useful as returning the a that
+         the IO action produced
+<Axman6> jusss`: can you write f :: IO a -> IO (Maybe a) without using Nothing
+<jusss`> Axman6: f = \x -> x >>= return $ return a                      [13:42]
+<Axman6> not wuite
+<jusss`> Axman6: I don't know the syntax, if I want declare the type in the
+         value
+<Axman6> quite*
+<Axman6> jusss`: hint: use fmap
+<Axman6> % :t MaybeT
+<yahb> Axman6: m (Maybe a) -> MaybeT m a
+<jusss`> Axman6: f x = fmap (\y-> Just y) x ?                           [13:46]
+<jusss`> oh, f x = fmap Just x
+<jusss`> eta-reduce
+<Axman6> yep, good!
+<jusss`> Just = \x -> Just x
+<Axman6> jusss`: can you now write  g :: IO a -> MaybeT IO a? we've seen how
+         to go from IO a to IO (Maybe a), and MaybeT is just a wrapper around
+         things of the shape m (Maybe a)
+<jusss`> f x = MaybeT $ fmap Just x                                     [13:50]
+<Axman6> % :t let f x = MaybeT $ fmap Just x in f -- let's find out     [13:51]
+<yahb> Axman6: Functor m => m a -> MaybeT m a
+<Axman6> Looks good to me, though that's evenmore powerful :o
+<Axman6> Nice work!
+<Axman6> whatr you've actually defined is the function lift, from the
+         MonadTrans class
+<Axman6> :t lift
+<lambdabot> (MonadTrans t, Monad m) => m a -> t m a
+<Axman6> can you write h :: IO a -> ExceptT String IO a?                [13:55]
+<Axman6> :t ExceptT
+<lambdabot> m (Either e a) -> ExceptT e m a
+<jusss`> lift x = Except $ fmap Right x?
+<jusss`> ExceptT
+<Axman6> % :t let lift x = ExceptT $ fmap Right x in lift
+<yahb> Axman6: Functor m => m a -> ExceptT e m a
+<Axman6> Looks good to me!
+<Axman6> jusss`: well, for someing to be a monad transformer, it needs to
+         provide the function lift which can turn some monad m into t m
+<jusss`> Axman6: how I can tell lift will turn monads into which transformer?
+<Axman6> it depends on the context                                      [14:02]
+<Axman6> % :t lift (print ()) :: ExceptT Int IO ()
+<yahb> Axman6: ExceptT Int IO ()
+<jle`> jusss`: you use it whenever you want to turn an 'm a' into a 't m a'
+<jle`> which can happen in many different situations                    [14:03]
+<jle`> the types will guide you, when you need it
+<jusss`> Axman6: jle` what's the relation, lift and liftIO?             [14:05]
+<jusss`> lift is a function which lift its monadic value parameter into a
+         monad transformer?                                             [14:06]
+<Axman6> good queation - with what we've written so far, lift and liftIO have
+         been the same. but what happens when we want ExceptT String (MaybeT
+         IO) a?
+<jle`> jusss`: the types tell you everything you need to know           [14:07]
+<jle`> lift :: MonadTrans t => m a -> t m a
+<jle`> liftIO :: MonadIO m => IO a -> m a
+<jle`> they are similar in that they are both 'monad homomorphisms'
+<jle`> or natural transformations
+<jle`> they move you from one monad to another
+<jle`> lift moves you from 'm' to 't m'
+<jle`> liftIO moves you from 'IO' to 'm'                                [14:08]
+<jle`> in a way they can be seen just as boilerplate, just moving an action
+       from one monad to another
+<jle`> liftIO :: IO a -> MaybeT IO a, you move from (IO) monad to (MaybeT IO)
+       monad
+<jle`> the use case?  when you have an IO a, but you want a MaybeT IO a
+<jle`> or more generally, liftIO :: IO a -> MyMonad a                   [14:09]
+<jle`> the use case? when you have an 'IO a', but you want 'MyMonad a'
+<jle`> there isn't really anything deeper or more profound than that
+<jle`> the reasion liftIO exists is so that you don't have to define a
+       liftIOIntoMyMonad :: IO a -> MyMonad a, for every single monad
+<jle`> then you'd have something like liftIOMaybeT :: IO a -> MaybeT IO a,
+       liftIOStateT :: IO a -> StateT s IO a, liftIOExceptT :: IO a -> ExceptT
+       e IO a
+<jle`> you could just have one function referring to all of the with the same
+       name
+<jle`> like how by having Eq and (==), you wouldn't have to write eqInt,
+       eqString, eqFloat, eqDouble, etc.
+<jusss``> lift IO into MaybeT IO a, then lift the result into EexceptT?
+<jle`> i'm not sure what you are asking                                 [14:11]
+<jusss``> jle`: sorry, net split, I''m reading your words
+* Axman6 hands the reins back to jle`
+<jle`> MonadIO is a completely ad-hoc typeclass -- just like Eq, Ord, Show,
+       Read, etc.; basically used for overloading names of useful functions,
+       with some laws to make it a little more predictable
+<jusss``> jle`: Axman6 sorry, this ExceptT String (MaybeT IO) a really got me
+<jle`> without monad IO, we'd do just fine.  we'd have liftIOMaybeT :: IO a ->
+       MaybeT IO a, liftIOStateT :: IO a -> StateT s IO a, etc.
+<jle`> having MonadIO just lets us call all of those functions by the same
+       name, liftIO. just like how having Eq lets us call our Int comparer,
+       Double comparer, string comparer, etc. all with (==)             [14:13]
+<jusss``> jle`: is MonadIO a monad?
+<jle`> no, it is a typeclass, like Eq, Ord, Show, etc.
+<jle`> but its instances are monads
+<jusss``> MaybeT m is a monad?                                          [14:14]
+<jusss``> when m is a monad,
+<jle`> yes
+<jle`> that's why it is called a "monad transformer"                    [14:15]
+<jle`> give it a monad, and it returns a monad
+<jle`> IO is a monad, so `MaybeT IO` is a monad
+<jusss``> jle`: sorry, it's lots of messages I need to think a few moments
+<jle`> give MaybeT a monad, and it returns a new monad.  if you have a monad
+       M, then MaybeT M is a fresh new monad for you                    [14:16]
+<jusss``> jle`: can you give me a simple instance of MonadIO 
+<dibblego> jusss``: you can ask ghci for the instances, use :info       [14:17]
+<jusss``> like newtype MaybeT m a = MaybeT m (Maybe a)
+<jle`> one simple instance is IO
+<jle`> instance MonadIO IO where liftIO = id
+<jusss``> jle`: except IO
+<jle`> another simple instance is MaybeT IO, liftIO x = MaybeT (Just <$> x)
+<jle`> in that type, liftIO :: IO a -> MaybeT IO a
+<jle`> yes all of those are true
+<jle`> MonadIO is actually a subclass of Monad
+<jle`> class Monad m => MonadIO m
+<jle`> just like how Ord is a subclass of Eq                            [14:20]
+<jle`> Fractional is a subclass of Num, etc.
+<jle`> in haskell we have many Monads, and some of those Monads are MonadIO
+<jle`> some Functors are Applicatives.  some Applicatives are Monads.  some
+       Monads are MonadIO
+<jle`> some shapes are quadrilaterals, some quadrilaterals are rectangles,
+       some rectangles are squares, etc.                                [14:21]
+<jle`> if seeing monad transformers is confusing, maybe look at a simpler
+       MonadIO instance, like `newtype WithArgs a = WithArgs { runWithArgs ::
+       String -> IO a }`                                                [14:23]
+<jle`> er, `newtype WithArgs a = WithArgs { runWithArgs :: [String] -> IO a }`
+
+<jle`> WithArgs a is [String] -> IO a, it's an IO a that has access to a
+       [String], the command line arguments
+<jle`> we can write an instance of Functor
+<jle`> instance Functor WithArgs where fmap f (WithArgs x) = WithArgs (fmap f
+       . x)
+<jle`> we can write an instance of Applicative, which i'll only give 'pure'
+       here:
+<jle`> instance Applicative WithArgs where pure x = WithArgs $ \_ -> pure x
+                                                                        [14:25]
+<jle`> and we can write an instance of Monad (exercise left to reader)
+<jle`> and we can write an instance of MonadIO:
+<jle`> instance MonadIO WithArgs where liftIO x = WithArgs $ \_ -> x
+<jle`> so that's an example of a Functor that is also an Applicative that is
+       also a Monad that is also a MonadIO
+<jusss``> jle`: MonadIO a is MT IO a, the value is like MT IO (M a) ?   MT
+          mean monad transformer type constructor
+<jle`> no, not necessarily                                              [14:26]
+<jle`> look above where i gave an instance of MonadIO that doesn't involve any
+       monad transformer applied to IO
+<jle`> here the `WithArgs` type i defined above is an instance of (1) Functor,
+       (2) Applicative, (3) Monad, (4) MonadIO                          [14:27]       
+<jle`> but there are no monad transformers involved
+<jle`> the purest form of a MonadIO
+<jusss``> jle`: now, I see, there're four typeclass, Functor, Applicative,
+          Monad and MonadIO, some monads are MonadIO, some aren't, MonadIO
+          isn't related to Monad Transformer,  Monad Transformer is also a
+          typeclass? what's the relation Monad and Monad Transformer?
+<jle`> jusss``: MonadTransformer is also a typeclass, but it exists separately
+       from the Functor > Applicative > Monad > MonadIO hierarchy       [14:37]
+<jle`> it's a different "kind", too
+<jle`> Functor, Applicative, Monad, MonadIO instances are all (Type -> Type)
+<jle`> but MonadTrans instances are all (Type -> Type) -> (Type -> Type)
+<jle`> they "take" a (Type -> Type) (your monad), and "return" a (Type ->
+       Type) (your transformed monad)                                   [14:38]
+<jle`> so MonadTrans is a higher-higher-kinded abstraction. it abstracts over
+       all things that can transform monads
+<jusss``> jle`: we use kind to describe type, we use typeclass to describe
+          type, typeclass is related to kind?
+<jle`> hm, i don't think there is really any formal link for it. kinds can be
+       used to reason with types and how they fit together, but typeclasses
+       express the 'capabilities' that certain types have in terms of
+       value-level functions associated with them                       [14:41]
+<jusss``> jle`: what you mean (Type -> Type)?                           [14:43]
+<jle`> (* -> *)
+
+<jusss``> Monad has the kind * -> *, and MonadTrans has the kind (*->*) ->
+          (*->*) ?
+<jle`> instances of Monad have kind * -> *, and instances of MonadTrans have
+       kind (* -> *) -> (* -> *)
+<jusss``> jle`: and instances of MonadIO have kind ?                    [14:45]
+<jle`> Functor, Applicative, Monad, MonadIO instances are all * -> *
+<jusss``> yeah
+<jusss``> jle`: about the law, Monad has that three laws, and MonadIO ? 
+                                                                        [14:46]
+<jusss``> MonadIO is a sub class Monad, and some monads aren't MonadIO  [14:47]
+<jusss``> MonadIO at least has three laws?
+<jusss``> and the implement functions?
+<jusss``> and laws and functions about MonadTrans?
+
+<jle`>
+       https://hackage.haskell.org/package/transformers-0.4.1.0/docs/Control-Monad-IO-Class.html
+                                                                        [14:48]
+<jusss``> jle`: Monads are about effects, and MonadIO and MonadTrans are about
+          ?
+<jle`> um...don't listen to the line that says "instances should satisfy ..",
+       it's kind of iffy
+<jle`> jusss``: MonadIO is being able to 'embed' IO actions into your monadic
+       actions, IO a -> M a.                                            [14:49]
+<jle`> there isn't any deeper meaning than that
+
+<jusss``> jle`: monad actions are not function, what about Functor and
+          Applicative?
+<jle`> what about them?                                                 [14:50]
+<jusss``> jle`: is there Functor action or Applicative action?
+
+<jle`> sometimes people call values of 'f a', where f is a functor, a
+       functorial action. same for applicative                          [14:51]
+<jle`> but it's not really anything formal, it's just to aid discussion
+<jle`> so an `IO Int` is an IO action. it's monadic, functorial, applicative,
+       monadio-ic, etc.                                                 [14:52]
+<jusss``> jle`: Functor and Applicative have laws?
+<jle`> i know one way to find out :)
+<jle`> hint: it utilizes a web browser                                  [14:53]
+
+<jusss``> jle`: those concepts really make me confused ...              [15:01]
+<jle`> that's ok :) familiarity and practice is what helps lower the confusion
+       over time
+<jusss``> it takes lots of time to build the intutive...
+<jle`> all the time won't do anything unless you are writing programs using
+       these abstractions                                               [15:02]
+<jle`> so time can help, but practice is necessary
+<jusss``> jle`: it's weird that it takes lots of time to understand concepts
+          not to code
+<jle`> you might be looking at it backwards
+<jle`> writing the code is how you understand the concepts
+<jle`> not the other way around
+<jusss``> yeah
+<jle`> so write the code, and the concepts will come to you after       [15:03]
+<jle`> you won't even have to try  :)
+<jusss``> jle`: but if I don't understand monad, how I can code about ti
+<jle`> sounds like it would be hard, right?
+<jle`> turns out, it isn't
+<jle`> writing code using monads, day to day, requires understanding nothing
+       about monads as an abstraction                                   [15:04]
+<jle`> that's the beauty of it
+
+<monochrom> It's true of everything.
+<jle`> you can write code using the monad instance of Maybe, without ever
+       understanding monads as an abstraction
+<jusss``> jle`: but then I never would know about `return' is the unit,
+<jle`> yes, so many things you will never know
+<monochrom> No one says "I don't understand rings, so how can I do plus and
+            times?"
+<jle`> but so many things you will end up accomplishing                 [15:05]
+<monochrom> In fact it's the other way round. You do plus and times for a long
+            time, then you're ready to learn ring theory.
+
+<monochrom> Similarly for Chess. Similarly for natural languages. I can go on
+            and on.
+<jle`> jusss``: imagine something building a useful haskell application,
+       without ever knowing 'return is the unit'                        [15:06]
+<jle`> the nerve of them!
+<jle`> how dare they
+<purelazy> You learn before you understand how muscles work
+<jle`> how dare they ... not know this, and still make useful things, that
+       don't require knowing it
+<purelazy> You do walk before you understand how muscles work
+<monochrom> When you were a child you didn't ask your parent to "explain
+            English to me first" or whatever your mother tongue it was.
+<purelazy> I think that is the point here
+<jusss``> yes, you all are right                                        [15:07]
+<jle`> it's like wondering how you can write a song without memorizing all the
+       cadences, modes, extensions, etc. of music theory
+<purelazy> If you can read and print using do, that is enough for the first
+           year
+<jle`> "you wrote a song? psh. did you even know about the locrian mode."
+<purelazy> And you can concentrate on more important things             [15:08]
+<jle`> knowing the 'essense of a monad' is maybe something fun to learn for no
+       purpose at all, but using monads day to day requires none of that
+<jusss``> jle`: now I meet a typeclass, I ask three questions, laws, functions
+          and used for                                                  [15:10]
+<jusss``> or about
+<jusss``> maybe I should append the kind
+<jle`> the thing is that, what a typeclass is 'used for' is often not that
+       useful                                                           [15:11]
+<jle`> that a *type* is used for -- that's definitely very useful
+<jle`> learn what Maybe is used for. what IO is used for
+<jusss``> jle`: but that `used for' is we really use it to do
+<jle`> right, but when do you actually 'use' a typeclass?
+<jle`> usually you're using the types
+<jle`> not the 'typeclass' as an abstraction                            [15:12]
+*** ht_ (~Thunderbi@2a02:a210:9501:ad80:2943:9ff1:1e07:65bc) has quit: Quit:
+    ht_
+<jle`> 90% of the time you use >>=, <$>, etc., you're using specific
+       types. you're not using Monad the abstraction, Functor the abstraction,
+       etc.
+<jle`> so it doesn't matter what Monad is used for. it matters what the
+       specific type you are using is used for
+<jusss``> jle`: yeah, the typeclass's laws and implented functions, and the
+          type instances of it, the type is used for, or about ?
+<jle`> learning about laws and methods of a typeclass and what they 'mean' in
+       the abstract sense is usually not very useful                    [15:13]
+<jusss``> jle`: wait a sec, typeclass is not type, typeclass don't have kind?
+<jle`> well, it can be in some situations. but it's never going to be the
+       first thing you learn.
+
+<jle`> typeclasses have a kind with -XConstraintKinds, they are k ->
+       Constraint. but that's not too important here
+
+<nshepperd> the term 'monad action' is kind of 
+
+<jusss``> jle`: so now we have type and typeclass two stuff, and they both
+          have kind, and types are instances of typeclass
+
+<jusss``> Semigroup, Monoid, Functor, Applicative, Monad, MonadIO, MonadTrans,
+          those seven all are typeclass, and MonadTrans has kind (*->*) ->
+          (*->*), the others have kind (*->*), some instances of Monad are
+          also instances of MonadIO too, but some aren't                [15:17]
+<jle`> instances of MonadTrans ahve kind (*->*) -> (*->*), ec., yeah
+<jle`> Semigroup, Monoid instances are *
+
+<jusss``> jle`: what?
+<jusss``> jle`: <jle`> Semigroup, Monoid instances are *
+<jusss``> * is a type now?                                              [15:19]
+<jusss``> or it means any type
+<jle`> it means things of kind *                                        [15:20]
+<jle`> like Int, Bool, String, Double
+<jle`> but not Maybe, IO, Either, MaybeT
+<jle`> :k Int
+<lambdabot> *
+<jusss``> :k (Int -> Int)
+<lambdabot> *
+<jusss``> jle`: so (Int -> Int) is an instance of Semigroup and Monoid?
+<jle`> it could be if someone wrote an instance for it
+<jle`> but in base, nobody has written an instance
+<jle`> just like how there is no Show instance for it either
+<jusss``> jle`: except those seven typeclass, is there any other special
+          typeclass?                                                    [15:22]
+<jle`> jusss``: none of those typeclasses are special
+<jusss``> jle`: those seven may have connections
+          
+##############################################
+
+we should use `return' to create a IO a type, not liftIO
+like you do that in other OOP IO.return(whatever)
+
+f = return (Just 3) :: IO (Maybe Int)
+
+:t runMaybeT (liftIO (print True) :: MaybeT IO ())
+runMaybeT (liftIO (print True) :: MaybeT IO ()) :: IO (Maybe ())
+
+fmap (\() -> "3") (print 3)
+3
+"3"
+
+
+#########################################
+
+#four ways to express some same things
+
+#1 (+1) ((+2) 3)
+#2 (+1) $ (+2) 3
+#3 ((+1) . (+2)) 3
+#4 (+1) . (+2) $ 3
+
+######################################
+
+Data P = P a, is not ok, a is not defined in the scope
+Data P a = P a , is ok, a is defined in the type side
+Data P = P Int, is ok, Int is defined
+
+static@(Static settings) <- static "static"
+the whole result `static "static"' bind to static
+then the result `Static x' match `Static settings'
+bind x to settings, two bindings
+
+/static StaticR Static getStatic
+data Static = Static { getStatic :: value }
+
+##################################################
+
+Shakespearean templates
+Hamlet for HTML
+Julius for Javascript
+Cassius and Lucius for CSS
+
+As-patterns
+bind a name to the whole value
+let x@(y,z) = ("Hello", True) in (x,y,z)
+bind the whole value ("Hello", True) to x
+and (y,z) to match ("Hello", True)
+so (x,y,z) is (("Hello", True), "Hello", True)
+
+example xs@(y:ys) = (xs, y, ys)
+exmaple [1,2,3] =
+bind [1,2,3] to xs, and (y:ys) to match [1,2,3]
+so
+(xs,y,ys) is ([1,2,3], 1, [2,3])
+
+everything@(h:t) = "Hello"
+everything is "Hello", and (h:t) is "Hello"
+so (everything, h, t) is ("Hello", "H", "ello")
+
+everything@(Just x) = Just True
+everything is Just True, Just x is Just True
+so (everything, x) is (Just True, True)
+
+do
+static@(Static settings) <- static "static"
+it means bind `static "static"' to static,
+and `static "static"' has the value form `Static x',
+bind x to settings, this is two bindings
+
+data P = P a is not fine, a should show in the left befor,
+like data P a = P a,
+but data P = P Int is fine, 'cause Int is defined
+
+in yesod
+static :: FilePath -> IO Static
+Static :: WaiAppStatic.Types.StaticSettings -> Static
+
+data Static = Static WaiAppStatic.Types.StaticSettings
+
+
+###########################################
+
+#kleisli composition #monad transformer
+
+>=> can't use to exchange the context,
+ >=> is really not that special. It doesn't do anything that you cannot do with >>=.
+ it's just a bit of convenience in certain situations.
+ (f >=> g) x = f x >>= g
+ That's the entire source code for it.
+ loadUser :: Name -> IO User, loadProfile :: User -> IO Profile, you can do "loadUser >=> loadProfile :: Name -> IO Profile"
+ compose
+ But you could also do "\name -> do {user <- loadUser name; loadProfile user}"
+ In general there is no concept for switching monads included in the typeclass. Every monad needs its own functions for "switching". Often you have something like "runPure :: m a -> a" or "runInIO :: m a -> IO a"
+
+-- rememeber that, Functor need to implement fmap, Applicative need to implement
+ fmap, apply, pure, Monad need to implement fmap, apply, return, bind, join
+ -- typeclass is the class of type, every type instance need to implement that functions so
+ that become the instance of typeclass, type has function
+ -- semigroup need mappend, monoid need mempty and mappend
+ -- mempty is the unit in monoid, return is the unit in monad, pure is the unit in applicative
+
+-- join is m (m a) -> m a, not m a -> a,
+so we have to  implement  m a -> a, For a particular m, you might be able to
+But in general, a function of type m a -> a isn't going to be possible
+yeah, like Maybe a->a, if Maybe a is Nothing
+ but if we concret a then it's possible, Maybe String -> String
+03:33:07 <jusss> then we can return a string if it's Nothing
+03:33:45 <jusss> but that's not a good idea, not generics
+03:34:58 <jusss> I saw that maybe and fromJust in Data.Maybe
+03:35:22 <__monty__> It's not possible with IO a for example.
+03:37:32 <jusss> :t either
+03:37:33 <lambdabot> (a -> c) -> (b -> c) -> Either a b -> c
+03:39:00 <jusss> what about f :: (Maybe a-> b) -> (Maybe a -> b) -> b?
+03:40:31 <Cale> Doesn't seem too plausible
+03:40:51 <Cale> :t maybe
+03:40:53 <lambdabot> b -> (a -> b) -> Maybe a -> b
+03:41:08 <Cale> If you're looking to something analogous to either
+03:46:44 <Cale> Well, you could give Nothing to either one of those functions and get something of type b
+03:46:59 <Cale> But that doesn't seem especially useful
+03:47:53 <jusss> yeah, that's what I mean
+03:49:14 <jusss> but it seems maybe already has that
+03:49:22 <jusss> :t maybe
+03:49:23 <lambdabot> b -> (a -> b) -> Maybe a -> b
+###########################################################
+
 #ADT #data type #sum type #product type
 #scotty #yesod #servant #wai #warp
 <jusss> what's the different between scotty , yesod, servent?           [16:51]
@@ -2472,6 +3294,13 @@ f = \x -> f x      -- if x is not free in f, \x -> x y this y is free in this la
 f s = g 3 s
 f = \s -> g 3 s = g 3
 
+f x = f x  -- move x to the right side
+f = \x -> f x
+
+f s = g 3 s  -- move s to the right side of f
+f =\s -> g 3 s  -- move g 3 to the left side
+\s -> g 3 s = g 3
+f = g 3
 
 eta-expand
 
