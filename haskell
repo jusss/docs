@@ -1,3 +1,27 @@
+
+ADT has two common classes, product type and sum type
+
+A class is A product type
+think class in Java or Javascript as a product type
+
+data ClassName parameters = ClassName { methods :: parameters }
+
+ClassName is the constructor in the class
+
+think record syntax like a class, have methods to access those parameters
+
+Algebraic Data Types, 
+<dminuoso> jusss: An ADT is just the simple idea that you can create data
+           types with a) multiple constructors and/or b) multiple fields in a
+           given constructor. Nothing more.
+<dminuoso> jusss: So ADT just means "You can have multiple fields and/or
+           constructors for a data type". :)
+
+data T = V
+T is the `data type' and V is the `data'
+
+----------------------------------------------------------------
+
 union, enum for sum type
 structure for product type,
 a class is a product type
