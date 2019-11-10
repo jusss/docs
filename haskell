@@ -1,3 +1,56 @@
+union, enum for sum type
+structure for product type,
+a class is a product type
+subclasses for sum type
+
+in C
+union can implement sum type, but need tagging
+enum is used for tag values
+
+in Java
+use subclasses for sums,
+A class is a product type
+they can use subclasses to implement sum types
+Maybe is a sum type, it adds one
+product types multipy cardinality of values by the things they stick together.
+
+data Person = Persion String Int
+this is a product type, this Person type's cardinality is every possible String * every possible Int
+
+Maybe is a sum type, its cardinality is the cardinality of a, plus the cardinality
+of Nothing (which is 1)
+
+
+sum type, data Bool = True | False, data Either a b = Left a | Right b
+product type, data Person = Person String Int
+
+but data Person = Person a is wrong, a must show up in the left side, a is not defined
+data Person a = Person a is ok
+
+in OOP, use subclasses to implement product and sum type
+
+isomorphic, two types have same number of values, but different values,
+they are isomorphic
+
+Bool is isomorphic to Maybe (), but not to Maybe Int
+Maybe () only have Just () and Nothing two values, 
+but Maybe Int has many values
+
+data P = P 
+Maybe P is isomorphic to Bool
+
+what is polymorphic and ad-hoc?
+id :: a -> a
+a polymorphic type is a type variable here
+
+id is a polymorphic function
+
+ad hoc polymorphism is function overloading or operator overloading
+
+parametric polymorphic
+
+
+---------------------------------------------------
 import Control.Concurrent -- forkIO is used for multi-threading
 
  forkIO (forever $ do
