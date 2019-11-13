@@ -1,3 +1,61 @@
+IO is about affect outside world
+what about MonadIO ReaderT r IO a
+MonadIO is a typeclass
+liftIO will lift an IO action into an MonadIO instance, but this IO action won't be executed
+ReaderT r IO a,  ReaderT r IO is an instance of MonadIO also Monad
+how to run an IO action, put it into `main'
+
+how to get a from IO a, use do-notation with <- or =<<
+main only has IO ()
+put runReaderT on ReaderT r IO a in main
+
+main :: IO ()
+so ReaderT r IO ()
+ReaderT is instance of MonadReader, it has ask :: ReaderT r m r
+
+you can't get value inside IO, 
+
+getLine >>= putStrLn won't execute IO actions, until put it to `main'
+
+you can't get String from getLine :: IO String,
+getLine is a value, an IO action , effect is read line from stdin
+
+we have fromJust or maybe or either to get values from context,
+but we can't get values from IO context
+
+there's no way to deconstruct IO inside Haskell
+
+we can even put IO action in lists
+blah = [getLine >>= putStrLn]
+
+we can't put ReaderT r IO a action into main,
+because main :: IO ()
+so we use runReaderT to convert it to IO ()
+
+runReaderT ReaderT r m a -> r -> m a
+this ReaderT need to be ReaderT r m ()
+
+Reader effect is passing configuration
+use ask can get the configuration to use it
+
+main = runReaderT (x :: ReaderT r IO ()) y::r
+
+ReaderT is an instance of MonadReader, 
+ask :: ReaderT r m r
+ask change ReaderT r m () to ReaderT r m r, and the monad is ReaderT r m,
+so in do-notation, ask return r
+main = runReaderT $ do
+    x <- ask
+    ...
+ y
+this x is y
+
+
+main = runReaderT (do y <- ask; liftIO (putStrLn y)) "hello"
+
+how to prevent tail on empty list?
+
+------------------------------
 
 ADT has two common classes, product type and sum type
 
