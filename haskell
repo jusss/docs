@@ -1,3 +1,36 @@
+#1 in do-notation, only the last line can concret the type of whole do-block
+     in the other lines, they can share the same context, but without same type
+
+#2 a monadic action is a do-notation, Just 3 = do r<- Just 3; return r
+
+#3 about IO a in other context, how we operate on that a?
+lift that IO a with liftIO into that context, and then use <- get a in that context
+'cause <- will get a from m a which m is an instance of MonadIO
+
+use >>= in the other context will be fine, or make a new do-block
+
+lift IO a into ReaderT r IO a,
+data ReaderT r m a = ReaderT { runReaderT :: r -> m a }
+but in do-notation , we can get a with <-, or >>= , =<< from ReaderT r IO a
+'cause ReaderT r IO is a Monad too, not just a MonadIO
+also we can get m a by runReaderT r
+
+so there're two ways to get a from IO a
+one is using <- within do-notation or >>= , =<<
+another one is liftIO that IO a into a MonadIO, then use <-, >>=, =<<
+
+
+-------------------------------------------
+
+cabal v2-install ghcide
+
+export PATH=$PATH:/root/.cabal/bin/
+
+emacs install use-package eglot 
+https://github.com/digital-asset/ghcide
+
+---------------------------------------------------
+
 IO is about affect outside world
 what about MonadIO ReaderT r IO a
 MonadIO is a typeclass
@@ -53,7 +86,8 @@ this x is y
 
 main = runReaderT (do y <- ask; liftIO (putStrLn y)) "hello"
 
-how to prevent tail on empty list?
+how to prevent tail on empty list? headMaybe :: [a] -> Maybe a
+tailMaybe :: [a] -> Maybe a
 
 ------------------------------
 
