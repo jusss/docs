@@ -1,0 +1,7 @@
+cd .vim/bundle/
+git clone https://github.com/ycm-core/YouCompleteMe.git
+cd YouCompleteMe
+sudo proxychains git submodule update --init --recursive
+sudo pacman -S boost
+cmake -G "Unix Makefiles" -DUSE_SYSTEM_BOOST=ON -DUSE_SYSTEM_LIBCLANG=ON . ~/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp
+sudo python install.py --al
