@@ -1,0 +1,19 @@
+
+{- # LANGUAGE TemplateHaskell #-} -- enable compile-time metaprogramming
+{- # LANGUAGE QuasiQuotes #-} -- allow to embed domain specific languages
+
+mkYesod "App" [parseRoutes |
+    / HomeR Get  -- visit the / with Get method will run `getHomeR', everything between [parseRoutes | and |] is not haskell
+|]
+
+
+-- mkYesod is a Template Haskell function
+
+getHomeR :: Handler Html  -- Route Handler Actions
+getHomeR = defaultLayout $ do
+    setTitle "File Processor"
+    toWidget [whamlet | -- Yesod uses a templating language called Hamlet to produce static HTML
+        <h2>Previously submitted files
+    |]
+
+

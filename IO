@@ -1,0 +1,227 @@
+irc27313: IO is about affect the outside world, what MonadIO is used to?
+irc27313: /time
+:karatkievich.freenode.net 391 irc27313 karatkievich.freenode.net :Wednesday November 13 2019 -- 13:41:11 +00:00
+Uniaika: irc27313: MonadIO is a typeclass that you can use to constraint an `m`
+Uniaika: IO () → MonadIO m => m ()
+Uniaika: note that not all types involving IO are isomorphic to a version that replaces IO with a constrained m, though.
+Uniaika: https://stackoverflow.com/questions/52387403/haskell-monadio-vs-io
+ashkan_kiani: Was anyone here an intern at tsurucapital before? I'm curious what the likelihood of becoming a full time employee is after the internship.
+ashkan_kiani: I got an offer from them
+dmwit: That seems like a fantastic question to ask Tsuru Capital.
+irc27313: liftIO will lift an IO action into an MonadIO instance, will this IO action will be executed?
+dmwit: I guess Proxy could technically be an instance of MonadIO, with `liftIO _ = Proxy`. Which... obviously won't execute the provided action.
+irc27313: what’s the special about lift an IO action into an ReaderT ?
+irc27313: ReaderT r IO a
+dmwit: E_TOOVAGUE
+ph88: is there a function for   return ()   or  pure ()   ?
+dmwit: 1. No, because aren't (necessarily) functions. 2. Yes, `pure ()`.
+dmwit: But see also `void`.
+irc27313: what value can have ReaderT r IO a?
+irc27313: ReaderT r IO is an instance of MonadIO? also Monad?
+phaazon: I think I could try CA
+dmwit: Yes, it has both of those instances.
+irc27313: how to execute an IO action?
+dmwit: Make it reachable from `main`.
+irc27313: how to get a from IO a?
+dmwit: Can't.
+Uniaika: irc27313: from a type perspective you cannot
+dmwit: But you can turn a function that would normally consume an `a` into a function that knows how to consume an `IO a`, which is almost as good.
+Uniaika: from a value perspective, you can use the do-notation to retrieve the content of said `a` and play with it
+dmwit: :t (=<<)
+lambdabot: Monad m => (a -> m b) -> m a -> m b
+hackage:  ACTION rainbox 0.22.0.0 - Two-dimensional box pretty printing, with colors  https://hackage.haskell.org/package/rainbox-0.22.0.0 (OmariNorman)
+dmwit: % :t (=<<) @IO
+yahb: dmwit: (a -> IO b) -> IO a -> IO b
+irc27313: what’s the effect of ReaderT r IO?
+dmwit: So, for example, you can't get the `String` out of `getLine :: IO String` and pass it to `putStrLn :: String -> IO ()`. But you can convert `putStrLn` by `(=<<) putStrLn :: IO String -> IO ()`, and then `getLine` is a fine argument for it; `(=<<) putStrLn getLine :: IO ()`.
+irc27313: if I want to use some value that inside an IO action, use do-notation or =<< means I have to put the function into that IO stack, it weird
+dmwit: ReaderT r IO offers all the effects available to both Reader r and IO; that is: you can create a value of type r out of thin air and you can do IO.
+dmwit: I agree that if you want to use some value that is inside an IO action, you must use do-notation or (=<<), and the result will still be in IO. I do not agree that this is weird.
+tdammers: I think that before you attempt to understand MonadIO, you first need to understand IO
+irc27313: yeah, I don’t understand IO
+tdammers: OK, so Haskell is a pure language, right? that means nothing in Haskell has any side effects - in other words, effects cannot occur as a result of evaluation
+tdammers: that means we cannot trigger IO actions by evaluating a Haskell function
+tdammers: and hence, IO doesn't do that either; it's not really special that way
+tdammers: what IO *can* do is symbolically represent interactions with the outside world (a.k.a. effects)
+tdammers: for example, `getLine` is a value (not a function!) that represents the effect of reading one line from stdin
+tdammers: `putStrLn` *is* a function, but applying it does not cause any effects to happen; rather, it is a function that takes a string and gives a value that represents the effect of printing that string to stdout
+tdammers: applying putStrLn to a string doesn't print anything, it just gives you a value of type IO ()
+tdammers: and you cannot execute the effect from inside Haskell; only the RTS (runtime system) can do this
+tdammers: and it will, if you bind a suitable IO action to the name "main" in the module "Main", and run the program
+irc27313: t = getLine >>= putStrLn
+main = t
+:karatkievich.freenode.net 421 irc27313 main :Unknown command
+tdammers: right, yes, >>=
+irc27313: main = t
+tdammers: obviously it's not very useful to have all these individual IO actions if we can't combine them into more useful programs, and that's what >>= does
+tdammers: it happens to be a method of the Monad typeclass, so implementations also exist for a lot of other types, but in this context, it's probably best to only consider the version for IO
+tdammers: :t (>>=)
+lambdabot: Monad m => m a -> (a -> m b) -> m b
+tdammers: :t (>>=)@IO
+lambdabot: error:
+lambdabot:     Pattern syntax in expression context: (>>=)@IO
+:lambdabot!~lambdabot@haskell/bot/lambdabot PRIVMSG #haskell :    Did you mean to enable TypeApplications?
+tdammers: aww
+tdammers: (>>=) :: IO a -> (a -> IO b) -> IO b
+tdammers: in this context
+irc27313: we have fromJust or maybe or either to get the values from the context, but we can’t get values from IO context?
+tdammers: correct
+tdammers: there is no way to "deconstruct" IO inside Haskell
+irc27313: we only can pass values in IO actions?
+tdammers: not quite
+tdammers: IO a is an effectful computation that produces an "a"
+tdammers: but the only thing we can do with it, other than passing it around and throwing it away, is to feed it to a combinator that accepts such values
+irc27313: IO product an "a"
+tdammers: yes, but the "produce" part happens outside of Haskell
+irc27313: how you describe getLine >>= putStrLn?
+tdammers: we can, for example, pass an IO a to the LHS of (>>=); this gives us the opportunity to consume that value in another function of our choice on the RHS, but due to the type of (>>=), that function must return another effectful computation
+tdammers: getLine >>= putStrLn is a value that represents the effectful computation of reading one line from stdin and printing it to stdout
+tdammers: colloquially, you will hear people say "getLine >>= putStrLn reads one line from stdin and prints it to stdout", but that's technically incorrect - it doesn't actually *do* that, it just *represents* it.
+tdammers: > let blah = getLine >>= putStrLn in "hello"
+lambdabot:  "hello"
+tdammers: see? we're not putting it in a context where the RTS reaches it when executing the "main" action, so it doesn't get executed. it's just a value sitting somewhere, just like any other value
+tdammers: > let blah = [getLine >>= putStrLn] in map (\x -> 1) blah -- we can even put IO actions in lists and all that
+lambdabot:  [1]
+tdammers: as far as Haskell itself is concerned, they're just values
+lortabac: tdammers: what you are saying is true, but your results in lambdabot and the fact that you can put IO in lists are unrelated to your point
+lortabac: both are due to laziness
+merijn: What? No
+tdammers: > let blah = getLine >>= putStrLn in seq blah "hello"
+lambdabot:  "hello"
+merijn: THe fact that you can put IO in lists would work just as well in a strict language
+tdammers: > let blah = getLine >>= putStrLn in seq getLine $ seq putStrLn $ seq blah "hello" -- how hard do you want me to seq this?
+lambdabot:  "hello"
+merijn: tdammers: spoon hard
+merijn: @hackage spoon
+lambdabot: http://hackage.haskell.org/package/spoon
+merijn: or deepseq or whatever :p
+tdammers: yeah, but this should be deep enough to show that lazy evaluation has nothing to do with it
+irc27313: ReaderT r IO a, if I put this action into main, it will ?
+tdammers: you can't, because ReaderT r IO isn't the same type as IO, and main must be IO ()
+tdammers: however, there is a useful function that can convert a ReaderT r m a value into an m a value (runReaderT)
+irc27313: then how I can make that possible?
+tdammers: :t runReaderT
+lambdabot: ReaderT r m a -> r -> m a
+tdammers: runReaderT takes your ReaderT r IO () action and gives you an IO () action; you do need to provide an r though
+irc27313: why main must be IO () not IO a?
+tdammers: the resulting IO () action, however, *can* be bound to main
+lortabac: tdammers: oops you are right, I didn't sleep enough last night :)
+tdammers: I'm not 100% sure it can't be IO a, but it would be pointless to use anything other than (), because the result can never be used
+irc27313: IIRC POSIX can have return value 0-255 from program
+tdammers: the RTS executes the action and throws the result away
+merijn: tdammers: main has to unify with "IO a" per the report
+tdammers: right... but that's not how we return exit codes from programs (though I don't know why not... might be to do with the fact that exit codes are a unix-specific thing)
+merijn: GHC doesn't do anything with the return value, but that's not required
+tdammers: merijn: ah, see, thought there was something
+tdammers: right, you *could* build a Haskell compiler that does something with the return value, though it's kind of difficult to imagine what that would be
+tdammers: you can
+tdammers: t print it, because just "a" doesn't give you a Show instance
+lortabac: maybe IO Int could be an exit code :)
+merijn: tdammers: If you build a Haskell OS you could return results to the calling process!
+tdammers: yeah, but that would require some un-haskelly dynamic dispatch logic
+merijn: tdammers: Not everything has to be about this shitty unix nonsense! :p
+tdammers: merijn: sure.
+irc27313: :runReaderT
+tdammers: merijn: just saying that returning an integer is not necessarily sensible for a program across execution environments / platforms
+absence: if i have a HashSet of keys, can i use them to split a HashMap in two, one that contains the keys and one that doesn't?
+tdammers: irc27313: you need to write it as :t runReaderT (":t" means "type of
+hackage:  ACTION rainbow 0.34.0.0 - Print text to terminal with colors and effects  https://hackage.haskell.org/package/rainbow-0.34.0.0 (OmariNorman)
+tdammers: ")
+irc27313: what’s the meaning to provide r in runReaderT ?
+irc27313: ReaderT r IO (), because a is ()
+irc27313: it’s like f _ = ()
+kuribas: irc27313: reader is used for passing configuration
+kuribas: irc27313: the r is a configuration type, for example which reads from a datafile, or from the command line.
+irc27313: main = runReaderT (x :: ReaderT r IO ()) y
+irc27313: y :: r
+irc27313: what this y is used to?
+irc27313: main = runReaderT (x >>= ...) y ?
+kuribas: irc27313: it could be configuration you read from a file
+irc27313: y is in the context of Reader T r?
+irc27313: so it can pass to others
+kuribas: irc27313: y :: r
+kuribas: like main = do y <- readConfiguration; runReaderT myProgram y
+kuribas: irc27313: supposing readConfiguration has type "IO r"
+irc27313: how I can get y from ReaderT r IO context? pass x >>= \z -> ...      what z is?
+irc27313: x :: ReaderT r IO ()
+irc27313: x >>= \z -> ....     what z has?
+irc27313: ()?
+irc27313: becasue ReaderT r IO is the monad
+kuribas: irc27313: you don't need to get y from ReaderT, because reader cannot change the value, unlike State
+kuribas: irc27313: or do you ask you to get it in the monad?
+kuribas: irc27313: you use ask
+kuribas: :t ask
+lambdabot: MonadReader r m => m r
+irc27313: but this is a ReaderT
+irc27313: how I get a Reader from it?
+kuribas: irc27313: ReaderT is an instance of MonadReader
+kuribas: ask is polymorphic
+irc27313: ask (_::ReaderT r IO ()) will get?
+irc27313: y::r?
+kuribas: :t ask :: Monad m => ReaderT r m r
+lambdabot: Monad m => ReaderT r m r
+kuribas: irc27313: you need to be clearer in the question you ask
+irc27313: ask is not a function?
+kuribas: :t ask :: ReaderT r IO r
+lambdabot: ReaderT r IO r
+kuribas: irc27313: no, it's not
+kuribas: it does wrap a function though
+kuribas: :t ask :: Reader r r
+lambdabot: Reader r r
+kuribas: :t ask :: StateT s (ReaderT r IO) r
+lambdabot: StateT s (ReaderT r IO) r
+irc27313: then I don’t understand
+irc27313: ask is not a function, how it used to ReaserT
+kuribas: irc27313: ask is a monadic action.
+kuribas: in the reader monad
+tdammers: OK, so here's the deal
+kuribas: the same way putStrLn "hello" is a monadic action in the IO monad
+kuribas: :t putStrLn "hello"
+lambdabot: IO ()
+tdammers: Reader r a is basically a synonym for r -> a
+irc27313: main = runReaderT $ do x <- ask ...  y
+tdammers: ReaderT r m a is a synonym for r -> m a (more or less)
+irc27313: what this x has type?
+tdammers: runReader(T) gets you from the former representation to the latter
+kuribas: irc27313: r
+tdammers: the trick is of course that Reader monads allow you to combine r -> a and a -> r -> b into r -> b
+tdammers: and likewise, ReaderT allows you to combine r -> m a and a -> r -> m b into r -> m b
+tdammers: what that means is that rather than passing an extra argument explicitly at every part of the call chain, you wrap things in Reader(T), and only supply the extra argument once
+irc27313: it’s so trick
+tdammers: essentially the Reader monad captures a very common coding pattern, namely the one where you have some sort of context or environment that you pass to all parts of an expression
+tdammers: and now, if you look at ask:
+tdammers: :t ask
+lambdabot: MonadReader r m => m r
+tdammers: and desugar the Reader notation away:
+tdammers: ask :: r -> r
+tdammers: oh boy
+tdammers: so that means that if Reader r a is just r -> a, then ask is just r -> r
+tdammers: and it follows that \r -> runReader r ask is the identity
+tdammers: > runReader "hello" ask
+lambdabot:  error:
+lambdabot:      • Couldn't match type ‘[Char]’ with ‘ReaderT (m0 r0) Identity a’
+:lambdabot!~lambdabot@haskell/bot/lambdabot PRIVMSG #haskell :       Expected type: Reader (m0 r0) a
+tdammers: :t runReader
+lambdabot: Reader r a -> r -> a
+tdammers: > runReader ask "helo"
+lambdabot:  "helo"
+tdammers: (the other way around, actually)
+tdammers: but of course the real use for it is when you use monadic combinators inside
+tdammers: e.g.:
+tdammers: > runReader (ask >>= \str -> return (str ++ str)) "hello"
+lambdabot:  "hellohello"
+tdammers: > runReader (ask >>= \a -> ask >>= \b -> return (a ++ b)) "hello"
+lambdabot:  "hellohello"
+tdammers: or, with do sugar:
+tdammers: > runReader (do { a <- ask; b <- ask; return (a ++ b) }) "hello" -- literally the same thing
+lambdabot:  "hellohello"
+kuribas: > runReaderT (do y <- ask; liftIO (putStrLn y)) "hello"
+lambdabot:  error:
+lambdabot:      • Ambiguous type variable ‘m0’ arising from a use of ‘show_M559522842239...
+:lambdabot!~lambdabot@haskell/bot/lambdabot PRIVMSG #haskell :       prevents the constraint ‘(Show (m0 ()))’ from being solved.
+kuribas: > runReaderT (do y <- ask :: ReaderT String IO String; liftIO (putStrLn y)) "hello"
+lambdabot:  <IO ()>
+kuribas: that would print "hello"
+tdammers: > (runReaderT (do { y <- ask; liftIO (putStrLn y) }) "hello") :: IO ()
+lambdabot:  <IO ()>
+tdammers: oof
