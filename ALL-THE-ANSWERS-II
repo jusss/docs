@@ -1,4 +1,131 @@
+import System.Random
+import Data.Tuple
+import System.Environment
 
+randomSequence :: RandomGen g => [a] -> g -> Int -> [a] -> [a]
+randomSequence = \l g count result ->
+               if count > 0 then
+                  let s = (randomR (0, length l - 1) g) in
+                             randomSequence l  (snd s)  (count - 1) $ ((!!) l $ fst s) : result
+               else
+                  result
+
+l = "abcdefghijklmnopqrstuvwxyz0123456789_ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+getRandomString _number randomNumber = randomSequence l (mkStdGen randomNumber) _number ""
+
+main = do
+  args <- getArgs
+  let i = read $ head args :: Int
+  let ii = read $ head $ tail args :: Int
+  putStrLn $ getRandomString i ii
+
+-- ./getRandomString 22 111111111111111111112222222222222222222222222222222218888888888888888866666666666666
+
+######################################################################
+
+
+double exclamation marks !! indexes lists.
+it takes a list and an index, and return the item at that index.
+(!!) [1,2] 0 will return 1
+
+generate random strings from a list
+pick a random item from a list
+
+<dsal> > let rs a = (a !!) <$> randomRs (0, length a - 1) (mkStdGen 104) in
+       take 37 $ rs "abc123"
+
+take 37 $ rs "abc123" where
+     rs a = fmap (a !!) (randomRs (0, length a - 1) (mkStdGen 42))
+
+System.Random
+
+don't write StdGen by hand, use `mkStdGen'
+class RandomGen g
+data StdGen = StdGen !Int32 !Int32  is an instance of RandomGen
+call it generator
+
+
+randomR :: RandomGen g => (a, a) -> g -> (a, g)
+random :: RandomGen g => g -> (a, g)
+
+this a is from class Random a where { random :: RandomGen g => g -> (a, g);
+      ... }
+
+randomRs :: RandomGen g => (a, a) -> g -> [a] 
+mkStdGen :: Int -> StdGen
+getStdGen :: IO StdGen
+newStdGen :: IO StdGen
+
+newStdGen >>= print   will generate different numbers every time
+
+randomSequence :: RandomGen g => [a] -> g -> Int -> [a] -> [a]
+randomSequence = \l g count result ->
+               if count > 0 then
+                  let s = (randomR (0, length l - 1) g) in
+                             randomSequence l  (snd s)  (count - 1) $ ((!!) l $ fst s) : result
+               else
+                  result
+
+randomSequence "abcdefg123" (mkStdGen 42) 22 ""
+
+
+instance Functor ((,) a) where
+    fmap f (x,y) = (x, f y)
+
+#tuple #set #SteGen
+
+(a,g) is 2-tuple,  (1,2,3) is 3-tuple
+
+we use mkStdGen to get a x::StdGen,
+we use fromList :: [a] -> Set a to get a `Set a', not write it by hand
+
+fromList [1,2,1,3,2] will get fromList [1,2,3]    -- fromList is a "smart constructor"
+
+import Data.Tuple
+fmap swap $ random (mkStdGen 42)
+
+
+#####################################################################
+
+#symbol
+
+slash /
+backslash \
+vertical bar |
+period .
+horizontal
+quote "
+single quotation mark '
+question mark ?
+exclamation mark !
+comma ,
+colon :
+semicolon ;
+tilda ~
+at sign @
+number sign #
+ellipsis ...
+dollar sign $
+percent sign %
+hyphen -
+caret ^
+dash --
+ampersand &
+asterisk *
+parenthesis ()
+square brackets []
+brackets {}
+angle brackets <>
+underscore _
+plus sign +
+minus sign -
+equals =
+less-than <
+greater-then >
+semantic
+
+###########################################################
 
 root@CASE:~/yesod# cat TPG.hs
 {-# LANGUAGE OverloadedStrings #-}
