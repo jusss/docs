@@ -1,3 +1,366 @@
+<dminuoso> data Cont r a = Cont { runCont :: (a -> r) -> r }
+
+###############################################
+
+https://www.cs.utah.edu/~mflatt/past-courses/cs6520/public_html/s02/cps.pdf
+
+(define (map f l)
+  (if (null? l)
+    '()
+    (cons (f (car l)) (map f (cdr l)))))
+
+add k
+(define (map2 f l k)
+  (if (null? l)
+    (k '())
+    (k (cons (f (car l)) (map2 f (cdr l))))))
+
+lift (f (car l))
+(define (map2 f l k)
+  (if (null? l)
+    (k '())
+    (f (car l) (lambda (v) (k (cons v (map2 f (cdr l))))))))
+
+lift (map2 f (cdr l))
+(define (map2 f l k)
+  (if (null? l)
+    (k '())
+    (f (car l) (lambda (v) (map2 f (cdr l) (lambda (v2) (k (cons v v2))))))))
+
+(map2 (lambda (x k) (k (+1 x))) '(1 2 3) (lambda (x) x))
+
+
+(define rember8
+  (lambda (ls)
+    (cond
+      [(null? ls) '()]
+      [(= (car ls) 8) (cdr ls)]
+      [else (cons (car ls) (rember8 (cdr ls)))])))
+
+(define rember8
+  (lambda (ls k)
+    (cond
+      [(null? ls) (k '())]
+      [(= (car ls) 8) (k (cdr ls))]
+      [else (rember8 (cdr ls) (lambda (x) (k (cons (car ls) x))))])))
+
+
+#CPS #continuation
+
+import sys
+sys.setrecursionlimit(5500000)
+cons = lambda x,l: [x] + l
+car = lambda l: l[0]
+cdr = lambda l: l[1:]
+
+isEmpty = lambda l: True if l == [] else False
+
+map2 = lambda f, l, k: k([]) if isEmpty(l) else f(car(l),
+                                                  lambda v: map2(f, cdr(l),
+                                                                 lambda v2: k(cons(v,v2))))
+
+
+print(map2(lambda v,k: k(v+1),  range(999), lambda x: x))
+
+###############################################
+
+id a = a
+idCPS1 a k = k a
+idCPS2 a k1 = \k2 -> k1 a k2
+
+but `k a` = `\x -> k a x`  based on the eta-conversion of lambda
+
+k a = k a
+k = \a -> k a
+k a = \x -> k a x
+\x -> k a x = k a
+
+################################################################
+
+<jusss> merijn: about last day's continuation talk, when a function can be a
+        continuation? what's the condition?                             [10:05]
+<jusss> merijn: inC `bind` fn = \out -> inC (\inCval -> (fn inCval) out)
+        from  https://jsdw.me/posts/haskell-cont-monad/      do you think this
+        inC is a continuation?                                          [10:06]
+<jusss> based on this article, the continuation should be a function f, which
+        take a function g, and call g in the final of f                 [10:07]
+<jusss> f = k1 >>= \v -> return k2; f g will call g in k1, and v is the result
+        that g in k1, then it make a new continuation k2, and call g again in
+        that k2                                                         [10:10]
+<jusss> g is passing in the chain                                       [10:12]
+
+
+#############################################3<=8
+
+maybe any function could be a continuation
+
+https://wiki.haskell.org/Continuation
+https://en.wikipedia.org/wiki/Continuation
+https://jsdw.me/posts/haskell-cont-monad/
+
+<heatsink> find f (x:xs) = if f x then Just x else find f xs; find f [] = Nothing
+<heatsink> With continuation-passing style, find wouldn't return to its
+           caller.  Instead, its caller would tell find what to do next.
+<heatsink> find f (x:xs) cont = if f x then cont (Just x) else find f xs cont;
+           find f [] = cont Nothing
+
+<jusss> heatsink: I think continuation is a funciton f, which take another
+        function g as its parameter, call g in f, and g never go back in f
+<heatsink> That's right                                                 [14:39]
+--that f may be a CPS function, a Cont (a->r)->r, also a continuation
+
+<heatsink> Without continuation-passing, it was foo = print (find (<0) [1,
+           -2])
+<heatsink> With continuation-passing, it is foo cont = find (<0) [1, -2] (\x
+           -> print x cont)
+<heatsink> This means, call "find"; tell "find" that when it's done, it should
+           call "print", and tell print that when it's done, it should call
+           "cont"                                                       [14:41]
+<heatsink> I'm assuming that this "print" was also converted to
+           continuation-passing style
+<heatsink> To make a continuation monad, you would need to write return and
+           >>= for continuation-passing style                           [14:45]
+<jusss> heatsink: inC `bind` fn = \out -> inC (\inCval -> (fn inCval) out)
+        from https://jsdw.me/posts/haskell-cont-monad/
+<heatsink> bind fn inC out = inC (\inCval -> fn inCval out)
+<heatsink> inC and fn are functions that are in continuation-passing style.
+           Their last parameters are continuations.
+<jusss> so inC is not a continuation?
+<heatsink> Right, it is not a continuation                              [14:50]
+<jusss> heatsink: so here inC and fn both are functions, they take
+        continuation, and `out' is a continuation?
+<heatsink> The call `inC cont` means to call inC and tell it to call cont when
+           it's finished.
+<heatsink> right
+<heatsink> So, this will call inC.  When it's finished, it will call that
+           lambda.                                                      [14:53]
+<heatsink> That lambda will call fn.  When fn is finished, it will call out.
+<jusss> heatsink: but that lambda is a continuation?                    [14:55]
+<heatsink> yes
+<heatsink> Cont values are not continuations.  They are continuation-passing
+           functions.  The continuation-passing part is hidden inside the
+           monad.                                                       [15:01]
+<jusss> inC is a Cont values right?
+<doublex> @unmtl Cont r a                                               [15:02]
+<lambdabot> (a -> r) -> r
+<heatsink> right
+<jusss> but a->r is continuation?                                       [15:03]
+<heatsink> The example that you showed is teaching about Cont.  So it is not
+           actually using the Cont type, but it's basically doing the same
+           thing as Cont.
+<heatsink> (a -> r) is the type of a continuation                       [15:04]
+<doublex> if a direct-style function produces an `a`, a
+          continuation-passing-style function instead passes an `a` to its
+          continuation                                                  [15:05]
+<doublex> the Cont monad allows you to thread together CPS functions with >>=
+<jusss> doublex: it means in the continuation-passing-style function, the
+        function take a continuation, and pass its within value to its
+        continuation?                                                   [15:11]
+<jusss> err. now I'm confused about continuation-passing-style function and
+        continuation...
+
+<jusss> a funciton f, which take another function g as its parameter, call g
+        in f, and g never go back in f, f is a continuation-passing function,
+        g is the continuation, right?
+<dminuoso> "continuation-passing function" is not really a term Ive heard.
+<dminuoso> "continuation-passing" is a coding style.
+<dminuoso> jusss: And no, f might do things after g.
+<dminuoso> For example `withConnection :: (Connection -> IO a) -> IO a`
+           usually does resource cleanup after the continuation is done.
+<jusss> dminuoso: then it's against the "and g never go back in f"      [16:38]
+<dminuoso> jusss: Right.
+<jusss> dminuoso: so f won't do thing after g
+<dminuoso> jusss: Well "after" is a difficult term.
+<jusss> dminuoso: may use "call g in the last code in f"?
+<jusss> of f
+<dminuoso> jusss: If we are talking about `withConnection`, what such a
+           continuation would usually do, is prepare a connection handle,
+           provide it to your continuation, and then close the connection
+           using `finally`
+<dminuoso> (The finally is done to ensure that the resource is released even
+           if your continuation throws an exception)                    [16:40]
+<jusss> dminuoso: how you describe the function f :: (a->r) -> r?
+<jusss> if (a->r) is the type of a continuation                         [16:41]
+<jusss> Cont r a >>= ...   this Cont r a is a continuation?             [16:42]
+<dminuoso> jusss: Id call it a continuation handler, maybe.
+<jusss> err, wait, there's no Cont r a, right?                          [16:43]
+<dminuoso> jusss: Sure there is.
+<jusss> type Cont r = ContT r Identity
+<jusss> Cont is defined by ContT
+<jusss> type Cont r = ContT r Identity
+<kuribas> jusss: that's fabricating an 'a' out of thin air.
+<dminuoso> jusss: It turns out that Cont and ContT are the same thing. :)
+<dminuoso> kuribas: Nope.
+<dminuoso> kuribas: type aliases can be defined to be non-saturated on the
+           RHS.                                                         [16:44]
+<jusss> dminuoso: wait a sec, Cont is a Monad, ContT is a Monad Transformer
+<dminuoso> jusss: Try implementing the monad instance for both. It's an
+           interesting excercise.
+<jusss> dminuoso: I even don't know the data type of Cont...
+<jusss> I can't find its definition on the haskell.org                  [16:45]
+<kuribas> dminuoso: "(a implies r) implies r", is the same as "a" is true,
+          logically
+<jusss> it's defined by ContT
+
+<dminuoso> data Cont r a = Cont { runCont :: (a -> r) -> r }
+
+<dminuoso> equivalently
+<dminuoso> data ContT r m a = Cont { runCont :: (a -> m r) -> m r }     [16:46]
+<dminuoso> Err
+<dminuoso> data ContT r m a = ContT { runContT :: (a -> m r) -> m r }
+<dminuoso> :)
+<jusss> dminuoso: it reminds me about Reader...                         [16:47]
+<jusss> there's a Kleisli arrow in its type
+<kuribas> dminuoso: right, it's a clojure containing some a, which is passed
+          to the continuation
+<dminuoso> It's quite unlike Reader.
+<kuribas> dminuoso: closure                                             [16:48]
+<dminuoso> kuribas: Might not be a closure.
+<dminuoso> kuribas: A closure is a particular type of implementation.
+<dminuoso> I'd just call it a continuation handler.
+<dminuoso> It knows how to handle/run a continuation.                   [16:49]
+<kuribas> dminuoso: it must get an a from somewhere
+<jusss> >>= :: Cont r a -> (a -> Cont r b) -> Cont r b
+<jusss> >>= :: ContT r m a -> (a -> ContT r m b) -> ContT r m b?
+<jusss> data Cont r a = Cont (a->r) -> r;  x :: Cont r a;  x is the
+        `continuation handler'?
+<jusss> it needs a (a->r) to extract the r?                             [16:53]
+<kuribas> jusss: x is a continuation, which is a function which accepts the
+          result of the previous computation.
+<jusss> kuribas: wait, x >>= \...    this x is a continuation?
+<kuribas> jusss: yes                                                    [16:55]
+<jusss> "<heatsink> Cont values are not continuations.  They are
+        continuation-passing functions.  The continuation-passing part is
+        hidden inside the monad.
+        [15:01]"
+<mycroftiv> continuations are a really deep subject,
+            http://okmij.org/ftp/continuations/ has a ton of material
+            including some introductory/tutorial code                   [16:56]
+<kuribas> jusss: well, technically it's the continuation, with the previous
+          value already filled in.
+<kuribas> jusss: so it's the part which computes a new value, and passes it to
+          the next continuation                                         [16:59]
+
+<jusss> kuribas: then what's the context? what's the effect?
+<kuribas> jusss: I'd say the context is the next continuation, the effect is
+          passing the computed value to the next continuation.
+
+<jusss> kuribas: but some people said Cont Monad doesn't have an effect...
+                                                                        [17:01]
+<jusss> not all Monads have effects...
+<kuribas> jusss: indeed, not a real effect, like in IO
+<kuribas> jusss: it's like emulating non-local jumps in imperative language,
+          though it's more powerful than that.                          [17:02]
+<jusss> kuribas: err.. is there a clear definition of `continuation'? not
+        something about CPS and callCC?
+<kuribas> jusss: continuations are linked to CPS and callCC
+<jusss> kuribas: if even there's no CPS and callCC, continuation still exists
+<kuribas> jusss: having a continuation implies doing CPS, or having a low
+          level primitive (like in scheme)
+<jusss> even from https://wiki.haskell.org/Continuation,  it's talk about CPS
+        and callCC, not really about what exactly is a continuation
+<jusss> scheme provide call/cc to capture continuation
+<kuribas> jusss: loosely, you could say, a continuation is a function which
+          you accept, which you pass the computed value.  It represents "the
+          rest of the computation".                                     [17:07]
+<jusss> kuribas: (+2) is a continuation?
+<kuribas> jusss: could be
+<kuribas> jusss: it implies that you never return a value.
+<jusss> kuribas: f = \x -> (x 2)   this f is a continuation?            [17:08]
+<kuribas> jusss: sure
+<merijn> jusss: any function can be a continuation
+<merijn> jusss: So "is 'f' a continuation?" is always "yes" if 'f' is a
+         function
+<jusss> kuribas: but (+2) :: Int -> Int,  it return a Int
+<merijn> jusss: 'f' is not continuation passing style, but it can be a
+         continuation                                                   [17:09]
+<kuribas> jusss: the first google link on scheme gives me a definition:
+          https://courses.cs.washington.edu/courses/cse341/04wi/lectures/15-scheme-continuations.html
+<jusss> merijn: kuribas ok, so (+2) could be a continuation, but it's not a
+        continuation-passing style function?
+<jusss> do we have the term continuation-passing style function?        [17:12]
+<jusss> or just continuation-passing style will be fine?
+<kuribas> jusss: no, because then it would also take a continuation
+<kuribas> jusss: like \v k -> k (v+2)
+<jusss> kuribas: this k is continuation?                                [17:17]
+<jusss> f = \v k -> k (v+2)       this f is continuation?
+<kuribas> jusss: yes
+<jusss>  kuribas: both are continuations?
+<kuribas> jusss: <merijn> jusss: any function can be a continuation
+
+
+
+###############################################
+
+callBack, call then back, it's a callback,
+f(g) call g in f, then return to f with its result then do other things
+that g is a callback function,
+but continuation it never be back, f(g) call g in f, and that's it,
+g won't back to f, f don't do something with g's result,
+
+continuation is a function f, which take another function g as a parameter,
+call g in the continuation f, and g won't be back
+
+(+2) is not a continuation, 'cause (+2) take a Int and return a Int
+f = \x -> (x 2)
+f is a continuation,
+f (+2) would be 4, f id would be 2
+the result ends within the function (+2) or id, not f
+
+
+about callback hell, 'cause it's always waiting callback functions's back with result
+and it stucks the process
+but continuation doesn't have that, it always jump to another function's execute stack with everything it needs through function call, won't jump back, no other things wait it, it's always jumping
+
+###################################################
+
+same like docker
+
+config sshd inside a chroot env,
+vim /etc/ssh/sshd_config in chroot env, change the port,
+make it not as same as the host's,
+then /etc/init.d/ssh start, don't use systemctl start ssh
+'cause systemd won't allow that
+then on the client side, just ssh that port, it will be ok.
+
+######################################################
+-- get a random number based on a string
+
+import System.Random
+import System.Random.Shuffle
+
+-- _find :: [a] -> [(a,b)] -> [[a]]
+_find str keyPair = fmap (f keyPair) str
+     where
+        f k c = fmap (\(x,y) -> if x == c then y else 0) k
+
+
+
+_match str keyPair =
+     sum $ _find str keyPair >>= (return . sum)
+
+
+
+genKeyPair seed = zipWith (,) (['a'..'z'] <> ['A'..'Z'] <> ['0'..'9'] <> ['_']) $ shuffle' [1..63] 63 (mkStdGen seed)
+
+keyPair = genKeyPair 42
+
+
+main = print $ _match "aha" keyPair
+
+################################################
+
+map f alist; if f is a binary function, this won't work
+use zipWith
+<doublex> > zipWith (,) "abc" "123"
+<lambdabot>  [('a','1'),('b','2'),('c','3')]
+<doublex> every-to-every (i.e. concatMap) is the list Applicative       [10:18]
+<doublex> > (,) <$> "abc" <*> "123"
+<lambdabot>
+            [('a','1'),('a','2'),('a','3'),('b','1'),('b','2'),('b','3'),('c','1'),('c',...
+
+###########################################################
+
 import System.Random
 import Data.Tuple
 import System.Environment
@@ -2226,6 +2589,38 @@ cd sid; ./mount.chroot.share.X.sh
 source source.me
 
 amd64 is for 64 bit, i386 is for 32 bit
+
+########################################
+
+debootstrap --arch amd64 --foreign sid  ./sid/ http://mirrors.aliyun.com/debian
+cd ./sid
+chroot . /bin/bash
+/debootstrap/debootstrap --second-stage
+export PATH=$PATH:/bin:/usr/bin
+
+exit the chroot env, then
+cp mount.chroot.share.X.sh ./sid
+cd sid; ./mount.chroot.share.X.sh
+source source.me
+
+amd64 is for 64 bit, i386 is for 32 bit
+
+mount.chroot.share.X.sh
+sudo mount -t proc proc ./proc
+sudo mount -t sysfs sysfs ./sys
+sudo mount --make-rslave  ./sys
+sudo mount -t devtmpfs devtmpfs ./dev
+sudo mount --make-rslave  ./dev
+sudo mount -t tmpfs tmpfs ./dev/shm
+sudo mount -t devpts devpts ./dev/pts
+xauth extract - $DISPLAY | sudo tee ./root/.Xauthority
+sudo mount -t tmpfs tmpfs ./tmp
+sudo mount --make-rslave ./tmp
+sudo chroot . /bin/bash
+
+source.me
+#!/bin/bash
+export PATH=/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/home/john/.cabal/bin
 
 ##################################################
 
