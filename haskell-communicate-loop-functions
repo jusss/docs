@@ -1,0 +1,96 @@
+
+communicate within two loops
+
+1. forkIO and killThread
+2. async and withAsync
+3. Systemd to handle the exit and restart or bash script
+4. Continuation
+
+
+del.hs
+
+import System.Exit
+import Control.Concurrent
+sleep = threadDelay . ceiling . (*1000000)
+main = do
+  sleep 5
+  exitWith $ ExitFailure 22
+
+I2T5.sh
+#!/bin/bash
+while :
+do
+  echo "re-run"
+  sleep 2
+  ./del
+done
+
+-----------------------------------------------------
+
+main :: IO ()
+main = runTCPClient _server _port $ \socket -> do
+    manager <- newManager tlsManagerSettings
+    token <- return $ Token _token
+    chatId <- return $ ChatId _chatId
+    sendAll socket nick
+    sendAll socket user
+
+    forkIO (forever $ do
+        msg <- recv socket 1024  -- msg :: ByteString
+        if (D.length msg == 0) then do           --  irc disconnected
+           print "IRC Disconnected, Re-connecting"
+           sleep 5
+           main
+        else
+            case D.isPrefixOf "PING" msg of
+                        True -> sendAll socket $ D.map (\i -> if (i == 73) then 79 else i) msg -- PING PONG
+                        False ->
+                                 case (parseMsg msg == "hide") of -- filter QUIT JOIN PART messages
+                                   False -> sendMsg chatId (filterUtf8Exception $ En.decodeUtf8' $ parseMsg msg) token manager -- send msg from irc to telegram
+                                   -- True -> putStrLn $ C.unpack msg
+                                   True -> return $ filterMsg msg)
+                        
+    recvMsg token manager Nothing [] chatId socket _nick  -- send msg from telegram to irc
+
+
+forkIO ... is one loop function
+recvMsg ... is another loop function
+they share the same variable socket
+once socket is changed, how to let them know?
+
+comminucate in two loop functions, if we have global variables, it would be easy,
+but we don't have that in Haskell
+so we put them into one function, so we can make them share the variable in the function,
+but now how to let them know something is changed?
+
+we could merge those two loops into one loop
+one of them is a blocking function, so we need to make it non-blocking,
+like `select()` in C language, or epoll() whatever
+
+haskell provide `async`
+
+import Control.Concurrent.Async -- from async package
+
+<nshepperd> jusss: async doBlockingAction >>= (\h -> do { ... poll h ... })
+<nshepperd> or: 'async doBlockingAction >>= (\h -> do { ... wait h ... })' if
+            you want to start the action (or several actions) now and then
+            wait for it to finish later
+<lambdabot> do { a <- async doBlockingAction; (\ h -> do { x <- poll h; return
+            x}) a}
+
+<nshepperd> do { h <- async (recv socket 1024); do some other stuff; answer <-
+            wait h ; do stuff with answer }
+
+<nshepperd> jusss: dunno. probably. read through
+            https://hackage.haskell.org/package/async  [00:09]
+<nshepperd> if nothing else you can do timer <- async (threadDelay 1000000)
+            and then waitEither timer h  [00:10]
+<dsal> jusss:
+       http://hackage.haskell.org/package/base-4.12.0.0/docs/System-Timeout.html
+
+it need change recvMsg to a non-recursive function so we can put it into another loop with async
+merge two loops into one loop
+
+
+
+
