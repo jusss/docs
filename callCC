@@ -1,0 +1,62 @@
+k is \x -> \_ -> cc x
+and id is cc
+
+callcc f = \cc -> f ( \x -> \_ -> cc x) cc
+f k cc = k 3
+callcc f (+1) 2
+callcc f (+1) ()
+
+f2 k cc = k 3 ()
+callcc f2 id
+
+f3 k cc = k 3 cc
+callcc f3 id
+
+in pointless, f3 k = k 3
+
+f4 k = k 3
+callcc f4 id
+
+f5 cc = \_ -> cc 5
+callcc f5 id ()
+
+f6 x cc = cc x
+callcc (f6 6) id
+
+cc is waiting for f's result in `callcc f cc`, and cc want to apply on f's result
+inside f, f use (k v) to return v as result in `f k cc`
+
+f7 k _ = if (1<0) then k 1 else k 2
+callcc f7 id ()
+
+f8 k _ = if (1<0) then (k 8 ()) else (k 9 ())
+callcc f8 (+1), it won't eval anything until give (+1) to callcc f8
+and in `f8 k () = ...` (k a) will escape, and a is the result of f8, and (+1) apply on a
+
+
+f9 k _ = k k will cause infinite type
+
+you can not use () in the left of = of a function, it's identifier in the left, not constant value like () in the left
+
+f10 k _ = k 3 ()
+callcc f10 (+9)
+
+f11 k a = k 3 a
+callcc f11 (+2)
+
+
+in function definition
+() can be left of =
+_ can be right of =
+
+
+const callcc = f => cc => f( x => _ => cc(x))(cc)
+const f = k => _ => k(3)(_)
+callcc(f)(console.log)
+
+const callcc2 = f => cc => f( x => cc(x))
+const f2 = k => k(3)
+callcc2(f2)(console.log)
+f2(console.log)
+
+

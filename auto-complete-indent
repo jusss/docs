@@ -1,0 +1,24 @@
+#auto complete #vim #emacs #indent
+
+in vim 8.x, C-n or C-p will auto complete for some words you already typed, that's wonderful
+
+emacs turn all indent off
+
+(defun my-turn-indentation-off ()
+  (interactive)
+  (local-set-key (kbd "<tab>") 'tab-to-tab-stop))
+
+(dolist (hook '(perl-mode-hook
+                cperl-mode-hook
+                c-mode-hook
+                haskell-mode-hook
+                c++-mode-hook
+                java-mode-hook))
+  (add-hook hook 'my-turn-indentation-off))
+
+https://www.emacswiki.org/emacs/TurnAllIndentingOff
+
+
+otherwise, lsp language server protocal would be a choice
+YouCompleteMe Jedi for Vim
+auto-complete company-mode lsp-mode for Emacs

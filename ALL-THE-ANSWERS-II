@@ -1,3 +1,609 @@
+
+callCC f cc = f (\x _ -> cc x) cc
+this cc is current continuation
+exit f with cc, 
+callCC's effect is that use cc to exit f
+
+callCCex1 = do
+    val <- callCC $ \exit -> do
+
+        exit True
+        undefined
+
+    return val
+
+runCont callCCex1 kn, kn will apply on val
+'cause callCCex1 :: Cont r a
+so return val = \x -> x val
+kn apply on val
+and exit True will exit with True, so val is True
+kn will apply on True
+
+kn :: Bool -> String
+kn True = "it's true"
+kn False = "it's false"
+
+main = print $ runCont callCCex1 kn
+
+it's same to
+callCCex1 = callCC $ \exit -> do
+        exit True
+        undefined
+
+'cause undefined never reached so
+it's equal to
+
+callCCex1 = callCC $ \exit -> exit True
+
+callCC :: ((a->m b) -> m a) -> m a
+so exit :: (a->m b) -> m a 
+
+\exit -> exit True :: (a->m b) -> m a
+
+f = \exit -> exit True
+callCCex1 :: m a = (callCC :: ((a->m b)->m a) ->m a) f
+so f :: (a->m b) -> m a
+
+(+1) :: Int -> Int
+3 :: Int = (+1) (2 :: Int)
+
+
+\exit -> exit True :: (a->m b) -> m a
+exit :: a -> m b
+exit = \a -> \_ -> _ a
+
+this kn is runCont callCCex1 kn
+
+callCCex1 = exit True = \_ -> _ True
+callCCex1 kn = kn True
+
+runCont (callCC $\cc -> cc True) cc
+the outside cc is the cc in \cc
+
+main = print $ runCont (callCC $ \cc -> cc True) kn
+kn is the cc
+
+
+
+############################################
+
+there're four parts,
+1. Cont https://www.schoolofhaskell.com/school/to-infinity-and-beyond/pick-of-the-week/the-mother-of-all-monads
+2. ContT and >=> with ContT http://www.haskellforall.com/2012/12/the-continuation-monad.html
+3. >>= with Cont "c >>= f = \k -> c (\a -> f a k)"
+4. callCC 
+
+
+Cont is from Control.Monad.Cont
+ContT is from Control.Monad.Trans.Cont
+
+<wonderC>  m >>= k  = ContT $ \ c -> runContT m (\ x -> runContT (k x) c)
+<wonderC> equal to "c >>= f = \k -> c (\a -> f a k)"                    
+<wonderC> callCC f = ContT $ \ c -> runContT (f (\ x -> ContT $ \ _ -> c x)) c
+callCC :: ((a -> m b) -> m a) -> m a 
+callCC f = \c -> f (\x -> \_ -> c x) c
+
+function callcc (f,cc) { 
+  f(function(x,k) { cc(x) },cc)
+}
+
+callcc f cc = f (\x k -> cc x) cc
+
+Scheme:
+(define call/cc (lambda (f cc) (f (lambda (x k) (cc x)) cc)))
+
+Javascript:
+callcc = f => cc => f(x => k => cc(x), cc)
+
+Haskell:
+callCC f = \c -> f (\x -> \_ -> c x) c
+callCC f cc = f (\x -> \_ -> cc x) cc
+callCC f cc = f (\x _ -> cc x) cc
+
+#################################################
+
+#Understand #Cont #Monad #JS #Haskell #continuation
+let's assume that continuation :: (a->r)->r
+that unary function :: a->r
+
+e.g:  "c >>= f = \k -> c (\a -> f a k)"
+
+``` #continuation #Cont
+const pure = x => cb => cb(x)
+const bind = amb => ma => cb => ma(a => amb(a)(cb))
+const lift2 = f => ma => mb => bind(a => bind(b => pure(f(a)(b)))(mb))(ma)
+
+const delay = d => v => cb => setTimeout(() => cb(v), d)
+
+const hello = delay(1000)("hello")
+const world = delay(1000)("world")
+const format = x => y => `${x}, ${y}!`
+const main = lift2(format)(hello)(world)
+
+main(result => { console.log(result) })
+// after a couple seconds, logs "hello, world!"
+```
+world2 = a => delay(1000)(a+"world")
+bind(world2)(hello)(console.log)
+const _bind = ma => amb => cb => ma(a => amb(a)(cb))
+_bind(hello)(world2)(console.log)
+
+again = a => delay(1000)(a + "again")
+_bind(_bind(hello)(world2))(again)(console.log)
+with infix notation, not this prefix notation
+it would be 
+(hello >>= world2 >>= again) console.log
+
+this delay is a continuation (a->r)->r function,
+let's call that (a->r) as an unary function
+f(a,cb){ ... cb(r)} this is a continuation
+it's a extense version of pure a = \cb -> cb a
+no matter how you do something with a, like turn it to b
+but you will apply cb on that b in the final
+
+pure2 a = \cb -> cb $ a + 2
+
+this pure2 a is still a continuation, which has (a->r)->r
+
+delay(1000)("hello") >>= (a => delay(1000)(a+"world"))
+you can always operate the result by and >>= a->m b,
+util you give it a->r to get the final result r,
+we chain Cont Monad with >>=, ContT with >=>
+
+lift2 is liftA2, is another version of fmap
+lift2 will take a binary function, m a and m b,
+then it needs an unary callback function to apply on binary(a)(b)'s result
+
+you can always append >>= a->m b to the previous m a to work on that a,
+until you give it an unary function a->r to get the final result r,
+and the whole chain won't evaluate till you give it a->r,
+the whole chain becomes one Cont, waiting for a->r
+
+use >>= to chain Cont
+use >=> to chain ContT
+
+<wonderC[m]> \a -> f a k, this with f and k, construct a unary function for m a
+<wonderC[m]> f is a-> m b
+<wonderC[m]> c >>= f
+<wonderC[m]> phanimahesh[m] and you were right, it is eval m a first then m b
+<wonderC[m]> \a -> f a k, give f the unary k, this will be an unary function
+             for m a, and that \a is the value that m a hold
+<wonderC[m]> and yes, \a is the a in m a                                [20:41]
+<wonderC[m]> give f::a->m b an unary, so it becomes another unary function,
+             pass that unary to m a, and that unary's parameter is the value
+             that m a holding, so a in m a is the a in \a -> f a k      [20:43]
+<wonderC[m]> f a k products the final result                
+
+<jacks2> > liftA2 (+) (Just 10) (Just 20)                               [19:39]
+<lambdabot>  Just 30
+
+a continuation we said has (a->r)->r, not a->r
+we call a->r as an unary function
+
+that lift2 is just liftA2
+
+and that delay function create a continuation, which is the expand version of return,
+every function with f(a,cb){... cb(finalResult)} is a continuation
+
+lift2(format)(hello)(world) will create a new continuation
+which result is "hello" <> "world" 
+so console.log can get it out, also the effect stay, like setTimeout effect
+
+#################################################
+
+#emoji #haskell #unicode #ByteString
+
+{-# LANGUAGE OverloadedStrings #-}
+Data.ByteString.putStrLn $ Data.Text.Encoding.encodeUtf8 "\128308"
+
+"\128308" is an emoji
+
+em = Data.Text.Encoding.encodeUtf8 "\128308"
+this em is the ByteString of emoji
+
+from
+https://unicode.org/emoji/charts/full-emoji-list.html
+we can get the hex number of an emoji
+then 
+https://www.rapidtables.com/convert/number/hex-to-decimal.html
+turn hex to decimal 
+so U+1F600 is 1f600 is 128512
+Data.ByteString.putStrLn $ Data.Text.Encoding.encodeUtf8 "\128512"
+
+128309 is the blue one
+
+########################################
+
+>>= :: m a -> (a -> m b) -> m b
+>>= :: Cont r a -> (a -> Cont r b) -> Cont r b
+
+r = (cont $ \k -> k 9) >>= \x -> (cont $ \k -> k x)
+runCont r (+2) == 11
+
+
+##########################################################
+
+Cont http://blog.sigfpe.com/2008/12/mother-of-all-monads.html
+ContT http://www.haskellforall.com/2012/12/the-continuation-monad.html
+      
+      don't fear the type, every type is inhabited by value!
+
+#############################################################
+
+#ContT
+
+unitAttack :: Target -> (Target -> IO ()) -> IO ()
+unitAttack target todo = do
+           ...
+           todo target
+
+unitAttack target todo :: IO ()
+so we can use do-notation in the right side of '='
+
+todo is the k, the continuation, todo :: Target -> IO ()
+continuation has the type a -> m r
+
+and it same to 
+unitAttack :: Target -> Cont (IO ()) Target
+unitAttack target = Cont $ \todo -> do   --:: IO (), 'cause todo::Target->IO()
+           ...
+           todo target
+
+same to
+unitAttack :: Target -> ContT () IO Target
+
+newtype ContT r m a = ContT { runContT :: (a -> m r) -> m r }
+
+k :: Target -> IO ()
+runContT (unitAttack target) k :: IO ()
+
+
+#Sum #Polymorphic
+
+Sum type can implement Polymorphic 
+
+if it needs to take two continuations, and they haven't the same type
+
+data Hole = Swing Int | Attack Target
+
+unitAttack :: Target -> ContT () IO Hole
+
+damage :: Target -> IO ()
+swingBack :: Int -> IO ()
+
+continue :: Hole -> IO ()
+continue (Swing n) = swingBack n
+continue (Attack t) = damage t
+
+runContT (unitAttack target) continue :: IO ()
+
+even we can do
+data Hole = Hole1 Arg1 Arg2 | Hole2 | Hole3 Arg3 | Hole4
+
+ContT () IO Int have a value ContT (f :: (Int -> IO ()) -> IO ())
+and Int -> IO () is the type of k
+ContT $ \k -> do ...  this do-notation has IO () type
+
+don't fear the type, every type is inhabited by value!
+
+newtype ContT r m a = ContT { runContT :: (a -> m r) -> m r }
+
+ContT () IO Target is a type
+ContT (Target -> IO ()) -> IO () is not a type or a value
+ContT (f :: (Target -> IO ()) -> IO ()) is a value
+
+#inhabited #type #value 
+Just Int is not a value, Just (3 :: Int) is a value
+
+unitAttack :: Target -> ContT () IO Target
+halfAssedCompletion :: Target -> ContT () IO Int
+>=> :: Monad m => (a -> m b) -> (b -> m c) -> a -> m c
+unitAttack >=> halfAssedCompletion :: Target -> ContT () IO Int
+
+The Cont monad is all about chaining these kinds of partial completions together until all the holes are finally filled.
+
+
+from Callback to Continuation
+
+use Kleisli arrow to chain those continuations
+
+largeProgram :: IO ()
+
+largeProgram :: () -> ContT () IO Hole
+nextContribution :: Hole -> ContT () IO NextHole
+secondContribution :: NextHole -> ContT () IO SecondHole
+
+largeProgram >=> nextContribution :: () -> ContT () IO NextHole
+largeProgram >=> nextContribution >=> secondContribution :: () -> ContT () IO SecondHole
+
+handler :: SecondHole -> IO ()
+
+r = runCont ((largeProgram >=> nextContribution >=> secondContribution) ()) handler :: IO ()
+
+put this whole line to main so it will run
+main = r
+
+http://www.haskellforall.com/2012/12/the-continuation-monad.html
+
+#######################################################
+
+the mother of all monads
+
+https://www.schoolofhaskell.com/school/to-infinity-and-beyond/pick-of-the-week/the-mother-of-all-monads
+
+
+import Control.Monad.Cont
+
+-- retun x = cont (\_ -> _ x)
+-- return 1 = cont (\k -> k 1)
+-- a <- return 1   a is 1
+
+ex2 = do
+    a <- cont (\x -> x 1)
+    --    b <- cont (\k -> k 10 ++ k 20)
+    --    b <- cont (\k -> concat [k 10, k 20])
+    b <- cont (\k -> [10, 20] >>= k)
+    -- b <- cont [10,20]
+    return $ a+b
+
+-- test2 = runCont ex2 show
+test2 = runCont ex2 return
+
+-- i is k, i is call/cc
+i x = cont (\fred -> x >>= fred)
+
+run m = runCont m return
+
+test9 = run $ do
+    a <- i [1, 2]
+    b <- i [10,20]
+    return $ a+b
+
+main = print test9
+
+
+--    main = print test2
+-- https://www.schoolofhaskell.com/school/to-infinity-and-beyond/pick-of-the-week/the-mother-of-all-monads
+-- http://blog.sigfpe.com/2008/12/mother-of-all-monads.html
+
+#####################################################
+
+#wechat robot #debian buster 
+
+https://github.com/wechaty/wechaty
+
+apt install nodejs chromium
+apt install npm
+apt remove npm
+re-install npm from
+curl https://www.npmjs.com/install.sh | sudo sh
+
+mkdir del
+cd del
+npm init
+npm install wechaty
+npm mybot.js
+
+const { Wechaty } = require('wechaty') // import { Wechaty } from 'wechaty'
+
+Wechaty.instance() // Global Instance
+.on('scan', (qrcode, status) => console.log(`Scan QR Code to login: ${status}\nhttps://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(qrcode)}`))
+.on('login',            user => console.log(`User ${user} logined`))
+.on('message',       message => console.log(`Message: ${message}`))
+.start()
+
+
+visit that qrcode link via browser
+then use wechat to scan it to login
+
+
+##############################################
+
+Fira Font
+https://github.com/mozilla/Fira/tree/master/ttf
+
+;;; Shift-Tab back for four whitespace
+(defun jusss/back-by-4 () (interactive)
+          ;;;(backward-delete-char-untabify 4)
+          (backward-char 4)
+)
+          
+(global-set-key (kbd "<S-tab>") 'jusss/back-by-4)
+
+(defun my-turn-indentation-off ()
+  (interactive)
+  ;;; disable tab indent
+  (local-set-key (kbd "<tab>") 'tab-to-tab-stop)
+  ;;; enable indent for previous line
+ ;;;(local-set-key (kbd "<tab>") 'indent-relative)
+ (setq tab-width 4)
+)
+
+;;; disable all the tab indent
+(dolist (hook '(perl-mode-hook
+                c-mode-hook
+                haskell-mode-hook
+                java-mode-hook))
+  (add-hook hook 'my-turn-indentation-off))
+
+
+#############################################
+
+;;; Shift-Tab back for four whitespace
+(defun jusss/back-by-4 () (interactive)
+          ;;;(backward-delete-char-untabify 4)
+          (backward-char 4)
+)
+          
+(global-set-key (kbd "<S-tab>") 'jusss/back-by-4)
+
+(defun my-turn-indentation-off ()
+  (interactive)
+  ;;; disable tab indent
+  ;;;(local-set-key (kbd "<tab>") 'tab-to-tab-stop)
+  ;;; enable indent for previous line
+ (local-set-key (kbd "<tab>") 'indent-relative)
+ (setq tab-width 4)
+)
+
+;;; disable all the tab indent
+(dolist (hook '(perl-mode-hook
+                c-mode-hook
+                haskell-mode-hook
+                java-mode-hook))
+  (add-hook hook 'my-turn-indentation-off))
+
+##################################
+
+Arial font show 1111 and jjjjjjjj the same length
+so use a normal Monospace font
+Monospace font is necessary for indentation
+Helvetica is another non-monospace font
+
+(set-default-font "Consolas Bold-10")
+
+#########################################
+
+#auto complete #vim #emacs #indent
+
+in vim 8.x, C-n or C-p will auto complete for some words you already typed, that's wonderful
+
+emacs turn all indent off
+
+(defun my-turn-indentation-off ()
+  (interactive)
+  ;;; disable tab indent
+  ;;;(local-set-key (kbd "<tab>") 'tab-to-tab-stop)
+  ;;; enable indent for previous line
+  (local-set-key (kbd "<tab>") 'indent-relative)
+)
+
+(dolist (hook '(perl-mode-hook
+                cperl-mode-hook
+                c-mode-hook
+                haskell-mode-hook
+                c++-mode-hook
+                java-mode-hook))
+  (add-hook hook 'my-turn-indentation-off))
+
+https://www.emacswiki.org/emacs/TurnAllIndentingOff
+
+#########################################################################
+
+https://github.com/quchen/articles/blob/master/cont_monad.md
+https://jsdw.me/posts/haskell-cont-monad/
+https://stackoverflow.com/questions/9050725/call-cc-implementation
+https://hackage.haskell.org/package/transformers-0.5.6.2/docs/Control-Monad-Trans-Cont.html
+https://blog.oyanglul.us/grokking-monad/part2
+
+import Control.Monad.Trans.Cont
+
+(Cont inC) >>= fn = Cont $ \out -> inC (\a -> (runCont (fn a)) out)
+m >>= k  = Cont $ \c -> runCont m $ \a -> runCont (k a) c
+
+pure val = Cont $ \out -> out val
+return a = Cont ($ a)
+
+
+https://2ality.com/2012/06/continuation-passing-style.html
+http://hackage.haskell.org/package/transformers-0.5.6.2/docs/src/Control.Monad.Trans.Cont.html#Cont
+http://matt.might.net/articles/by-example-continuation-passing-style/
+https://hackage.haskell.org/package/async-2.2.2/docs/Control-Concurrent-Async.html#v:withAsync
+https://hackage.haskell.org/package/stm-2.5.0.0/docs/Control-Monad-STM.html
+https://www.zhihu.com/question/40806617?sort=created
+https://stackoverflow.com/questions/3322540/how-and-why-does-the-haskell-cont-monad-work
+https://www.youtube.com/watch?v=wSg1vIAOCO8
+https://jsdw.me/posts/haskell-cont-monad/
+https://stackoverflow.com/questions/9050725/call-cc-implementation
+https://stackoverflow.com/questions/3322540/how-and-why-does-the-haskell-cont-monad-work
+https://dev.to/yelouafi/algebraic-effects-in-javascript-part-3---delimited-continuations-42hj
+https://www.jianshu.com/p/9ba09fe14208
+https://blog.oyanglul.us/grokking-monad/part2
+#Cont #Continuation #continuation #monad #Monad
+
+#####################################
+
+#backend #webserver #webframe #scotty #sql
+
+http://hackage.haskell.org/package/scotty-0.11.5/docs/Web-Scotty.html#t:ScottyM
+https://taylor.fausak.me/2014/10/21/building-a-json-rest-api-in-haskell/
+http://seanhess.github.io/2015/08/19/practical-haskell-json-api.html
+https://ocharles.org.uk/posts/2014-08-07-postgresql-simple-generic-sop.html
+http://www.lambda-land.com/posts/2017-11-16-postgresql-simple
+http://hackage.haskell.org/package/postgresql-simple-0.6.2/docs/Database-PostgreSQL-Simple.html
+http://adit.io/posts/2013-04-15-making-a-website-with-haskell.html
+
+################################################
+
+typeclass as instance of typeclass
+
+data Dict p where Dict :: p => Dict p; data a :- b = Sub (a => Dict b); class Class b h | h -> b where { cls :: h :- b }; 
+instance Class () (Class b a) where cls = Sub Dict; instance Class () (Eq a) where cls = Sub Dict -- etc
+
+####################################3
+
+communicate within two loops
+
+1. forkIO and killThread
+2. async and withAsync
+3. Systemd to handle the exit and restart or bash script
+4. Continuation
+
+
+del.hs
+
+import System.Exit
+import Control.Concurrent
+sleep = threadDelay . ceiling . (*1000000)
+main = do
+  sleep 5
+  exitWith $ ExitFailure 22
+
+I2T5.sh
+#!/bin/bash
+while :
+do
+  echo "re-run"
+  sleep 2
+  ./del
+done
+
+
+<dsal> There's also some friendly variants  that work with UnliftIO which is
+       handy for doing concurrency in the middle of transformer stacks.
+<jusss> dsal: IORef is not recommend to use ,right?
+<dsal> If you're doing concurrency, just use STM.
+<dsal> It's pretty easy to get right and many dumb things are impossible.
+<dsal> async to make concurrent tasks.  STM transactions to manage state
+       across them.  Super easy.                                        [11:13]
+
+https://hackage.haskell.org/package/async-2.2.2/docs/Control-Concurrent-Async.html#v:withAsync
+#########################################
+
+#ffmpeg ##ffplay
+
+ffplay -vf subtitles=filename=input.mkv input.mkv
+
+ffplay -vf subtitles=401.srt 401.mkv
+
+################################################
+
+re-install npm from
+curl https://www.npmjs.com/install.sh | sudo sh
+
+
+
+##########################################3
+
+install WSL on windows 10
+https://docs.microsoft.com/en-us/windows/wsl/install-win10
+
+run `Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux` in Powershell with administrator
+then resstart,
+install Debian in Windwos Store and Windows Terminal
+
+#########################################
+
 <dminuoso> data Cont r a = Cont { runCont :: (a -> r) -> r }
 
 ###############################################
@@ -4676,9 +5282,9 @@ pacman -Ss haskell-yesod
 <dminuoso> (It does slightly more than that though)
 <masaeedu[m]> it's pretty easy to implement the continuation monad in JS
 
-e.g:
+e.g:  "c >>= f = \k -> c (\a -> f a k)"
 
-```
+``` #continuation #Cont
 const pure = x => cb => cb(x)
 const bind = amb => ma => cb => ma(a => amb(a)(cb))
 const lift2 = f => ma => mb => bind(a => bind(b => pure(f(a)(b)))(mb))(ma)
