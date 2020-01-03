@@ -1,0 +1,12 @@
+1. Press Windows key + R keyboard shortcut to open the Run command.
+2. Type the following path and click "OK":
+%windir%\System32\Tasks\Microsoft\Windows\UpdateOrchestrator
+3. Select the
+Reboot ) (it does not have an extension)
+file right-click it and select "Rename".
+4. Rename the Reboot file to "Reboot.old".
+5. Right-click inside the folder, select "New," and click on "Folder".
+6. Name the New Folder "Reboot".
+7. Now restart your computer. 
+
+https://answers.microsoft.com/en-us/windows/forum/all/disable-windows-10-automatic-restart-after-updates/16f1826d-a796-4de8-ac99-1d625420d265?auth=1
