@@ -1,5 +1,75 @@
+
+
+Lambda cube
+
+Lambda -> Simple typed lambda calculus
+Lambda-2 -> System F (doesn't have dependent type)
+Lambda-P -> STLC + dependent types
+Lambda-P2 -> System F + dependent types
+Lambda-P-Omega-Bar -> CoC the Calculus of Constructions
+lambda-Omega -> System F-omega
+LC 
+Lambda-P-Omega
+Lambda-Omega-Bar -> STLC + higher-kinded type operators
+
+https://cstheory.stackexchange.com/questions/36054/how-do-you-get-the-calculus-of-constructions-from-the-other-points-in-the-lambda
+https://en.wikipedia.org/wiki/Lambda_cube
+-------------------------------------------------------
+let x = 3 
+    y = 2
+in x + y
+
+let x = 1 in let z = x+y in z + 1
+let x=1; z=x+y in z + 1
+
+x + y 
+where
+    x = 3
+    y = 2            
+
+
+pattern matching
+f [] = []
+f (x:xs) = x
+
+but if it's x<0 then 
+you can't have f (x<0) = 1; f x = 2
+
+use guards
+f x
+  | x<0 = 1
+  | otherwise = 2
+
+`guards` in haskell, `cond` in scheme,
+`case` in javascript, 
+also haskell has `case .. of..`
+
+but if-then-else can implement them all
+
+pattern matching, guards |, case..of, if-then-else
+
+using pattern matching to define if-then-else
+if' True a _ = a
+if' False _ b = b
+if' (1 < 2) "yeh" "nah" == "yeh"
+if' ("foo" == "bar") "yeh" "nah" == "nah"
+
+https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/glasgow_exts.html#multi-way-if-expressions
+MultiWayIf since 7.6.1
+if | guard1 -> expr1
+   | ...
+   | guardN -> exprN
+
+---------------------------------------------------------
+#lambda #anonymous #recursive #fixed-point
+x = c x
+eta-convertion
+x y = c x y
+call `x y` in `c x y` will implement recursive of `c x y`
+--------------------------------------------------
 common functions
 https://www.jianshu.com/p/9ba09fe14208
+Data.List Data.Char Data.Prelude Data.Map Data.Set
 
 zipWith (,) "abc" "123" = [('a','1'),('b','2'),('c','3')]
 liftA2 (,) "abc" "123" = [('a','1'),('a','2'),('a','3'),('b','1'),('b','2'),('b','3'),('c','1'),('c','2'),('c','3')]
