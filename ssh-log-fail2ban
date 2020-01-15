@@ -1,0 +1,90 @@
+
+journalctl -u sshd -g Failed
+journalctl -u sshd -n 100 -g Failed   # -g is grep, -n is tail 100
+
+journalctl -u sshd -g Accepted
+
+# check failed login
+sudo journalctl -u sshd -g Failed -n 20000
+
+# ban specific ip for login, or use Fail2Ban
+/etc/hosts.deny
+vsftpd : ALL
+vsftpd : 192.168.1. , .abc.com
+sshd : 192.168.5.5 : spawn /bin/echo `/bin/date` from %h >> /var/log/ssh.log : deny
+sshd : client1.xyz.com : twist /bin/echo “You are prohibited from accessing this service!!” : deny
+sshd 192.168.1.*
+sshd 192.168.1.101, 192.168.1.102, 192.168.1.103
+
+there's also /etc/hosts.allow
+# vi /etc/hosts.allow
+vsftpd : .example.com
+
+---------------------------------------------------------------------------
+
+# Fail2Ban
+
+pacman -S fail2ban
+# cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
+sudo touch /var/log/auth.log
+sudo vim /etc/fail2ban/jail.local
+
+# ban specific IPs
+[DEFAULT]
+# ignoreip = 127.0.0.1/8 123.45.67.89
+
+# The default value of 600 is set to ban an IP for a 10-minute duration.
+# If set to a negative number, the ban will be permanent.
+bantime  = 600
+
+# max retry times
+maxretry = 3
+
+# ban the ip failed to login, maxretry times in findtime, 600 sec is 10 minutes
+findtime = 600
+
+# email alert
+# destmail
+# sendermail
+# sender
+# those need MTA MUA, mutt or mail and postfix or msmtp
+
+[ssh]
+enabled  = true
+port     = 22
+filter   = sshd
+logpath  = /var/log/auth.log
+maxretry = 6
+
+
+systemctl restart fail2ban
+
+systemctl start fail2ban
+systemctl enable fail2ban
+
+there's also fail2ban-client status
+
+# check if it works
+systemctl status fail2ban
+
+# check error if there is
+journalctl -u fail2ban
+
+archlinux there're python 3.7 and 3.8 both on archlinux, weird,
+fail2ban is in python 3.8 site-packages
+python3.7 is default
+import fail2ban, no module named fail2ban
+sudo cp -r /usr/lib/python3.8/site-packages/fail2ban /usr/lib/python3.7/site-packages/
+
+https://www.linode.com/docs/security/using-fail2ban-to-secure-your-server-a-tutorial/
+https://www.smartdomotik.com/2015/02/09/using-etchosts-allow-and-etchosts-deny-to-secure-unix/
+-----------------------------------------
+it won't work on archlinux, so use journalctl
+
+/etc/sshd/sshd_config
+
+LogLevel VERBOSE
+
+sytemctl restart sshd
+
+/var/log/auth.log
