@@ -1,3 +1,8 @@
+git reflog expire
+git gc --prune=now
+git rebase
+git push code bla2
+-------------------------------
 git log  # get the commit id
 git reset --hard commit-id # reset to that version
 git push -f code bla2 # push to remote

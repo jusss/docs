@@ -1,0 +1,11 @@
+code/Haskell/
+cd code
+git filter-branch --force --index-filter 'git rm --cached --ignore-unmatch Haskell/IRC2TelegramM.hs' --prune-empty --tag-name-filter cat -- --all
+
+git push code bla2 --force
+rm -rf .git/refs/original/
+git reflog expire --expire=now --all
+git gc --prune=now
+
+https://help.github.com/en/github/authenticating-to-github/removing-sensitive-data-from-a-repository
+https://www.cnblogs.com/cmsd/p/6880795.html
