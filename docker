@@ -2,3 +2,160 @@ http://www.ruanyifeng.com/blog/2018/02/docker-tutorial.html
 http://www.runoob.com/docker/docker-tutorial.html
 https://hub.docker.com/
 
+image vs container
+
+an instance of an image is called a container,
+if you start this image, you have a running container of this image
+you can have many running containers of the same image.
+
+docker images to see all images
+docker ps to see all running containers
+
+so a running instance of an image is a container
+
+1. create an image
+2. start a container
+3. make changes to the container
+4. save the container back as an image
+
+image is read-only,
+an image can never change,
+modifications to a Docker container aren't saved unless you create another image
+
+you can also share containers, but they're much larger,
+so share images
+
+https://stackify.com/docker-image-vs-container-everything-you-need-to-know/
+
+pacman -S docker
+systemctl start docker
+sudo gpasswd -a john docker
+
+/etc/docker/daemon.json
+{
+  "storage-driver": "overlay2"
+}
+
+pull an image
+docker pull debian
+
+or you can build it with chroot
+Build Debian image with debootstrap:
+
+# mkdir jessie-chroot
+# debootstrap jessie ./jessie-chroot http://http.debian.net/debian/
+# cd jessie-chroot
+# tar cpf - . | docker import - debian
+# docker run -t -i --rm debian /bin/bash
+
+check for running containers
+docker ps 
+
+stop a rnning container
+docker stop <container id>
+
+docker kill <container id>
+docker rm <container id>
+
+list all docker images
+docker images
+
+delete images
+docker rmi <image id>
+
+delete all images
+docker system prune
+
+search image on docker hub
+docker search nginx
+
+get into that container
+
+docker run -it debian /bin/bash
+-d will run it at daemon mode
+
+docker run -itd debian /bin/bash
+docker attach <container id> will get into that container
+but exit from this container will stop it
+
+docker ps get the container id
+use `docker exec -it container-id /bin/bash`
+this won't stop in case you exit it
+
+1. docker run -itd debian /bin/bash
+2. docker ps 
+3. docker exec -it 128331737efa /bin/bash
+
+export container to file
+docker export 128331737efa > ./deb.tar
+
+import that container file, and name the image as deb2
+cat deb.tar | docker import - deb2
+or 
+docker import ./deb.tar deb3
+docker images
+
+----------------------------------------------------
+
+run a web app
+docker pull training/webapp
+docker run -d -P training/webapp python app.py
+-d run at backstage
+-P redir the port inside the container to host
+then run `docker ps` get the info
+or use -p set the port
+docker run -d -p 5000:5000 training/webapp python app.py
+
+you can redir the host port to the container's ssh,
+so you can ssh to that container
+
+docker run -itd -p 20022:22 debian /bin/bash
+this is very like chroot
+
+0. docker run -itd -p 20022:22 debian /bin/bash
+docker ps
+docker exec -it 5d42b816fd16 /bin/bash
+apt update
+apt install openssh-server vim
+exit
+
+1. docker export 5d42b816fd16 > deb5.tar
+docker import ./deb5.tar deb5
+docker images
+docker run -itd -p 20022:22 deb5 /bin/bash
+docker ps
+docker exec -it eb91f01bc263 /bin/bash
+/etc/init.d/ssh start
+useradd -m john
+passwd john
+vim /etc/passwd
+john:x:1000:1000::/home/john/:/bin/bash
+exit
+
+2. ssh -p 20022 john@localhost
+exit
+3. docker export eb91f01bc263 > ./deb9.tar
+docker ps -a     to get all the container id
+docker rm 7caccfd31d2c to delete all the containers
+docker images    to get all the images id
+docker rmi 971452c94376 5d5aa13b6c51 e54b7117e910
+
+docker ps -a
+docker images
+
+docker stop eb91f01bc263
+docker rm eb91f01bc263
+docker rmi a8f839a36350
+docker images
+
+mv deb9.tar docker.debian.tar
+docker import docker.debian.tar debian
+docker run -itd -p 20022:22 debian /bin/bash
+docker ps
+docker exec -it a42b1ac10839  /bin/bash
+/etc/init.d/ssh start
+exit
+ssh  -p 20022 john@localhost
+
+but chroot can work on 32bit OS on 64bit host OS, 
+can docker?
