@@ -1,4 +1,35 @@
 
+
+
+创建一个用户joe，home为/var/user/ 创建时指定/usr/bin/nologin,因为无法su进去，所以随便用个u
+ser生成key pair,然后复制到home的.ssh里面即可
+这样就可以让这个用户以ssh certificate连接但无法登录shell,但可使用ssh tunnel
+ON SERVER:
+mkdir -p /var/ssh-user/joe
+useradd -m -d /var/ssh-user/joe  -s /usr/sbin/nologin joe
+passwd joe 必须给joe设置密码，否则用密钥连接时提示public key denied
+
+# generate ssh key pair
+ssh-keygen -t rsa -b 3077 -f ./.ssh/joe
+# there will be ./.ssh/joe and joe.pub
+# put joe.pub into /var/ssh-user/joe/.ssh/authorized_keys on server
+chown -R joe:joe /var/ssh-user/joe
+chmod 600 /var/ssh-user/joe/.ssh/authorized_keys
+systemctl restart sshd
+# and past ./.ssh/joe to local, done!
+
+ON LOCAL:
+ssh -p 1990 -D 7070 -C -q -N joe@moon -i .ssh/joe
+
+
+TCPKeepAlive yes
+ClientAliveInterval 120
+ClientAliveCountMax 720
+PubkeyAuthentication yes
+
+
+
+
 1.改22为22222
 2. 禁止密码登录，改密钥
 3. iptables设置只允许本地访问22222,映射22223到22222
