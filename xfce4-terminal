@@ -1,3 +1,8 @@
+You can easily disable it by Menu->Edit->Preferences->General->Clipboard-> Show unsafe paste dialog
+
+
+--------------------------------------------
+
 有个MiscDefaultWorkingDir= 留空就是默认上一个tab的目录为新tab的目录
 或者设置为~
 xfce4-terminal的配置文件竟然是scheme, 而且在archlinux上装xfce4-terminal只
