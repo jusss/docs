@@ -1,0 +1,22 @@
+docker pull breakwa11/shadowsocksr
+
+
+docker run -p 1775:1775 -p 1775:1775/udp --env SERVER_PORT=1775 --env PASSWORD=x --env METHOD=chacha20 --env PROTOCOL=origin --env OBFS=http_simple --env PROTOCOLPARAM=104114:m9Rz7o -itd breakwa11/shadowsocksr
+
+
+---------------------------------------------
+docker run -itd breakwa11/shadowsocksr
+docker ps --no-trunc
+
+know 
+
+"/bin/sh -c 'python server.py -p $SERVER_PORT -k $PASSWORD -m $METHOD -O $PROTOCOL -o $OBFS -G $PROTOCOLPARAM'"  
+
+you need use docker --env pass those parameters into that docker, and also redirect port
+
+python server.py -p 443 -k password -m aes-128-cfb -O auth_aes128_md5 -o tls1.2_ticket_auth_compatible
+
+
+reference:
+https://teddysun.com/536.html
+https://docs.docker.com/engine/reference/commandline/run/

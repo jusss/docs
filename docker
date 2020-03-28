@@ -1,3 +1,10 @@
+-v /etc:/etc     mount host directory into container
+-p 80:80 -p 80:80/udp      redirect host TCP and UDP 80 port to container
+--env SERVER_PORT=1775 --env PASSWORD=x    set container's environment
+
+docker run -p 1775:1775 -p 1775:1775/udp --env SERVER_PORT=1775 --env PASSWORD=x --env METHOD=chacha20 --env PROTOCOL=origin --env OBFS=http_simple --env PROTOCOLPARAM=104114:m9Rz7o -itd breakwa11/shadowsocksr
+
+-----------------------------------------------------------
 http://www.ruanyifeng.com/blog/2018/02/docker-tutorial.html
 http://www.runoob.com/docker/docker-tutorial.html
 https://hub.docker.com/
