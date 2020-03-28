@@ -29,6 +29,78 @@ Section "Device"
 	BusID       "PCI:0:2:0"
 EndSection
 
+-----------------------------------------------
+/etc/X11/xorg.conf.d/xorg.conf
+Section "ServerLayout"
+	Identifier     "X.org Configured"
+	Screen      0  "Screen0" 0 0
+	InputDevice    "Mouse0" "CorePointer"
+	InputDevice    "Keyboard0" "CoreKeyboard"
+	Option	"StandbyTime"	"30"
+	Option	"SuspendTime"	"30"
+	Option	"BlankTime"	"30"
+EndSection
+
+Section "Files"
+	ModulePath   "/usr/lib/xorg/modules"
+EndSection
+
+Section "Module"
+	Load  "glx"
+EndSection
+
+Section "InputDevice"
+	Identifier  "Keyboard0"
+	Driver      "kbd"
+EndSection
+
+Section "InputDevice"
+	Identifier  "Mouse0"
+	Driver      "mouse"
+	Option	    "Protocol" "auto"
+	Option	    "Device" "/dev/input/mice"
+	Option	    "ZAxisMapping" "4 5 6 7"
+EndSection
+
+Section "Monitor"
+	Identifier   "Monitor0"
+	VendorName   "Monitor Vendor"
+	ModelName    "Monitor Model"
+	Option	"DPMS"	"true"
+EndSection
+
+Section "Device"
+        Option     "AccelMethod"        "sna"	
+        Option     "DRI"               "3" 	
+        Option     "SwapbuffersWait"    "true"
+        Option     "TearFree"           "true"	
+	Identifier  "Intel Graphics"
+	Driver      "intel"
+	BusID       "PCI:0:2:0"
+EndSection
+
+Section "Screen"
+	Identifier "Screen0"
+	Device     "Card0"
+	Monitor    "Monitor0"
+	DefaultDepth 24
+	SubSection "Display"
+		Viewport   0 0
+		Depth     24
+	EndSubSection
+EndSection
+
+-----------------------------------------------------
+/etc/X11/xorg.conf.d/30-touchpad.conf
+Section "InputClass"
+	Identifier "Elan Touchpad"
+	Driver "libinput"
+	MatchIsTouchpad "on"
+	Option "Tapping" "on"
+	Option "TappingButtonMap" "lmr"
+EndSection
+
+
 
 
 
