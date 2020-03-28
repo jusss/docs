@@ -1,0 +1,35 @@
+after 2013, intel xorg driver has some bugs,
+suggest use `uxa` instead of `sna`
+and there're still some screen tearing bugs
+even chromium and firefox have this screen tearing issue when 
+browse websites and watch videos on websites
+
+now, change `Identifier` in `Device` section in /etc/X11/xorg.conf.d/20-intel.conf
+
+before
+
+Section "Device"
+        Option     "AccelMethod"        "uxa"	
+        Option     "SwapbuffersWait"    "true"
+        Option     "TearFree"           "true"	
+	Identifier  "Card0"
+	Driver      "intel"
+	BusID       "PCI:0:2:0"
+EndSection
+
+after
+
+Section "Device"
+        Option     "AccelMethod"        "sna"	
+        Option     "DRI"               "3" 	
+        Option     "SwapbuffersWait"    "true"
+        Option     "TearFree"           "true"	
+	Identifier  "Intel Graphics"
+	Driver      "intel"
+	BusID       "PCI:0:2:0"
+EndSection
+
+
+
+
+
