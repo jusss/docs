@@ -1,3 +1,8 @@
+install yay from aur
+yay -S nix
+nix-channel --add https://mirrors.tuna.tsinghua.edu.cn/nix-channels/nixpkgs-unstable
+
+-------------------------------
 pacman -Syu show key xxx could not be looked up remotely
 sudo pacman -S archlinux-keyring
 -------------------------------------
