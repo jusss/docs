@@ -1,0 +1,9 @@
+show page virtual view, FvwmPager
+make sure you set the module path in .fvwm2rc
+
+ModulePath /usr/lib/fvwm/2.6.9/
+
+AddToFunc StartFunction
++ I Module      FvwmPager *
+
+Style FvwmPager    NoTitle,  Sticky, WindowListSkip, CirculateSkipIcon, CirculateSkip                                                                                                     
