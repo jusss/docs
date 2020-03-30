@@ -34,3 +34,6 @@ client = yes
 accept=22
 connect=$SERVER:22222
 
+--------------------------------------
+https://serverfault.com/questions/247176/iptables-only-allow-localhost-access
+https://wiki.archlinux.org/index.php/Iptables
