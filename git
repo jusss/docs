@@ -1,0 +1,68 @@
+# show who modified the file and what he modified
+git blame filename 
+
+# get one file's all commit id, author and time
+git log filename 
+
+# get files's difference with two commits in history, this may contain many files
+git diff commitId1 commitId2
+
+# difference caused by the latest commit, this show whole tree every file's changes
+git diff HEAD~1
+
+# just for a single file
+git diff HEAD~1 filename
+
+# revert a single file in a commit which may change many files
+git checkout commitId  -- filename
+git commit
+git checkout HEAD filename # make the working tree match HEAD
+
+# git checkout commitId -- filename # jump to an old verion
+# git checkout HEAD -- filename  # jump back, nothing changed, no need for commit
+# you can even after jump to an old version then git checkout -b newBranch to let
+# that old verion to be a new branch, then git checkout HEAD -- file jump back
+
+# revert whole tree to an old version
+git log # get whole tree's commitId
+git checkout commitId # detach the tree's HEAD, and revert it to the commitId version
+# remember the lastest commitId so you can come back
+# or git reset --hard commit-id # reset to that version
+
+# make a new branch
+git checkout -b newBranchName # create a new branch
+
+# switch branch
+git checkout anotherBranch
+
+
+HEAD = HEAD^0
+HEAD^1 = HEAD~1 is previous commit from latest, I don't like it, I prefer commitId
+
+git checkout HEAD^0  # return the last commit on tree
+or git checkout HEAD~x # x is the number of commits to go back
+
+checkout is like switch to somewhere then mark it as something
+
+image branch as a tree, and all the files like leafs on the tree
+and every leaf has its HEAD and grow log
+
+HEAD is the latest commit, 
+
+
+
+
+
+
+-- mark it as a path
+As the error states, it would not be possible to know if path/to/file is 
+a file path or a tree-ish, so it is always parsed as a tree-ish, 
+and arguments after -- are parsed as paths.
+
+If you have a file named bar and a branch named bar, 
+how would git know which to remove? 
+
+For example, imagine your repository has a file named master in its root. 
+Then git checkout master would checkout the branch master. 
+But git checkout -- master would check out the file master of the current 
+HEAD and replace the local master file with the version of that revision.
