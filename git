@@ -16,6 +16,15 @@ git diff HEAD~1 filename
 # show a single file's whole changes history
 git log -p filename
 
+# show the difference of a single file between two commit
+git log filename # get all commit id
+git checkout commitId1 filename # rollback to one old version
+cp filename /tmp/file1
+git checkout commitId2 filename # rollback to anoter version
+cp filename /tmp/file2
+git checkout HEAD filename # rollback to latest
+diff -u /tmp/file1 /tmp/file2 # show the changes
+
 # change a single file but without commit, you want to revert it
 git checkout HEAD -- filename
 
