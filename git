@@ -13,6 +13,12 @@ git diff HEAD~1
 # just for a single file
 git diff HEAD~1 filename
 
+# show a single file's whole changes history
+git log -p filename
+
+# change a single file but without commit, you want to revert it
+git checkout HEAD -- filename
+
 # revert a single file in a commit which may change many files
 git checkout commitId  -- filename
 git commit
