@@ -1,0 +1,9 @@
+vim -d /tmp/tv1 /tmp/tv2
+
+M-x ediff-files on emacs
+
+pacman -S meld
+meld /tmp/tv1 /tmp/tv2
+
+pacman -S kdiff3
+kdiff3 /tmp/tv1 /tmp/tv2
