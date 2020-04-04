@@ -43,6 +43,11 @@ vim 按q进入recording宏录制
 4.按q停止宏录制
 5.按@再按缓冲器名字调用宏
 输入数字再@再宏名，执行多次宏
+
+~/.vimrc
+"disable macro recording"
+map q <Nop>
+
 --------------------------------------
 :e! 切换Buffer(only work in vi)
 :X 加密文件
