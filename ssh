@@ -1,4 +1,43 @@
+On Server
 
+ssh over ssl onle
+
+#!/bin/bash
+systemctl start iptables
+systemctl enable iptables
+iptables -A INPUT -i lo -p tcp --dport 1990 -j ACCEPT
+iptables -A INPUT -p tcp --dport 1990 -j DROP
+iptables-save -f /etc/iptables/iptables.rules
+
+/etc/stunnel/stunnel.conf
+cert = /etc/stunnel/server.pem
+sslVersion = TLSv1
+pid = /stunnel.pid
+socket = l:TCP_NODELAY=1
+socket = r:TCP_NODELAY=1
+
+[sshd]
+accept = 22222
+connect = 22
+TIMEOUTclose = 0
+
+[openvpn]
+accept = 20183
+connect = 20182
+
+On Local:
+
+/etc/stunnel/stunnel.conf
+pid = /tmp/stunnel.pid
+sslVersion = TLSv1
+client = yes
+[ssh2]
+accept=22
+connect=$SERVER:22222
+
+--------------------------------------
+https://serverfault.com/questions/247176/iptables-only-allow-localhost-access
+https://wiki.archlinux.org/index.php/Iptables
 
 
 创建一个用户joe，home为/var/user/ 创建时指定/usr/bin/nologin,因为无法su进去，所以随便用个u
