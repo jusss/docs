@@ -60,6 +60,8 @@ connect=127.0.0.1:19900
 
 
 ssh -p 1990 user@localhost
+
+ssh -XY -p 1990 user@localhost      X11 Forwarding
 scp -P 1990 user@server:/path/to/file /tmp
 
 ssh over ssl over kcp
@@ -67,5 +69,47 @@ ssh over stunnel over kcptun
 
 Proxy
 ssh -D 1080 -C -q -N -p 1990 user@localhost
+ssh -D 1080 -C -q -N -p 1990 user@localhost -i ~/.ssh/user
 
 firefox set proxy localhost:1080
+
+
+[john@moon kcptun]$ cat ssh.sh 
+#!/bin/bash
+count=1
+while :
+do
+	echo $count >> ./re-run-times
+	date >> ./re-run-times
+    ssh -D 1080 -C -q -N -p 1990 user@moon -i ~/.ssh/user
+	sleep 3
+	count=$((count+1))
+done
+
+
+with proxychains you can play youtube video with mpv
+pacman -S youtube-dl
+proxychains mpv 'youtube-link'
+proxychains youtube-dl 'pornhub-link'
+
+
+
+there's also udp2raw for fake udp to icmp 
+but udp2raw only work for udp, not tcp, so it needs kcptun to convert tcp to udp
+
+
+there's also you can do
+`proxychains emacs` to install elpa packages through socks proxy,
+this proxy can be proxychains -> ssh -> stunnel -> kcptun -> kcptun:remote -> stunnel -> sshd
+
+
+[john@moon ~]$ grep -v '#' /etc/proxychains.conf 
+strict_chain
+proxy_dns 
+remote_dns_subnet 224
+tcp_read_time_out 15000
+tcp_connect_time_out 8000
+
+[ProxyList]
+socks5 127.0.0.1 1080
+
