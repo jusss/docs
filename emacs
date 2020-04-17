@@ -1,3 +1,85 @@
+there's also you can do
+`proxychains emacs` to install elpa packages through socks proxy,
+this proxy can be proxychains -> ssh -> stunnel -> kcptun -> kcptun:remote -> stunnel -> sshd
+
+--------------------------------------------
+C-x C-f /ssh:user@remote#port:/path/to/a.py
+this a.py buffer is in tramp-mode
+in this buffer, M-& will run async shell command
+in this buffer,M-x auto-revert-tail-mode RET runs similarly showing continuous output. 
+M-& run `async-shell-command`, in tramp-mode, async-shell-command will auto use remote shell, not local shell
+https://www.gnu.org/software/tramp/#Remote-processes
+
+;;; in tramp-mode buffer, M-x shell RET, will open remote shell
+(defun my-haskell-compile ()
+  (interactive)
+  (if (string-match "^/ssh:.*?:" (buffer-file-name (current-buffer)))
+      ;;; if tramp-mode on remote
+      (progn
+        (write-region (point-min) (point-max) (concat (buffer-file-name) ".tmp"))
+        (setq tmp-file (concat
+              (substring (buffer-file-name) 
+                         (+ 1 (string-match ":/.*" (buffer-file-name)))
+                         (length (buffer-file-name)))
+              ".tmp")))
+      ;;; on local
+      (progn (setq tmp-file (concat (buffer-file-name) ".tmp"))
+             (write-region (point-min) (point-max) tmp-file)))
+
+  (async-shell-command (concat "runghc " tmp-file)))
+
+(electric-indent-mode -1)
+(add-hook 'haskell-mode-hook
+	  (lambda () (local-set-key (kbd "<f5>") 'my-haskell-compile)
+      (haskell-indentation-mode -1)
+      (haskell-indent-mode 1) ;;; just won't work, I don't know why
+     ))
+
+--------------------------------------------------------------------
+(substring "/ssh:user@remote:/path/to/files" (string-match ":/.*" "/ssh:user@remote:/path/to/files") nil)
+":/path/to/files"
+
+
+(substring "/ssh:user@remote:/path/to/files" (+ 1 (string-match ":/.*" "/ssh:user@remote:/path/to/files")) (length "/ssh:user@remote:/path/to/files"))
+"/path/to/files"
+
+
+(defun my-python-compile ()
+  (interactive)
+  (setq tmp-file (concat (buffer-file-name) ".tmp"))
+  (write-region (point-min) (point-max) tmp-file)
+  (async-shell-command (concat "python " tmp-file)))
+
+(add-hook 'python-mode-hook
+          (lambda () (local-set-key (kbd "<f5>") 'my-python-compile)))
+
+(defun my-haskell-compile ()
+  (interactive)
+  (setq tmp-file (concat (buffer-file-name) ".tmp.hs"))
+  (write-region (point-min) (point-max) tmp-file)
+  (async-shell-command (concat "runghc " tmp-file)))
+
+(electric-indent-mode -1)
+(add-hook 'haskell-mode-hook
+	  (lambda () (local-set-key (kbd "<f5>") 'my-haskell-compile)
+      (haskell-indentation-mode -1)
+      (haskell-indent-mode 1) ;;; just won't work, I don't know why
+     ))
+
+this can run python and haskell code in shell mode,you can input 
+something to the async shell buffer
+----------------------------
+in tramp-mode, run M-x shell will open remote shell,
+but how to run remote shell command via a key binding?
+like press F5 to run "python a.py" in remote, answer is above
+
+--------------------------
+<jusss> what this (interactive) do?  [16:51]
+<refusenick> jusss: It means you can call the function via M-x  [16:52]
+<refusenick> It makes the function interactive.
+<jusss> refusenick: ok
+<refusenick> C-h f interactive
+------------------------------------
 <jusss> C-x o I can jump another filed, how I can reverse?
 <jusss> jump back?
 <str1ngs> jusss: C-u -1 C-x o IIRC  [23:55]

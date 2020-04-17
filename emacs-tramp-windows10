@@ -1,6 +1,39 @@
+C-x C-f /ssh:user@remote#port:/path/to/a.py
+this a.py buffer is in tramp-mode
+in this buffer, M-& will run async shell command
+in this buffer,M-x auto-revert-tail-mode RET runs similarly showing continuous output. 
+M-& run `async-shell-command`, in tramp-mode, async-shell-command will auto use remote shell, not local shell
+https://www.gnu.org/software/tramp/#Remote-processes
+
+;;; in tramp-mode buffer, M-x shell RET, will open remote shell
+(defun my-haskell-compile ()
+  (interactive)
+  (if (string-match "^/ssh:.*?:" (buffer-file-name (current-buffer)))
+      ;;; if tramp-mode on remote
+      (progn
+        (write-region (point-min) (point-max) (concat (buffer-file-name) ".tmp"))
+        (setq tmp-file (concat
+              (substring (buffer-file-name) 
+                         (+ 1 (string-match ":/.*" (buffer-file-name)))
+                         (length (buffer-file-name)))
+              ".tmp")))
+      ;;; on local
+      (progn (setq tmp-file (concat (buffer-file-name) ".tmp"))
+             (write-region (point-min) (point-max) tmp-file)))
+
+  (async-shell-command (concat "runghc " tmp-file)))
+
+(electric-indent-mode -1)
+(add-hook 'haskell-mode-hook
+	  (lambda () (local-set-key (kbd "<f5>") 'my-haskell-compile)
+      (haskell-indentation-mode -1)
+      (haskell-indent-mode 1) ;;; just won't work, I don't know why
+     ))
+
 on Linux:
 C-x C-f /ssh:root@moon#22:/path/to/files
 
+on Windows:
 1. download plink from https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html
 https://the.earth.li/~sgtatham/putty/0.73/w64/plink.exe
 2. put plink.exe to your Path
