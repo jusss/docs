@@ -1,3 +1,28 @@
+telegram-cli, nctelegram based on pytg and telegram-cli
+but telegram-cli doesn't provide proxy,
+so use redsocks + iptables redirect the connection to ssh tunnel
+
+1. install redsocks
+yay -S redsocks
+
+2. edit the config
+sudo vim /etc/redsocks.conf
+let's assume ssh socks proxy tunnel listen on localhost:1080,
+so change that redsocks.conf to connect to 1080
+
+3. edit the iptables
+sudo vim /etc/iptables/redsocks.rules
+redirect tcp connection to redsocks
+
+4. run redsocks
+cd /etc; sudo redsocks
+
+5. run iptables
+sudo iptables-restore < /etc/iptables/redsocks.rules
+sudo iptables -t nat -F # to clear it
+
+
+-----------------------------------------
 +86 international prefix phone number for China
 download Telegram from App Store on iPhone,
 registe with china telecom +86 180 xxxx xxxx, I can't get auth code sent by telegram
