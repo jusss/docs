@@ -1,3 +1,13 @@
+GuixSD vs NixOS
+guix vs nix
+--------------------------------------------
+ 
+
+there're three ways to handle remote disconnected without an exit signal,
+the normal way is recv length 0 or empty string,
+but we can use recv/send timeout exceptions
+or ping/pong from ICMP protocal to detect that
+------------------------------------------
 
 #clear ByteArray
 
