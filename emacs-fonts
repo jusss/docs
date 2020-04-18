@@ -1,0 +1,40 @@
+C-h h can't show proper fonts, 
+even
+(require 'unicode)
+(unicode-fonts-setup)
+
+then install some fonts like Symbola
+
+yay -S symbola
+sudo pacman -S noto-fonts noto-fonts-cjk noto-fonts-emoji noto-fonts-extra ttf-croscore dina-font ttf-sazanami ttf-ubuntu-font-family
+
+https://wiki.archlinux.org/index.php/Fonts_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)#%E9%98%BF%E6%8B%89%E4%BC%AF%E5%92%8C%E4%B9%8C%E5%B0%94%E9%83%BD%E6%96%87%E5%AD%97
+
+https://aur.archlinux.org/ttf-mac-fonts.git
+
+in C-h h buffer,
+point on character
+M-x describe-char
+will get the font name
+
+
+    xft:-CTDB-Fira Mono-normal-normal-normal-*-19-*-*-*-m-0-iso10646-1 (#x11)
+
+              display: by this font (glyph code)
+
+    xft:-WenQuanYi-WenQuanYi WenQuanYi Bitmap Song-normal-normal-normal-*-16-*-*-*-*-*-iso10646-1 (#x2384)o
+
+              display: by this font (glyph code)
+
+
+
+;;; fonts settings begin                                                              
+(set-face-attribute 'default nil :font "Droid Sans Mono")
+;;;(set-face-attribute 'default nil :font "CamingoCode:style=Bold")
+(set-fontset-font t 'han "WenQuanYi WenQuanYi Bitmap Song")
+(set-fontset-font t 'latin "Noto Sans")
+;;; C-h h point on character, M-x describe-char get the font name
+;;; fc-list show all the fonts name
+;;; https://idiocy.org/emacs-fonts-and-fontsets.html
+;;; fonts settings end
+
