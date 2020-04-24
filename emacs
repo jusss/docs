@@ -1,3 +1,131 @@
+----------------------------------------------------------
+;;; https://emacs.stackexchange.com/questions/42172/run-elisp-when-async-shell-command-is-done
+;;; https://stackoverflow.com/questions/34857843/kill-emacss-async-shell-command-buffer-if-command-is-terminated
+
+(defun my-python-compile ()
+  (interactive)
+  (if (string-match "^/ssh:.*?:" (buffer-file-name (current-buffer)))
+      ;;; if tramp-mode on remote
+      (progn
+        (write-region (point-min) (point-max) (concat (buffer-file-name) ".tmp"))
+        (setq tmp-file (concat
+              (substring (buffer-file-name) 
+                         (+ 1 (string-match ":/.*" (buffer-file-name)))
+                         (length (buffer-file-name)))
+              ".tmp"))
+        )
+      ;;; on local
+      (progn (setq tmp-file (concat (buffer-file-name) ".tmp"))
+             (write-region (point-min) (point-max) tmp-file)))
+  (let* ((proc (progn
+                 (async-shell-command (concat "python " tmp-file))
+                 (switch-to-buffer-other-window "*Async Shell Command*")
+                 (get-buffer-process "*Async Shell Command*"))))
+    (if (process-live-p proc)
+        (set-process-sentinel proc #'after-async-done)
+      (message "No process running."))))
+
+(defun after-async-done (process signal)
+  (when (memq (process-status process) '(exit signal))
+    (back-to-code-buffer)
+    (shell-command-sentinel process signal)))
+
+(defun back-to-code-buffer ()
+  (interactive)
+  (switch-to-buffer-other-window 
+   (substring (car (last (split-string tmp-file "/"))) 0 -4)))
+
+(add-hook 'python-mode-hook
+          (lambda () (local-set-key (kbd "<f5>") 'my-python-compile)))
+
+;;; in tramp-mode buffer, M-x shell RET, will open remote shell
+(defun my-haskell-compile ()
+  (interactive)
+  (if (string-match "^/ssh:.*?:" (buffer-file-name (current-buffer)))
+      ;;; if tramp-mode on remote
+      (progn
+        (write-region (point-min) (point-max) (concat (buffer-file-name) ".tmp"))
+        (setq tmp-file (concat
+              (substring (buffer-file-name) 
+                         (+ 1 (string-match ":/.*" (buffer-file-name)))
+                         (length (buffer-file-name)))
+              ".tmp")))
+      ;;; on local
+      (progn (setq tmp-file (concat (buffer-file-name) ".tmp"))
+             (write-region (point-min) (point-max) tmp-file)))
+
+  (let* ((proc (progn
+                 (async-shell-command (concat "runghc " tmp-file))
+                 (switch-to-buffer-other-window "*Async Shell Command*")
+                 (get-buffer-process "*Async Shell Command*"))))
+    (if (process-live-p proc)
+        (set-process-sentinel proc #'after-async-done)
+      (message "No process running."))))
+
+(electric-indent-mode -1)
+(add-hook 'haskell-mode-hook
+	  (lambda () (local-set-key (kbd "<f5>") 'my-haskell-compile)
+      (haskell-indentation-mode -1)
+      (haskell-indent-mode 1) ;;; just won't work, I don't know why
+     ))
+;;; http://haskell.github.io/haskell-mode/manual/latest/Indentation.html#Indentation
+;;;(add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
+
+(setq compilation-save-buffers-predicate '(lambda () nil))
+(setq compilation-always-kill t)
+
+----------------------------------------------
+reference 
+
+https://stackoverflow.com/questions/34857843/kill-emacss-async-shell-command-buffer-if-command-is-terminated
+
+What you are looking for is Process Sentinels.
+
+The sentinel for *Async Shell Command* is shell-command-sentinel.
+
+You can advise it:
+
+(defun my-kill-buffer-when-done (process signal)
+  (when (and (process-buffer process)
+             (memq (process-status process) '(exit signal)))
+    (kill-buffer (process-buffer process))))
+
+(defun my-kill-async-buffer-when-done ()
+  (let ((process (get-buffer-process "*Async Shell Command*")))
+    (add-function :after (process-sentinel process) #'kill-buffer-when-done)))
+
+(add-function :after #'async-shell-command #'my-kill-async-buffer-when-done)
+
+PS. I did not test the above code, mostly because I think it is a horrible idea: you want to examine the content of *Async Shell Command* before killing it. However, I hope reading the code and links above will help you become a more proficient Emacs user.
+
+
+https://emacs.stackexchange.com/questions/42172/run-elisp-when-async-shell-command-is-done
+
+You can specify the output buffer for async-shell-command. The shell runs as a process of the output buffer. You can get that process with get-buffer-process. Define your own process sentinel for the shell and set it with set-process-sentinel. It is wise to run shell-command-sentinel from your sentinel since that is the sentinel actually set by async-shell-command.
+
+Note that the output buffer may not be associated with any other process when you call async-shell-command. Otherwise an other buffer could be used as process buffer for the shell command (see the documentation of the variable async-shell-command-buffer).
+
+There follows an example:
+
+(defun do-something (process signal)
+  (when (memq (process-status process) '(exit signal))
+    (message "Do something!")
+    (shell-command-sentinel process signal)))
+
+(let* ((output-buffer (generate-new-buffer "*Async shell command*"))
+       (proc (progn
+               (async-shell-command "sleep 10; echo Finished" output-buffer)
+               (get-buffer-process output-buffer))))
+  (if (process-live-p proc)
+      (set-process-sentinel proc #'do-something)
+    (message "No process running.")))
+--------------------------------------------------------
+
+emacs neotree, treemacs + projectile + lsp, more look like an IDE
+also doom-themes
+package install use-package RET
+
+---------------------------------
 there's also you can do
 `proxychains emacs` to install elpa packages through socks proxy,
 this proxy can be proxychains -> ssh -> stunnel -> kcptun -> kcptun:remote -> stunnel -> sshd
