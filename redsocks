@@ -1,3 +1,33 @@
+redsocks2 instead of redsocks
+
+1. start ssh tunnel on 1080
+2. vim /etc/redsocks2.conf, 31338 -> 1080, tcpdns lan ip as dns server,
+becuase dnscrypt take 127.0.0.1
+3. vim /etc/iptables/redsocks2.rules
+-A OUTPUT -p tcp -m owner --uid-owner ruby -j REDSOCKS
+4. sudo redsocks2 -c /etc/redsocks2.conf
+5. sudo iptables-restore /etc/iptables/redsocks2.rules
+
+
+
+To launch redsocks2:
+
+1. Start an ssh tunnel on port 4711
+2. Start the redsocks2 and iptables daemons:
+
+    rc.d start redsocks2 iptables
+
+3. Load the redsocks2 iptables rules:
+
+    iptables-restore /etc/iptables/redsocks2.rules
+
+
+https://aur.archlinux.org/redsocks2-git.git
+https://github.com/Intika-Linux-Proxy/Red-Socks-2
+
+
+
+--------------------------------------
 redsocks或者brook的 tunnel udp都需要指定目的地址，这有点难用，要使用udp需要先知道它跟where连接
 不知道openvpn基于udp的部分是怎么实现的，它不需要先知道具体地址
 -------------------------------------

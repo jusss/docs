@@ -1,0 +1,59 @@
+
+matched by user to instead of matched by pid or program names
+then run program by the particular user
+let's assume that ssh socks5 proxy tunnel listen on localhost:1080
+
+1. add user
+useradd -m ruby
+passwd ruby
+cp .telegram-cli /home/ruby -r
+cp .ncTelegram.conf /home/ruby
+chown -R ruby:ruby /home/ruby
+
+2. run redsocks, just like stunnel for ssl tunnel, redsocks is for socks tunnel, or
+consider iptables transparent proxy
+cd /etc
+vim redsocks.conf # set the listen port as 31338 to 1080 for tcp
+sudo redsocks
+
+3. iptables redirect all packets matched by user ruby
+sudo iptables -t nat -A OUTPUT -p tcp -m owner --uid-owner ruby -j REDIRECT --to-port 31338
+# sudo iptables -t nat -F to clear
+
+4. run telegram-cli or nctelegram by user
+su ruby
+cd
+nctelegram
+
+5. also this work for other applications like chromium
+just run any applications by user ruby, will use that proxy tunnel,
+and tcp only, 'cause redsocks doesn't work for udp
+about dns, use dnscrypt-proxy to solve
+
+run by user ruby
+chromium -> iptables -> redsocks -> ssh -> stunnel -> kcptun -> remote
+
+another way is using VPN for global proxy inside a docker
+
+------------------------
+is there a way to make iptables redirect packages by program name or pid?
+sheep :whatatiming: why do you want to do that? And what do you mean by "redirect"?
+I want to use nctelegram, but I have to use a proxy for it, and proxychains nctelegram won't work
+but proxychins telegram-cli works,
+nctelegram is based on telegram-cli, I think it's just a front-end for telegram-cli
+so proxychains nctelegram won't work
+sheep :you might be able to use the iptables owner module
+
+so I wonder if I can use iptables to set a rule, that redirect all packages to a transparent socks tunnel when those packages matched
+sheep :it doesn't look like -m owner has PID or process name options
+sheep :check iptables -m owner --help. I'm using a custom kernel and nftables so that command doesn't work for me
+this iptables owner module can redirect all packages that matched the user?
+sheep :it matches packets
+sheep :it matches packets
+sheep :you can then have those packets jump to a chain that does the redirectionm
+sheep :I am not sure if the owner module can actually match by process name yet thoughsheep :it can definitely match by user id
+sheep :I also don't know if iptables can redirect connections over SOCKS5 or HTTP
+so if I run the program by user john, and I can use iptables owner module to redirect all packets from john, right?
+there's redsocks
+sheep :yes
+redsocks can provide socks proxy, like stunnel for ssl
