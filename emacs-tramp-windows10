@@ -1,3 +1,86 @@
+(require 'tramp)
+(customize-set-variable
+           'tramp-ssh-controlmaster-options
+           (concat
+             "-o ControlPath=/tmp/ssh-ControlPath-%%r@%%h:%%p "
+             "-o ControlMaster=auto -o ControlPersist=yes"))
+
+;;; https://emacs.stackexchange.com/questions/42172/run-elisp-when-async-shell-command-is-done
+;;; https://stackoverflow.com/questions/34857843/kill-emacss-async-shell-command-buffer-if-command-is-terminated
+(defun my-python-compile ()
+  (interactive)
+  (if (string-match "^/ssh:.*?:" (buffer-file-name (current-buffer)))
+      ;;; if tramp-mode on remote
+      (progn
+        (write-region (point-min) (point-max) (concat (buffer-file-name) ".tmp"))
+        (setq tmp-file (concat
+              (substring (buffer-file-name) 
+                         (+ 1 (string-match ":/.*" (buffer-file-name)))
+                         (length (buffer-file-name)))
+              ".tmp"))
+        )
+      ;;; on local
+      (progn (setq tmp-file (concat (buffer-file-name) ".tmp"))
+             (write-region (point-min) (point-max) tmp-file)))
+  (let* ((proc (progn
+                 (async-shell-command (concat "python " tmp-file))
+                 (switch-to-buffer-other-window "*Async Shell Command*")
+                 (get-buffer-process "*Async Shell Command*"))))
+    (if (process-live-p proc)
+        (set-process-sentinel proc #'after-async-done)
+      (message "No process running."))))
+
+(defun after-async-done (process signal)
+  (when (memq (process-status process) '(exit signal))
+    (back-to-code-buffer)
+    (shell-command-sentinel process signal)))
+
+(defun back-to-code-buffer ()
+  (interactive)
+  (switch-to-buffer-other-window 
+   (substring (car (last (split-string tmp-file "/"))) 0 -4)))
+
+(add-hook 'python-mode-hook
+          (lambda () (local-set-key (kbd "<f5>") 'my-python-compile)
+                     (local-set-key (kbd "C-c r") 'my-python-compile)))
+
+;;; in tramp-mode buffer, M-x shell RET, will open remote shell
+(defun my-haskell-compile ()
+  (interactive)
+  (if (string-match "^/ssh:.*?:" (buffer-file-name (current-buffer)))
+      ;;; if tramp-mode on remote
+      (progn
+        (write-region (point-min) (point-max) (concat (buffer-file-name) ".tmp"))
+        (setq tmp-file (concat
+              (substring (buffer-file-name) 
+                         (+ 1 (string-match ":/.*" (buffer-file-name)))
+                         (length (buffer-file-name)))
+              ".tmp")))
+      ;;; on local
+      (progn (setq tmp-file (concat (buffer-file-name) ".tmp"))
+             (write-region (point-min) (point-max) tmp-file)))
+
+  (let* ((proc (progn
+                 (async-shell-command (concat "runghc " tmp-file))
+                 (switch-to-buffer-other-window "*Async Shell Command*")
+                 (get-buffer-process "*Async Shell Command*"))))
+    (if (process-live-p proc)
+        (set-process-sentinel proc #'after-async-done)
+      (message "No process running."))))
+
+(electric-indent-mode -1)
+(add-hook 'haskell-mode-hook
+	  (lambda () (local-set-key (kbd "<f5>") 'my-haskell-compile)
+                 (local-set-key (kbd "C-c r") 'my-haskell-compile)
+      (haskell-indentation-mode -1)
+      (haskell-indent-mode 1) ;;; just won't work, I don't know why
+     ))
+;;; http://haskell.github.io/haskell-mode/manual/latest/Indentation.html#Indentation
+;;;(add-hook 'haskell-mode-hook 'turn-on-haskell-indent)
+
+(setq compilation-save-buffers-predicate '(lambda () nil))
+(setq compilation-always-kill t)
+--------------------------------------------------------
 C-x C-f /ssh:user@remote#port:/path/to/a.py
 this a.py buffer is in tramp-mode
 in this buffer, M-& will run async shell command
@@ -38,8 +121,8 @@ on Windows:
 https://the.earth.li/~sgtatham/putty/0.73/w64/plink.exe
 2. put plink.exe to your Path
 3. (setq tramp-default-method "plink")
-4. C-x C-f /plink:root@localhost:/root/path/file
-5. about stunnel, plink use port 22, so make sure stunnel listen on localhost:22
+4. C-x C-f /plink:user@ip#port:/path/to/file, after press C-x C-f just press /
+5. about stunnel, plink use port 22 by default
 
 
 
