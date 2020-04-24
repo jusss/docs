@@ -1,10 +1,132 @@
-django-admin
 
-Model - View - Process
+settings.py -- database, pages, secret_key, installed_apps
+view.py -- show page
+urls.py -- route to view
+migration.py 
+manage.py 
 
-it's kind like Model View Update in Elm
+model
+user
+-------------------------
+debian sid
+apt install gcc python2 # 2.7.16, 2.7.5 is release in 2013, python-275
+curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+ln -s /usr/bin/python2 /usr/bin/python
+python get-pip.py
+pip install pymysql django # 1.11.29
 
+wget http://repo.mysql.com/mysql-apt-config_0.8.13-1_all.deb
+apt install gnupg lsb-release
+dpkg -i mysql-apt-config_0.8.13-1_all.deb
+dpkg-reconfigure mysql-apt-config
+apt update
+apt install mysql-server mysql-client
+
+
+docker run -it --cap-add SYS_ADMIN --security-opt=seccomp:unconfined -v /sys/fs/cgroup:/sys/fs/cgroup:ro -d -p 8080:8080 --name django_server django /sbin/init
+docker exec -it ea8492d21b8d /bin/bash
+systemctl start mysql
+
+#MySQL ERROR 1049, import sql file into database
+# -p mean login with password
+mysql -u root -p
+create database tsdbd;
+mysql -u root -p tsdbd < tsdbd0323.sql
+
+vim setting.py
+in DATABASE set password 123456, 'cause mysql is using root:123456
+
+python manage.py runserver 0.0.0.0:8080
+
+ip a # get the docker ip 172.17.0.1
+visit http://172.17.0.1:8080/ in host
+
+#docker support Chinese
+apt install locales
+vim /etc/locales.gen
+#uncomment zh_CN.UTF8
+locale-gen
+export LC_ALL=zh_CN.UTF-8
+
+
+--------------------------------
+curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+python get-pip.py
+
+apt install python-dev
+pip2 install bce-python-sdk
+
+from django.shortcuts import render, redirect, reverse
+from django.core.urlresolvers import reverse     
+
+-------------------------------
+from outside visit that django web server inside docker
+inside docker
+python manage.py runserver 0.0.0.0:8000
+
+host
+ip a # get the docker ip
+then visit that ip:8000
+
+
+
+
+----------------------------------
+python manage.py migrate
+
+https://stackoverflow.com/questions/11100911/cant-drop-table-a-foreign-key-constraint-fails
+
+
+ERROR 1217 (23000): Cannot delete or update a parent row: a foreign key constraint fails
+
+SET FOREIGN_KEY_CHECKS=0; DROP TABLE bericht; SET FOREIGN_KEY_CHECKS=1;
+
+
+
+-------------------------------------
+Django
+ValueError: Dependency on app with no migrations: 
+https://stackoverflow.com/questions/26207022/custom-user-in-django-raises-valueerror/26207074
+
+    Delete migrations folder in each app
+    Drop table django_migrations
+    Run python3 manage.py makemigrations app1
+    Run python3 manage.py makemigrations app2
+
+manage.py runserver should now work like a charm
+app name can get from apps.py
+
+
+mysql -u root -p       # login mysql
+
+-----------------------------------------
+MySQL: ERROR 1045 Access denied for user
+# 进入mysql
+mysql -u root -p
+# 进入项目使用的数据库
+use test  
+# 运行下面命令
+grant usage on *.* to root@localhost identified by 'password';  # password是进入MySQL设置的密码
+GRANT all privileges on DBNAME.* to 'root'@'localhost' IDENTIFIED BY 'root' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+
+
+重新生成迁移文件： python manage.py makemigrations
+应用数据库迁移： python manage.py migrate
+---------------------------------
+
+
+show tables from database_name;
+use database_name;
+select * from table_name;
+
+-------------------------------------
+Model - View - Process, it's kind like Model View Update in Elm
+
+#1. Create a project
 django-admin startproject HelloWorld     # create the project
+
+#2. Start 
 cd HelloWorld
 python manage.py runserver 0.0.0.0:8000
 
@@ -20,4 +142,44 @@ from django.conf urls import url
 from . import view
 urlpatterns = [
     url(r'^$',view.hello)
+    # path('hello/', view.hello), -- visit localhost:8000/hello
 ]
+
+#3. Create html pages, Template
+HelloWorld/templates/hello.html
+use {{ variable }} to expand in html
+
+HelloWorld/settings.py, point where pages are, also database
+DIRS: [BASE_DIR+"/templates",]
+
+vim view.py
+from django.shortcuts import render
+ 
+def hello(request):
+    context          = {}
+    context['hello'] = 'Hello World!'
+    return render(request, 'hello.html', context)
+
+then visit localhost:8000/hello
+
+
+#4. SQL, Model
+HelloWorld/HelloWorld/settings.py DATABASES set sql
+
+django-admin startapp TestModel
+
+which has models.py admin.py view.py
+
+
+mysql db name, user, password, are in settings.py
+
+
+#5 import sql file into mysql
+apt install mysql-server mysql-client
+/etc/init.d/mysql start
+mysql -u root -p
+
+
+
+mysql -u user_name -p database_name < tsdbd0323.sql
+
