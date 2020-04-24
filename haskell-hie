@@ -1,0 +1,20 @@
+
+https://github.com/hmemcpy/haskell-hie-devcontainer
+
+
+curl -L --proto '=https' --tlsv1.2 https://nixos.org/nix/install | sh
+nix-env -iA cachix -f https://cachix.org/api/v1/install
+cachix use all-hies
+nix-env -iA hies -f https://github.com/domenkozar/hie-nix/tarball/master
+
+https://github.com/domenkozar/hie-nix
+https://github.com/Infinisil/all-hies
+
+Atom
+apm install language-haskell atom-ide-ui ide-haskell-hie
+https://github.com/haskell/haskell-ide-engine#using-hie-with-atom
+
+
+
+https://mega.nz/#!cVBQRY6Q!3_j3HJB18qgXxKmdy6qFIg6vCMoxaPNZXJ3tYJ1GtTg
+https://github.com/zsomegithub/haskell-ide-engine-binaries
