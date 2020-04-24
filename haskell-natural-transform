@@ -1,0 +1,18 @@
+fmap poll [a1,a2,a3] :: [IO (Maybe (Either SomeException ()))]
+how I can get Maybe (Either SomeException ())?
+use Data.Foldable.sequenceA to swap outer monads
+
+sequenceA :: (Traversable t, Applicative f) => t (f a) -> f (t a)
+sequenceA is a NT from Compose t f to Compose f t
+
+you can get a from IO a inside do notation, but you can't get out a from this do notation unless
+you use `unsafePerformIO`, there's globale variable called `IORef`
+
+sequenceA can turn [IO ...] to IO [...]
+
+
+Control.Natural.~>
+Type Synonym for a Natural Transformation
+type (~>) f g = forall x. f x -> g x infixr 0Source#
+
+A natural transformation from f to g.

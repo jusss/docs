@@ -1,3 +1,15 @@
+
+Passing files from PC to iPhone
+
+PC: 
+cp a.mp4 /tmp/
+cd /tmp/
+python -m http.server 8080
+
+iPhone:
+vlc - Network - Downloads - http://PC-IP:8080/a.mp4
+
+--------------------------------------
 pacman -S ifuse libimobiledevice
 modprobe fuse
 connect your iPhone to archlinux, then click trust this computer

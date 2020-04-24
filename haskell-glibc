@@ -1,0 +1,101 @@
+I compiled a code with ghc -optl-static on debian, and I run the executable file on archlinux, and I got "Segmentation fault (core dumped)"
+
+is that normal?
+
+ merijn :whataday: Since you're on linux: yes
+merijn :whataday: glibc has some (intentional) hacks that make it hard, if not impossible, to statically link glibc
+
+merijn :whataday: "don't use glibc"
+John
+function hsnet_getadd    rinfo: warning: Using 'getaddrinfo' in statically linked applications requires at runt    ime the shared libraries from the glibc version used for linking
+merijn :Right, there you go
+
+merijn :Like I said: "don't use glibc", but since that's hardwired into most linux libraries and toolchains that means setting up a custom non-glibc toolchain
+merijn :Using something like musl as libc
+merijn :I think there's an Alpine Linux (uses musl instead of libc) docker container you can use, but I don't know the details
+
+ merijn :whataday: The GHC runtime uses libc, which means glibc on most linux distributions. So you need to build GHC with a different libc (like musl), which in turn requires a C compiler (gcc or clang) which uses musl instead of glibc
+merijn :Note that you also have to build all non-haskell libraries you use with this musl-based gcc
+Athas :I think in practice, most people who produce static Haskell binaries use Nix to get all of the troops in position.
+
+merijn :whataday: This is why I recommended looking for this Alpine Linux docker container, since that already has GHC build with musl :)
+
+yushyin :whataday: alpine linux is one alternative if you don't like to use nix
+
+
+merijn :I think maerwald was looking into this at some point, but I also think this resulted in frustrated ranting about the insanity of glibc, so... :p
+merijn :The damage one zealout can wreak on the entire world >.>
+
+
+why the most distros use glibc?
+why not libc or musl?
+
+ merijn :whataday: libc is a specification, glibc is one possible implementation by GNU. Since linux is based on a GNU core, that's what they use
+John
+merijn then why the binary will crush by using glibc, and musl won't? what's the difference between glibc and musl?
+even they're all implementation of libc
+
+yushyin :'requires at runtime the shared libraries from the glibc version used for linking' because you are missing the right shared library
+
+
+ merijn :whataday: One of the glibc core committers is a "true believer" who thinks static linking is bad
+ merijn :whataday: The hacks that cause glibc to break when linked statically are *intentional*
+merijn :Because one of its core committers doesn't *want* you to statically link it
+
+
+merijn :musl (and the libc used on the various BSDs) work just fine when linked statically
+John
+merijn the glibc core committers must use archlinux!
+
+glibc is dynamic linked, musl is static linked, alpine linux use musl
+1. build ghc and all modules with musl to instead of glibc
+2. link the same glibc verion on the compiled environment and runtime environment
+3. pack all the depends like docker, snap, or AppImage
+
+use `ldd --version` can know the version of glibc
+
+
+if the compiled environment and runtime environment has the same glibc verion, this can run the executable file on both ?
+
+merijn :whataday: That should work, yes
+
+
+merijn :yushyin: THe problem with Arch is that it only installs dynamic libraries for GHC while GHC *by default* links Haskell code statically. So by not installing the static libs any "standard" GHC invocation breaks
+
+merijn :haha, that acme-don't release announcement :D
+
+yushyin :merijn: I dislike the hatespeech I often see here against arch linux while ghc doesn't guarantee abi compatibility for shared libraries (yet). The arch linux builds work ok if you only use them to install haskell tools like pandoc and co. Arch also provides ghc-static. But truth be told I also think the situation with haskell on arch is not great and also I dislike to use distribution provided ghc
+
+yushyin :for developing anyways. I want more control which ghc version per project I gonna use. So I always recommend ghcup (or stack)
+
+merijn :yushyin: GHC is unlikely to ever support ABI compatibility as it doesn't even define an ABI at the moment
+
+
+
+
+ 1 root@localhost:~/haskell-telegram-api/IRC# ghc -optl-static I2T15-II.hs
+  2 Loaded package environment from /root/haskell-telegram-api/.ghc.environment.x86_64-lin    ux-8.6.5
+  3 [1 of 1] Compiling Main             ( I2T15-II.hs, I2T15-II.o )
+  4 Linking I2T15-II ...
+  5 /usr/lib/haskell-packages/ghc/lib/x86_64-linux-ghc-8.6.5/network-2.8.0.1-Hmt657UE3v349    uYmvUXEvW/libHSnetwork-2.8.0.1-Hmt657UE3v349uYmvUXEvW.a(HsNet.o):function hsnet_getadd    rinfo: warning: Using 'getaddrinfo' in statically linked applications requires at runt    ime the shared libraries from the glibc version used for linking
+  6 root@localhost:~/haskell-telegram-api/IRC# 
+  7 
+  8                                                                                       
+~                   
+I have tested that compile code to a binary file which is static linked on alpine
+is OK, alpine use musl to instead of glibc, and musl can be static linked,
+so the binary file can run on cross-distros, 
+compile it on alpine and run it on debian or archlinux
+
+docker pull alpine
+docker run ..
+docker exec ..
+apk update
+apk install ghc
+ghc -optl-static a.hs
+file a
+ldd a
+...
+
+docker cp containerId:/path/to/file  ./
+

@@ -2,6 +2,8 @@
 
 in vim 8.x, C-n or C-p will auto complete for some words you already typed, that's wonderful
 
+also there's a plug-in SuperTab on vim, using tab for C-n or C-p
+
 emacs turn all indent off
 
 (defun my-turn-indentation-off ()

@@ -1,0 +1,13 @@
+1. if and case
+val :: Maybe (Either SomeException ())
+if val == Nothing then ... won't work
+case val of Nothing -> is ok
+
+because == on values of type Maybe a requires that the underlying type a is also comparable
+which is likely not the case for SomeException
+
+otherway, you can use Data.Maybe.maybe or fromMaybe to disassemble it
+
+https://github.com/jusss/code/blob/bla2/Haskell/I2T14.hs#L305 can just point line 305
+
+

@@ -1,3 +1,23 @@
+
+
+
+  docker run -it --cap-add SYS_ADMIN --security-opt=seccomp:unconfined -v /sys/fs/cgroup:/sys/fs/cgroup:ro -d -p 8080:8080 --name django_server django /sbin/init
+  docker exec -it ea8492d21b8d /bin/bash                                                                                                                                                  
+  systemctl start mysql
+  
+
+
+from outside visit that django web server inside docker
+  inside docker
+  python manage.py runserver 0.0.0.0:8000
+  
+  host
+  ip a # get the docker ip
+  then visit that ip:8000
+
+
+
+--------------------------------------------
 -v /etc:/etc     mount host directory into container
 -p 80:80 -p 80:80/udp      redirect host TCP and UDP 80 port to container
 --env SERVER_PORT=1775 --env PASSWORD=x    set container's environment
@@ -165,3 +185,8 @@ ssh  -p 20022 john@localhost
 
 but chroot can work on 32bit OS on 64bit host OS, 
 can docker?
+
+
+copy file from container to host
+
+docker cp 9a36b4ff6f82:/haskell-telegram-api/IRC/I2T15 ./

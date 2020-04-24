@@ -1,4 +1,377 @@
 
+Cygwin, MSYS2, WSL2,
+wsl is not available for windwos 10 32 bit,
+##################################################
+
+FOL, First order logic,
+∀ for all
+∃ exist
+∨ or
+∧ and
+¬ not
+→ then, same as ⇒, x =2 ⇒ x^2 = 4
+↔ x + 5 = y + 2 ↔ x + 3 = y
+⊕ xor, a ⊕ b is true, a and b both can not be true
+⊤ unconditionally true
+⊥ unconditionally false
+∃! there's exactly one exist
+≔ definition
+
+
+######################################################
+
+青山一道同云雨，明月何曾是两乡
+松山虽异域，万里更同心
+山川异域，日月同天
+
+partial ∂ U+2202
+the character ∂ is a stylized cursive d, mainly used as a mathematical symbol
+
+##################################################
+<Solonarv> broadly speaking a "parser" is a program (or part of a program)
+           that takes any text as input, and if that text conforms to a
+           certain format, the parser produces a data structure representing
+           the information in the input more abstractly                 
+<albet70> Solonarv so can we say Data.Text.words is a parser?
+<Solonarv> albet70: yes! a very simple one
+<albet70> Solonarv I find there's a parser called happy , what it used for?
+<phadej> it's a parser generator, think yacc/bison
+<Solonarv> albet70: that's more properly a parser *generator*; you write code
+           in some special-purpose language ( I think it's a superset of
+           Haskell? ), and happy produces ordinary Haskell code which
+           implements a parser
+Related to Template Haskell? 
+<Solonarv> it's not really directly related, no - the only similarity is that
+           both generate Haskell code
+DSL? 
+<Solonarv> sure, the language you describe your parser with (i.e. the input to
+           happy) is a DSL
+
+<albet70> Solonarv related to FFI?
+<Solonarv> no, not really
+
+DSL -> parser -> Haskell code
+###########################################
+
+toText = En.decodeUtf8With lenientDecode
+
+libghc-utf8-string-dev package Data.ByteString.Lazy.UTF8
+
+Data.ByteString.Lazy.UTF8> words $ "你 好"
+
+char8 is not utf-8. It's just... char8.
+It truncates chars to 8 bits.
+Remember, ByteString is not an encoding.  How do you determine what a "word" is if you don't have an encoding?
+Data.ByteString.map can work on ByteString with Word8, but this Word 8 code is get from encoding's codepoint
+
+#######################################
+install scala on intellij idea
+Settings - Plugins - search Scala and install
+New Project - IDEA (not sbt) - Scala SDK Create - Download - choose latest - 
+or just install sbt from scala-lang.org
+then when create Scala Project, choose that installed-directory as Scala SDK
+
+
+###################################################
+
+multiple monadic actions need to be in one do notation,
+
+else
+        let msgList = tokenise "\r\n" msg -- msgList :: [ByteString]
+        -- ["abcd","PING :xxxx","efgh",""]
+        let getPING = Prelude.filter (D.isPrefixOf "PING") msgList
+        if not (Prelude.null getPING) then
+will have an error on parse `let'
+just put those monadic actions into one do notation
+
+else do
+     let ...
+     let ..
+     if ... then do
+        ...
+
+#############################################
+there's no splitOn in Data.ByteString
+but there's decodeUtf8 :: ByteString -> Text in Data.Text.Encoding
+
+Data-ByteString-Lazy-UTF8
+toString :: ByteString -> String
+fromString :: String -> ByteString
+
+Convert a UTF8 encoded bytestring into a Haskell string. Invalid characters are replaced with '\xFFFD'.
+####################################################33
+
+#unicode operator
+λ - U+03BB, C-x 8 RET 03BB RET
+
+:set -XUnicodeSyntax
+ f :: ∀a. a -> a
+ f = id
+https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/glasgow_exts.html#unicode-syntaxw
+
+a letter can't be a operator in haskell
+characters in alphabet are letters
+'f' is a letter, 'f' can't be an operator,
+you can't do `3 f 2`
+λ is a letter too, it can't be an operator
+so f = λa -> a is wrong
+
+\ isn't an operator, it's syntax
+
+(∩) = Data.List.intersect
+[1,2] ∩ [3] 
+∩ is an unicode symbol, it can be an operator 
+
+(≠) = (/=)
+3 ≠ 2
+
+(∈) = elem
+Prelude Data.List> 3 ∈ [1,2]
+False
+Prelude Data.List> 3 ∈ [1,2,3]
+
+ (∪) = union
+[1,2] ∪ [2,3]
+[1,2,3]
+
+#########################################
+
+<Welkin> id :: forall a. a -> a
+<oats> ah, yes, the hidden forall!                                      [10:14]
+<jusss> actually, I did notice that keyword forall, but I haven't see a
+        article tell me what it is
+<Welkin> there is an implicit forall in every type that contains all type
+         variables                                                      [10:15]
+<nitrix> Universal quantification. `a` being a type variable, it has to come
+         from somewhere. Something introduces `a`.
+<nitrix> This becomes more important when you start nesting polymorphic type
+         signatures, they have their own scopes (:                      [10:16]
+<nitrix> e.g. `forall a. a -> (forall b. b -> b) -> a`
+<Welkin> that's existential quantification then, right?                 [10:20]
+<Welkin> for the b -> b
+<nitrix> Yeah. Going towards Rank-2 and such.       
+
+#RankNTypes #rank
+
+rank 1 type is `forall a. T a`
+rank 2 type `(forall a. T a) -> B`
+f :: (forall a. Maybe a) -> Bool is rank 2 type
+f :: (forall a. Maybe a) is rank 1 type
+`forall a. a -> (forall b. b -> b) -> a` is rank 2
+id :: forall a. a -> a is rank 1
+const :: forall a b. a -> b -> a
+
+https://gist.github.com/merijn/77e3fa9757658e59b01d
+
+RankNTypes is used for higher-order function, which parameter is a polymorphic function
+the higher-order function don't know pick what concrete type for polymorphic function, so there will be errors, unless enable RankNTypes
+
+data Foo = Foo Int | Bar Double
+
+mangle :: Num a => (a -> a) -> Foo -> Foo
+mangle f (Foo i) = Foo (f i)
+mangle f (Bar d) = Bar (f d)
+
+mangle don't know pick what concrete type for polymorphic function f,
+so there's an error: Could not deduce (a ~ Int) from the context (Num a)
+
+f :: forall a. Num a => a -> a
+f = id
+f 3.5 == 3.5
+f 3 = 3
+
+f is ad-hoc polymorphic, it can works on Int or Double which are instances of Num
+when f as a parameter to mangle, mangle can't pick a concrete type for f,
+if mangle picks "Int" for f, then f can't work on a "Double"
+that's why we need to enable RankNTypes
+
+about type variables, it needs to be claimed in agda,
+but in haskell, it is auto-claimed, but in rankNType you need forall,
+it can make function A receive a polymorphic function B
+
+"it has to come from somewhere"
+#######################################
+#ad-hoc polymorphism #parametric polymorphism
+
+for all a, that is parametric polymorphism, call "generic" in other languages,
+
+for some a with a constraint, like typeclass, that's ad-hoc,
+
+lookup :: (Eq a) => a -> [(a,b)] -> Maybe b 
+exhibits both parametric (in b) and ad-hoc (in a) polymorphism.
+
+class Foo a where { f :: a -> a };
+instance Foo Int where { f = (+1) };
+instance Foo String where { f = id };  
+this f is ad-hoc, it's only work on Int or String, not all types
+and id is parametric polimorphism, id works on any type
+
+https://wiki.haskell.org/Polymorphism
+######################################
+#polymorphic #type #function
+
+polymorphic function,
+f :: Int -> Int
+f = (+1)
+f :: String -> String
+f = id
+
+it needs a typeclass to do that,
+
+types have functions, `data P = V Int`, you can't `print (V 3)`, 'cause data type P doesn't have function print, unless you make P as an instance of Show
+
+data P = V Int deriving Show
+print (V 3) will show V 3
+
+or `instance Show P where { show (V x) = "V " <> show x }`
+print $ V 9 will print V 9
+
+or 
+printP :: P -> String
+printP (V x) = show x
+instance Show P where { show = printP }
+print $ V 3 will print 3
+
+so make Int and String as intances of one same typeclass, then implement f for both of them
+
+class Foo a where { f :: a -> a }
+instance Foo Int where { f = (+1) }
+instance Foo String where { f = id }
+
+you need to enable FlexiableInstances, 'cause String is [Char]
+and it is type variable a in Foo, [Char] is not variable, [a] is,
+so use FlexiableInstances
+
+:set -XFlexibleInstances
+
+f "a" == "a"
+f (3 :: Int) == 4
+
+there're also other polymorphic functions, like id, id is polymorphic over everything, also const and flip
+------------------------------------------
+
+fixed-point
+http://www.vex.net/~trebla/haskell/fix.xhtml
+https://www.codewars.com/kata/5443dd2d7fc4478154000ac6/train/haskell
+
+#unicode 
+
+λ - U+03BB, C-x 8 RET 03BB RET
+∀ - for all - upside down A (u+2200)
+⊥ - bottom - "non-terminating computation" in haskell it's called undefined
+∃ - That means exists
+~> maybe "natural transformation"
+-> is function type, not kleisli arrow
+the kleisli arrow for a monad M is _ -> M _
+
+
+https://twitter.com/Iceland_jack/status/1220326760589471744
+build :: (∀ b. (a -> b -> b) -> b -> b) -> [a] 
+destroy :: [a] -> (∀ b. (b -> Maybe (a,b)) -> b -> c) -> c 
+∀ in destroy should be an ∃ 
+Build a = (∀b. (a->b->b) -> b -> b) 
+Destroy a = (∃b. (b->Maybe(a,b), b) 
+build :: Build ~> [] 
+destroy :: [] ~> Destroy
+
+https://github.com/ghc-proposals/ghc-proposals/blob/master/proposals/0287-simplify-subsumption.rst
+
+https://text-symbols.com/upside-down/
+https://www.rapidtables.com/math/symbols/Basic_Math_Symbols.html
+
+#natural transformation
+https://stackoverflow.com/questions/58363868/what-is-a-natural-transformation-in-haskell
+
+A natural transformation, without getting into the category theory behind it, is really just a polymorphic function.
+Prelude> :set -XRankNTypes
+Prelude> :set -XTypeOperators
+Prelude> type (~>) f g = forall x. f x -> g x
+
+The ~> operator maps a type constructor to another type constructor, in such a way that it works for any given argument to the first type constructor.
+
+Prelude| m2l :: Maybe ~> []
+Prelude| m2l Nothing = []
+Prelude| m2l (Just x) = [x]
+
+Prelude> m2l Nothing
+[]
+Prelude> m2l (Just 3)
+[3]
+Prelude> m2l (Just 'c')
+"c"
+
+----------------------------------------------
+
+use parser to write a transpiler for transform one language to another language,
+does that count for new language?
+or use meta-programming write a DSL, (lisp's macro, C++'s template, Haskell's template, etc...)
+write a compiler is too difficult
+
+------------------------------------
+big O notation, time related,
+It shows how an algorithm scales based on input size.
+---------------
+O(n)
+elemIndex
+
+for (i=1; i<n; i++) x++; O(n)
+
+O(n): known as Linear complexity
+1 item: 1 second
+10 items: 10 seconds
+100 items: 100 seconds
+----------------
+O(n^2)
+for (i=1; i<=n; i++) 
+    for (j=1; j<=n; j++)
+        x++; 
+n^2
+
+O(n^2): known as Quadratic complexity
+1 item: 1 second
+10 items: 100 seconds
+100 items: 10000 seconds
+---------------------
+O(n!)
+n!
+Data.List.permutations
+10! == 3628800
+a list that has 10 elements,
+it has 3628800 possible permutations
+-----------------------------
+
+O(1) 
+f x = x
+id
+[1..10] 
+
+O(1): known as Constant complexity
+1 item: 1 second
+10 items: 1 second
+100 items: 1 second
+-------------------------------
+O(log n): known as Logarithmic complexity
+dict, map, hash table
+1 item: 1 second
+10 items: 2 seconds
+100 items: 3 seconds
+--------------------------
+
+
+f(n) is O(f(n))
+
+https://stackoverflow.com/questions/487258/what-is-a-plain-english-explanation-of-big-o-notation
+
+-------------------------------------------------------
+
+Coq, Agda, Idris, Haskell, Ocaml, Scala
+Proof Assistant: Coq, Agda
+Coq : CoC
+Haskell is System F, Lambda-2
+
+https://www.codewars.com/kata/a-plus-b-equals-b-plus-a-prove-it
+1 kyu A+B=B+A? Prove it!
+-------------------------------------------------
 
 Lambda cube
 
@@ -55,6 +428,7 @@ if' (1 < 2) "yeh" "nah" == "yeh"
 if' ("foo" == "bar") "yeh" "nah" == "nah"
 
 https://downloads.haskell.org/~ghc/latest/docs/html/users_guide/glasgow_exts.html#multi-way-if-expressions
+
 MultiWayIf since 7.6.1
 if | guard1 -> expr1
    | ...
