@@ -1,3 +1,5 @@
+consider wireguard over kcptun for udp proxy
+-----------------------------------
 https://github.com/xtaci/kcptun
 
 On Server:
@@ -63,6 +65,7 @@ ssh -p 1990 user@localhost
 
 ssh -XY -p 1990 user@localhost      X11 Forwarding
 scp -P 1990 user@server:/path/to/file /tmp
+scp -P 1990 -C user@remote:/path/to/files /tmp
 
 ssh over ssl over kcp
 ssh over stunnel over kcptun
