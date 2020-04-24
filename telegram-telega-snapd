@@ -1,0 +1,33 @@
+git clone https://aur.archlinux.org/snapd.git
+cd snapd
+makepkg -si
+
+sudo systemctl enable --now snapd.socket
+sudo ln -s /var/lib/snapd/snap /snap
+sudo systemctl start snapd.socket
+
+export PATH=$PATH:/var/lib/snapd/snap/bin
+sudo snap install telega
+
+cd /var/lib/snapd/snap/bin/
+sudo snap alias telega.telega-server telega-server
+
+M-x package-install RET telega RET
+
+;;; telega begin
+(add-to-list 'load-path "/snap/telega/current/share/emacs/site-lisp/telega/")
+(require 'telega)
+(setq exec-path (append exec-path '("/var/lib/snapd/snap/bin")))
+(setq telega-proxies (list '(:server "127.0.0.1" :port 1080 :enable t
+                                       :type (:@type "proxyTypeSocks5"))))
+;;; telega end
+
+M-x telega
+
+https://snapcraft.io/install/telega/arch
+#FuckGlibc #FuckAWS #FuckGFW #FuckArchlinux #FuckTDLIB
+
+nctelegram based on telegram-cli 
+but proxychains telegram-cli works, proxychains nctelegram doesn't,
+pacman -S telegram-desktop, this need qt, and you can't input Chinese into the text frame,
+use telegram-desktop-bin from AUR, that can input Chinese into text frame
