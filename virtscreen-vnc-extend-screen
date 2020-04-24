@@ -1,0 +1,18 @@
+virtscreen need a trayer
+
+pacman -S stalonetray
+cp /etc/stalonetrayrc ~/.stalonetrayrc
+
+stanlonetray
+
+install virtscreen from aur
+https://github.com/kbumsik/VirtScreen
+
+virtscreen
+click that virtscreen icon on the trayer
+enable virtscreen
+click vnc tab, enable vnc server
+
+
+
+on windows or iphone, use vnc viewer to connect the server
