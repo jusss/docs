@@ -1,0 +1,5 @@
+proxychains emacs
+M-x package-refresh-content
+M-x package-install RET telega 
+yay -S telegram-tdlib # it needs tdlib-dev for .h files
+
