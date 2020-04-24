@@ -1,0 +1,25 @@
+the unit in >>= is "return", and return can pick value constructor from the context and combine one
+id is the unit in the monoid (.), so
+a `op` unit = a  
+unit `op` a = a
+
+return is the unit in >>=
+id is the unit in (.)
+
+0 is the unit in +
+1 is the unit in *
+
+0 + 1 == 1
+1 * 3 == 3
+
+Nothing is the unit in Control.Applicative.<|>
+
+Nothing <|> Just 3 == Just 3
+
+<|> is `mplus` in monoid
+
+foldl1 (<|>) [Nothing, Nothing, Just 3] == Just 3
+
+isNothing $ foldl1 (<|>) [Nothing, Nothing, Nothing] == True
+
+

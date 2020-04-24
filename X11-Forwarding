@@ -1,3 +1,20 @@
+firt, make sure local and remote both have installed xauth
+pacman -S xorg-xauth
+
+Remote:
+vim /etc/ssh/sshd_config
+AllowAgentForwarding yes
+AllowTcpForwarding yes
+X11Forwarding yes
+X11UseLocalhost no
+TCPKeepAlive yes
+ClientAliveInterval 120
+ClientAliveCountMax 720
+
+
+Local:
+ssh -X user@remote
+---------------------------------
 vps上是没显卡的，所以在vps上xorg会报错 no screen found
 但是vps依然可以X11转发，把X11信息转发之本地的X上显示
 #aptitude install xorg xauth

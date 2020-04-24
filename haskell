@@ -1,3 +1,117 @@
+higher ranked type, Rank-N types,
+higher order logic, first order login,
+lens, STM, async, 
+
+--------------------------------
+TextToInt64.hs
+
+import qualified Data.Text as T
+import           Data.Int
+
+hash :: T.Text -> Int64
+hash = T.foldl combine 0
+  where
+    combine a = (+ a) . fromIntegral . fromEnum
+
+another way is 
+let    _chatId = (read $ T.unpack "23" )) :: Int64
+
+------------------------------------------------
+
+yes, I guess we can only knowing the connection whith send/read stuff
+select/epoll are used for sync, but I perfer forkIO/async
+
+all :: Foldable t => (a -> Bool) -> t a -> Bool
+all (== Nothing) alist to check if the whole elements are Nothing in alist
+
+or 
+
+foldl1 (<|>) [Nothing, Nothing, Just 3] == Just 3
+
+isNothing $ foldl1 (<|>) [Nothing, Nothing, Nothing] == True
+
+
+
+-------------------------------------------------------
+1. if and case
+val :: Maybe (Either SomeException ())
+if val == Nothing then ... won't work
+case val of Nothing -> is ok
+
+because == on values of type Maybe a requires that the underlying type a is also comparable
+which is likely not the case for SomeException
+
+otherway, you can use Data.Maybe.maybe or fromMaybe to disassemble it
+
+https://github.com/jusss/code/blob/bla2/Haskell/I2T14.hs#L305 can just point line 305
+
+2. natural transform
+fmap poll [a1,a2,a3] :: [IO (Maybe (Either SomeException ()))]
+how I can get Maybe (Either SomeException ())?
+use Data.Foldable.sequenceA to swap outer monads
+
+sequenceA :: (Traversable t, Applicative f) => t (f a) -> f (t a)
+sequenceA is a NT from Compose t f to Compose f t
+
+you can get a from IO a inside do notation, but you can't get out a from this do notation unless
+you use `unsafePerformIO`, there's globale variable called `IORef`
+
+sequenceA can turn [IO ...] to IO [...]
+
+
+3. . and $
+$ is a infix expression. (prefix/infix/postfix/suffix)
+$ :: (a -> b) -> a -> b
+f $ a == $ f a == f a
+
+. :: (b -> c) -> (a -> b) -> a -> c
+
+. is function composition
+$ is function application
+
+f . g . t $ a  == $ (f . g . t) a == f (g (t a))
+
+($) ($) :: (a -> b) -> a -> b
+($) ($) ($) :: (a -> b) -> a -> b
+($) ($) ($) ($) ($) (+10) 1 == 11
+
+(&) :: a -> (a -> b) -> b
+
+3 & (+2) == 5
+
+flip ($) :: a -> (a -> b) -> b
+
+flip (&) :: (a -> c) -> a -> c
+
+flip & = $ 
+flip $ = &
+
+
+
+
+
+
+
+---------------------------------------------------
+
+#recursive type #infinite type
+
+f = _ => {console.log(_); return f}
+this will case infinite type in haskell, turn it with Fix 
+
+https://www.quora.com/Why-doesnt-Haskell-implement-infinite-types
+
+'bout recursive type, you can handle it if you write out all the type and finally give it a type
+
+f :: String -> (String -> (String -> IO ()))
+
+Dependent type, f "a" "b" "c" :: IO()
+type can dependent on value
+
+
+
+---------------------------------------------------------------
+
 #1 in do-notation, only the last line can concret the type of whole do-block
      in the other lines, they can share the same context, but without same type
 

@@ -1,0 +1,206 @@
+I. data type exception like Maybe or Either, not runtime
+
+II. runtime exception like the other languages
+System.IO.Error.catch and try will only capture IO errors,
+Control.Exception catch IO and other exceptions
+
+Prelude exports System.IO.Error's version of catch
+so import qualified Control.Exception as E
+and use E.catch to all the exceptions
+
+Control.Exception.try ::  Exception e => IO a -> IO (Either e a) 
+
+Similar to catch, but returns an Either result which is (Right a) if no exception of type e was raised, or (Left ex) if an exception of type e was raised and its value is ex. If any other type of exception is raised than it will be propogated up to the next enclosing exception handler.
+
+input <- try (hGetLine inh)
+case input of
+    Left e ->
+        if isEOFError e then return () else ioError e
+    Right inpStr ->
+        ...
+
+
+Network.Socket.setSocketOption is unusable,
+you can't use RecvTimeOut and SendTimeOut to detect if
+the remote disconnected without an exit signal, and
+this exception is available to catch in other langages like python
+but not in haskell
+
+
+so use Network.Socket.sendAll to send Ping messages by period, and if it's
+diconnected, this sendAll will cause an IOError,
+use Control.Exception.try to catch it
+
+
+
+catch :: Exception e => IO a -> (e -> IO a) -> IO a
+
+catch all exceptions with SomeException type
+
+catch f (\e -> ... (e :: SomeException) ... )
+
+http://book.realworldhaskell.org/read/error-handling.html
+https://stackoverflow.com/questions/12590202/setting-socket-options-on-osx
+
+
+
+
+
+
+
+
+
+
+
+
+try takes an IO action to run, and returns an Either. If the computation succeeded, the result is given wrapped in a Right constructor. (Think right as opposed to wrong). If the action threw an exception of the specified type, it is returned in a Left constructor. If the exception was not of the appropriate type, it continues to propagate up the stack. Specifying SomeException as the type will catch all exceptions, which may or may not be a good idea.
+
+
+try (print x) :: IO (Either SomeException ())
+
+main = do
+    result <- try (evaluate (5 `div` 0)) :: IO (Either SomeException Int)
+    case result of
+        Left ex -> show ex
+        Right val -> show val
+
+
+ use which function?
+
+Here's the recommendation from the Control.Exception documentation:
+
+    If you want to do some cleanup in the event that an exception is raised, use finally, bracket or onException.
+    To recover after an exception and do something else, the best choice is to use one of the try family.
+    ... unless you are recovering from an asynchronous exception, in which case use catch or catchJust.
+
+try :: Exception e => IO a -> IO (Either e a)
+
+try takes an IO action to run, and returns an Either. If the computation succeeded, the result is given wrapped in a Right constructor. (Think right as opposed to wrong). If the action threw an exception of the specified type, it is returned in a Left constructor. If the exception was not of the appropriate type, it continues to propagate up the stack. Specifying SomeException as the type will catch all exceptions, which may or may not be a good idea.
+
+Note that if you want to catch an exception from a pure computation, you will have to use evaluate to force evaluation within the try.
+
+main = do
+    result <- try (evaluate (5 `div` 0)) :: IO (Either SomeException Int)
+    case result of
+        Left ex  -> putStrLn $ "Caught exception: " ++ show ex
+        Right val -> putStrLn $ "The answer was: " ++ show val
+
+catch :: Exception e => IO a -> (e -> IO a) -> IO a
+
+catch is similar to try. It first tries to run the specified IO action, but if an exception is thrown the handler is given the exception to get an alternative answer.
+
+main = catch (print $ 5 `div` 0) handler
+  where
+    handler :: SomeException -> IO ()
+    handler ex = putStrLn $ "Caught exception: " ++ show ex
+
+However, there is one important difference. When using catch your handler cannot be interrupted by an asynchroneous exception (i.e. thrown from another thread via throwTo). Attempts to raise an asynchroneous exception will block until your handler has finished running.
+
+Note that there is a different catch in the Prelude, so you might want to do import Prelude hiding (catch).
+
+https://stackoverflow.com/questions/6009384/exception-handling-in-haskell
+
+there're three ways to handle remote disconnected without an exit signal,
+the normal way is recv length 0 or empty string,
+but we can use recv/send timeout exceptions
+or ping/pong from ICMP protocal to detect that
+
+1. exit with an exit signal, recv lengh is 0
+2. send/recv timeout
+3. ICMP protocal 
+
+keep send PING message per minute, so if send fails there will
+cause raise an exception, so client know remote disconnected
+
+there's no globla variable in haskell,
+so threads communicate is really hard
+use STM or IORef to do that
+
+exitWith only terminate current thread, not whole process
+so throw an exception and catch it in main, then exitWith in main
+
+Control.Concurrent doesn't provide that throw exception in thread and catch in main
+async package provide what after to do when a thread is terminated
+
+forkIO is from Control.Concurrent.forkIO
+
+https://hackage.haskell.org/package/async-2.2.2/docs/Control-Concurrent-Async.html#v:poll
+
+poll can do something after a thread is over
+
+
+https://hackage.haskell.org/package/async-2.2.2/docs/Control-Concurrent-Async.html#v:poll
+
+async :: IO a -> IO (Async a)
+poll :: Async a -> IO (Maybe (Either SomeException a))Source#
+
+Check whether an Async has completed yet. If it has not completed yet, then the result is Nothing, otherwise the result is Just e where e is Left x if the Async raised an exception x, or Right a if it returned a value a.
+
+
+import Control.Concurrent.Async -- from async package
+<nshepperd> jusss: async doBlockingAction >>= (\h -> do { ... poll h ... })
+<nshepperd> or: 'async doBlockingAction >>= (\h -> do { ... wait h ... })' if
+<lambdabot> do { a <- async doBlockingAction; (\ h -> do { x <- poll h; return
+<nshepperd> do { h <- async (recv socket 1024); do some other stuff; answer <-
+            https://hackage.haskell.org/package/async  [00:09]
+<nshepperd> if nothing else you can do timer <- async (threadDelay 1000000)
+
+-------------------------------------------------------------
+
+recvMsg :: Token -> Manager -> Maybe Int -> ChatId -> Socket -> T.Text -> Map T.Text T.Text -> IO ()
+recvMsg ... = do
+    ...
+    exitWith $ ExitFailure 22
+
+relayIRC2Tele :: Token -> Manager -> ChatId -> Socket ->  Text -> IO a
+relayIRC2Tele ... = do
+    ...
+    exitWith $ ExitFailure 22
+
+detectDisconnected :: Socket -> IO ()
+detectDisconnected ... = do
+    ...
+    exitWith $ ExitFailure 22
+
+-- checkException :: Async a -> Async a -> Async a -> IO ()
+checkException a1 a2 a3 = do
+    r1 <- poll a1
+    r2 <- poll a2
+    r3 <- poll a3
+    case [r1,r2,r3] of
+        [Nothing,Nothing,Nothing] -> do
+            sleep 60
+            checkException a1 a2 a3
+        [Just x, Just y, Just z] -> exitWith $ ExitFailure 22
+
+
+
+checkException :: [Async a] -> IO ()
+checkException alist = do
+    currentState <- sequenceA (fmap poll alist) -- sequenceA will do natural transform, turn [IO (Maybe (Either SomeException a))] to IO [Maybe (Either SomeException a)]
+    -- poll :: Async a -> IO (Maybe (Either SomeException a))
+    -- if Async is running, return Nothing, exit with successful, return Just (Right value), exit with exception, return Just (Left exception)
+    -- if L.null $ catMaybes currentState then do
+    if isNothing $ foldl1 (<|>) currentState then do
+            sleep 60
+            checkException alist
+    else
+       exitWith $ ExitFailure 22
+
+
+
+main :: IO ()
+main = runTCPClient server port $ \socket -> do
+    ...
+
+    t2IRC <- async (recvMsg token manager Nothing chatId socket nick Data.Map.Strict.empty)  -- Telegram to IRC
+    pingMsg <- async (detectDisconnected socket) -- send PING per minute
+    irc2T <- async (relayIRC2Tele token manager chatId socket nick) -- IRC to Telegram
+
+    -- checkException t2IRC pingMsg irc2T
+    checkException [t2IRC, pingMsg, irc2T]
+    
+
+    
+
+

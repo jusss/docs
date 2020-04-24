@@ -1,0 +1,28 @@
+. and $
+$ is a infix expression. (prefix/infix/postfix/suffix)
+$ :: (a -> b) -> a -> b
+f $ a == $ f a == f a
+
+. :: (b -> c) -> (a -> b) -> a -> c
+
+. is function composition
+$ is function application
+
+f . g . t $ a  == $ (f . g . t) a == f (g (t a))
+
+($) ($) :: (a -> b) -> a -> b
+($) ($) ($) :: (a -> b) -> a -> b
+($) ($) ($) ($) ($) (+10) 1 == 11
+
+(&) :: a -> (a -> b) -> b
+
+3 & (+2) == 5
+
+flip ($) :: a -> (a -> b) -> b
+
+flip (&) :: (a -> c) -> a -> c
+
+flip & = $
+flip $ = &
+
+

@@ -1,0 +1,9 @@
+ghc -optl-static del.hs
+will compile it to an statically linked file can run other systems
+
+you can use `file del` and `ldd del` to check on it
+
+but this won't work on archlinux, 'cause archlinux is using dynamic libraries
+it works on debian
+
+

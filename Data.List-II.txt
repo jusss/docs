@@ -1,0 +1,37 @@
+
+foldMap = fold . fmap 
+
+[3,1,2,7] \\ [3,1,5,9] == [2,7]
+[1,2] \\ [1,2,3] == []
+
+Data.Either
+lefts [Left "3", Right "2", Left "5"] == ["3","5"]
+
+fold . fmap (<> "\n") . lefts $ [Left "a", Right "b", Left "c"]
+== "a\nc\n"
+
+Data.Foldable
+fold = foldl1 (<>)
+
+Data.Text.isInfixOf is just check if it contain, if it ends with, true
+isInfixOf "=" "ab=" == True
+
+splitWith x xs = L.filter (/= "") . T.splitOn x $ xs
+
+concatMap (fromLeft []) [Left "a", Right "b", Left "c"] == "ac"
+
+Data.Text.replace
+
+T.replace "\r" "\n" "a\r\nb\rc\n" == "a\n\nb\nc\n"
+
+L.filter (/= "") . T.splitOn "\n" $ T.replace "\r" "\n" "a\r\nb\rc\n\n\nd"
+== ["a","b","c","d"]
+
+
+split with "\r" or "\n" or "\r\n"
+the good way is replace "\r" to "\n" then split on "\n", and filter empty strings
+
+T.filter (/= ' ') to filter spaces
+T.replace "\r" "\n" to replace "\r" with "\n"
+T.splitOn "\n" split with "\n"
+L.filter (/= "") filter empty strings
