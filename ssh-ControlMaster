@@ -1,0 +1,7 @@
+~/.ssh/config
+Host *
+ControlPersist yes
+ControlMaster auto
+ControlPath ~/.ssh/master-%r@%h:%p
+
+# this will generate a socket file in ~/.ssh/master-user@remote:port

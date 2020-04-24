@@ -1,3 +1,8 @@
+error: hook /usr/share/libalpm/hooks/gtk-query-immodules-3.0.hook line 2: invalid value Path
+
+edit this hook file, change Type=Path to Type=File
+then pacman -Syu
+-----------------------------------
 install yay from aur
 yay -S nix
 nix-channel --add https://mirrors.tuna.tsinghua.edu.cn/nix-channels/nixpkgs-unstable
