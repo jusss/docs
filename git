@@ -65,10 +65,6 @@ and every leaf has its HEAD and grow log
 HEAD is the latest commit, 
 
 
-
-
-
-
 -- mark it as a path
 As the error states, it would not be possible to know if path/to/file is 
 a file path or a tree-ish, so it is always parsed as a tree-ish, 
@@ -81,3 +77,24 @@ For example, imagine your repository has a file named master in its root.
 Then git checkout master would checkout the branch master. 
 But git checkout -- master would check out the file master of the current 
 HEAD and replace the local master file with the version of that revision.
+
+
+
+--------------------------------------------
+git add ..
+git commit ..
+git checkout HEAD^
+this will cause a git head deteched from xxx
+
+git checkout -b temp # create a temp branch
+git checkout bla2 # return to the main branch
+git merge temp # merge temp to bla2
+git branch -d temp # delete temp branch
+
+--------------------------------------
+# undo the last commit
+git reset --soft HEAD^
+
+# or
+git reset --hard commitId # the commitId is the id before the last commitId
+# this will delete files that are related to the last commitId
