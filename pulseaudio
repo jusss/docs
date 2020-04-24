@@ -1,0 +1,3 @@
+pulseaudio is a unit service
+systemctl --user status pulseaudio
+systemctl --user restart pulseaudio

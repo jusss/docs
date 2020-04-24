@@ -1,3 +1,32 @@
+
+
+cabal v2-install http-client-tls
+then you found
+ Could not load module ‘Network.HTTP.Client.TLS’
+    It is a member of the hidden package ‘http-client-tls-0.3.5.3’.
+    You can run ‘:set -package http-client-tls’ to expose it.
+    (Note: this unloads all the modules in the current scope.)
+    Use -v to see a list of the files searched for.
+
+so you run `ghc I2T15.hs -package http-client-tls -optl-static`
+
+or make .cabal config file to describe that depends package
+
+vim ./telegram-api.cabal
+append 'http-client-tls' into 'build-depends' section,
+then cabal v2-build
+now you can `ghc -optl-static I2T15.hs` without error
+this would output a binary file static linked, 
+I ghc this on alpine on docker, use musl to instead of glibc
+so this static linked binary file can run on archlinux or debian
+it doesn't use glibc, so it doesn't care about glibc version on them
+
+into repl with depend packages
+
+cabal v2-repl --build-depends http-client-tls
+cabal v2-repl -b http-client-tls
+---------------------------------------------
+
 pacman -S cabal-install
 for i in $(pacman -Ss haskell|grep 'community/haskell-'|grep -v 'installed'); do sudo pacman -S $i --noconfirm; done;
 

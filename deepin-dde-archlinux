@@ -1,0 +1,8 @@
+pacman -S deepin deepin-extra startdde
+vim /etc/lightdm/lightdm.conf
+[Ssat:*]
+...
+greeter-session=lightdm-deepin-greeter
+
+start by systemctl start lightdm
+don't use `exec startdde` in .xinitrc by `startx`

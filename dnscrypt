@@ -1,0 +1,14 @@
+sudo pacman -S dnscrypt-proxy
+
+vim /etc/dnscrypt-proxy/dnscrypt-proxy.toml
+server_names = ['cf'] 
+[static]
+  [static.'cf']
+  stamp = 'sdns://AgcAAAAAAAAADTIxNy4xNjkuMjAuMjMgPhoaD2xT8-l6SS1XCEtbmAcFnuBXqxUFh2_YP9o9uDgNZG5zLmFhLm5ldC51awovZG5zLXF1ZXJ5'
+
+server from https://dnscrypt.info/public-servers/
+
+sudo systemctl start dnscrypt-proxy
+sudo systemctl enable dnscrypt-proxy
+sudo vim /etc/resolv.conf
+nameserver 127.0.0.1
