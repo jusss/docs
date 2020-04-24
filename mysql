@@ -1,0 +1,5 @@
+apt install mysql-server mysql-client
+/etc/init.d/mysql start
+mysql -u root -p
+
+mysql -u user_name -p databas_name < backup.sql
