@@ -1,3 +1,14 @@
+stunnel from stunnel.org
+on windows
+
+stunnel.conf
+[ssh]
+client = yes
+accept = 1990
+connect = 127.0.0.1:19900
+
+
+----------------------------------------------
 # generate certificate
 cd /etc/stunnel/
 sudo openssl genrsa -out server.key 4096
