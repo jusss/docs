@@ -18,3 +18,12 @@ LControl & '::Send {F8}
 
 also, there's stunnel and kcptun for windows
 
+if you want to run bash from msys2 on windows terminal,
+then edit windows terminal's settings.json
+{ 
+ "guid":"{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
+ "name":"msys2",
+ "commandline":"D:\\msys32\\usr\\bin\\bash.exe -i -l",
+ "hidden":false
+}
+
