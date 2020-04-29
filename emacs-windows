@@ -1,0 +1,20 @@
+emacs works on mintty is well, but sometimes mintty crushes
+if run the emacs from msys2 package on windows terminal or other terminals,
+they won't capture some key bindings, like C-, C-; and C-h,
+those keys won't send to emacs, they're captured by terminals
+
+the solution is autohotkey
+
+~/.emacs
+(global-set-key (kbd "<f12>") 'ido-switch-buffer)
+(global-set-key (kbd "<f9>") 'set-mark-command)
+(global-set-key (kbd "<f8>") 'pop-to-mark-command) ;;; there's also pop-global-mark
+
+
+edit emacs.ahk, then double click on it to run
+LControl & ,::Send {F12}
+LControl & `;::Send {F9}
+LControl & '::Send {F8}
+
+also, there's stunnel and kcptun for windows
+
