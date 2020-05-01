@@ -2,3 +2,21 @@ JetBrains Mono, u没有右下角那一点
 Source Code Pro, i上面有一撇，下面却没那一撇
 Fira Mono, @显示不全
 Camingo Code, 没有上面那三个问题
+
+Windows Terminal Preview use Cascadia Code as default font
+
+and Cascadia Code has ligature feature,
+also Fira Code v3 has that feature, and JetBrains Mono
+
+they make -> as one symbol, and three = can be one long =
+
+
+# install font on linux
+
+kdir ~/.fonts
+cp simsun.ttf ~/.fonts
+cd ~/.fonts
+mkfontscale
+mkfontdir
+fc-cache -fv ~/.fonts
+fc-list |grep Sim
