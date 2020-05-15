@@ -1,3 +1,84 @@
+/etc/wireguard/wg0.conf 
+wg-quick up wg0
+wg-quick down wg0
+
+-----------------------------------------
+on Server
+
+[Interface]
+Address = 10.0.0.1/24, fdc9:281f:04d7:9ee9::1/64
+ListenPort = 24002
+PrivateKey = server-pri-key
+
+PostUp = iptables -A FORWARD -i %i -j ACCEPT; iptables -A FORWARD -o %i  -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+PostDown = iptables -D FORWARD -i %i -j ACCEPT; iptables -D FORWARD -o %i -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+
+[Peer]
+PublicKey = client-pub-key
+AllowedIPs = 10.0.0.2/32, fdc9:281f:04d7:9ee9::2/128
+
+[Peer]
+PublicKey = client-pub-key
+AllowedIPs = 10.0.0.3/32, fdc9:281f:04d7:9ee9::3/128
+
+---------------------------------------
+
+on Client
+
+[Interface]
+Address = 10.0.0.2/24, fdc9:281f:04d7:9ee9::2/128
+PrivateKey = client-pri-key
+PostUp = iptables -t nat -A POSTROUTING -o %i -j MASQUERADE
+PostDown = iptables -t nat -D POSTROUTING -o %i -j MASQUERADE
+#DNS = 127.0.0.1
+DNS = 8.8.8.8
+
+
+[Peer]
+PublicKey = server-pub-key
+AllowedIPs = 0.0.0.0/0, ::/0
+Endpoint = server-ipv4:24002
+#Endpoint = [server-ipv6]:24002
+
+-------------------------
+
+another client
+
+[Interface]
+Address = 10.0.0.3/24, fdc9:281f:04d7:9ee9::3/128
+PrivateKey = client-pri-key
+PostUp = iptables -t nat -A POSTROUTING -o %i -j MASQUERADE
+PostDown = iptables -t nat -D POSTROUTING -o %i -j MASQUERADE
+#DNS = 127.0.0.1  for dnscrypt-proxy
+DNS = 8.8.8.8
+
+
+[Peer]
+PublicKey = server-pub-key
+AllowedIPs = 0.0.0.0/0, ::/0
+Endpoint = server-ipv4:24002
+#Endpoint = [server-ipv6]:24002
+
+
+
+-------------------------------------------
+
+10.0.0.1/24 10.0.0.2/32 10.0.0.3/32 on server.conf
+but 10.0.0.2/24 10.0.0.3/24 on client.conf
+
+pacman -S wireguard-tools
+wg genkey > peer_A.key
+wg pubkey < peer_A.key > peer_A.pub
+wg genkey | tee peer_B.key | wg pubkey > peer_B.pub
+-------------------
+you should use private address not the public address for ipv6
+like fdc9:281f:04d7:9ee9::1/64
+fdc9:281f:04d7:9ee9::2/128
+fdc9:281f:04d7:9ee9::3/128
+/24 and /128 mean just one address, it's CDIR notation about ip range
+
+https://wiki.archlinux.org/index.php/WireGuard
+-------------------
 ipv6 wireguard on Linode Tokyo 2 (failure, I don't know how to push one ISP's ipv6 address to another ISP's network, because there's no private addr on ipv6 vpn)
 #server
 root@localhost:~# cat /etc/wireguard/wg0.conf 
