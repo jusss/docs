@@ -31,6 +31,7 @@ PrivateKey = client-pri-key
 PostUp = iptables -t nat -A POSTROUTING -o %i -j MASQUERADE
 PostDown = iptables -t nat -D POSTROUTING -o %i -j MASQUERADE
 #DNS = 127.0.0.1
+#DNS = 10.0.0.1
 DNS = 8.8.8.8
 
 
@@ -71,6 +72,18 @@ wg genkey > peer_A.key
 wg pubkey < peer_A.key > peer_A.pub
 wg genkey | tee peer_B.key | wg pubkey > peer_B.pub
 -------------------
+if the server doesn't route traffic,
+# sysctl -w net.ipv4.ip_forward=1
+# sysctl -w net.ipv6.conf.all.forwarding=1
+
+or write this into /etc/sysctl.conf
+ net.ipv4.ip_forward=1
+ net.ipv6.conf.all.forwarding=1
+# sysctl -p
+
+https://www.reddit.com/r/WireGuard/comments/cwz0fe/route_traffic_for_wireguard_subnet_through/
+
+----------------------------------------------
 you should use Reserved IP address not the public address for ipv6
 like fdc9:281f:04d7:9ee9::1/64
 fdc9:281f:04d7:9ee9::2/128
