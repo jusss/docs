@@ -1,0 +1,21 @@
+usage:
+    on server: ./split.sh 207.mkv
+    on local: ./t.sh
+            cat output0* > 207.mkv
+        also you can view through `screen -ls` to get the progress
+
+
+split.sh
+#!/bin/bash
+rm output0*
+split -C 70m --numeric-suffixes $1 output
+
+
+t.sh
+#!/bin/bash
+rm output0*
+for i in "output00" "output01" "output02" "output03" "output04" "output05"
+do
+    screen -dmS $i scp -P 1990 root@moon:/root/$i ./  
+done
+
