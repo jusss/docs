@@ -1,4 +1,449 @@
 
+#Fixed Point
+https://up.monade.li/sL34es
+`fix` allows you to delegate away recursion, so given a recursive definition like
+
+    f x y = ..f..x..y..
+
+you can write the same function as
+
+    f = fix (\f x y -> ..f..x..y..)
+
+So, given
+
+    reverse l = rev l []
+        where
+            rev [] a = a
+            rev (x:xs) a = rev xs (x:a)
+
+you can see that `reverse` itself isn't recursive, but its helper function `rev` is. So defining `reverse` as a fixed point isn't particularly useful, but you can do
+
+    reverse l = fix rev' l []
+        where
+            rev' rev [] a = a
+            rev' rev (x:xs) a = rev xs (x:a)
+
+Note that rev' is the (\f x y -> ..f..x..y..) abstraction from earlier.
+
+https://blog.forec.cn/2016/10/08/haskell-fixit/
+http://www.vex.net/~trebla/haskell/fix.xhtml
+
+https://www.codewars.com/kata/5443dd2d7fc4478154000ac6
+in this question, get the reverse and foldr definition from hackage.haskell.org, and they're not recurisve, turn them to recursive then use
+the mechanical process to get reverse' and foldr'
+
+and of course, the shortest anwser would be
+reverse' = const reverse
+foldr' = const foldr
+
+GHC.List.reverse not recursive, rev is recursive
+reverse l =  rev l []
+  where
+    rev []     a = a
+    rev (x:xs) a = rev xs (x:a)
+
+the tail recursive function need one more argument than non-tail recursive
+
+recursive one
+reverse [] = []
+reverse (x:xs) = (reverse xs) ++ [x]
+
+reverse' f [] = []
+reverse' f (x:xs) = f xs ++ [x]
+
+any function could be a fixed point of other functions, recursive or not
+
+f' = const f
+f = fix (const f)
+f' f = f
+
+reverse' = const reverse
+<awpr> `fix (const x) === x` for any `x`, so you can always find a `g` such that `fix g === f`, namely `const f
+<liiae> awpr https://www.codewars.com/kata/5443dd2d7fc4478154000ac6
+<awpr> `const reverse` is technically an answer; there are many possible answers`
+
+<liiae> MarcelineVQ: GHC.List.reverse's definition is not recursive, right?
+<liiae> MarcelineVQ: https://hackage.haskell.org/package/base-4.14.0.0/docs/src/GHC.List.html#reverse
+<MarcelineVQ> correct. reverse does not call reverse, so it is not recursive
+         by the normal definition
+<MarcelineVQ> however, rev calls rev. rev is recursive.
+<liiae> MarcelineVQ: but that non-recursive reverse still could be a fixed
+        point of reverse', right?
+<MarcelineVQ> I'm really really sure this was said earlier though..
+<liiae> fix (const f) = f
+<liiae> const f = f'
+<liiae> MarcelineVQ: so that codewars anwser can be "import Data.List.reverse; reverse' = const reverse"
+<dminuoso> Oh boy, this is just about codewars?
+<liiae> dminuoso: fixed point on codwars
+<liiae> dminuoso: https://www.codewars.com/kata/5443dd2d7fc4478154000ac6
+<MarcelineVQ> There's a reason I said mere minutes ago that const wasn't relevant to the codewars problem. That's not the answer they're trying to get you to write.
+<dminuoso> fix allows you to turn explicit recursion into implicit recursion
+<liiae> awpr: sorry, I didn't pay more attension on your anwsers, you're right, there's always f' = const f
+<liiae> reverse' = const reverse
+<dminuoso> fix (const f) = f
+<dminuoso> % :t (fix . const)
+<yahb> dminuoso: c -> c
+<liiae> dminuoso: id == fix . const?
+<[exa]> liiae: why not
+<liiae> [exa]: wow, id is simple and fix is not simple in my view, and they're the same, is magic
+<[exa]> liiae: you instantly "kill" the fix complexity by passing in a function that discards it
+
+let x = 1: x in x
+x = 1: x
+fix (1:)
+
+fix (const 3) == 3
+fix (const reverse) [1,2,3] == [3,2,1]
+reverse = fix (const reverse)
+reverse' = const reverse
+
+f' = const f
+f' f = f
+fix f' = f
+fix (const f) = f
+(fix . const) f = f
+
+id == fix . const
+
+#######################################################################
+
+Fixed-Point
+
+fix f = x
+f x = x
+f (fix f) = fix f 
+
+fix work on f to get f's fixed point, 
+fixed point is where x in f x = x
+some functions's fixed point are constant numbers
+some are functions
+
+y = x is the line, for single x fuction, 
+f x = 3 is a line function which y always be 3, 
+it is `const x 3`
+and 3 is the only fixed point on f x = 3
+
+f xs = 3:xs, [3,3,3,3...] is xs, is the fixed point on f xs = 3:xs
+'cause f [3,3,3...] = 3:[3,3,3...]
+
+a constant number 3 or a list or a function, they all can be fixed point
+
+fix $ scanl (+) 0 . (1:)  this scanl (+) 0 . (1:)'s fixed point is fibonacci sequence
+
+recursion and fixed point, find the function f is which function's fixed point
+
+--foldl f z [] = z
+--foldl f z (x:xs) = foldl f (f z x) xs
+
+gg _foldl f z [] = z
+gg _foldl f z (x:xs) = _foldl f (f z x) xs
+foldl' f z [] = z
+foldl' f z (x:xs) = gg foldl' f (f z x) xs
+-- 1. based on foldl defintion
+-- 2. get gg from foldl = fix gg, which means gg foldl = foldl
+-- 3. re-write foldl with gg, get foldl'
+
+-- main = print $ foldl' (+) 0 [1..3]
+
+-- f2 n accum = if n == 1 then accum else f2 (n-1) (n * accum)
+f2' f2 n accum = if n==1 then accum else f2 (n-1) (n* accum)
+--f2N n accum = if n ==1 then accum else f2' f2N (n-1) (n* accum)
+f2N n accum = if n ==1 then accum else fix f2' (n-1) (n* accum)
+--main = print $ f2N 10 1
+
+reverse [] = []
+reverse (x:xs) = reverse xs ++ [x]
+
+reverse' f [] = []
+reverse' f (x:xs) = f xs ++ [x]
+--main = print $ reverse' (reverse' reverse) [1,2,3]
+
+--const x _ =  x
+--f' = const f
+--f = fix (const f)
+--f' f = f
+-- any function could be a fixed point of other functions, recursive or not
+reverse'' = const reverse
+main = print $ reverse'' reverse [1,2,3]
+
+#meaning #used for
+if f2 is f1's fixed point function,
+fix f1 = f2
+f1 f2 = f2
+so do recursion in f2 like `f2 x`, it can be `f1 f2 x`
+this is not recursive,
+f2 x = f1 f2 x
+
+on the type level, we can get
+data Fix f = MkFix f (Fix f)
+
+#n!
+f n = foldl1 (*) [1..n]
+
+###############################################
+
+#lazy evaluation
+
+[a,b,c,d] = map (*2) [1,a,b,c]
+d == 16
+a = 2, b =2 a, c=2b, d=2c, this only can happen on lazy evaluation
+it would be "a is not defined" in JS
+
+#Prime
+let primes = 2 : filter isPrime [3,5..]; 
+    isPrime n = all (\p -> n `mod` p /= 0) (takeWhile (\p -> p*p <= n) primes)
+    in primes
+
+
+let s (x:xs) = x : s [ i | i <- xs , mod i x /=0] in s [2..]
+
+#Fibs
+let fibs = 0: 1: zipWith(+) fibs (tail fibs) in fibs
+
+fibs = 0 : scanl (+) 1 fibs
+fix $ (0:) . scanl (+) 1
+
+fix $ scanl (+) 0 . (1:)   -- eta conversion
+fix (\xs -> scanl (+) 0 (1:xs))
+let xs = scanl (+) 0 (1:xs) in xs
+
+<awpr> `newtype Fix f = Fix (f (Fix f))` is the common definition, and it
+       gives you (modulo newtype constructors) `f (f (f (f (f (f ...)))))))`
+
+#Even
+let as = map (*2) (1:as) in as
+
+#############################################
+<liiae> what this `.' in scanl (+) 0 . (1:)?                            [14:59]
+
+<xerox_> @src (.)
+<lambdabot> (f . g) x = f (g x)
+<xerox_> aka function composition
+<sshine> (1:) = \x -> 1:x                                               [15:01]
+<sshine> > fix (\xs -> scanl (+) 0 (1:xs))                              [15:03]
+<lambdabot>
+            [0,1,1,2,3,5,8,13,21,34,55,89,144,233,377,610,987,1597,2584,4181,6765,10946,...
+
+<liiae> sshine: why fixed-point is related to fibonacci?                [15:09]
+<Cale> liiae: The fixed point that fix gives you can be used to define
+       anything recursive                                               [15:10]
+<Cale> fix (\x -> ... x ...) is the same as  let x = ... x ... in x     [15:11]
+<Cale> > fix (\fac n -> if n == 0 then 1 else n * fac (n-1)) 10
+<lambdabot>  3628800
+<Cale> > product [1..10]
+<lambdabot>  3628800
+<Cale> > fix (\ones -> 1 : ones)                                        [15:12]
+<lambdabot>
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1...
+<Cale> > let ones = 1 : ones in ones
+<lambdabot>
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1...
+<Cale> fix f = let x = f x in x
+
+<liiae> Cale:
+        https://www.quora.com/Why-doesnt-Haskell-implement-infinite-types
+
+<liiae> Cale: we can turn that infinite type to fixed-point stuff?
+<awpr> you can write a type family that acts sort-of like `fix`, but it will
+       just ruin GHC's day; or, you can write a newtype that acts slightly
+       less like `fix` and get recursively-defined but not infinite types
+                                                                        [15:15]
+<Cale> Which infinite type?
+<Cale> But yeah, if you run into a case where you'd otherwise want an infinite
+       type, you can generally turn it into a recursively defined type  [15:16]
+<awpr> `newtype Fix f = Fix (f (Fix f))` is the common definition, and it
+       gives you (modulo newtype constructors) `f (f (f (f (f (f ...)))))))`
+
+
+################################################
+
+#reflection
+reflection is used to get the inside messages of a class
+like get variables and functions name of a class
+
+fun isOdd(x:Int ) = x%2 != 0
+val s = {it:Int -> it%2 != 0 }
+val n = listOf(1,2,3)
+println(n.filter(::isOdd))
+print(n.filter(s))
+
+::isOdd == s?
+
+######################################3
+#extension function
+
+fun Int.foo() {...}
+so you can call `5.foo()`
+
+fun foo(): Int {...} is a function return a Int value
+
+also you can do
+fun Int.foo(): Int { return this + 1 }
+
+The extension method would work for Int and 
+all subclasses of Int, although Int is not an open class 
+and therefore cannot be subclassed.
+
+#this expression
+in Java, this can do like self in python
+class Builder {
+ setA(A a){
+        return this;
+ }
+ setB(B b) {
+        return this;
+ }
+}
+new Builder().setA(a).setB(b)
+this `this` here is current instance, so it can make chainsaw call
+
+this.var = var , like python self.var = var
+return this("parameter") for make a new instance
+
+class A {
+      inner class B {
+            fun Int.foo() {
+                var a = this@A   // A's instance
+                var b = this@B  // B's instance
+                var c = this  // foo()'s receiver is 5, 5.foo(), same as `var c = this@foo`
+                var c1 = this@foo // c1 is the caller itself, 5.foo(), then c1 is 5
+
+                // receiver.foo()
+                val funLit = lambda@ fun String.(): String {
+                        val d = this // funLit's receiver is "a", "a".funLit(),  
+                                return d
+                                }
+
+            val funLit2 = { s: String ->
+                // foo()'s receiver, since enclosing lambda expression doesn't have any receiver
+                val d1 = this
+                }
+}}}
+
+##################################################################
+
+@label
+
+fun foo() {
+    listOf(1, 2, 3, 4, 5).forEach {
+        if (it == 3) return // 非局部的返回(non-local return), 直接返回到 foo() 函数的调用者
+        print(it)
+    }
+    println("this point is unreachable")
+}  // just print 1 2
+
+fun foo() {
+    listOf(1, 2, 3, 4, 5).forEach {
+        if (it == 3) return@forEach // 局部的返回(local return), 直接返回到 lambda 函数的调用者, here is forEach
+        print(it)
+    }
+    println("this point is reachable")
+} // print 1 2 4 5 this point is reachable
+
+local return and non-local return, non-local return is return to the whole function's caller
+local return is return to this current scope's caller, return@caller
+return@to-the-calller
+
+print(3) :: Unit
+
+fun foo() {
+    listOf(1, 2, 3, 4, 5).forEach {
+        if (it == 3) return@forEach print(3)
+        print(it)
+    }
+    println("this point is reachable")
+} // print 1 2 3 4 5 this point is reachable
+
+return@caller parameter, here `return@forEach print(3)`
+when it == 3, return to the caller forEach and make print(3) as forEach's return to outside
+
+
+
+#########################################3
+
+#Main Class #Kotlin #Config #Module
+package com.aldebaran.ks
+
+this src\main\kotlin\com.aldebaran.ks\server5.kt
+"kotlin" should  Make directory as Source Root, a blue tag
+and Main class is com.aldebaran.ks.Server5Kt
+classpath of module is current project name like KotlinServer
+
+if src\com.sun.k2p\Robot.kt,
+then Make "src" as Source Root, Main class is com.sun.k2p.RobotKt
+
+Make package's previous directory as Source Root
+and Main Class start with package's name
+
+################################################################
+
+#Kotlin  #constructor
+variables in Class but out of function, that's instance variables in other languages
+class f {
+ var a=0
+ fun f() {
+    print(a)
+    }
+}
+
+second constructor in a class is for polymorphic,
+constructor for different class parameters
+
+class f(a:Int)
+class f(a:Int, b:String)
+so that f(3) and f(3,"a") can generate different instances
+
+str.run {
+        it.xxx
+}
+here it mean str itself, see scope functions
+sometime it means the parameter itself
+
+this@
+
+in a member of a class, this mean current object of the class
+same as java or python's self.
+
+
+
+##############################################
+
+use >> to combind IO actions
+
+t = print 1 >> print 2
+t will print 1 and 2 at once
+
+sequence $ fmap print [1,2]
+
+sequenceA
+sequenceA_
+
+mapM print [1..10]
+
+print "a" <> print "b"
+
+getLine <> getLine 
+which will read two lines of input, and produce the result of concatenating them
+
+<Cale> liiae`: It's important to remember that fmap just applies a function to the results of an action
+<Cale> It can't be used to combine multiple actions
+
+forM xs f = mapM f xs
+main = forM [1..3] $ \n -> do
+   print n
+   getLine
+
+##############################################
+#network #linux #port #check
+sudo lsof -i -P -n|grep LISTEN
+
+
+
+#enable #android #studio #network #permission #gradle
+write those into Manifest.xml
+<uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+##########################################
 Cygwin, MSYS2, WSL2,
 wsl is not available for windwos 10 32 bit,
 ##################################################
