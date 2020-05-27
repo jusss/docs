@@ -1,0 +1,203 @@
+
+#Fixed Point
+https://up.monade.li/sL34es
+`fix` allows you to delegate away recursion, so given a recursive definition like
+
+    f x y = ..f..x..y..
+
+you can write the same function as
+
+    f = fix (\f x y -> ..f..x..y..)
+
+So, given
+
+    reverse l = rev l []
+        where
+            rev [] a = a
+            rev (x:xs) a = rev xs (x:a)
+
+you can see that `reverse` itself isn't recursive, but its helper function `rev` is. So defining `reverse` as a fixed point isn't particularly useful, but you can do
+
+    reverse l = fix rev' l []
+        where
+            rev' rev [] a = a
+            rev' rev (x:xs) a = rev xs (x:a)
+
+Note that rev' is the (\f x y -> ..f..x..y..) abstraction from earlier.
+
+https://blog.forec.cn/2016/10/08/haskell-fixit/
+http://www.vex.net/~trebla/haskell/fix.xhtml
+
+https://www.codewars.com/kata/5443dd2d7fc4478154000ac6
+in this question, get the reverse and foldr definition from hackage.haskell.org, and they're not recurisve, turn them to recursive then use
+the mechanical process to get reverse' and foldr'
+
+and of course, the shortest anwser would be
+reverse' = const reverse
+foldr' = const foldr
+
+GHC.List.reverse not recursive, rev is recursive
+reverse l =  rev l []
+  where
+    rev []     a = a
+    rev (x:xs) a = rev xs (x:a)
+
+the tail recursive function need one more argument than non-tail recursive
+
+recursive one
+reverse [] = []
+reverse (x:xs) = (reverse xs) ++ [x]
+
+reverse' f [] = []
+reverse' f (x:xs) = f xs ++ [x]
+
+any function could be a fixed point of other functions, recursive or not
+
+f' = const f
+f = fix (const f)
+f' f = f
+
+reverse' = const reverse
+<awpr> `fix (const x) === x` for any `x`, so you can always find a `g` such that `fix g === f`, namely `const f
+<liiae> awpr https://www.codewars.com/kata/5443dd2d7fc4478154000ac6
+<awpr> `const reverse` is technically an answer; there are many possible answers`
+
+<liiae> MarcelineVQ: GHC.List.reverse's definition is not recursive, right?
+<liiae> MarcelineVQ: https://hackage.haskell.org/package/base-4.14.0.0/docs/src/GHC.List.html#reverse
+<MarcelineVQ> correct. reverse does not call reverse, so it is not recursive
+         by the normal definition
+<MarcelineVQ> however, rev calls rev. rev is recursive.
+<liiae> MarcelineVQ: but that non-recursive reverse still could be a fixed
+        point of reverse', right?
+<MarcelineVQ> I'm really really sure this was said earlier though..
+<liiae> fix (const f) = f
+<liiae> const f = f'
+<liiae> MarcelineVQ: so that codewars anwser can be "import Data.List.reverse; reverse' = const reverse"
+<dminuoso> Oh boy, this is just about codewars?
+<liiae> dminuoso: fixed point on codwars
+<liiae> dminuoso: https://www.codewars.com/kata/5443dd2d7fc4478154000ac6
+<MarcelineVQ> There's a reason I said mere minutes ago that const wasn't relevant to the codewars problem. That's not the answer they're trying to get you to write.
+<dminuoso> fix allows you to turn explicit recursion into implicit recursion
+<liiae> awpr: sorry, I didn't pay more attension on your anwsers, you're right, there's always f' = const f
+<liiae> reverse' = const reverse
+<dminuoso> fix (const f) = f
+<dminuoso> % :t (fix . const)
+<yahb> dminuoso: c -> c
+<liiae> dminuoso: id == fix . const?
+<[exa]> liiae: why not
+<liiae> [exa]: wow, id is simple and fix is not simple in my view, and they're the same, is magic
+<[exa]> liiae: you instantly "kill" the fix complexity by passing in a function that discards it
+
+let x = 1: x in x
+x = 1: x
+fix (1:)
+
+fix (const 3) == 3
+fix (const reverse) [1,2,3] == [3,2,1]
+reverse = fix (const reverse)
+reverse' = const reverse
+
+f' = const f
+f' f = f
+fix f' = f
+fix (const f) = f
+(fix . const) f = f
+
+id == fix . const
+
+
+--foldl f z [] = z
+--foldl f z (x:xs) = foldl f (f z x) xs
+
+gg _foldl f z [] = z
+gg _foldl f z (x:xs) = _foldl f (f z x) xs
+foldl' f z [] = z
+foldl' f z (x:xs) = gg foldl' f (f z x) xs
+-- 1. based on foldl defintion
+-- 2. get gg from foldl = fix gg, which means gg foldl = foldl
+-- 3. re-write foldl with gg, get foldl'
+
+-- main = print $ foldl' (+) 0 [1..3]
+
+-- f2 n accum = if n == 1 then accum else f2 (n-1) (n * accum)
+f2' f2 n accum = if n==1 then accum else f2 (n-1) (n* accum)
+--f2N n accum = if n ==1 then accum else f2' f2N (n-1) (n* accum)
+f2N n accum = if n ==1 then accum else fix f2' (n-1) (n* accum)
+--main = print $ f2N 10 1
+
+reverse [] = []
+reverse (x:xs) = reverse xs ++ [x]
+
+reverse' f [] = []
+reverse' f (x:xs) = f xs ++ [x]
+--main = print $ reverse' (reverse' reverse) [1,2,3]
+
+--const x _ =  x
+--f' = const f
+--f = fix (const f)
+--f' f = f
+-- any function could be a fixed point of other functions, recursive or not
+reverse'' = const reverse
+main = print $ reverse'' reverse [1,2,3]
+
+------------------------------------------------------
+<Cale> fix f = let x = f x in x
+
+<liiae> Cale:
+        https://www.quora.com/Why-doesnt-Haskell-implement-infinite-types
+
+<liiae> Cale: we can turn that infinite type to fixed-point stuff?
+<awpr> you can write a type family that acts sort-of like `fix`, but it will
+       just ruin GHC's day; or, you can write a newtype that acts slightly
+       less like `fix` and get recursively-defined but not infinite types
+                                                                        [15:15]
+<Cale> Which infinite type?
+<Cale> But yeah, if you run into a case where you'd otherwise want an infinite
+       type, you can generally turn it into a recursively defined type  [15:16]
+<awpr> `newtype Fix f = Fix (f (Fix f))` is the common definition, and it
+       gives you (modulo newtype constructors) `f (f (f (f (f (f ...)))))))`
+
+----------------------------------------------------
+newtype Fix f = MkFix (f (Fix f))
+MkFix :: f (Fix f) -> Fix f
+when f ~ Maybe
+MkFix :: Maybe (Fix Maybe) -> Fix Maybe
+Nothing :: Maybe (Fix Maybe)
+MkFix Nothing :: Fix Maybe
+Just $ MkFix Nothing :: Maybe (Fix Maybe)
+MkFix (Just (MkFix Noting)) :: Fix Maybe
+MkFix (Just (MkFix (Just (MkFix Nothing)))) :: Fix Maybe
+
+
+data ExprF a = Const Int | Add a a
+Const 3 :: ExprF a == ExprF (Fix ExprF)
+MkFix (Const 3) :: Fix ExprF
+Add (MkFix (Const 3)) (MkFix (Const 3)) :: ExprF (Fix ExprF)
+MkFix $ Add (MkFix (Const 3)) (MkFix (Const 3)) :: Fix ExprF
+
+data ExprF a = Const Int | Add a a | Mult a a
+this is related to parser or eval something
+
+F-Algebras
+
+https://bartoszmilewski.com/2013/06/10/understanding-f-algebras/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+currying, eval from left to right on the parameter sequence
+f a b c = ((f a) b) c
+
+compose, from right to left
+f . a = \x -> f (a x)
