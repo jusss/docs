@@ -1,4 +1,229 @@
 
+import Control.Monad.Writer
+import Data.Time
+
+-- :info! WriterT to get WriterT's definition
+-- :t writer (3, "3") :: Writer String Int 
+-- that'll let you test such hypotheses
+
+-- data Writer w a = Writer { runWriter :: (a, w) }
+-- newtype WriterT w m a = WriterT { runWriterT :: m (a, w) }
+-- type Writer w = WriterT w Identity
+
+half :: Int -> Writer String Int
+half x = do
+     tell ("halved " <> (show x) <> ",")
+     return (x `div` 2)  -- context is Writer ( ,String)
+
+-- main = print $ runWriter (half 16 >>= half >>= half)  
+
+--main = print $ runWriter $ writer (16, "16 ")
+
+-- Writer isn't an instance of MonadIO, so liftIO can't lift IO into it
+-- WriterT is an instance of MonadIO, which liftIO can lift IO into
+halfWriter :: WriterT String IO Int -> WriterT String IO Int
+halfWriter x = do
+    v2 <- (liftIO getCurrentTime)
+    v <- x
+    tell ((show v) <> "," <> (show v2) <> ",")
+    return (v `div` 2)
+
+main = do
+    l <- runWriterT $ halfWriter (writer (16, ""):: WriterT String IO Int)
+    l2 <- runWriterT $ halfWriter (writer l :: WriterT String IO Int)
+    print l2
+
+-- main = print =<< (runWriterT $ halfWriter (writer (16, ""):: WriterT String IO Int))
+    
+
+-- == (2,"halved 8,halved 4,")
+
+--main = print $ runWriter ( writer ("3", 3 :: Sum Int))
+--main = print $ runWriter ( writer ("3", Just "3"))
+
+--------------------------------------------------
+<lortabac> 'data MaybeInt = Nothing | Just Int' is correct
+<liiae> lortabac: only before Int is defined before this
+<liiae> everything comes from some where
+<liiae> lortabac: Just 3 :: Maybe Int, in your definition, Just 3 :: MaybeInt
+<liiae> lortabac: Just 3 is a value, Maybe Int is a type, and yes , there
+        could be Just Int in data definition, what we should call it?
+<liiae> data P = P Int
+<liiae> P 3 :: P
+<liiae> what we should call `P Int`?
+<Cale> Yeah, that "Just Int" that potentially appears in a data declaration is neither an expression nor a type. It's a data declaration constructor clause, I guess.
+<liiae> in the right side of =, P is a value constructor, and Int is a type,
+        what we call P Int?
+<Cale> It's just a thing that defines a new data constructor, things of that
+       sort only appear in data declarations and define data constructors
+<liiae> Cale: yes, but why people didn't split it or give it a new name so it won't confused beginners
+<liiae> if a show up in the left of = in the type definition, it can show up
+in the right side, and a can't show in the right side if a didn't show up in the left side unless a is defined in somewhere else
+
+<liiae> Cale: what's the different between `type IS = Either Int String` and
+        `data IS = Either Int String`?
+<liiae> oh, I see, this Either in the second is not that Either in the lib
+
+type IS = Either Int String
+:t (Left 3) :: IS
+
+<liiae> newtype Fix f = Fix (f (Fix f)), this value constructor Fix in the
+ right side of = has nothing to do with the second Fix in the right of =
+<Cale> The first and third Fix are the same thing, the second Fix is a
+       different thing
+<liiae> the second Fix in the right side of = is that left Fix
+<Cale> It might be less confusing to write like:
+<Cale> newtype Fix f = MkFix (f (Fix f))
+<liiae> right
+------------------------------------------------------------
+
+Monad, MonadIO, MonadTrans are typeclass
+IO is type
+
+lift is for MonadTrans, lift a monad into other monad context, combine to a new one for multiple effects
+
+liftIO is for MonadIO, lift an IO into other monad context,
+MonadIO is about access to IO, lift other type into IO
+
+instance (Monoid w, MonadIO m) => MonadIO (WriterT w m) where
+  liftIO = lift . liftIO
+
+WriterT w m is an instance of MonadIO only when m is an instance of MonadIO,
+and IO is an instance of MonadIO
+
+Writer is a monad, not a monadIO, Writer doesn't have the access to IO
+but WriterT has the access to IO
+
+<liiae> MonadIO is the type who can access IO?
+<liiae> what about MonadTrans, MonadTrans is for multiple effects to combine
+        monad?
+<liiae> to an giant one or new one
+
+------------------------------------------------
+
+ghci, think ghci is a whole IO,
+so `l <- (getCurrentTime :: IO UTCTime)` is ok
+but `s <- Just 3` is ok in ghci
+:info! WriterT to get WriterT's definition
+:t writer (3, "3") :: Writer String Int 
+that'll let you test such hypotheses
+
+
+Writer is a logger, it can log function every call like time or parameters, store the log in its value
+Reader is an environment, 
+State is both
+Maybe is a option, 
+Either is a advance Maybe
+Cont is a jump
+IO do everything with outside world
+[] is a store
+() is another store
+
+
+import Control.Monad.Writer
+--data Writer w a = Writer { runWriter :: (a, w) }
+half :: Int -> Writer String Int
+half x = do
+     tell ("halved " <> (show x) <> ",")
+     return (x `div` 2)  -- context is Writer ( ,String)
+
+main = print $ runWriter (half 16 >>= half >>= half)  
+
+tell is for concat w in Writer w a
+return is for computate value a in Writer w a
+writer is for make a Writer w a, writer (16, "16 ")
+
+runWrite (Writer w a) :: (a, w), then fst can get a from Writer w a
+
+halfWriter :: Writer String Int -> Writer String Int
+halfWriter x = do
+    v <- x
+    tell ((show v) <> ",")
+    return (v `div` 2)
+main = print $ runWriter $ ((halfWriter (writer (16, ""))) >>= half)
+
+
+<liiae> Maybe a is a monoid when a is a monoid, and Maybe is a monad
+monoid has kind *
+monad has kind *->*
+Maybe Int is not a monoid
+Maybe String is a monoid
+a monoid is a semigroup with a unit
+<dsal> a monoid is a semigroup with an empty value.
+<dsal> > Just "hi" <> mempty
+
+[] is a monad has kind *->*
+[a] is a monoid, even [Int] is a monoid
+
+mtl and transformers two packages for monad transformers
+transformers is old one
+Control.Monad.Writer is from transformers
+and it points to Control.Monad.Trans.Writer.Lazy
+
+w is short for writer, a is short for the value of computation, like Just a
+w need to be a monoid type,
+see the >>= definition for Writer or WriterT, that w need to be <>
+so it needs to be a mnoid instance
+
+<liiae> Maybe a is a monoid when a is a monoid, and Maybe is a monad
+Maybe Int is not a monoid
+
+writer ("3", 3) 3 is Int not a monoid type, 
+change it to writer ("3", 3 :: Sum Int)
+Sum is from Data.Monoid.
+
+String [] are monoid, Int is not
+
+<liiae> 0 is a unit in (+)
+<awpr> the second one is fairly right: 0 and (+) form a monoid (lower-case
+       monoid) over integers
+<awpr> `Sum` is a type that has a `Monoid` (upper-case) instance implementing that 0 and (+) behavior
+<dsal> A monoid is any type that has a binary operator (think: "combine") and an empty value.
+<liiae> Cale: the logs is w, and result is a, in Writer w a
+<Cale> liiae: yeah
+<liiae> w is a monoid instance, so it can be concatenated
+<Cale> yep
+
+newtype WriterT w m a = WriterT { runWriterT :: m (a, w) }
+type Writer w = WriterT w Identity
+
+
+import Control.Monad.Writer
+main = print $ runWriterT (WriterT (Just ('3', 3)))
+
+WriterT (Just ('3',True)) :: WriterT Bool Maybe Char
+
+writer (3, "3") :: Writer String Int :: WriterT String Identity Int
+
+:t writer (3, "3") :: Writer String Int 
+that'll let you test such hypotheses
+
+
+---------------------------------------------------
+newtype Fix f = MkFix (f (Fix f))
+MkFix :: f (Fix f) -> Fix f
+when f ~ Maybe
+MkFix :: Maybe (Fix Maybe) -> Fix Maybe
+Nothing :: Maybe (Fix Maybe)
+MkFix Nothing :: Fix Maybe
+Just $ MkFix Nothing :: Maybe (Fix Maybe)
+MkFix (Just (MkFix Noting)) :: Fix Maybe
+MkFix (Just (MkFix (Just (MkFix Nothing)))) :: Fix Maybe
+
+
+data ExprF a = Const Int | Add a a
+Const 3 :: ExprF a == ExprF (Fix ExprF)
+MkFix (Const 3) :: Fix ExprF
+Add (MkFix (Const 3)) (MkFix (Const 3)) :: ExprF (Fix ExprF)
+MkFix $ Add (MkFix (Const 3)) (MkFix (Const 3)) :: Fix ExprF
+
+data ExprF a = Const Int | Add a a | Mult a a
+this is related to parser or eval something
+
+F-Algebras
+
+https://bartoszmilewski.com/2013/06/10/understanding-f-algebras/
+----------------------------------------------------------------
 #Fixed Point
 https://up.monade.li/sL34es
 `fix` allows you to delegate away recursion, so given a recursive definition like
