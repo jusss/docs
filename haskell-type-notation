@@ -1,0 +1,72 @@
+data P = P Int
+P Int is not a value neither a type,
+P 3 is a value, which type is P
+P is a value(data) constructor also a type constructor here
+also P is a function,(different than action)
+'cause P :: Int -> P
+
+P Int may be called constructor specification,
+https://wiki.haskell.org/Type#Data_declarations
+
+but I'd like call it "type notation" or "pseudo type"
+a "type notation" is not a type neither a value
+
+data Writer w a = Writer (a, w)
+Writer (a, w) is a "type notation", not a type neither a value
+Writer (3, "3") is a value, which type is Writer String Int
+this w here it must be a monoid
+
+types have kinds, values have types
+Those are two different -> in type and kind, when -> is in type, 
+it means this value is a function, otherwise it may be an action
+when -> is in kind, it means the type may be a monad, 
+otherwise the type is not a moand
+id :: a -> a
+getLine :: IO String
+id is a function, a value, which type is a -> a, it doesn't has kind
+getLine is an IO action, a value, which type is IO String, it doesn't has kind
+
+Maybe is a type, has kind * -> *
+Int is a type, has kind *
+Maybe Int is a type, has kind *
+
+Just 3 is a action, a value, Just is a function, a value,
+Just is also a data constructor
+and both Just 3 and Just don't has kind, but Maybe has kind * -> *, and Maybe Int has kind *
+
+monad has kind * -> *, monoid has kind *
+Maybe is a monad, and Maybe String is a monoid only when String is a monoid
+[] is a monad, [a] is a monoid
+
+a monoid which is a semigroup with an empty value
+
+not all types which have kind * -> * are monad,
+only when they implement <$> <*> >>= return and join, they become monad
+
+0 is the unit in (+), 1 is the unit in (*), return is the unit in >>=,
+[] is a monoid, which empty value is []
+
+0 and (+) form a monoid, likewise, [] and (++) form a monoid.
+to form a monoid, you need an identity element, and an operator, such
+that the operator is associative, and the identity element can be
+used to remove and introduce that operator.
+
+0 and (+) form a monoid, 1 and (*) form a monoid
+[] and <> form a monoid, return and >=> form a monoid
+
+(a + b) + c = a + (b + c), and 0 + a = a = a + 0
+
+monad has three laws, left identity, right identity and associativity
+
+associative
+(a + b) + c = a + (b + c)
+(a * b) * c = a * (b * c)
+(f . g) . h = f . (g . h)
+(a >=> b) >=> c   =   a >=> (b >=> c)
+
+but (a >>= b) >>= c    /=    a >>= (b >>= c)
+(a >>= b) >>= c     =     a >>= (b >=> c)
+(a >>= b) >>= c     =     a >>= (\x -> b x >>= c)
+
+so question, return and >>= form a monoid?
+>>= obey the associative law of monad?
