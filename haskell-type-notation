@@ -70,3 +70,18 @@ but (a >>= b) >>= c    /=    a >>= (b >>= c)
 
 so question, return and >>= form a monoid?
 >>= obey the associative law of monad?
+
+https://wiki.haskell.org/Monad_laws
+
+m >>= (\x -> f x) >>= g   =   m >>= (\x -> f x >>= g)
+f = return . (+1)
+g = return . (+2)
+Just 3 >>= (\x -> f x) >>= g     =     Just 6
+Just 3 >>= (\x -> f x >>= g)     =     Just 6
+
+left identity return >=> g = g
+right identity f >=> return = f
+associativity f >=> g >=> h = f >=> (g >=> h)
+
+
+
