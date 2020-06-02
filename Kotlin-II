@@ -1,0 +1,287 @@
+
+------------------------------------------------------
+interface can do communication between class in kotlin
+interface can do ad-hoc polymorphism in haskell
+ad-hoc or overload, one function take different type parameter,
+do different behaviors
+interface, generic in java
+
+----------------------------------------------------------
+#Kotlin #Interface #Class #Communication
+
+to visit part attributes of an class in another class, not whole
+
+type has functions, class has functions,
+when B pass itself with type A to instance C,
+so C only can visit type A's attributes which is implement function a
+
+interface A, class B, class C,
+make an interface A and implement function a,
+make class B implement that interface A, 
+and call B's attributes in function a in B,
+then instance C with B's instance in B, with B's type is A,
+and within C, C only can visit that attributes of 
+B in function a, C can't visit whole attributes of B
+
+interface A { fun a () }
+class B : A {
+  val b = 1
+  val b2 = 2
+  override fun a () {
+    return b
+  }
+  val c = C(this)
+  print(c.getBattr())
+}
+
+class C internal constructor(val b: A) {
+  fun getBattr () {
+    print(b.a()) // here C can only visit B.b
+  }
+}
+
+-----------------------------------------------------------
+
+#Kotlin #Coroutine
+https://kotlinlang.org/docs/reference/coroutines/basics.html#coroutine-basics
+GlobalScope.launch { // launch a new coroutine in background and continue
+        delay(1000L) // non-blocking delay for 1 second (default time unit is ms)
+        println("World!") // print after delay
+    }
+this GlobalScope.launch {} is non-blocking
+GlobalScope mean lifetime is whole application
+you should try CoroutineScope
+
+runBlocking {     // but this expression blocks the main thread
+        delay(2000L)  // ... while we delay for 2 seconds to keep JVM alive
+        // this delay is blocking
+    } 
+
+fun main() = runBlocking<Unit> { // start main coroutine
+    GlobalScope.launch { // launch a new coroutine in background and continue
+        delay(1000L)
+        println("World!")
+    }
+    println("Hello,") // main coroutine continues here immediately
+    delay(2000L)      // delaying for 2 seconds to keep JVM alive
+}
+
+delay in GlobalScope.launch is non-blocking
+delay in runBlocking is blocking
+
+val job = GlobalScope.launch { // launch a new coroutine and keep a reference to its Job
+    delay(1000L)
+    println("World!")
+}
+println("Hello,")
+job.join() // wait until child coroutine completes
+
+fun main() = runBlocking { // this: CoroutineScope
+    launch { // launch a new coroutine in the scope of runBlocking
+        delay(1000L)
+        println("World!")
+    }
+    println("Hello,")
+}
+runBlocking will block whole main wait for the coroutine ending,
+and launch in runBlocking is non-blocking
+
+runBlocking and coroutineScope may look similar because they both wait 
+for its body and all its children to complete. The main difference between 
+these two is that the runBlocking method blocks the current thread for waiting, 
+while coroutineScope just suspends,
+
+there shouldn't be two GlobalScope in the code, there's conflicted
+but there could be two coroutineScope
+
+import kotlinx.coroutines.*
+
+fun main() = runBlocking { // this: CoroutineScope
+    launch { 
+        delay(200L) //non-blocking
+        println("Task from runBlocking")
+    }
+    
+    coroutineScope { // Creates a coroutine scope
+        launch {
+            delay(500L)  // non-blocking
+            println("Task from nested launch")
+        }
+    
+        delay(100L) // blocking
+        println("Task from coroutine scope") // This line will be printed before the nested launch
+    }
+    
+    println("Coroutine scope is over") // This line is not printed until the nested launch completes
+}
+
+Task from coroutine scope
+Task from runBlocking
+Task from nested launch
+Coroutine scope is over
+
+
+fun main() = runBlocking {
+    launch { doWorld() }
+    println("Hello,")
+}
+
+// this is your first suspending function
+suspend fun doWorld() {
+    delay(1000L)
+    println("World!")
+}
+Suspending functions can be used inside coroutines just like regular functions,
+they can use additional feature in coroutine, here is delay
+
+
+fun main() = runBlocking {
+    repeat(100_000) { // launch a lot of coroutines
+        launch {
+            delay(1000L)
+            print(".")
+        }
+    }
+}
+It launches 100K coroutines and, after a second, each coroutine prints a dot.
+
+Dispatchers.Main is for UI, Dispatchers.IO is for IO, there're also Default and Unconfined
+https://stackoverflow.com/questions/54671817/update-ui-async-call-with-coroutines
+
+Dispatchers.Main is A coroutine dispatcher that is confined to the Main thread operating with UI objects. 
+Usually such dispatchers are single-threaded.
+
+https://developer.android.com/kotlin/coroutines
+In Kotlin, all coroutines must run in a dispatcher, even when they're running on the main thread. 
+Coroutines can suspend themselves, and the dispatcher is responsible for resuming them.
+
+To specify where the coroutines should run, Kotlin provides three dispatchers that you can use:
+
+    Dispatchers.Main - for UI, change TextView
+    Dispatchers.IO - for IO, network, socket, file writing
+    Dispatchers.Default - for computation, parsing json
+
+call withContext(Dispatchers.IO) to create a block that runs on the IO thread pool.
+
+https://stackoverflow.com/questions/53079234/how-to-update-ui-in-coroutines-in-kotlin-1-3
+https://medium.com/swlh/how-can-we-use-coroutinescopes-in-kotlin-2210695f0e89
+
+private var viewModelJob = Job()
+private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
+
+uiScope.launch {
+            withContext(Dispatchers.IO) {
+                //Do background tasks...
+                withContext(Dispatchers.Main){
+                    //Update UI
+                }
+            }
+        }
+------------------------------------------------------
+
+update TextView in other class than MainActivity.kt
+
+"there's a TextView in activity_main.xml, I can use findViewById to update text 
+on that TextView in MainActivity.kt, but findViewById is not resolved in other file like AnotherClass.kt"
+
+Er Imran4u  3 days ago
+findViewById you will not get in other class. if you have to use textview in other class, then pass textview object in that class
+
+Olenyov Kirill  3 days ago
+Or you need to have another activity/fragment in your AnotherClass.kt inflated with activity_main.xml
+
+one way is get the TextView by findViewById in MainActivity and passing it to another ClassB by Class initialize
+another way is via interface, make an interface A, and function B within it, 
+make MainActivity implement that interface, and do findViewById stuff in that function B,
+then use `this` pass MainActivity to Class B by Class B initialize in MainActivity, 
+so class B can use function B to operate that TextView
+https://stackoverflow.com/questions/46217551/communication-between-class-and-activity-via-interface
+
+#One Way
+
+class MainActivity : RobotActivity(), RobotLifecycleCallbacks {
+
+    lateinit var  showTextView: TextView
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // Register the RobotLifecycleCallbacks to this Activity.
+        setContentView(R.layout.activity_main)
+
+        showTextView = findViewById<TextView>(R.id.text1)
+    }
+
+    override fun onRobotFocusGained(qiContext: QiContext) {
+        val qnAChatbot = QnAChatbot(qiContext,showTextView)
+     }
+}
+
+class QnAChatbot internal constructor(context: QiContext?, val showAnwser: TextView) : BaseChatbot(context) {
+
+    override fun replyTo(phrase: Phrase, locale: Locale): StandardReplyReaction? {
+        if (phrase.text.isNotEmpty()){
+            val response = mainNLP(phrase.text)
+               showAnwser.text = response
+        }
+    }
+}
+
+#Another Way
+class MainActivity : QnAChatbot.UpdateTextView, RobotActivity(), RobotLifecycleCallbacks {
+    override fun changeTextView(x: String) {
+        val showTextView = findViewById<TextView>(R.id.text1)
+        showTextView.text=x
+    }
+}
+
+class QnAChatbot internal constructor(context: QiContext?, mac: UpdateTextView) : BaseChatbot(context) {
+    interface UpdateTextView {
+        fun changeTextView(x: String)
+    }
+lateinit var n : UpdateTextView
+    init {
+         n = mac
+    }
+
+    override fun replyTo(phrase: Phrase, locale: Locale): StandardReplyReaction? {
+        if (phrase.text.isNotEmpty()){
+            val response = mainNLP(phrase.text)
+            n.changeTextView(response)
+}}}
+
+----------------------------------------------------------
+
+#Kotlin #Constructor #Parameter #Class #init #self
+class Another (val a: TextView) {
+      fun runText() {
+          a.text = "a"
+      }
+}
+
+this a can be resolved when using `val` in the constructor,
+if it's 
+class Another (a : TextView) {
+      fun runText() {
+          a.text = "a"   // this a is not resolved
+      }
+}
+
+but there's another way
+class Another (a : TextView) {
+      lateinit var an: TextView
+      init {
+           an = a
+           }
+      fun runText() {
+          an.text = "a"
+      }
+}
+or 
+class Another (a: TextView) {
+      val an = a
+      fun runText(){
+          an.text = "a"
+      }
+}
+
+https://stackoverflow.com/questions/52567108/why-to-put-val-or-var-in-kotlin-class-constructors
