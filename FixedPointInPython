@@ -1,0 +1,153 @@
+use eta-conversion to do 'thunk' for that turn call-by-name function to call-by-value function
+to avoid eval immediatly
+fix f = f (fix f) this fix f will eval immediatly in call-by-value eval stratege,
+use eta-conversion to do thunk, fix f = \x -> f (fix f) x, this won't eval immediatly in call-by-value
+
+<jusss> Axman6: I tried that fix f = f (fix f), it won't work in python, does
+        haskell do some magic on it?
+<jusss> fix = lambda f: f(fix(f))                                       [09:54]
+<jusss> reverse__ = lambda f: lambda l: [] if l == [] else f(l[1:]) + [l[0]]
+<dolio> Python is call-by-value, so you'd need to use a different combinator.
+<dolio> `fix f x = f (\y -> fix f y) x` or something along those lines.
+<dolio> It's probably only important to guard the fix call.
+<dolio> jusss: Yes. Call-by-value will just keep calling fix forever
+        immediately.
+<dolio> So you need to eta expand around the call to fix, and it can't work
+        for values.
+<dolio> Or, non-functions.
+<jusss> dolio: you're right! fix = lambda f,x: f((lambda y: fix(f,y)),x)
+<jusss> reverse_ = lambda f,l: [] if l == [] else f(l[1:]) + [l[0]]
+<jusss> print(fix(reverse_,[3,8,9]))
+<ski>   (define fix (lambda (f) (lambda (x) ((f (fix f)) x))))  ; or this, if
+      you just want to support passing one argument to `f'
+<ski>   fix = lambda f: lambda x: f(fix(f))(x)
+<ski>   reverse = fix(lambda f: lambda l: [] if l == [] else f(l[1:]) + [l[0]])
+<jusss> f = partial(fix,reverse_)
+<ski>   print(reverse([3,8,9]))                                         [10:15]
+<ski> jusss : are you sure something like that ^ doesn't work ?
+<jusss> ski: yes, it will work, 
+<ski> so, Python does "support currying"                                [10:16]
+<jusss> "The obvious definition of the Y combinator (\f-> (\x -> f (x x))
+        (\x-> f (x x))) cannot be used in Haskell because it contains an
+        infinite recursive type (a = a -> b). Defining a data type (Mu) allows
+        this recursion to be broken. "                                  [10:17]
+<jusss> https://rosettacode.org/wiki/Y_combinator#Haskell
+<jusss> is that true?
+<ski> oh, and `(cons (f (cad l)) (car l))' in your Scheme version ought to be
+      `(append (f (cdr l)) (list (car l)))' (and i'd rather use `(null? l)' as
+      the condition)                                                    [10:18]
+<ski> jusss : yes. you can do it with `ocaml -rectypes', though
+<ski> (but there's a reason why neither Haskell, nor OCaml (by default)
+      supports equi-recursive types, aka "infinite types" or "cyclic types")
+<jusss> dolio: "<dolio> `fix f x = f (\y -> fix f y) x` or something along
+        those lines." you did twice eta-conversion?
+<jusss> fix f = f (fix f); fix f x = f (fix f) x                        [10:20]
+<jusss> fix f x = f (\y -> fix f y) x
+<ski> jusss : "It's probably only important to guard the fix call."
+<jusss> ski: by how?                                                    [10:21]
+<ski> huh ?
+<ski> (i don't understand the question)
+<jusss> I don't understand "guard the fix call"
+<ski> (that's what i wrote in my Scheme and Python versions, anyway)
+<ski> jusss : but, this is assuming a strict language (otherwise no eta is
+      needed)
+<ski> jusss : so, in the definition `fix = lambda f: f(fix(f))', eta-expanding
+      `f(fix(f))' there yeilds `fix = lambda f: lambda y: f(fix(f))(y)'
+<jusss> ski: fix f = f (fix f) = \y -> f (fix f) y = f (\y -> fix f y)?
+<jusss> outsider and inner eta-conversion
+<ski> hm, yes. so i ought to have said that `fix f x = f (fix f) x' is
+      enough. sorry about that                                          [11:13]
+<jusss> ski: oh, I see
+<ski> you want the call `fix f' to not immediately call `fix' again     [11:14]
+<monochrom> It is easy to lose track and forget that Haskell is merely a
+            programming language.
+<ski> so, if you define `fix f' to be `\y -> (...) y', then that lamda will
+      "guard" the `fix' call inside `...', which here is `f (fix f)'
+<ski> next, when you actually supply an input `y' to `fix f', you don't want
+      the body `f (fix f) y' to run away into an infinite loop. but since `fix
+      f' here will compute (say) `\z -> (...) z' (renaming `y' to `z', just
+      for clarity), that call to `fix' won't cause any further immediate
+      expansion. only when `f' decides to call its argument function, with
+      some input `z', will that `...' inside the argument function `\z ->
+      (...) z' happen
+<ski> and so on ..
+<ski> jusss : does that make any sense ?
+<jusss> ski: this trick is related to that trampoline?
+<ski> jusss : not really
+<monochrom> Completely unrelated to trampoline.
+<ski> (at least not that i'm aware of)
+<monochrom> Instead, this is how to fake call-by-name in a call-by-value
+            language, by raising every basic value to the function level.
+<ski> trampolines can be used to implement tail-calls on top of a system which
+      doesn't provide them                                              [11:21]
+<monochrom> You want "1+1" to be evaluated later not sooner? Turn it into a
+            function, \() -> 1+1.
+<ski> (such a function is often called a "thunk")
+<jusss> ski: someone tell me that eta-conversion could be really help when do
+        reduction in CPS, he suggest me to read <On One-Pass CPS
+        Transformations>
+<ski> hm, i don't recall if i've read that one
+<jusss> and I have no idea what that is now...
+<jusss> by Oliver Danvy
+<ski> jusss : but you might perhaps have some use, reading either "Abstracting
+      Control" or "Representing Control" (i forgot which), by Olivier Danvy &
+      Andrzej Filinski
+<ski> hah, doesn't surprise me that that was Danvy                      [11:23]
+<ski> and yes, strategic eta-expansions are helpful for that
+<d34df00d> Is there any combinator that's reasonably close?             [11:24]
+<jusss> ski: I will take a little time to think about this, and thank you
+
+<lambdabot> fix f = let x = f x in x
+<Axman6> jusss: fix f = f (fix f)
+from functools import partial
+
+reverse = lambda l: [] if l == [] else reverse(l[1:]) + [l[0]]
+#print(reverse([1,2,3]))
+
+reverse_ = lambda f,l: [] if l == [] else f(l[1:]) + [l[0]]
+#print(reverse_(reverse,[1,2,3]))
+
+reverse__ = lambda f: lambda l: [] if l == [] else f(l[1:]) + [l[0]]
+
+#fix f = f (fix f)   
+#fix = lambda f: f(fix(f)) //won't work in call-by-value eval strategy
+#fix f = f (fix f) = \y -> f (fix f) y = f (\y -> fix f y) // outsider and inner eta-conversion
+
+#fix f x = f (\y -> fix f y) x   //do twice eta-conversion
+fix = lambda f,x: f((lambda y: fix(f,y)),x)  #will work in call-by-value
+
+#fix f x = f (fix f) x  //do once eta-conversion is enough
+fix2 = lambda f: lambda x: f(fix2(f))(x)
+
+rev1 = partial(reverse_, reverse)
+rev2 = partial(reverse_, rev1)
+print(reverse_(rev2,[1,2,3]))
+
+const = lambda x, _: x
+_reverse = partial(const, reverse)
+print(_reverse(_reverse(reverse))([1,2,3]))
+print(fix(reverse_,[3,8,9]))
+print(fix2(reverse__)([3,9,2]))
+
+
+"""
+const x _ =  x
+f' = const f
+f = fix (const f)
+f' f = f
+
+-- any function could be a fixed point of other functions, recursive or not
+reverse [] = []
+reverse (x:xs) = reverse xs ++ [x]
+
+reverse' f [] = []
+reverse' f (x:xs) = f xs ++ [x]
+
+main = print $ reverse' (reverse' reverse) [1,2,3]
+
+
+f2 = lambda f, n, accum: accum if n==1 else f ((n-1), (n* accum))
+f2NoRecur = lambda n, accum: accum if n ==1 else f2 (f2NoRecur, (n-1), (n* accum))
+print(f2NoRecur(990,1))
+
+"""
