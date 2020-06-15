@@ -2,8 +2,14 @@ on debian, wireguard-tools wireguard-dkms,
 make sure linux-image-amd64 and linux-headers-$(uname -r) 
 are installed
 debian buster doesn't have wireguard, use sid
-update to sid, then install linux-image-amd64 and linux-headers
+
+cat /etc/apt/sources.list
+deb http://deb.debian.org/debian/ unstable main contrib non-free
+aptitude update
+update to sid, then install linux-image-amd64 and linux-headers-$(uname -r)
+then reboot
 then install wireguard-tools and wireguard-dkms
+use `modprobe wireguard` and `lsmod|grep wireguard` to check if wireguard module is loaded
 and also if your vps doesn't have ipv6, then don't use ipv6 on wireguard config
 --------------------------------
 /etc/wireguard/wg0.conf 
