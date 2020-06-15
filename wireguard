@@ -1,7 +1,18 @@
+on debian, wireguard-tools wireguard-dkms,
+make sure linux-image-amd64 and linux-headers-$(uname -r) 
+are installed
+debian buster doesn't have wireguard, use sid
+update to sid, then install linux-image-amd64 and linux-headers
+then install wireguard-tools and wireguard-dkms
+and also if your vps doesn't have ipv6, then don't use ipv6 on wireguard config
+--------------------------------
 /etc/wireguard/wg0.conf 
 wg-quick up wg0
 wg-quick down wg0
+wg # to show current status
 
+note: 10.0.0.2/32 on server, but 10.0.0.2/24 on client
+on client, Allowd IPs 0.0.0.0/0, not 0.0.0.0/32
 -----------------------------------------
 on Server
 
