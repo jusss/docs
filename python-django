@@ -1,0 +1,840 @@
+Debug = True in settings.py will not raise 404 handler when url doesn't exist
+set Debug = False
+
+
+<serafeim> f.e `url(r'^((?:[\w\-]+/)*)$', match_all_handler, )`         [15:10]
+<serafeim> to match all just add a regex url that would match all in *the end*
+           of your url patterns
+<blitzkraft> include is to have paths from different "apps" within your project.
+<serafeim> path does not support regex
+<serafeim> you need url or re_path
+
+
+from django.conf.urls import handler404, url
+        url(r'^((?:[\w\-]+/)*)$', handler404 ),
+-------------------------------------------------------------
+1. forms.py
+class LoginForm(forms.Form):
+    username = forms.CharField(label='username', max_length=100)
+    password = forms.CharField(label='password', max_length=100)
+
+2. views.py
+@ensure_csrf_cookie
+def login_view(request):
+    #    if request.user.is_authenticated:
+    if request.method == "POST":
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            #username = request.POST['username']
+            #password = request.POST['password']
+            print(form.cleaned_data)
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('post_new')
+            else:
+                return HttpResponse("invalid login")
+    else:
+        form = LoginForm()
+
+    return render(request, 'blog/login.html', {'form': form}) # login page
+
+3. login.html
+<form method="POST" class="post-form"> 
+        {% csrf_token %}
+         <!-- <p><label for="id_username">user:</label>
+    <input id="id_username" type="text" name="username" maxlength="100" required></p>
+        <p><label for="id_password">password:</label>
+    <input id="id_password" type="text" name="password" maxlength="100" required></p>
+       <input type="submit" value="Submit">
+   -->
+   {{ form.as_p }}
+
+       <input type="submit" value="Submit">
+</form>
+
+4. urls.py
+   path('post/login', views.login_view, name='login_view'),
+
+5. post.py
+import requests
+url = 'http://localhost:8000/post/login'
+client = requests.session()
+headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+client.get(url)
+csrftoken = client.cookies['csrftoken']
+login={'username':'john', 'password':'nopassword','csrfmiddlewaretoken' : csrftoken}
+r2 = client.post('http://localhost:8000/post/login',data=login) # after this post, client instance has cookies for login
+
+client.get('http://localhost:8000/post/new')
+csrftoken = client.cookies['csrftoken']
+params={'title':"617 618", 'text':"John",'csrfmiddlewaretoken' : csrftoken}
+r3 = client.post('http://localhost:8000/post/new',data=params)
+print(r3.text)
+
+REMEMBER it's /post/new in urls.py, not /post/new/, notice that!
+---------------------------------
+
+there're two cookies, session cookie and csrf cookie, 
+they're different
+if you want use csrf token, then on you view use ensure_csrf_cookie decorator
+
+from django.views.decorators.csrf import ensure_csrf_cookie
+@ensure_csrf_cookie
+def post_new(request):
+
+and in template
+ {% csrf_token %}
+
+in post you can do
+client = requests.session()
+client.get(url)
+csrftoken = client.cookies['csrftoken']
+
+and you should have two views, one view for login, another view for post
+
+
+------------------------------------------------------------
+
+<jusss> FunkyBob: I don't know how to do auth on both side
+<jusss> requests and django
+<FunkyBob> jusss: on the django side, you read the auth docs...
+<FunkyBob> https://docs.djangoproject.com/en/3.0/topics/auth/
+<FunkyBob> the shortest path is to include the urls from
+           django.contrib.auth.urls
+<FunkyBob> and write templates for the views
+<FunkyBob> https://docs.djangoproject.com/en/3.0/topics/auth/default/#using-the-views
+<FunkyBob> from the client side... you do what a browser would do
+<FunkyBob> get the login page so you can get the CSRF Token             [14:04]
+<FunkyBob> then post to it with username+password
+<FunkyBob> so long as your client code remembers the session cookie, you're
+           good
+<FunkyBob> hence using requests.Session()
+
+1. create user
+python manage.py createsuperuser
+or
+>>> from django.contrib.auth.models import User
+>>> user = User.objects.create_user('john', 'lennon@thebeatles.com', 'johnpassword')
+>>> user.last_name = 'Lennon'
+>>> user.save()
+
+>>> from django.contrib.auth.models import User
+>>> u = User.objects.get(username='john')
+>>> u.set_password('new password')
+>>> u.save()
+
+2. auth, the simple way, with auth, without csrf
+comment  #'django.middleware.csrf.CsrfViewMiddleware', in settings.py and don't use {% csrf_token %} in templates
+cat blog/models.py
+class Post(models.Model):
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    title = models.CharField(max_length=200)
+    text = models.TextField()
+    created_date = models.DateTimeField(default=timezone.now)
+    published_date = models.DateTimeField(blank=True, null=True)
+
+cat blog/views.py
+def post_new(request):
+    username = request.POST['username']
+    password = request.POST['password']
+    user = authenticate(username=username, password=password)
+    if user is not None:
+        if request.method == "POST":
+            form = PostForm(request.POST)
+            if form.is_valid():
+                post = form.save(commit=False)
+                post.author = user
+                post.published_date = timezone.now()
+                post.save()
+                return redirect('post_detail', pk=post.pk)
+            else:
+                form = PostForm()
+        return render(request, 'blog/post_edit.html', {'form': form})
+    else:
+        return HttpResponse("invalid login")
+
+cat blog/forms.py
+from django import forms
+from .models import Post
+
+class PostForm(forms.ModelForm):
+    class Meta:
+        model = Post
+        fields = ('title', 'text',)
+
+post.py
+#!/usr/bin/python3
+import requests
+# chanage your context here
+params={'title':"619", 'text':"John", 'username':'john', 'password':'password'}
+headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+r = requests.post('http://net/post/new/', data=params, headers=headers)
+print(r.text)
+
+3. with csrf
+uncomment  #'django.middleware.csrf.CsrfViewMiddleware', in settings.py
+use {% csrf_token %} in templates
+
+
+
+
+
+
+
+
+#####################################################
+
+django-admin startproject mysite
+
+vim mysite/settings, 
+ALLOWED_HOST=['*']
+TIME_ZONE = 'Asia/Shanghai'
+LANGUAGE_CODE = 'en-us'
+STATIC_URL = '/static/'
+STATIC_ROOT = ''
+STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'), )
+#ALLOWED_HOSTS = ['127.0.0.1', '.pythonanywhere.com']
+
+python manage.py migrate # create a database, default use sqlite in settings.py
+
+python manage.py runserver 0.0.0.0:8000
+
+Post model is an object, which has some properties and methods
+Post model need some properties like 'title' 'text' 'author' 'created_date' 'published_date'
+and some methods like 'publish' for post
+
+a model is a special kind of object, it's saved in database,
+a database store information like users, posts, etc
+a model in the database as a spreadsheet with columns (fields) and rows (data).
+
+create an app
+python manage.py startapp blog
+
+mysite/settings.py
+INSTALLED_APPS = [
+    ...
+    'blog.apps.BlogConfig',
+]
+
+In the blog/models.py file we define all objects called Models
+
+blog/models.py
+
+from django.conf import settings
+from django.db import models
+from django.utils import timezone
+
+class Post(models.Model):
+    # Post model properties
+    # text is a filed's name in db, models.TextField() is text's type
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    title = models.CharField(max_length=200)
+    text = models.TextField()
+    created_date = models.DateTimeField(default=timezone.now)
+    published_date = models.DateTimeField(blank=True, null=True)
+
+    def publish(self):
+        # Post model methods
+        self.published_date = timezone.now()
+        # save Post model in database
+        self.save()
+
+    def __str__(self):
+        return self.title
+
+add Post model into db
+python manage.py makemigrations blog
+python manage.py migrate blog
+
+to add, edit and delete the posts, we use django admin
+blog/admin.py
+
+from django.contrib import admin
+from .models import Post
+# this blog app's admin site, and show Post model on admin page
+admin.site.register(Post)
+
+visit 192.168.1.62:8000/admin
+
+python manage.py createsuperuser # create a super user to login admin page
+
+now visit that address again, now you can login admin page, and see
+post model on it
+
+mysite/ulrs.py for route
+path('admin', admin.site.urls), # 'admin' is route addr, admin.site.urls is view
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', include('blog.urls')),
+]
+django will now redirect everything that comes into 'http://127.0.0.1:8000/' to blog.urls
+
+now create blog/urls.py
+blog/urls.py
+
+urlpatterns = [
+    path('', views.post_list, name='post_list'),
+]
+visit 127.0.0.0:8000 will redirect to 'views.post_list',
+name='post_list' can be same as the name of view, or different
+
+now create that blog views,
+A view is a place where we put the "logic" of our application. 
+It will request information from the model you created before and pass it to a template. 
+blog/views.py
+
+def post_list(request):
+    return render(request, 'blog/post_list.html', {})
+
+
+now create that pages within template,
+A template is a file that we can re-use to present different information in a consistent format,
+like mail format, same format, different contexts
+make -p blog/templates/blog
+
+blog/templates/blog/post_list.html
+
+<html>
+<body>
+    <p>Hi there!</p>
+    <p>It works!</p>
+</body>
+</html>
+
+now python manage.py runserver 0.0.0.0:8000
+then visit 192.168.1.62:8000, you will see post_list.html
+
+route
+vist 192.168.1.62:8000 -> mysite/ulrs.py -> blog/urls.py -> blog/views.py -> blog/templates/blog/post_list.html
+
+A QuerySet is, in essence, a list of objects of a given Model. 
+QuerySets allow you to read the data from the database, filter it and order it.
+
+python manage.py shell # interactive shell
+from blog.models import Post
+Post.objects.all() # show all the Post instances
+
+from django.contrib.auth.models import User
+User.objects.all() # show all the users instances
+
+me = User.objects.get(username='john')
+Post.objects.create(author=me, title='Sample title', text='Test') # create another Post object 
+Post.objects.all() # show all the Post instances
+
+Post.objects.filter(author=me) # filter all the post by user john
+Post.objects.filter(title__contains='title') # filter all the title contain 'title'
+
+from django.utils import timezone
+Post.objects.filter(published_date__lte=timezone.now()) # filter the post by time
+post = Post.objects.get(title="Sample title") # new Post instance
+post.publish() # save this new instance into db, publish() use post.save() to save it
+Post.objects.order_by('created_date') # order by date
+Post.objects.order_by('-created_date') # reverse the post date, - mean reverse here,
+Post.objects.filter(published_date__lte=timezone.now()).order_by('published_date') # filter will return a QuerySet
+exit()
+
+take some content (models saved in the database) and display it nicely in our template
+this is exactly what views are supposed to do: connect models and templates. 
+In our post_list view we will need to take the models we want to display and 
+pass them to the template. In a view we decide what (model) will be displayed in a template.
+
+views connect modles and templates
+
+now let's add Post model in view
+
+blog/views.py
+from django.shortcuts import render
+from django.utils import timezone
+from .models import Post # .models means models.py incurrent directory
+
+def post_list(request):
+    posts = Post.objects.filter(published_date__lte=timezone.now()).order_by('published_date')
+    return render(request, 'blog/post_list.html', {'posts': posts}) # pass the posts object to template
+
+now let's change template for that post object
+django template tags allow us to transfer Python-like things into HTML
+
+blog/templates/blog/post_list.html
+<div> {{ posts }} </div>  # now we can operate on that Post model object by add {{ }}
+
+{% for post in posts %} # use for to print it as a list
+    {{ post }}
+{% endfor %}
+
+{% for post in posts %}
+    <div>
+        <p>published: {{ post.published_date }}</p>
+        <h2><a href="">{{ post.title }}</a></h2>
+        <p>{{ post.text|linebreaksbr }}</p>
+    </div>
+{% endfor %}
+
+now you can read data from database in templates
+
+css should be blog/static/css/blog.css
+mkdir -p blog/static/css
+vim blog/static/css/blog.css
+h1 a, h2 a {
+    color: #C25100;
+}
+
+now in blog/templates/blog/post_list.html
+{% load static %}
+<html>
+<head>
+<link rel = "stylesheet" href = "{% static 'css/blog.css' %}">
+</head>
+....
+
+now, cp post_list.html base.html
+remove that {% post operations %} with 
+{% block content %}
+{% endblock %} in base.html
+
+so this base.html would be a frame
+in post_list.html remove everything with
+{% extends 'blog/base.html' %} # use base.html as frame
+{% block content %} # this below replace that block in base.html
+{% post operations %} # post operation like {% for post in posts %}
+{% endblock %}
+
+embed url in django template tags
+in post_list.html
+<h2><a href="{% url 'post_detail' pk=post.pk %}">{{ post.title }}</a></h2>
+The post_detail part means that Django will be expecting a URL in blog/urls.py with name=post_detail
+pk is short for primary key, which is a unique identifier for each record in a database.
+
+then let's create a url in urls.py for post_detail view
+blog/urls.py
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('', views.post_list, name='post_list'),
+    path('post/<int:pk>/', views.post_detail, name='post_detail'),
+]
+now visit 192.168.1.62:8000/post/5/ will vist post_detail view, and pass pk equals 5 to that view
+
+then create that post_detail view in blog/views.py
+blog/views.py
+from django.shortcuts import render, get_object_or_404
+def post_detail(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    return render(request, 'blog/post_detail.html', {'post': post})
+
+now that title could be click as a link, but we don't have post_detail.html
+let's create it in blog/templates/blog
+blog/templates/blog/post_detail.html
+{% extends 'blog/base.html' %}
+{% block content %}
+    <div class="post">
+        {% if post.published_date %}
+            <div class="date">
+                {{ post.published_date }}
+            </div>
+        {% endif %}
+        <h2>{{ post.title }}</h2>
+        <p>{{ post.text|linebreaksbr }}</p>
+    </div>
+{% endblock %}
+now pk is important here, you can click that different title link,
+and pass it different pk to post_detail view, same frame, different contexts from database
+http://192.168.1.62:8000/post/1/ this pk is 1 to post_detail view,
+post_detail view get post object with pk 1, then use base.html as frame and get contents from db with post object
+pk identify the post object
+
+http://192.168.1.62:8000/post/1/ -> post_detail view(with pk identify post object) -> post_detail.html -> base.html
+in post_list.html, <h2><a href="{% url 'post_detail' pk=post.pk %}">{{ post.title }}</a></h2>
+this post.pk will get current post object's pk value, and pass this pk to post_detail view by url django template tag
+
+now let's do the reverse! put templates data into database
+1. embed url in page
+blog/templates/blog/base.html # for add + button to post and it call post_new view in urs.py
+<a href="{% url 'post_new' %}" class="top-menu"><span class="glyphicon glyphicon-plus"></span></a>
+2. route url to view
+blog/urls.py # jump to post_new view in blog/views.py
+path('post/new/', views.post_new, name='post_new'),
+3. create post form
+we will create a form for our Post model.
+blog/forms.py
+from django import forms
+from .models import Post
+class PostForm(forms.ModelForm):
+    class Meta:
+        model = Post
+        fields = ('title', 'text',)
+4. view connect template page to database
+blog/views.py #
+from .forms import PostForm
+def post_new(request):
+    if request.method == "POST":
+        form = PostForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.published_date = timezone.now()
+            post.save()
+            return redirect('post_detail', pk=post.pk)
+    else:
+        form = PostForm()
+    return render(request, 'blog/post_edit.html', {'form': form})
+5. create that template page
+blog/templates/blog/post_edit.html
+{% extends 'blog/base.html' %}
+{% block content %}
+<h2> new post </h2>
+<form method="POST" class="post-form"> {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="save btn btn-default">Save</button>
+</form>
+{% endblock %}
+https://tutorial.djangogirls.org/en/django_forms/
+-----------------------------
+remove that `author` in Post model, then it doesn't require login for post
+
+----------------------------------------------------------------------------
+
+startapp make your own app, if you want to use the 3rd app, 
+install them by pip, and using them by `import` in your own app, and make them in INSTALLED_APPS
+
+tutorial https://docs.djangoproject.com/en/3.0/intro/tutorial01/
+all available apps https://djangopackages.org/
+
+check the version of django
+$ python -m django --version
+
+django-admin startproject mysite
+
+vim mysite/settings, 
+ALLOWED_HOST=['*']
+python manage.py runserver 0.0.0.0:8000
+
+An app is a Web application that does something – e.g., a Weblog system, 
+a database of public records or a small poll app. A project is a collection of configuration 
+and apps for a particular website. A project can contain multiple apps. An app can be in multiple projects.
+
+python manage.py startapp polls
+polls/views.py
+from django.http import HttpResponse
+def index(request):
+    return HttpResponse("Hello, world. You're at the polls index.")
+
+
+polls/urls.py¶
+from django.urls import path
+from . import views
+urlpatterns = [
+    path('', views.index, name='index'),
+]
+
+
+mysite/urls.py¶
+from django.contrib import admin
+from django.urls import include, path
+urlpatterns = [
+    path('polls/', include('polls.urls')),
+    path('admin/', admin.site.urls),  # path need two arguments, route and view
+]
+python manage.py runserver 0.0.0.0:8000
+http://192.168.1.62:8000/polls/
+
+python manage.py migrate
+
+Now we’ll define your models – essentially, your database layout, with additional metadata.
+A model is the single, definitive source of truth about your data. 
+It contains the essential fields and behaviors of the data you’re storing.
+
+
+polls/models.py¶
+
+from django.db import models
+
+class Question(models.Model):
+    question_text = models.CharField(max_length=200)
+    pub_date = models.DateTimeField('date published')
+
+
+class Choice(models.Model):
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    choice_text = models.CharField(max_length=200)
+    votes = models.IntegerField(default=0)
+
+
+those Field's instances are column's name in db
+class name is used to generate the table name in db
+
+To include the app in our project, we need to add a reference to its configuration class in the INSTALLED_APPS setting. 
+The PollsConfig class is in the polls/apps.py file, so its dotted path is 'polls.apps.PollsConfig'. 
+Edit the mysite/settings.py file and add that dotted path to the INSTALLED_APPS setting
+
+python manage.py makemigrations polls
+
+python manage.py migrate
+
+once you changed your models in models.py, run python manage.py makemigrations, then python manage.py migrate
+
+python manage.py shell # interactive with db
+
+python manage.py createsuperuser # create super user
+
+only after create super user admin, then localhost:8000/admin will be available
+
+But where’s our poll app? It’s not displayed on the admin index page.
+
+Only one more thing to do: 
+we need to tell the admin that Question objects have an admin interface. 
+To do this, open the polls/admin.py file, and edit it to look like this:
+polls/admin.py¶
+
+from django.contrib import admin
+
+from .models import Question
+
+admin.site.register(Question)
+
+
+
+polls/views.py¶
+
+def detail(request, question_id):
+    return HttpResponse("You're looking at question %s." % question_id)
+
+def results(request, question_id):
+    response = "You're looking at the results of question %s."
+    return HttpResponse(response % question_id)
+
+def vote(request, question_id):
+    return HttpResponse("You're voting on question %s." % question_id)
+
+
+
+polls/urls.py¶
+
+from django.urls import path
+
+from . import views
+
+urlpatterns = [
+    # ex: /polls/
+    path('', views.index, name='index'),
+    # ex: /polls/5/
+    path('<int:question_id>/', views.detail, name='detail'),
+    # ex: /polls/5/results/
+    path('<int:question_id>/results/', views.results, name='results'),
+    # ex: /polls/5/vote/
+    path('<int:question_id>/vote/', views.vote, name='vote'),
+]
+
+
+/polls/3, /polls/3/vote, /polls/3/results
+
+The maximum number of bytes in a string or BLOB in SQLite is defined by the preprocessor 
+macro SQLITE_MAX_LENGTH. The default value of this macro is 1 billion (1 thousand million or 1,000,000,000)
+
+pgsql
+ In any case, the longest possible character string that can be stored is about 1 GB
+
+
+#########################################################################################
+https://simpleisbetterthancomplex.com/series/2017/09/04/a-complete-beginners-guide-to-django-part-1.html
+django-admin startproject myproject
+
+manage.py: a shortcut to use the django-admin command-line utility. It’s used to run management commands related to our project. We will use it to run the development server, run tests, create migrations and much more.
+__init__.py: this empty file tells Python that this folder is a Python package.
+settings.py: this file contains all the project’s configuration. We will refer to this file all the time!
+urls.py: this file is responsible for mapping the routes and paths in our project. For example, if you want to show something in the URL /about/, you have to map it here first.
+wsgi.py: this file is a simple gateway interface used for deployment. You don’t have to bother about it. Just let it be for now
+
+python manage.py runserver 0.0.0.0:8000
+setting.py 
+ALLOWED_HOSTS = ['*']
+
+
+app: is a Web application that does something. An app usually is composed of a set of models (database tables), views, templates, tests.
+project: is a collection of configurations and apps. One project can be composed of multiple apps, or a single app.
+
+It’s important to note that you can’t run a Django app without a project. 
+Simple websites like a blog can be written entirely inside a single app, which could be named blog or weblog for example.
+
+the app inside the project called `internal apps`, outside of the project called `external apps`
+
+#install your first app
+
+django-admin startapp boards    # boards is another app for forum, this command will create a boards app and its directory
+
+settings.py
+INSTALLED_APPS=[..., 'boards',]
+
+Open the views.py file inside the boards app, and add the following code:
+
+views.py
+
+from django.http import HttpResponse
+
+def home(request):
+    return HttpResponse('Hello, World!')
+
+Views are Python functions that receive an HttpRequest object and returns an HttpResponse object. Receive a request as a parameter and returns a response as a result. That’s the flow you have to keep in mind!
+ 
+boards app, change view,
+but urls and settings still be myproject
+
+urls.py
+from boards import views  # this mean boards/views.py
+urlpatterns = [
+ path('home', views.home, name='home'),  # this 'home' mean localhost:8000/home/
+...
+]
+
+python manage.py runserver 0.0.0.0:8000
+
+#################################################
+draw.io 
+https://app.diagrams.net   draw your imagination
+
+################################################
+one project may have several apps, every app has it own views for display and models for data communication
+##############################################
+The models are basically a representation of your application’s database layout
+The User model is already defined inside a built-in app named auth, which is listed in our INSTALLED_APPS configuration under the namespace django.contrib.auth.
+
+models.py
+from django.db import models
+
+
+from django.contrib.auth.models import User
+
+
+class Board(models.Model):
+    name = models.CharField(max_length=30, unique=True)
+    description = models.CharField(max_length=100)
+
+
+class Topic(models.Model):
+    subject = models.CharField(max_length=255)
+    last_updated = models.DateTimeField(auto_now_add=True)
+    board = models.ForeignKey(Board, on_delete= models.CASCADE,related_name='topics')
+    starter = models.ForeignKey(User, on_delete= models.CASCADE,related_name='topics')
+
+
+class Post(models.Model):
+    message = models.TextField(max_length=4000)
+    topic = models.ForeignKey(Topic, on_delete= models.CASCADE,related_name='posts')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(null=True)
+    created_by = models.ForeignKey(User, on_delete= models.CASCADE,related_name='posts')
+    updated_by = models.ForeignKey(User, on_delete= models.CASCADE,null=True, related_name='+')
+
+# Create your models here.
+
+python manage.py makemigrations
+python manage.py migrate
+
+(defun my-python-compile ()
+  (interactive)
+  (run-code "python3" "" "runserver 0.0.0.0:8000" "*Async Shell Command*"))
+for f5 key binds in tramp-mode
+
+
+mkdir templates
+touch templates/home.html
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Boards</title>
+  </head>
+  <body>
+    <h1>Boards</h1>
+
+    {% for board in boards %}
+      {{ board.name }} <br>
+    {% endfor %}
+
+  </body>
+</html>
+
+settings.py  tell where pages are
+set the DIRS key to os.path.join(BASE_DIR, 'templates')
+Basically what this line is doing is finding the full path of your project directory and appending “/templates” to it.
+
+
+boards/views.py
+
+from django.shortcuts import render
+from .models import Board
+
+def home(request):
+    boards = Board.objects.all()
+    return render(request, 'home.html', {'boards': boards})
+
+http://192.168.1.62:8000/home
+
+mkdir static
+cp bootstramp.min.css static/css/
+settings.py
+STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
+templates stores html pages
+static stores css
+
+templates/home.html
+{% load static %}<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Boards</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+  </head>
+  <body>
+    <div class="container">
+      <ol class="breadcrumb my-4">
+        <li class="breadcrumb-item active">Boards</li>
+      </ol>
+      <table class="table">
+        <thead class="thead-inverse">
+          <tr>
+            <th>Board</th>
+            <th>Posts</th>
+            <th>Topics</th>
+            <th>Last Post</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for board in boards %}
+            <tr>
+              <td>
+                {{ board.name }}
+                <small class="text-muted d-block">{{ board.description }}</small>
+              </td>
+              <td class="align-middle">0</td>
+              <td class="align-middle">0</td>
+              <td></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>
+localhost:8000/home
+
+python manage.py createsuperuser # create super user
+localhost:8000/admin
+
+To add the Board model is very straightforward. Open the admin.py file in the boards directory, and add the following code:
+
+boards/admin.py
+
+from django.contrib import admin
+from .models import Board
+
+admin.site.register(Board)
