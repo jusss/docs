@@ -1,0 +1,398 @@
+there're two levels, value and type
+
+on type level, Java doesn't support higher-kinded polymorphism
+so it can't express Fixed-Point Type like Fix Maybe
+on value level, Java could have fixed-point function
+ fix = \f -> \x -> f (fix f) x
+
+do once lambda eta-conversion, make fix from eval-by-name 
+to eval-by-value
+
+fix f = f (fix f); fix f x = f (fix f) x
+------------------------------------------------
+Java/Kotlin的类型参数的类型只能是kind *, 不能是(* -> *), 
+所以它们类型只能有
+kind * -> *, 
+(*,*) -> *, 
+不能有(* -> *) -> *, 它们不支持higher-kinded polymorphism，无法表达Fix Mayeb, 
+data Fix f = Fix (f (Fix f))
+Fix Nothing :: Fix Maybe
+Java的List拥有kind * -> * 做不了类型参数
+
+Kotlin的arrow-kt里模拟了higher-kinded polymorphism, 但能不能用来实现Fix Maybe就不知道了
+--------------------------------------------------------------
+
+18:15:25 <jusss> Nothing :: Maybe a, a could be any type, is this related to kind?
+18:15:32 <jusss> higher kind?
+18:16:09 <jusss> we give Maybe any type and we get different type
+18:16:10 <jumper149> Maybe :: * -> * is it's kind signature I think
+18:16:56 <wavemode_> :k Maybe
+18:16:58 <lambdabot> * -> *
+18:17:24 <wavemode_> Maybe is a type constructor. it receives a type of kind * and produces a type of kind *
+18:17:34 <wavemode_> :k Maybe Int
+18:17:36 <lambdabot> *
+18:18:00 <EvanR> "higher kind" is a weird way to say "type constructor"
+18:18:19 <jusss> in value level, we have function, we give it something, it returns something, in type level, we have that?
+18:18:22 <EvanR> reminiscent of higher order function
+18:18:26 <jusss> type function?
+18:18:32 <EvanR> sure
+18:18:46 <jusss> like?
+18:20:20 <EvanR> all the typing rules for function types carry over pretty much exactly to type constructors
+18:20:45 <EvanR> they also use the same symbol (->)
+
+18:27:58 <whataday> data Fix f = Fix (f (Fix f)); Nothing :: Maybe (Fix Maybe), Fix Nothing :: Fix Maybe, why in other languages , they couldn't express Fix Maybe?
+18:28:54 <whataday> what make haskell different to others?
+18:30:32 <shachaf> Other languages can also do it.
+18:30:42 <c_wraith> Scala could.  I think C++ could.
+18:32:02 <whataday> and Java or Kotlin?
+18:32:11 <c_wraith> No, not them.
+18:32:32 <dolio> Java doesn't let you have variables that could be instantiated to Maybe.
+18:32:34 <whataday> what features make some can do, some can't?
+18:33:00 <c_wraith> a possibly simpler example:  data Foo f = Foo (f Int)
+18:34:21 <wavemode_> @define data Fix f = Fix (f (Fix f))
+18:34:23 <lambdabot>  Defined.
+18:34:27 <wavemode_> :k Fix
+18:34:29 <lambdabot> (* -> *) -> *
+18:34:49 <wavemode_> you need a language which supports such kinds (or some equivalent)
+18:35:40 <whataday> do this such kinds have a name?
+18:41:30 <whataday> they can't implement kind with class?
+18:44:21 <wavemode_> in most languages where you can define something like `MyClass<T>`, T cannot itself be generic (such that you could do something like `T<V>`)
+18:46:32 <wavemode_> though in c++ it's actually doable with template templates
+18:49:15 <whataday> you mean T couldn't be T<V>?
+18:49:39 <wavemode_> In most languages, no
+18:50:06 <Maxdamantus> Rather, `T` can't be applied an argument, because `T` has to be a type.
+18:50:15 <Maxdamantus> In Java, all type parameters are actual types.
+18:50:46 <Maxdamantus> eg, https://news.ycombinator.com/item?id=21728256
+18:51:46 <Maxdamantus> Can't write a proper `interface Monad<M>` because you need to be able to write `M<T>` in the body, since `M` there is not meant to be a type (that is, something of kind `*`), but a function taking a type and returning a type (that is, something of kind `* -> *`)
+18:52:35 <Maxdamantus> It might be feasibly possible with some sort of extension of Java that allows you to write something like `interface Monad<M: Type â†’ Type> { .. }`
+18:53:32 <whataday> "The only reason it doesn't actually work is because Java doesn't support higher-kinded polymorphism, so you can't pass type-level functions such as IO or List as type parameters, therefore you can't actually write M<T> as appears in the interface body."
+18:54:24 <Maxdamantus> Indeed, so `IO` is an example of a type-level function (since it has kind `* -> *` rather than kind `*`, AKA "type")
+18:55:01 <Maxdamantus> > undefined :: IO
+18:55:03 <lambdabot>  Terminated
+18:55:16 <Maxdamantus> > let x :: IO; x = undefined in x
+18:55:18 <lambdabot>  Terminated
+18:55:25 <Maxdamantus> Hm, weird.
+18:55:33 <Maxdamantus> Maybe lambdabot is broken.
+18:56:47 <wavemode_> IO is uninhabited. it's not a type, it's a type constructor
+18:56:51 <whataday> so in Java, all types only have kind *?
+18:57:03 <Maxdamantus> whataday: not really.
+18:57:11 <Maxdamantus> whataday: all type parameters have kind *.
+18:57:44 <Maxdamantus> whataday: you can think of `List` as being of kind `* -> *` in Java, but you can't pass `List` as a type parameter since all type parameters are kind `*`.
+18:58:30 <Maxdamantus> (confusingly, when you write `List` it actually ends up being a "raw type", but that's just a quirky thing that doesn't really make much type theoretical sense)
+18:59:52 <Maxdamantus> wavemode_: right. I was expecting lambdabot to say "Expected a type, but â€˜IOâ€™ has kind â€˜* -> *â€™".
+19:00:24 <whataday> if it can have kind (* -> *) -> *, then it has higher-kinded polymorphism?
+19:01:07 <Maxdamantus> Sure. That would be the kind of `Monad` in my hackernews example.
+19:01:13 <whataday> Java's type parameter couldn't have kind * -> *, they only can have kind *
+19:02:19 <Maxdamantus> Right, so whenever you write interfaces/classes in Java, they end up having kinds like `*`, `* -> *`, `(*, *) -> *`, `(*, *, *) -> *`, etc
+19:02:26 <Maxdamantus> and never `(* -> *) -> *`
+19:03:40 <Maxdamantus> in the Java kinds that I just listed, you always have types on the left of the arrow and always have a type on the right of the arrow.
+19:03:56 <Maxdamantus> s/a type/type/
+19:04:23 <whataday> do you know Kotlin's arrow library?
+19:04:47 <Maxdamantus> Nope.
+19:06:29 <wavemode_> I know it. I don't really like it
+19:07:14 <whataday> https://arrow-kt.io/docs/0.10/patterns/glossary/
+19:08:07 <whataday> "In a Higher Kind with the shape Kind<F, A>, if A is the type of the content, then F has to be the type of the container." I don't if this is higher-kinded polymorphism?
+19:08:41 <whataday> higher-kinded type and higher-kinded polymorphism are same thing?
+19:08:59 <Maxdamantus> "higher-kinded type" has always seemed like a misnomer to me.
+19:09:20 <Maxdamantus> But I think it has to do with people referring to, eg, `IO` as a "type".
+19:09:49 <wavemode_> whataday: no, they're faking higher kinded polymorphism
+19:10:11 <whataday> in that case Kind<F,A>, it has kind ((*->*), *)?
+19:10:56 <whataday> ((* ->*), *) -> *
+19:11:08 <wavemode_> no, Kind is just a type which takes two type parameters. never is F actually applied to A ala `F<A>`
+19:11:53 <wavemode_> Kind<F,A> is just a regular generic type, but it's meant to _represent_ F<A>, artificially
+19:13:18 <wavemode_> so it's essentially a simulation of higher-kinded polymorphism, in a language which doesn't support it natively
+19:15:30 <whataday> use that simulation, could they express Fix<Maybe>?
+19:16:43 <boxscape> wavemode_ when you say you don't like it, is that a slight against the library or against the language?
+19:17:18 <wavemode_> oh, I love kotlin. I dislike arrow-kt
+19:17:21 <boxscape> I see
+19:18:27 <whataday> wavemode_, could Kotlin express Fix<Maybe> with that simulation?
+19:18:50 <whataday> Fix<Maybe, Any>?
+19:19:27 <wavemode_> umm well I don't know. since it's a simulation, I suppose it just depends on the limit of one's imagination
+19:57:36 <whataday> Maxdamantus, wavemode_, could we fake higher-kinded polymorphism in dynamic language like python?
+19:59:02 <whataday> I forget class A(B) if we can pass A to C(A)
+19:59:43 <Maxdamantus> whataday: support for higher-kinded polymorphism is only important in static systems. In a dynamic system, you're not having to prove anything about types to a compiler, so you don't need support for particular patterns around types.
+20:01:13 <whataday> Maxdamantus, what about fixed-point function in Java, could we implement it? it's on value level not type level
+20:01:15 <Maxdamantus> whataday: in a dynamically typed system, you can think of the types however you want, but nothing's going to check that your thoughts are actually sensible.
+20:03:32 <Maxdamantus> whataday: the usefulness of a fixed-point pretty much depends on laziness. You can model laziness in Java in such a way that fixed-point functions can make sense, though you won't simply have a method like `<T> T fix(Function<T, T> fn);`
+20:08:52 <whataday> Maxdamantus fix = \f -> \x -> f (fix f) x, this lambda could use in Java?
+20:09:26 <whataday> fix f = f (fix f); fix f x = f (fix f) x
+20:18:57 <Maxdamantus> whataday: no, that function itself would not really be useful in Java, since it would never return (it would just keep calling itself recursively until the stack overflows)
+20:19:58 <whataday> but it worked in python
+20:20:01 <Maxdamantus> whataday: but you can obviously, eg, write a model for Haskell-style lazy computation, where you have a separate concept of "function" where a `fix` function would make sense.
+20:21:28 <Maxdamantus> whataday: oh right, that fix function can be used, sure.
+20:21:50 <Maxdamantus> anyway, I don't really think too much about fixed points, so probably not the best person to answer.
+
+------------------------------------------------------------------------
+from functools import partial
+
+reverse = lambda l: [] if l == [] else reverse(l[1:]) + [l[0]]
+#print(reverse([1,2,3]))
+
+reverse_ = lambda f,l: [] if l == [] else f(l[1:]) + [l[0]]
+#print(reverse_(reverse,[1,2,3]))
+
+reverse__ = lambda f: lambda l: [] if l == [] else f(l[1:]) + [l[0]]
+
+#fix f = f (fix f)   
+#fix = lambda f: f(fix(f)) //won't work in call-by-value eval strategy
+#fix f = f (fix f) = \y -> f (fix f) y = f (\y -> fix f y) // outsider and inner eta-conversion
+
+#fix f x = f (\y -> fix f y) x   //do twice eta-conversion
+fix = lambda f,x: f((lambda y: fix(f,y)),x)  #will work in call-by-value
+
+#fix f x = f (fix f) x  //do once eta-conversion is enough
+fix2 = lambda f: lambda x: f(fix2(f))(x)
+
+rev1 = partial(reverse_, reverse)
+rev2 = partial(reverse_, rev1)
+print(reverse_(rev2,[1,2,3]))
+
+const = lambda x, _: x
+_reverse = partial(const, reverse)
+print(_reverse(_reverse(reverse))([1,2,3]))
+print(fix(reverse_,[3,8,9]))
+print(fix2(reverse__)([3,9,2]))
+
+
+"""
+const x _ =  x
+f' = const f
+f = fix (const f)
+f' f = f
+
+-- any function could be a fixed point of other functions, recursive or not
+reverse [] = []
+reverse (x:xs) = reverse xs ++ [x]
+
+reverse' f [] = []
+reverse' f (x:xs) = f xs ++ [x]
+
+main = print $ reverse' (reverse' reverse) [1,2,3]
+
+
+f2 = lambda f, n, accum: accum if n==1 else f ((n-1), (n* accum))
+f2NoRecur = lambda n, accum: accum if n ==1 else f2 (f2NoRecur, (n-1), (n* accum))
+print(f2NoRecur(990,1))
+
+>>> fix = lambda f: lambda x: f(fix(f))(x)
+>>> fac = lambda f: lambda n: (1 if n<2 else n*f(n-1))
+>>> [fix(fac)(i) for i in range(10)]
+[1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880]
+>>> fib = lambda f: lambda n: 0 if n == 0 else (1 if n == 1 else f(n-1) + f(n-2))
+>>> [ fix(fib)(i) for i in range(10) ]
+[0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
+https://rosettacode.org/wiki/Y_combinator#Haskell
+
+
+<jusss> dminuoso: I tried to implement that Fix f type in kotlin, and Fix
+        Maybe can't be implement
+<jusss> dminuoso: make Maybe as a class with a parameter, Just and Nothing is
+        another class inherit it
+<jusss> dminuoso: but Fix <Maybe> couldn't exist, because Maybe need a A
+<jusss> Fix<Maybe<A>> is ok
+<jusss> but in haskell, we have Fix Maybe, not Fix (Maybe a)
+<jusss> sealed class Maybe<A>; data class Just<A>(val x:A): Maybe<A>();  data
+        class Nothing: Maybe<Any>()                                     [16:10]
+<jusss> sealed class Fix<F>; data class MkFix<F:Fix<F>>(val x:F): Fix<F>(); 
+<jusss> there couldn't be an object has Fix<Maybe>
+<dminuoso> jusss: Most type systems are fairly limited in expressiveness.
+<jusss> but we could have Fix Maybe in haskell, that's where I don't know
+<jusss> dminuoso: so I wonder how they implement Fix type in their type system
+<jusss> dminuoso: Kotlin, Java, other static type languages             [16:15]
+<dminuoso> jusss: I reckon they cant.
+<jusss> dminuoso: fix combinator is a common stuff on value level, even python
+        can have that
+<jusss> fix and const
+<jusss> we could have fix combinator on value level in python, but in type
+        level, I don't know                                             [16:24]
+
+"""
+----------------------------------------------------------------------------
+#Fixed Point
+https://up.monade.li/sL34es
+`fix` allows you to delegate away recursion, so given a recursive definition like
+
+    f x y = ..f..x..y..
+
+you can write the same function as
+
+    f = fix (\f x y -> ..f..x..y..)
+
+So, given
+
+    reverse l = rev l []
+        where
+            rev [] a = a
+            rev (x:xs) a = rev xs (x:a)
+
+you can see that `reverse` itself isn't recursive, but its helper function `rev` is. So defining `reverse` as a fixed point isn't particularly useful, but you can do
+
+    reverse l = fix rev' l []
+        where
+            rev' rev [] a = a
+            rev' rev (x:xs) a = rev xs (x:a)
+
+Note that rev' is the (\f x y -> ..f..x..y..) abstraction from earlier.
+
+https://blog.forec.cn/2016/10/08/haskell-fixit/
+http://www.vex.net/~trebla/haskell/fix.xhtml
+
+https://www.codewars.com/kata/5443dd2d7fc4478154000ac6
+in this question, get the reverse and foldr definition from hackage.haskell.org, and they're not recurisve, turn them to recursive then use
+the mechanical process to get reverse' and foldr'
+
+and of course, the shortest anwser would be
+reverse' = const reverse
+foldr' = const foldr
+
+GHC.List.reverse not recursive, rev is recursive
+reverse l =  rev l []
+  where
+    rev []     a = a
+    rev (x:xs) a = rev xs (x:a)
+
+the tail recursive function need one more argument than non-tail recursive
+
+recursive one
+reverse [] = []
+reverse (x:xs) = (reverse xs) ++ [x]
+
+reverse' f [] = []
+reverse' f (x:xs) = f xs ++ [x]
+
+any function could be a fixed point of other functions, recursive or not
+
+f' = const f
+f = fix (const f)
+f' f = f
+
+reverse' = const reverse
+<awpr> `fix (const x) === x` for any `x`, so you can always find a `g` such that `fix g === f`, namely `const f
+<liiae> awpr https://www.codewars.com/kata/5443dd2d7fc4478154000ac6
+<awpr> `const reverse` is technically an answer; there are many possible answers`
+
+<liiae> MarcelineVQ: GHC.List.reverse's definition is not recursive, right?
+<liiae> MarcelineVQ: https://hackage.haskell.org/package/base-4.14.0.0/docs/src/GHC.List.html#reverse
+<MarcelineVQ> correct. reverse does not call reverse, so it is not recursive
+         by the normal definition
+<MarcelineVQ> however, rev calls rev. rev is recursive.
+<liiae> MarcelineVQ: but that non-recursive reverse still could be a fixed
+        point of reverse', right?
+<MarcelineVQ> I'm really really sure this was said earlier though..
+<liiae> fix (const f) = f
+<liiae> const f = f'
+<liiae> MarcelineVQ: so that codewars anwser can be "import Data.List.reverse; reverse' = const reverse"
+<dminuoso> Oh boy, this is just about codewars?
+<liiae> dminuoso: fixed point on codwars
+<liiae> dminuoso: https://www.codewars.com/kata/5443dd2d7fc4478154000ac6
+<MarcelineVQ> There's a reason I said mere minutes ago that const wasn't relevant to the codewars problem. That's not the answer they're trying to get you to write.
+<dminuoso> fix allows you to turn explicit recursion into implicit recursion
+<liiae> awpr: sorry, I didn't pay more attension on your anwsers, you're right, there's always f' = const f
+<liiae> reverse' = const reverse
+<dminuoso> fix (const f) = f
+<dminuoso> % :t (fix . const)
+<yahb> dminuoso: c -> c
+<liiae> dminuoso: id == fix . const?
+<[exa]> liiae: why not
+<liiae> [exa]: wow, id is simple and fix is not simple in my view, and they're the same, is magic
+<[exa]> liiae: you instantly "kill" the fix complexity by passing in a function that discards it
+
+let x = 1: x in x
+x = 1: x
+fix (1:)
+
+fix (const 3) == 3
+fix (const reverse) [1,2,3] == [3,2,1]
+reverse = fix (const reverse)
+reverse' = const reverse
+
+f' = const f
+f' f = f
+fix f' = f
+fix (const f) = f
+(fix . const) f = f
+
+id == fix . const
+
+
+--foldl f z [] = z
+--foldl f z (x:xs) = foldl f (f z x) xs
+
+gg _foldl f z [] = z
+gg _foldl f z (x:xs) = _foldl f (f z x) xs
+foldl' f z [] = z
+foldl' f z (x:xs) = gg foldl' f (f z x) xs
+-- 1. based on foldl defintion
+-- 2. get gg from foldl = fix gg, which means gg foldl = foldl
+-- 3. re-write foldl with gg, get foldl'
+
+-- main = print $ foldl' (+) 0 [1..3]
+
+-- f2 n accum = if n == 1 then accum else f2 (n-1) (n * accum)
+f2' f2 n accum = if n==1 then accum else f2 (n-1) (n* accum)
+--f2N n accum = if n ==1 then accum else f2' f2N (n-1) (n* accum)
+f2N n accum = if n ==1 then accum else fix f2' (n-1) (n* accum)
+--main = print $ f2N 10 1
+
+reverse [] = []
+reverse (x:xs) = reverse xs ++ [x]
+
+reverse' f [] = []
+reverse' f (x:xs) = f xs ++ [x]
+--main = print $ reverse' (reverse' reverse) [1,2,3]
+
+--const x _ =  x
+--f' = const f
+--f = fix (const f)
+--f' f = f
+-- any function could be a fixed point of other functions, recursive or not
+reverse'' = const reverse
+main = print $ reverse'' reverse [1,2,3]
+
+------------------------------------------------------
+<Cale> fix f = let x = f x in x
+
+<liiae> Cale:
+        https://www.quora.com/Why-doesnt-Haskell-implement-infinite-types
+
+<liiae> Cale: we can turn that infinite type to fixed-point stuff?
+<awpr> you can write a type family that acts sort-of like `fix`, but it will
+       just ruin GHC's day; or, you can write a newtype that acts slightly
+       less like `fix` and get recursively-defined but not infinite types
+                                                                        [15:15]
+<Cale> Which infinite type?
+<Cale> But yeah, if you run into a case where you'd otherwise want an infinite
+       type, you can generally turn it into a recursively defined type  [15:16]
+<awpr> `newtype Fix f = Fix (f (Fix f))` is the common definition, and it
+       gives you (modulo newtype constructors) `f (f (f (f (f (f ...)))))))`
+
+----------------------------------------------------
+newtype Fix f = MkFix (f (Fix f))
+MkFix :: f (Fix f) -> Fix f
+when f ~ Maybe
+MkFix :: Maybe (Fix Maybe) -> Fix Maybe
+Nothing :: Maybe (Fix Maybe)
+MkFix Nothing :: Fix Maybe
+Just $ MkFix Nothing :: Maybe (Fix Maybe)
+MkFix (Just (MkFix Noting)) :: Fix Maybe
+MkFix (Just (MkFix (Just (MkFix Nothing)))) :: Fix Maybe
+
+
+data ExprF a = Const Int | Add a a
+Const 3 :: ExprF a == ExprF (Fix ExprF)
+MkFix (Const 3) :: Fix ExprF
+Add (MkFix (Const 3)) (MkFix (Const 3)) :: ExprF (Fix ExprF)
+MkFix $ Add (MkFix (Const 3)) (MkFix (Const 3)) :: Fix ExprF
+
+data ExprF a = Const Int | Add a a | Mult a a
+this is related to parser or eval something
+
+F-Algebras
+
+https://bartoszmilewski.com/2013/06/10/understanding-f-algebras/
+
+currying, eval from left to right on the parameter sequence
+f a b c = ((f a) b) c
+
+compose, from right to left
+f . a = \x -> f (a x)
