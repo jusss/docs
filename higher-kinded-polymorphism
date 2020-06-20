@@ -1,0 +1,10 @@
+Java/Kotlin的类型参数的类型只能是kind *, 不能是(* -> *), 
+所以它们类型只能有
+kind * -> *, 
+(*,*) -> *, 
+不能有(* -> *) -> *, 它们不支持higher-kinded polymorphism，无法表达Fix Mayeb, 
+data Fix f = Fix (f (Fix f))
+Fix Nothing :: Fix Maybe
+Java的List拥有kind * -> * 做不了类型参数
+
+Kotlin的arrow-kt里模拟了higher-kinded polymorphism, 但能不能用来实现Fix Maybe就不知道了
