@@ -1,0 +1,27 @@
+I think there're three type polymorphism
+1, result polymorphism, Maybe or Either
+2, parametric polymorphism, id, const
+3, ad-hoc polymorphism, less free than parametric polymorphism
+
+if you want function f only work on Int and String,
+like take f :: Int -> Int, f :: String -> String
+that's ad-hoc polymorphism
+
+how to implement that?
+in haskell, create a new typeclass called IS, it has a function f :: a -> a,
+then make Int and String as IS's instances by implement f,
+now f can do that you want
+
+that's also called function overload in other languages
+
+{-# LANGUAGE TypeSynonymInstances #-}
+{-# LANGUAGE FlexibleInstances #-}
+
+class IS a where { f :: a -> a}
+instance IS Int where { f = (+1) }
+instance IS String where
+    f = reverse
+
+main = print $ (f (2 :: Int), f "23")
+
+typeclass can be used to implement ad-hoc polymorphism
