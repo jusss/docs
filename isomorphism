@@ -1,0 +1,6 @@
+<mniip> an isomorphism f : X -> Y is a morphism that has an inverse: some
+        morphism g : Y -> X such that g.f = id and f.g = id
+<a1c`> mniip: what's Curry-Howard isomorphism?
+<mniip> it's called Curry-Howard correspondence                      
+<mniip> calling it an isomorphism is a bit of a terminology abuse
+`Reader r a` and `r -> a` are isomorphic.
