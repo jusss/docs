@@ -1,0 +1,31 @@
+
+
+data Maybe a = Jut a | Nothing
+this is a sum type
+
+data F = F Bool Int, this is a product type
+
+in OOP, use subclasses to implement product and sum type
+
+
+-------------------------------------------
+<jusss> dminuoso: I still have no idea about ADT and what it's used for
+<dminuoso> jusss: An ADT is just the simple idea that you can create data
+           types with a) multiple constructors and/or b) multiple fields in a
+           given constructor. Nothing more.
+<dminuoso> THat's it. :)
+<dminuoso> jusss: Having "multiple constructors" is sometimes called "a sum
+           type" and having "multiple fields in a constructor" is sometimes
+           called a "product type". There's really nothing more to it. :)
+                                                                        [17:16]
+<merijn> Well, there's a lot more to it, but all that is mostly unnecessary
+         for programming :p                                             [17:17]
+<jusss> ok                                                              [17:18]
+<dminuoso> jusss: In school you most likely learned elementary algebra in
+           which you can add numbers... multiply numbers... so in the same
+           sense the name "algebraic data types" is just derived from the fact
+           that you can "add and multiply types together"               [17:19]
+<dminuoso> jusss: (In truth there's more to it like merijn' hinted at, but
+           this is sufficient for Haskell)                              [17:21]
+
+
