@@ -1,3 +1,16 @@
+remove csrf line in settings.py MIDDLEWARE = [...]
+so you can post with urlencode django when django use post-form 
+r = requests.post('http://robot.huadin.net', data=params, headers=headers)
+r.text
+headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+params={'title':"abc", 'text':"ok"}
+r.url # is the response url
+x=requests.get(r.url)
+x.text
+
+dict to json json.dumps(dict)
+json to dict json.loads(json)
+----------------------------
 
 settings.py -- database, pages, secret_key, installed_apps
 view.py -- show page
