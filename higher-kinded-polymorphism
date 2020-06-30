@@ -8,3 +8,105 @@ Fix Nothing :: Fix Maybe
 Java的List拥有kind * -> * 做不了类型参数
 
 Kotlin的arrow-kt里模拟了higher-kinded polymorphism, 但能不能用来实现Fix Maybe就不知道了
+
+
+kotlin's extension function like
+fun Int.f ...
+fun String.f ...
+
+just function overload, make Int and String both can have function f,
+but Int and String are not inherite one class,
+if there's an interface call IS, it requires implement function f,
+Int and String both inherit by implement f, that would be nice,
+you can declare parameters have IS type, so you can pass Int or String,
+and that parameter can have function f,
+just like declare fmap :: Functor f => f a -> (a->b) -> f b
+here this f has kind * -> *, so f a :: *,
+more concrete is like f :: Functor f => f Int -> (Int -> String) -> f String
+or f :: [Int] -> (Int -> String) -> [String]
+typeclass Functor need have kind * -> *, 
+the best higher-kinded polymorphism example is Functor
+
+all what about is just "Specific Types Have Specific Functions"
+
+like group that all types, if types belong functor, then must have fmap
+if types belong monad, they have bind, we declare parameters type belong functor,
+then parameters types must have fmap, so we can use fmap work on parameters
+
+Functor has fmap, Applicative has apply, and Monad has bind
+if I declare a parameter type is Functor String, then this parameter must have fmap
+so I can use fmap work on this type
+
+but in kotlin, Int and String can't inherit other class,
+so there wouldn't be an interface that Int and String could inherit
+now we have arrow to do that for it
+
+Generics Constraint(type variable constraint) + Interface(require specific function implementation) + Class Extension(function overloading) == Typeclass 
+
+higher-kinded polymorphism -> typeclass (a group of specific types has specific functions)
+-> ad-hoc polymorphism (type constraint, restrict type, a group of specific types)
+
+like Int and String both have function f :: a -> a, and Int and String are instances of typeclass IS,
+then runF :: IS a => a -> a, so you can only pass v :: Int or v :: String to runF,
+it means runF only can take Int or String value, so this is ad-hoc polymorphism
+for example f = (+1) when it's Int, f = reverse when it's String
+runF x = f x
+runF 2 == 3
+runF "abc" == "cba"
+runF True will raise exceptions, because runF only take Int or String
+but this don't need to use higher-kinded polymorphism
+
+kotlin can't support higher-kinded polymorphism, 
+but arrow-kt use Kind<F,A> to simulate higer-kinded polymorphism
+
+so typeclass Functor's fmap :: f a -> (a -> b) -> f b
+
+interface Kind<out F, out A>
+interface Functor<F> {
+  fun <A,B> Kind<F,A>.map(f: (A) -> B): Kind<F,B>
+}
+
+sealed class List<out A>: Kind<List.K, A> { object K } // image List.K has kind * -> *
+object Nil: List<Nothing>()
+data class Cons<A> (val head: A, val tail: List<A>): List<A>()
+
+fun <A> Kind<List.K A>.unwrap(): List<A> = this as List<A>
+
+object ListFunctor: Functor<List.K> {
+  override fun <A,B> Kind<List.K, A>.map(f: (A) -> B): Kind<List.K, B> {
+    ...
+    }
+}
+
+ListFunctor.run { Cons(1, Nil).map { it + 1 } }
+
+it's really weird to express Functor in kotlin,
+just image Kind<F,B> is f b in haskell
+fmap :: Functor f => f a -> (a -> b) -> f b
+fun <A,B> Kind<F,A>.map(f: (A) -> B) :Kind<F,B>
+
+
+optionFunctor.run { Option(1).map { it + 1 } }  ==  Some(2)
+
+a is String will return a Bool, to check a has a String type or not
+a as String look like declare a has String type, if a doesn't, raise an exception
+
+Kotlin can't do give exist class a new interface,
+Int and String can't do inherit one new interface
+then how to do ad-hoc polymorphism? f :: IS a => a -> a
+use Either<String, Int>?
+
+Sum type and typeclass both can do type constraints
+
+kotlin use sealded class to simulate Sum type,
+or you call it union type or enum type,
+that Either String Int can do type constraints,
+
+or typeclass IS can do type constraints, 
+but typeclass can do ad-hoc polymorphism, Sum type can't
+
+
+
+
+
+
