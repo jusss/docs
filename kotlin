@@ -1,3 +1,82 @@
+higher-kinded polymorphism
+
+type after parameter in function is return type, like fun f(x: A): B {...}
+type after parameter in class is base class, like class A: B
+
+type variable in function, between `fun` and function name, fun <A> f(x: A)
+type variable in class, between class name and parameter, data class Just<A>(x: A): Maybe<A>()
+Just(3) : Just
+
+abstract class ListEq<A>(val a: Eq<A>)
+
+data ListEq = ListEq (Eq A), but this A is depended on the value which has Eq A
+
+interface Kind<out F, out A>
+sealed class List<out A>: Kind<List.K, A> { object K }
+now this List.K represent List :: * -> *
+we get Kind(* -> *, *), a simulation of higher-kinded polymorphism
+
+
+
+
+////////////////////////////////////////////
+object vs class
+kotlin has class and object,
+A Kotlin object is like a class that can't be instantiated so it must be called by name. (a static class per se)
+object HashUtils {
+    fun sha512(input: String) = hashString("SHA-512", input)
+    ...
+}
+
+so call it with HashUtils.sha512(...)
+
+////////////////////////////////////////////////////////////////////////////////
+sealed class vs enum
+Sealed classes are used for representing restricted class hierarchies, 
+when a value can have one of the types from a limited set, but cannot have any other type. 
+They are, in a sense, an extension of enum classes
+
+for example, an enum has Monady, Tuesday, ... Sunday value,
+if you declare a value is an enum, then the value must be one of Monady, Tuesday ... Sunday,
+it can't be others, so sealed classes too
+if you define a sealed class A, and make subclass B and subclass C inherit A,
+then when pass a value declared as A, this value only can be B or C 
+
+https://kotlinlang.org/docs/reference/sealed-classes.html
+sealed class Expr
+data class Const(val number: Double) : Expr()
+data class Sum(val e1: Expr, val e2: Expr) : Expr()
+object NotANumber : Expr()
+
+fun eval(expr: Expr): Double = when(expr) {
+    is Const -> expr.number
+    is Sum -> eval(expr.e1) + eval(expr.e2)
+    NotANumber -> Double.NaN
+    // the `else` clause is not required because we've covered all the cases
+}
+
+A sealed class is abstract by itself, it cannot be instantiated directly and can have abstract members.
+
+Sealed classes are not allowed to have non-private constructors (their constructors are private by default).
+///////////////////////////////////////////
+data class vs class
+if you declare a data class, then the compiler will add some particular functions to it automatically.
+data class Student(val stuName: String, val stuAge: Int)
+the compiler will generate equals(), hashCode(), toString(), copy() and componentN()
+for this data class's instances
+val stu = Student("Steve", 26, "Math")
+println(stu.toString())
+
+1. The primary constructor of the data class must have at least one parameter. Also, the parameters are either marked val or var.
+2. The class cannot be marked as open, abstract, sealed or inner.
+3. The class can extend (inherit) other class and it can also implements other interfaces.
+https://beginnersbook.com/2019/03/kotlin-data-class/
+
+---------------------------------------------------------
+// turn Map to URLRequests, {"a":"1","b":"2"} to "a=1&b=2"
+val postData = data.map { (k,v) -> "$k=$v"}.reduce{acc, str -> acc + "&" + str}
+--------------------------------------------------------------
+
 #clear ByteArray
 
 ```

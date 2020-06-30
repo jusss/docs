@@ -25,3 +25,21 @@ instance IS String where
 main = print $ (f (2 :: Int), f "23")
 
 typeclass can be used to implement ad-hoc polymorphism
+
+
+in Kotlin, they use function extension to do overload for ad-hoc polymorphism
+operator fun Int.f = (+1)
+operator fun String.f = reverse
+
+or use sealed class
+
+sealed class A
+data class IsString (val x: String) : A() { fun f = reverse }
+data class IsNumber (val x: Int) : A() { fun f = (+1) }
+fun test(x : A) : Unit { print(x.f()) }
+test(IsString("ab"))
+test(IsNumber(3))
+
+but this sealed class is just a Sum type, not ad-hoc polymorphism
+but Sum type and typeclass both can do type constraints
+
