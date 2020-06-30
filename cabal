@@ -1,4 +1,27 @@
 
+mkdir new_project
+cd new_project
+cabal v2-init # generate cabal config file
+if you package depends on ohter missing packages,
+use cabal v2-install them then write them into depends option in your cabal file
+
+copy you_code.hs Main.hs
+cabal v2-configure
+cabal v2-build
+ghc -optl-static Main.hs # to statically linked on alpine, fuck glibc
+now you have Main this executable file, you can copy it and run it on
+other amd64 linux distro, don't worry about that glibc dynamic linked libraries
+
+cabal install # now install this executable to you system like other commands
+or
+ln -s /root/.cabal/bin/new_cmd /usr/bin/new_cmd
+but those both are dynamic linked version,
+so just ln -s ./Main /usr/bin/new_cmd
+you can check it with ldd or file, to see if it's statically linked
+
+
+---------------------------------------
+
 
 cabal v2-install http-client-tls
 then you found
