@@ -1,4 +1,72 @@
 
+fmap :: Functor f => (a -> b) -> f a -> f b
+liftA2 :: Applicative f => (a -> b -> c) -> f a -> f b -> f c
+f is a context, a is a value in that context f,
+Functor will let you "lift" functions of one value into a context
+Applicative will let you "lift" functions of multiple values into a context
+
+>=> :: Monad m => (a -> m b) -> (b -> m c) -> a -> m c
+
+<ski> `Functor' lets you operate, independently, on each "element" of a "collection". or to add (non-effectful) "post-processing" operations to an effectful operation
+<ski> `Applicative' let's you merge multiple effectful operations into one, sequencing them. but it doesn't let you decide what effectful operation to do later, depending on what intermediate result you got earlier, while `Monad' allows that. one might call what `Applicative' gives you, "static sequencing", while `Monad' gives "dynamic sequencing"
+"Applicative vs Monadic build systems" by ndm in 2014-07-23 at <https://neilmitchell.blogspot.se/2014/07/applicative-vs-monadic-build-systems.html>. (cf. "static sequencing" vs. "dynamic sequencing")
+<ski> `mpa toLower <$> getLine' attaches a "to lower case" transformation to be done after doing the I/O effect of getting a line. that's just using `Functor'
+<ski> `replicate <$> readLn <*> getLine' will combine two effectful operations, in order : first read (parse) an `Int', then get a line. give back a list containing that line, repeated the specified number of times
+<ski> we can combine the two intermediate result values here, with `Applicative', but we can't use any of them to decide what effects to perform .. unless we start using other "plumbing" operations thatn just `Applicative', such as `Monad'
+<ski> `flip replicateM getLine =<< readLn' will first get the `Int', then use that to get that many lines (rather than getting a single line, then replicating that value). this is an example of "dynamic sequenceing", with `Monad', letting previous intermediate results of effectful operations determine what effects you do later. you could also imagine having an `if' or a `case' on the intermediate value, branching out
+<ski> .. for some time, some people were a bit reluctant to use the terminology "sequencing" with `Applicative' and `Monad', saying that they're not really about sequencing
+<ski> (a) not every `Applicative' or `Monad' instance cares about the sequencing you may express. there are "commutative" instances, such as `Reader r', e.g.
+<ski> (b) the sequencing that is being expressed doesn't necessarily have to correspond directly to what you may think of as sequencing, depending on the particular instance
+
+http://tunes.org/~nef/logs/haskell/20.07.04
+
+<jusss`> there's a list [1,2,[3,4],[3,[5,6,[7]]]], who to let every element in it plus 1?
+<Cale> jusss`: That's not a valid list, unless you have some way to interpret 6 as being of the same type as [7]
+<Cale> (so you'd need a way to interpret numbers as lists, which I suppose you could have via a Num instance)
+<Cale> jusss`: All the elements of a Haskell list must have the same type
+<Cale> jusss`: If we want a tree, we'll use a tree data type
+<Cale> data Tree a = Nil | Cons a (Tree a) | Subtree (Tree a) (Tree a)
+<Cale> Then we can encode your nested thing like:
+<Cale> Cons 1 (Cons 2 (Subtree (Cons 3 (Cons 4 Nil)) (Subtree (Cons 3 (Subtree (Cons 5 (Cons 6 (Subtree (Cons 7 Nil) Nil))) Nil)) Nil)))
+<Cale> We can write a function which applies a function to all the elements of such a thing
+<Cale> and in fact, while we're at it, might as well make it a Functor instance :)
+<Cale> instance Functor Tree where
+<Cale>   fmap f = g
+<Cale>     where
+<Cale>       g Nil = Nil
+<Cale>       g (Cons x t) = Cons (f x) (g t)
+<Cale>       g (Subtree t t') = Subtree (g t) (g t')
+http://tunes.org/~nef/logs/haskell/20.07.02
+
+<jusss> g :: (Functor f) => f Int -> f (Int -> String) -> f String
+<jusss> how I implement this function?
+<Cale> You need Applicative f if you want the sensible thing. You could also ignore the first argument and do something like g _ x = fmap ($ 0) x
+<Cale> :t fmap
+<lambdabot> Functor f => (a -> b) -> f a -> f b
+<Cale> Functor doesn't let you do anything to combine values of f-typed things
+<Cale> :t (<*>)
+<lambdabot> Applicative f => f (a -> b) -> f a -> f b
+<jusss> that `f Int` is new to me, I never thought that I can change the type constructor
+<jusss> f Int, so I can use Maybe Int, [Int], Either a Int
+<Cale> yeah
+<jusss> we always use that `f a`, f and a here both can be replaced
+<Cale> It's polymorphic in a choice of functor f
+<jusss> but the most time, we just replace that a,
+<jusss> and we use type variables too much, 
+<jusss> Cale: like that type constraints, can we constraint the `f` from `f a` ?
+<dmwit> Yes, neither the `f` nor the `a` is particularly special.
+<dmwit> Just about anything you can do to one, you can do to the other.
+<jusss> Cale: like we can constraint types have *, can we constraint types have * -> *?
+<Cale> jusss: There are examples of that just above
+<dmwit> Yes. (I think. Maybe I don't understand the question. But if I do understand the question, then the answer is yes.)
+<Cale> Functor f => ...
+<Cale> I think you meant to say "constrain" (which is a verb) rather than "constraint" (which is a noun or adjective) though
+<jusss> Cale: I see, if I just want Maybe and [], so I should make a new typeclass, and make Maybe and [] as its instances?
+<jusss> then declare where I'd like to use with the new typeclass constraints
+<dmwit> Right.
+
+---------------------------------------------------
+
 after all, Monad is a typeclass, and typeclass is used for polymorphism,
 typeclass's instance is type, Monad's instance is Maybe type, List type
 its different type instances have differnet function definitions
