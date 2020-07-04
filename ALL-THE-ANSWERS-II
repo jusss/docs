@@ -1,4 +1,470 @@
 
+#recursive type
+
+newtype Consumer a = C (a -> IO (Consumer a))
+runConsumer :: Consumer a -> a -> IO (Consumer a)
+runConsumer (C f) x = f x
+f :: Show a => Consumer a; 
+f = C (\x -> do print x; return f)
+
+-- main = do 
+--     f' <- runConsumer f 3; 
+--     f'' <- runConsumer f' 4; 
+--     f''' <- runConsumer f'' 5; 
+--     return f'''
+-- 
+main = do
+    f <- runConsumer f 3
+    f <- runConsumer f 4
+    f <- runConsumer f 5
+    return f
+
+------------------------------------------------------------------
+there's no way to extend a typeclass in haskell, like requrie a new function
+implement in that existed typeclass,
+but you can make a new typeclass which is a subclass of that typeclass,
+like Applicative is a sub typeclass of Functor
+every Applicative instances must be instances of Functor,
+
+(Functor f) => forall a. f a
+
+not just that a could be replaced, that f could be replaced too,
+so Maybe Int, Maybe String you may see,
+also Maybe Int, [Int]
+so (Functor f) => f Int or f String is valid
+
+g :: (Functor f) => f Int -> f (Int -> String) -> f String
+this can't use Functor,
+<Cale> You need Applicative f if you want the sensible thing. You could also
+ignore the first argument and do something like g _ x = fmap ($ 0) x
+
+<Cale> Functor doesn't let you do anything to combine values of f-typed things
+
+f Int could be Maybe Int, [Int], Either a Int
+
+f and a in `f a` both can be replaced
+
+we can constrain types which has * with typeclass,
+also we can constrain types which has * -> * with typeclass
+make a new typeclass IS, make Int and String as its instances
+IS a => a this a only can be Int or String
+and IS can ony have Int and String now, * -> * can only be IS
+even you can do (Functor f, IS a) => f a, so it only can f Int, or f String
+
+<Cale> It's polymorphic in a choice of functor f
+<jusss> typeclass can do type constraints, require specific function
+        implements and function overloading, that OOP langauges don't have
+        those at the same time
+<jusss> they may have generics, interfaces and class extensions, but they're
+        three stuff
+<jusss> dmwit: so when I see kotlin's arrow code, it's really weird to me
+        about higher-kinded polymorphism,
+<jusss> they may concrete the `a` in `f a`, and replace that `f`, I never saw that in haskell
+<jusss> like that `f Int` or `f String`
+<jusss> `f Int` may be `Maybe Int` `[Int]` `Either a Int` ...  
+<jusss> but we may just use `f a`...
+<jusss> or make a new typeclass for Int and String, then do type constraints
+        on that `f a`                                                   [13:52]
+<jusss> those static type languages give me a feel that they want do something
+        freely as dynamic languages, and with type system protection?
+<dmwit> Hm. That could be one way to understand it. =)
+<Cale> Type classes let you do things that would be essentially impossible in
+       dynamically-typed settings
+<jusss> dmwit: do you like that recursive type? function return function
+        itself is normal in dyanmic languages which haskell doesn't support
+<Cale> The instance of a type class to be used can depend on the result type
+       of the operation for example, which is usually something you can't
+       easily do in a dynamically typed setting
+<jusss> Cale: but type is alive on run-time?
+<Cale> jusss: hm?
+<Cale> jusss: Types aren't around at runtime
+<dmwit> jusss: I like recursive types. Haskell can have a function that
+        returns a function (even recursively) with minimal fuss; at most some
+        newtype nonsense.
+<Cale> They're erased by compilation
+<Cale> (at least in Haskell)        
+<dmwit> % newtype Weird a = Weird (a -> Weird a)
+<yahb> dmwit: 
+<dmwit> % f :: Weird a; f = Weird (\x -> f)
+<dmwit> jusss: ^ no matter how many arguments you feed to `f`, it will still
+        return yet another function.                                    [14:02]
+<dmwit> % feed :: Weird a -> a -> Weird a; feed (Weird f) x = f x
+<dmwit> % :t feed (feed f 3) 4
+<yahb> dmwit: Num a => Weird a
+<c_wraith> that's possible, but not very useful.  :P
+<dmwit> Sure. But more useful things are possible with the same trick.
+<c_wraith> variations of it are very useful, though
+<dmwit> It is pedagogical.
+<jusss> dmwit, aha, js: const f = _ => {console.log(_); return f}  how about
+        to implement this  in haskell?
+<c_wraith> don't forget the surprisingly useful newtype Hyper a b = Hyper
+           (Hyper b a -> b)                                             [14:04]
+<c_wraith> doesn't look useful.  actually is!
+<dmwit> :t \f _ -> putStr "" >> return f -- jusss, this?
+<lambdabot> b -> p -> IO b
+<dmwit> I don't know js. So.
+<dmwit> (`b` can be chosen to be the type of a function, no problem)    [14:05]
+<dmwit> jusss: I am going to bed. Keep asking questions. Others here can also
+        help you.                                                       [14:06]
+<jusss> c_wraith: do you know a little js?                              [14:07]
+<jusss> const f = _ => {console.log(_); return f}  could express in haslell?
+<c_wraith> which would end up like \a b -> print b >> return a
+<jusss> f 3 should print 3, f 3 4 should print 3 and 4, f 3 4 5 should print 3
+        4 5                                                             [14:10]
+<jusss> in other languages, f(3), f(3)(4), f(3)(4)(5)
+<jusss> if python support multiple lambdas, it should be `f = lambda x:
+        print(x);return f`                                              [14:11]
+<jusss> so f(3)(4)(5) and f(3) and f(3)(4) have the same return value, which
+        is f itself
+<Cale> jusss: Evaluation of a function can't usually print anything in Haskell
+<jusss> koz_: c_wraith \f _ -> putStr "" >> return f is that?
+<Cale> If it's allowed to produce an IO action which must be executed to give
+       you the function, that's easier though.                          [14:13]
+<jusss> which is?                                                       [14:14]
+<Cale> You'll need a recursive newtype to make this work, since if you think
+       about it, we'll need something like  Show a => a -> IO t  where t = a
+       -> IO t
+<jusss> code? :)                                                        [14:15]
+<Cale> So in order to make that happen, we can define  newtype Consumer a = C
+       (a -> IO (Consumer a))
+<Cale> runConsumer :: Consumer a -> a -> IO (Consumer a)                [14:16]
+<Cale> runConsumer (C f) x = f x
+<Cale> and then have  f :: Show a => Consumer a; f = C (\x -> do print x;
+       return f)                                                        [14:17]
+<Cale> So, then you can write stuff like:                               [14:18]
+<Cale> do f' <- runConsumer f 3; f'' <- runConsumer f' 4; f''' <- runConsumer
+       f'' 5; return f'''
+<Cale> Of course, with this particular f, that's a little silly         [14:19]
+<Cale> But if we had an f which was producing a different consumer in its
+       result than itself, then chaining like this would be meaningful
+<Cale> In Haskell, we don't have a type t for which t is *actually* equal to a
+       -> IO t, but with this newtype, we get one for which t is isomorphic to
+       a -> IO t
+<jusss> Cale: f' <- runConsumer f 3;     f'' <- runConsumer f' 4;     f''' <-
+        runConsumer f'' 5;  we couldn't have f <- runConsumer f 3?
+<Cale> You could, but that would shadow the f which was in scope, which is
+       just confusing
+<jusss> Cale: how it could like be?
+<jusss> I just wonder, of course this may not be meaningful
+<Cale> Not sure I understand that question
+<jusss> Cale: "You could, but that would shadow the f which was in scope,
+        which is just confusing"
+<Cale> Yeah, the code you wrote is valid, it's just not advisable, since you
+       won't be able to refer to the old f any longer. Perhaps that's what you
+       want, but shadowing like that is also confusing to readers usually.
+<jusss> could you show me how?                                          [14:30]
+<Cale> I don't know what you're asking me to show
+<Cale> You wrote the code, I'm saying that's valid
+<Cale> You could replace the occurrences of f' and f'' and f''' in the code I
+       wrote with f                                                     [14:31]
+<Cale> and it would mean the exact same thing
+<Cale> It's just a more confusing way to write the same code
+<dminuoso> I think they're rather hoping for something like mdo         [14:32]
+<jusss> Cale: I see
+<Cale> dminuoso: mdo wouldn't make sense here, because then there's nothing to
+       determine any part of f                                          [14:35]
+<dminuoso> Oh I know Cale, it's just an educated guess based on the many
+           previous conversations I've had with them.
+<dminuoso> Consider their example of `const f = _ => {console.log(_); return
+           f}`                                                          [14:36]
+<dminuoso> Im not saying it makes any particular sense, it's more probably
+           jusss has some gaping confusion in their head. :)            [14:37]
+<Cale> Well, we took a fixed point originally when defining f, sure
+<jusss> dminuoso: I just wonder can we do something freely as dynamic
+        languages                                                       [14:38]
+<dminuoso> With crutches and tricks we can mimic dynamic languages, yes.
+<dminuoso> Is it a good idea? Most likely not.
+<Cale> This kind of recursive continuation-y thing can be useful
+<Cale> A lot of early arrowized FRP systems are based on a slightly more
+       elaborate version of this trick
+<Cale> You can get "local state" by having parts of the computation which
+       replace themselves. I suppose a lot of the stream processing libraries
+       like pipes and conduit also apply                                [14:40]
+<jusss> "recursive continuation-y" I wonder if there's "fixed-point
+        continuation" and what it would be?                             [14:43]
+<Cale> In which particular case?                                        [14:45]
+<Cale> Usually that's a reasonable way of expressing infinite loops     [14:46]
+<jusss> I don't know yet                                                [14:47]
+<jusss> just a random combine term                                      [14:48]
+<jusss> goto = callCC \out -> fix out, that is interesting              [14:49]
+<Cale> That's not really goto, but the thing which would make a label
+<Cale> (and then you'd execute the label to jump back to there)         [14:51]
+<jusss> it has take me a few days to learn Cont Monad and higher-kinded
+        polymorphism in arrow-kt, and I'm still not clear about them,   [14:53]
+<Cale> We don't really use the Cont monad a whole lot                   [14:54]
+<Cale> Cont can clean up a very particular kind of mess, but it's one that
+       doesn't show up too often
+------------------------------------------------------
+kotlin's companion object is that skeleton in java,
+it just means you can call this class like an object
+object C { ... } you can call C.xxx
+or class C { companion C } you still can call C.xxx also
+this class C could have an instance
+----------------------------------------------------------
+_ is only used in pattern matching, out of pattern matching, _ would be an error
+
+<Axman6> _ when not used in a pattern causes a specific kind of error. its not
+really poart of HAskell, since no program can be compiled if it still
+contains _ in an expression
+
+<jusss> so if there're "null" and "Object" in haskell?
+<jusss> Void correspoinds that value doesn't exist
+--------------------------------------------------------------
+
+I think the benefits about FP are referential transparency and immutable data,
+the benefits about static languages are type constraints on generics,
+it can detect type errors on compile time, not run-time
+typeclass, trait, concepts?
+they're just group some specific types, and do ad-hoc polymorphism
+but python could do `assert isinstance("3",str)` to check type
+with decorator, it will be more powerful
+
+Dependent Type is a popular topic now, 
+but I wonder when languages that have CoC type system would be popular
+
+----------------------------------------
+#Sum #ad-hoc polymorphism
+union, enum, sealed class can implement Sum type
+
+Sum type is not ad-hoc polymorphism
+Bool is a sum type, but not polymorphic
+typeclass Monad is ad-hoc polymorphism
+not parametric polymorphism, id is.
+ad-hoc polymorphism just a group of specific types, not all types
+
+but Sum type and ad-hoc polymorphism both can solve same problem,
+they can do type constraints,
+
+if Int and String are instances of typeclass IS,
+then f :: IS a => a -> a
+this a only can be Int or String,
+
+f :: Either String Int -> Either String Int
+this a only can be Left String or Right Int
+
+they both can do type constraints
+but typeclass would ask specific implement functions
+Sum type doesn't
+
+####################################3
+
+interface NIS<T> {fun T.fmap():T}
+sealed class NIIS<T>: NIS<T>
+data class NIntIS(val x: Int): NIIS<Int>(){
+   override fun Int.fmap(): Int{
+       return this+x+1
+   }
+}
+
+data class NStringIS(val x: String): NIIS<String>(){
+    override fun String.fmap(): String{
+        return (this+x).reversed()
+    }
+}
+fun <T>g3(x: NIIS<T>):Any{
+    if (x is NIntIS){
+       with(NIntIS(0)) {
+           return NIntIS(x.x.fmap())
+       }
+    }
+    if (x is NStringIS){
+        with(NStringIS("")){
+            return NStringIS(x.x.fmap())
+        }
+    }
+    return x
+}
+
+
+fun main(){
+    println(g3(NIntIS(3)))
+    val gg =g3(NStringIS("321"))
+}
+
+////////////////////////////////////////////////
+generics constraints(type variable constraints)
++ interface(require specific function implements)
++ class extension(function overloading)
+== typeclass
+
+kotlin couldn't make existed class to inherit other interface
+Int can do class extension, but Int can't inherit new interfaces
+
+kotlin use a new way to do that,
+define a interface IS<T>, it requires function T.f,
+then implement object ISI inherit IS<Int> and ISS inherit IS<String>
+now you declare a value x has IS<T>
+and it could be IS<Int> or IS<String>
+and inside IS<T>, the value x has function f,
+use `with(ISI) { 3.f() }`
+or `ISI.run { 3.f() }`
+
+interface Functor<T>, require T.fmap
+sealed class Maybe<A>: Functor<T>
+data class Just<A>: Maybe<A>() implement fmap
+object FS: Functor<String> implement String.fmap
+
+so when you declare x: Functor<T>
+you can pass Just<A> or Functor<String> instances
+those instances have fmap function
+
+also you can do class extension for interface,
+so that class which inherit that interface would have that functions
+
+interface WithLength<T> {val T.length: Int}
+object StringWithFakeLength: WithLength<String> { override val String.length get() = 128 }
+fun <T, U: WithLength<T>> U.printLength(t: T) = println(t.length)
+StringWithFakeLength.run { printLength("hltj.me") }
+
+there's no such thing like F<A> in kotlin,
+this F<A> is just F, not F<A>,
+kotlin doesn't support higher-kinded polymorphism,
+KEEP 87 is not approved yet,
+and arrow-kt has Kind<F,A> to simulate higher-kinded polymorphism,
+by
+interface Monad<F> : Applicative<F> {
+  fun <A, B> Kind<F, A>.flatMap(f: (A) -> Kind<F, B>): Kind<F, B>
+  ...
+}
+interface Kind<out F, out A>
+typealias Kind2<F, A, B> = Kind<Kind<F, A>, B>
+typealias Kind3<F, A, B, C> = Kind<Kind2<F, A, B>, C>
+
+you can just image that simulation Kind<F,A>, F :: * -> *
+
+I would call that <A,B> quantified types in fun <A,B> Kind<F,A>
+just like forall a. in haskell
+
+# define functor, not possible yet, because lack of hihger-kinded polymorphism support
+interface Functor<C<*>> {
+    fun <T, R> C<T>.fmap(f: (T) -> R): C<T>
+}
+
+-- so we can have this within arrow
+
+interface Kind<out F, out A>
+interface Functor<F> {
+    fun <T, R> Kind<F, T>.fmap(f: (T) -> R): Kind<F, R>
+}
+
+//then we define Maybe Functor
+class ForMaybe private constructor()
+
+sealed class Maybe<out T> : Kind<ForMaybe, T> {
+    object `Nothing#` : Maybe<Nothing>() {
+        override fun toString(): String = "Nothing#"
+    }
+    data class Just<out T>(val value: T) : Maybe<T>()
+}
+
+fun <T> Kind<ForMaybe, T>.fix(): Maybe<T> = this as Maybe<T>
+
+object MaybeFunctor : Functor<ForMaybe> {
+    override fun <T, R> Kind<ForMaybe, T>.fmap(f: (T) -> R): Maybe<R> = when (val maybe = fix()) {
+        is Maybe.Just -> Maybe.Just(f(maybe.value))
+        else -> Maybe.`Nothing#`
+    }
+}
+
+fun main() = with(MaybeFunctor) {
+    println(Maybe.Just(5).fmap { it + 1 })
+    println(Maybe.`Nothing#`.fmap { x: Int -> x + 1 })
+}
+https://www.ituring.com.cn/article/509017
+//////////////////////////////////////////////
+
+interface IS<T> { fun T.f(): T}
+class IntIS(): IS<Int> {
+     override fun Int.f(): Int {
+        return this+1
+    }
+}
+
+class StringIS(): IS<String> {
+    override fun String.f(): String{
+        return this.reversed()
+    }
+}
+fun <T> g(x: T):Any? {
+    if (x is Int) {
+        with(IntIS()){
+            return x.f()
+        }
+    }
+    else if (x is String) {
+        with(StringIS()){
+            return x.f()
+        }
+    }
+    else return x
+}
+#ad-hoc polymorphism
+fun <T> g2(x: T):Any? {
+    if (x is Int) return x+1
+    else if (x is String) return x.reversed()
+    else return x
+}
+
+fun main(){
+    println(g(2))
+    println(g("123"))
+    println(g2(3))
+    println(g2("2323"))
+}
+
+
+///////////////////////////////////////////////////////////
+
+#kotlin #lambda
+f({ x -> x}) in kotlin, it can be f { it }
+f( { x -> g(x) } ) could be f { g(it) }
+return {x -> x} could be return { it }
+-------------------------------------------------------
+Change project name
+1. close android studio, change the root directory name of the project
+2. open android studio then open the project
+3. Build - Clean Project
+4. just keep the package name
+5. res/values/strings.xml, app name
+6. settings.gradle, delete rootProject.name = 'Your project name' this line
+
+https://stackoverflow.com/questions/18276872/change-project-name-on-android-studio
+-------------------------------------------------------
+
+#ADB #Android 
+
+set this 
+%LOCALAPPDATA%\Android\sdk\platform-tools
+on $PATH on windows 10, if you have installed android studio,
+then you already have this adb tools,
+cmd - adb tcpip 5555; adb connect deviceIp:5555
+then you in device, enable adb on development mode and accept this connection
+then in you android studio, just click run, it will show the connection
+
+----------------------------------
+#isomorphic #Cont #Continuation #CPS
+<Cale> jusss: X and Y are isomorphic types if there exist functions f :: X -> Y and g :: Y -> X such that f . g = id and g . f = id
+
+#Reader
+(do x <- (+1); y <- (+2); return (x+y)) 3
+
+<int-e> jusss: You're missing an r, I think. Cont r a and (a -> r) -> r are
+        isomorphic as types but they have fundamentally different Monad
+        instances associated with them.
+<int-e> jusss: The Monad instance would be that for (->) (a -> r), so a
+        (somewhat strange) reader.     
+
+<int-e> jusss: There's a Monad instance for  ReaderT m r  which implies one
+        for Reader r. There's a separate instance for (->) r. They are
+        behaviorally the same.
+
+r -> a and Reader r a = Reader {runReader ::r -> a} have the same behavior
+r -> a and Reader are ismorphic
+
+(->) a could be call Reader Monad, they have same instances
+but (a->r) -> couldn't be call Cont Monad, they don't have same instances
+
+##########################################
 when you want to get a function's original code so that to change it,
 that's reflection, get that function's describe, and comment code in it.
 when you want people to redefine their own function, that's interface
