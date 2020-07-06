@@ -1,3 +1,31 @@
+#Functor
+<liiae> > liftA (+1) [1,2,3]
+<lambdabot>  [2,3,4]
+
+#Applicative
+<liiae> > liftA2 (+) [1,2,3] [2,5]
+<lambdabot>  [3,6,4,7,5,8]
+
+#Monad
+<liiae> > [1,2,3] >>= (\x -> if x == 1 then return x else return (x+2))
+<lambdabot>  [1,4,5]
+<liiae> now I see
+
+<liiae> Functor and Applicative, do the same behavior on the value inside a
+        context without change their structures
+<liiae> Monad, can do different behavior
+
+when you need to operate on a value inside a context without change its structure,
+make it as an instance of Functor, implement fmap
+
+when you need to operate on one more values inside same contexts,
+make it as an instance of Applicative, implement <*>
+
+when you need to operate different behaviors based on the value,
+make it as an instance of Monad, implement >>=
+
+-------------------------------------------------------
+
 monad transformer
 MaybeT IO a = IO (Maybe a)
 ReaderT r m a = m (Reader r a)
