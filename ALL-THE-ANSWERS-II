@@ -1,3 +1,145 @@
+#Functor
+<liiae> > liftA (+1) [1,2,3]
+<lambdabot>  [2,3,4]
+
+#Applicative
+<liiae> > liftA2 (+) [1,2,3] [2,5]                                      [14:47]
+<lambdabot>  [3,6,4,7,5,8]
+
+#Monad
+<liiae> > [1,2,3] >>= (\x -> if x == 1 then return x else return (x+2))
+<lambdabot>  [1,4,5]
+<liiae> now I see
+
+<liiae> Functor and Applicative, do the same behavior on the value inside a
+        context without change their structures
+<liiae> Monad, can do different behavior
+
+when you need to operate on a value inside a context without change its structure,
+make it as an instance of Functor, implement fmap
+
+when you need to operate on one more values inside same contexts,
+make it as an instance of Applicative, implement <*>
+
+when you need to operate different behaviors based on the value,
+make it as an instance of Monad, implement >>=
+
+
+------------------------------------------------------------------------
+
+<c_wraith> for applicative, the function being applied must be blind to the
+           applicative context.  It's an (a -> b) function inside there.
+<c_wraith> for monad, the function is (a -> m b)
+<c_wraith> So you get to make decisions about what `m b` value to produce
+           based on the `a` value.
+
+<dibblego> Functor does liftA1, Applicative does liftA[0..N], Monad does (<=<)
+
+<dminuoso> I like to think of monads as being about "sequencing" and
+           applicatives as being about "branching off and joining together in
+           a diamond"
+
+<hololeap> another way to think about it is that Applicative allows you to
+           combine multiple effects
+<hololeap> :t \fa fb -> (,) <$> fa <*> fb                               [14:01]
+<lambdabot> Applicative f => f a1 -> f a2 -> f (a1, a2)
+<hololeap> and gives a way to lift something into a default "effectless"
+           effect
+<hololeap> :t pure
+<lambdabot> Applicative f => a -> f a
+<hololeap> while Monad allows you to take a "double-wrapped effect" and make
+           it into a regular effect                                     [14:02]
+<hololeap> :t (>>= id)
+<lambdabot> Monad m => m (m b) -> m b
+<dminuoso> I like to think of monads as being about "sequencing" and
+           applicatives as being about "branching off and joining together in
+           a diamond"
+<dminuoso> (The fact that you get sequencing in applicatives can be imagined
+           by "sequencing the left and right branches of the diamond onto each
+           other, somewhat senselessly" 
+
+fmap :: Functor f => (a -> b) -> f a -> f b
+fmap can let you manipulate some values inside *without* changing
+the structure of the thing.
+<liiae> when I need to operate on `f a` with `(a -> b)` and return `f b`, I
+        should make it as an instance of Functor
+
+<liiae> :t liftA2
+<lambdabot> Applicative f => (a -> b -> c) -> f a -> f b -> f c
+<liiae> when I need to operate on two `f a` or more, I should make it as
+        instance of Applicative
+
+<dibblego> do a <- x; b <- f a; ... -- here, a is named on the left of <- and
+           then used on the right of <- in the following expression
+<dibblego> liiae: you needed monad for that, applicative is not enough
+<dminuoso> Can you see how this is a mix between Monad and Applicative? :)
+<dminuoso> (The idea is, the first effect can produce Left or Right, and if
+           its a *Left* then the second effect is run)
+<dminuoso> So you have sort of "dynamic" decidability which effects should be
+           run, but statically analyzable (since you can just look at the tree
+           and combine all the possible effects)
+
+Just 5 >>= \x -> Just 4 >>= \y -> return $ x + y
+
+--------------------------------------------------------------
+#mapTree #binaryTree
+-- there's a list [1,2,[3,4],[3,[5,6,[7]]]], who to let every element in it plus 1?
+-- <Cale> jusss`: All the elements of a Haskell list must have the same type
+-- <Cale> jusss`: If we want a tree, we'll use a tree data type
+
+data Tree a = Nil | Cons a (Tree a) | Subtree (Tree a) (Tree a) deriving (Show)
+
+v :: Tree Int
+v = Cons 1 (Cons 2 (Subtree (Cons 3 (Cons 4 Nil)) (Subtree (Cons 3 (Subtree (Cons 5 (Cons 6 (Subtree (Cons 7 Nil) Nil))) Nil)) Nil)))
+
+instance Functor Tree where
+    fmap f = g
+        where
+            g Nil = Nil
+            g (Cons x t) = Cons (f x) (g t)
+            g (Subtree t t') = Subtree (g t) (g t')
+
+main = print $ fmap (+1) v
+
+-- Cons 2 (Cons 3 (Subtree (Cons 4 (Cons 5 Nil)) (Subtree (Cons 4 (Subtree (Cons 6 (Cons 7 (Subtree (Cons 8 Nil) Nil))) Nil)) Nil)))
+
+--data Tree a = Leaf a | Node (Tree a) (Tree a) deriving (Show)
+--mapTree :: (a->b) -> Tree a -> Tree b
+--mapTree f (Leaf x) = Leaf (f x)
+--mapTree f (Node xl xr) = Node (mapTree f xl) (mapTree f xr)
+
+v = [1,2,[3,4],[3,[5,6,[7]]]]
+def plus1(l: list): 
+    return [ plus1(i) if type(i) is list else i + 1 for i in l ]
+print(plus1(v))
+# [2, 3, [4, 5], [4, [6, 7, [8]]]]
+
+
+def g(x):
+    if (x == []): return []
+    if (not isinstance(x, list)):
+        return x+1
+    else:
+        return [g(x[0])] + g(x[1:])
+
+# the point here is waiting its result, so it won't return too early
+# return f(list[0]) + f(list[1:]), but f(list[0]) is a Int, and f(list[1:]) is a [], so [f(list[0])] + f(list[1:])
+        
+print(list(map(g,v)))
+
+def g2(f,x):
+    if (x == []): return []
+    if isinstance(x,list):
+        return [g2(f,x[0])] + g2(f,x[1:])
+    else:
+        return f(x)
+
+f_ = lambda x: x+3
+result = map(lambda x: g2(f_,x), v)
+print(list(result))
+
+
+-----------------------------------------------------------
 
 #recursive type
 
@@ -50,6 +192,11 @@ make a new typeclass IS, make Int and String as its instances
 IS a => a this a only can be Int or String
 and IS can ony have Int and String now, * -> * can only be IS
 even you can do (Functor f, IS a) => f a, so it only can f Int, or f String
+
+Java/Kotlin can't do type constraints for existed types like Int or String,
+they can create a new super class for type constraints if new subclasses to inherit it.
+but they can use an enum class doing type constraints for existed types,
+like Either<String, Int>, enum, union, sealed, whatever you call it
 
 <Cale> It's polymorphic in a choice of functor f
 <jusss> typeclass can do type constraints, require specific function
