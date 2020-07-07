@@ -1,3 +1,96 @@
+so think about Reader Functor,
+e -> is the context, a is the value
+e is the input, a is the result
+
+
+1. change the value inside a context without change its structure,
+
+
+so input e-> here is the structure, result a here is the value inside a context e->
+change the result without change its input, make it as a Functor
+
+fmap :: (a -> b) -> (e -> a) -> (e -> b)
+fmap (+1) (*2) == \x -> (+1) $ (*2) x == (+1) . (*2)
+
+*2 input is 3
+fmap (+1) (*2) input is 3 too
+they have the same structure, but with diffrent result in the structure
+
+
+2. you will get b if you give e in e -> b
+
+
+because (*2) is f a, you give the input x to *2, so you can get the result a,
+then fmap make (+1) work on that result
+so fmap on function, it's function compose
+
+
+3. input -> is the structure in Functor and Monad, 
+change the result without change the structure
+
+
+(+1) >>= \x -> return (x+2)
+e -> b is 3 -> 6
+
+you give 3 to (+1) :: e -> a,
+3 is the input e,
+you can get result a is 4 here
+then x is 4, 
+( (+1) >>= \x -> return (x+2) ) :: e -> b
+and e is 3, because you give 3 to this,
+you will get b 6
+
+(+1) >>= (+)
+>>= :: (e -> a) -> (a -> (e -> b)) -> (e -> b)
+(+1) :: e -> a
+(+) :: a -> (e -> b)
+
+the structure is 3, and you give 3 to (+1)
+(+) will get result a 4, then plus the structure 3, so it's 7
+
+e -> b is 3 -> 7 
+
+f :: e -> a
+g :: a -> (e -> b)
+
+f >>= g = \x -> g (f x) x
+
+(f >>= g) :: e -> b
+since you will give e it to f at first, so you will get b at last
+f >>= g will be b
+
+-------------------------------------------------------
+#Functor
+<liiae> > liftA (+1) [1,2,3]
+<lambdabot>  [2,3,4]
+
+#Applicative
+<liiae> > liftA2 (+) [1,2,3] [2,5]
+<lambdabot>  [3,6,4,7,5,8]
+
+#Monad
+<liiae> > [1,2,3] >>= (\x -> if x == 1 then return x else return (x+2))
+<lambdabot>  [1,4,5]
+<liiae> now I see
+
+<liiae> Functor and Applicative, do the same behavior on the value inside a
+        context without change their structures
+<liiae> Monad, can do different behavior
+
+when you need to operate on a value inside a context without change its structure,
+make it as an instance of Functor, implement fmap
+
+when you need to operate on one more values inside same contexts,
+make it as an instance of Applicative, implement <*>
+
+when you need to operate different behaviors based on the value,
+make it as an instance of Monad, implement >>=
+
+-------------------------------------------------------------
+
+
+
+
         0
        / \
       1   2
