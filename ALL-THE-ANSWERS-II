@@ -1,3 +1,247 @@
+
+about effects,
+Maybe a has Just a and Nothing,
+make any f work on Nothing, it returns Nothing
+make any f work on Just a, it returns Just (f a)
+
+keep the structure, and change its inside value,
+
+you don't need to do if a == null stuff before
+you want f work on a, 
+if a is Nothing, f Nothing still is Nothing
+
+fmap (+1) [None, 1, 2] will case error
+fmap (+1) [Nothing, Just 1, Just 2] is ok
+you needn't check every element is None/null anymore
+because any f work on Nothing will get Nothing
+
+null in Java has any type,
+but Nothing in Kotlin would only have Maybe a type
+
+concret null any type to one type
+concret arbitrary type to one type
+
+if you want different behaviors based on value,
+you should use bind
+
+[Nothing, Just 1, Just 2] >>= \x -> if x == Just 1 then return ((+1) <$> x) else return x
+
+> fmap (div 9) [0,1,2]
+<lambdabot>  [*Exception: divide by zero
+
+fmap (Just (div 9) <*>) [Nothing, Just 1, Just 2] == [Nothing,Just 9,Just 4]
+
+let mdiv x 0 = Nothing; mdiv x y = Just (div x y) in fmap (mdiv 9) [0,1,2]
+[Nothing,Just 9,Just 4]
+
+you still need to specify what 0 will return
+
+Prelude> Just (+1) <*> Just 3
+Just 4
+Prelude> Nothing <*> Just 3
+Nothing
+Prelude> Nothing <*> Nothing
+Nothing
+
+Just (+1) <*> Just 3 <$> (+)
+
+(+)  <$> ((+) <$> Just 3 <*> Just 3) <*> Just 3  this is anonying
+Just 3 >>= \x -> return (+x) >>= \x -> return (+) (x 3) >>= \x -> return (x 3)
+
+if there's a sequence function calls,
+you pass Just 3 to it, you will get a Just result
+you pass Nothing to it, you will get Nothing at beginning
+
+if the parameter is Just (+1) then use <*> concat
+
+Just (+1) -> f -> g -> h -> Just result
+Nothing -> f -> g -> h -> Nothing
+
+Just (+1) <*> Just 3    here it's Just 4, you can't <*> and <$>, because it's in the right parameter position, so >>= come to help
+
+<liiae`> :t (<$>)
+<lambdabot> Functor f => (a -> b) -> f a -> f b
+<liiae`> :t (<*>)                                                       [18:08]
+<lambdabot> Applicative f => f (a -> b) -> f a -> f b
+<liiae`> :t (>>=)
+<lambdabot> Monad m => m a -> (a -> m b) -> m b
+
+<liiae`> Functor and Applicative, the first parameter are (a -> b) or f (a ->
+         b)
+<liiae`> but Monad's first parameter is m a
+<liiae`> that's why we use >>= to concat a sequence calls stuff?
+<Rembane> YEs
+
+<liiae`> use <$> or <*> to chain will be ugly, (+)  <$> ((+) <$> Just 3 <*>
+         Just 3) <*> Just 3
+<liiae`> it's like h(g(f(a)))
+
+but fmap can chain functions, like function composition
+bind can chain values, or chain binary functions
+
+1. Maybe's effect is two branches
+2. Use fmap, Use Functor, Use >>=, Use Monad
+3. >>= chain whole operations to one, give it Nothing, return Nothing, specify when return Nothing
+
+------------------------------------------------------------
+python has a list of symbol operators, but you can't make your own symbols
+by define __rshift__() inside an object, so you can use >> on that object
+
+class _Maybe(object):
+      def __rshift__(self, function):
+        if not isinstance(function, _Maybe):
+            error_message = 'Can only pipeline monads.'
+            raise TypeError(error_message)
+
+        if not callable(function):
+            function = lambda _ : function
+
+        return self.bind(function)
+
+so you can do Just(int)(7) >> add(Just(int)(8))
+
+this >> is _Maybe.__rshift__()
+
+you may use >= for >>= in python
+https://docs.python.org/3/library/operator.html
+https://bytes.yingw787.com/documents/2019/12/06/monads.py
+
+a < b     __lt__(a,b)
+a <= b    __le__(a,b)
+a == b   __eq__
+!=      __ne__
+>      __gt__
+>=     __ge__
+not    __not__
+True   truth
+is     is_
+is not is_not
++  __add__
+//     __floordiv__
+~      __invert__
+<<     __lshift__
+%      __mod__
+*      __mul__
+@      __matmul__
+-      __neg__
+|      __or__
+**     __pow__
+>>     __rshift__
+-      __sub__
+/      __truediv__
+^      __xor__
+in     __contains__
+&      __and__
+
+also there's existed library called toolz, can provide curry decorator
+
+pip install toolz
+from toolz import *
+@curry
+def add(x,y):
+    return x+y
+
+add(3)(4)
+
+add1 = lambda x: x+1
+multi2 = lambda x: x*2
+t = compose(add1, multi2)
+t(3) == 7
+
+from toolz import *
+curry and compose can from toolz
+
+from toolz.curried import map, filter, reduce
+list(map(add1)([1,2])) == [2,3]
+add1OnList = map(add1)
+list(add1OnList([1,2])) == [2, 3]
+
+since map return an map object in python3, so use list() on it
+[x] is a list with one item in it.
+list(x) iterates over x and turns it into a list
+so don't use [map(add1)([1,2])], use list(map(add1)([1,2]))
+
+https://toolz.readthedocs.io/en/latest/api.html
+toolz.functoolz.pipe(data, *funcs)
+pipe(data, f, g, h) is equivalent to h(g(f(data)))
+
+>>> names = ['Alice', 'Bob', 'Charlie', 'Dan', 'Edith', 'Frank']
+>>> groupby(len, names)  # doctest: +SKIP
+{3: ['Bob', 'Dan'], 5: ['Alice', 'Edith', 'Frank'], 7: ['Charlie']}
+
+from toolz.compatibility import zip
+list(zip([0,1],['a','b'])) == [(0, 'a'), (1, 'b')]
+
+PyToolz is Data.List in Python!
+
+
+###############################################################
+
+python's type hint is just a poor of assert, it won't work very well
+do type constraints in python? 
+by assert every parameters's type at top of a function definition
+
+assert isinstances(a,str)
+
+--------------------------------------------------------------
+#what case the compilers can't help
+
+f :: Int -> Int
+f(0) = 0
+f(1) = 1
+f(n) = f(n-1) + f(n-2)
+f(42) will take a long time, even ghc support TCO,
+because this is not a tail call,
+also this f(42) will expand to 
+f(42) = f(41) + f(40)
+      = f(40) + f(39) + f(39) + f(38)
+      = f(39) + f(38) + f(38) + f(37) + f(38) + f(37) + f(37) + f(36)
+      = ...
+the inefficient bit isn't the call costs, it's the exponential asymptotics of the algorithm
+
+------------------------------------------------------------------
+
+it's AD 2020, java still doesn't support TCO, even first-class function, or
+higher-order function,
+higher-ranked type,
+higher-kinded polymorphism,
+type inference,
+dependent type,
+recursive type,
+type family,
+type application,
+typeclass,
+derive generic,
+
+---------------------------------------------------------------------
+
+kotlin arrow
+https://www.raywenderlich.com/324105-functional-programming-with-kotlin-and-arrow-part-2-categories-and-functors
+https://www.raywenderlich.com/9527-functional-programming-with-kotlin-and-arrow-getting-started
+https://hltj.me/kotlin/2020/01/11/kotlin-trait-typeclass.html
+https://hltj.me/lang/2017/08/01/modern-lang-static-type.html
+https://hltj.me/kotlin/2017/08/25/kotlin-functor-applicative-monad.html
+https://mattmoore.io/blog/arrow-io-monad
+
+
+haskell f-algebra
+https://bartoszmilewski.com/2013/06/10/understanding-f-algebras/
+
+haskell lens and arrow
+https://hackage.haskell.org/package/base-4.12.0.0/docs/Control-Arrow.html
+
+-------------------------------------------------------
+vim
+m a - mark as a
+'a - goto back a
+ea - append at end of word
+> - shift right
+< - shift left
+e - jump to end of words
+0 - (zero) start of line
+https://www.worldtimzone.com/res/vi.html
+-------------------------------------------------------------------------
+
 #Functor
 <liiae> > liftA (+1) [1,2,3]
 <lambdabot>  [2,3,4]
