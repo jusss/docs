@@ -1,4 +1,174 @@
+forever, replicate and cycle
 
+replicate 3 9 == [9,9,9]
+cycle [3] == [3,3,3,3,3...]
+replicateM 3 (print 3) -- will call 3 times `print 3` and return a result [(),(),()]
+forever (print 3) -- will `print 3` forever
+
+<jusss`> l <- async $ f1 v1; m <- async $ f2 v2; how to share that v1 and v2
+         in both?
+<jusss`> in f2 to visit that v1
+<jusss`> Waldkauz: f1 and f2 both are loop functions                    [17:02]
+<jusss`> Waldkauz: for example, f1 is that recv function about socket, it's a
+         loop for recv something from internet
+<jusss`> Waldkauz: and f2 is a send function, it needs that what f1 received
+         data
+<jusss`> so how I can get what f1 received in f2?                       [17:04]
+<jusss`> since f1 and f2 both are loop functions, so I don't think await to
+         get the result is a good way
+
+1.
+
+<jusss`> or make f1 and f2 aren't loop functions, use `wait` to get what f1
+         received and pass it to f2, put f1 and f2 in one loop
+         so f2 could use f1's result and f1 won't block f2 even f1 is blocking
+         
+        forever $ do {
+         r1 <- async f1 
+         do some other stuff
+         result <- wait r1
+         r2 <- async f2 result
+         result2 <- wait r2
+         }
+
+2. 
+use parsec to turn ":nick!~user@addr PRIVMSG #channel :words" to 
+data IRCMsg = IRCMsg {nick :: String, user :: String, addr :: String, cmd :: String, channel :: String, word :: String}
+
+
+
+--------------------------------------------------------
+android-x86 8.1-r5, speaker and headphone jack both working at the same time,
+use `alsa_amixer set Speaker 100 mute` to mute speaker
+use `alsa_amixer set Speaker 100 unmute` to unmute speaker
+
+or install alsamixer app on android
+
+wifi reconnection fail issue, try `pkill wpa_supplicant` in chroot
+
+-------------------------------------------------------------
+about sdcard, you may choose UHS card to instead of SDHC card, and make it as internal storage
+---------------------------------------------------
+mount -t vfat /dev/block/mmcblk1p1 /sdcard/debian #mount esp to change grub
+add `androidboot.selinux=permissive intel_idle.max_cstate=1` in EFI/Android/android.cfg linux line
+umount /sdcard/debian/
+after reboot, dmesg|grep idle to check
+---------------------------------------------------------------
+(debian, buster i386)  (img, 512k 7500 ext4) (sdcard, vfat-8k bs)
+
+#dd if=/dev/zero of=debian.img bs=4096k count=2000       # 8G
+dd if=/dev/zero of=debian.img bs=512k count=7500       # 3.7G
+mkfs -t ext4 debian.img
+
+if your update your system without reboot,
+then your running kernel may not be your installed kernel,
+then you may fail to mount
+
+sudo mount -o loop debian.img /mnt/
+su
+#debootstrap --arch amd64 --foreign sid /mnt/ http://mirrors.aliyun.com/debian 
+debootstrap --arch i386 --foreign buster /mnt/ http://mirrors.tuna.tsinghua.edu.cn/debian
+cd /mnt
+chroot . /bin/bash
+/debootstrap/debootstrap --second-stage 
+exit
+cd
+umount /mnt
+
+now you can pass you debian.img to android
+
+
+df -h # show where your sdcard mount on, like /mnt/media_rw/0435-FB6C/
+su
+mkdir /sdcard/debian
+cd /sdcard/debian
+mount -o loop /mnt/media_rw/0435-FB6C/debian.img ./debian
+cd debian
+mount -o bind /dev ./dev
+mount -t proc /proc ./proc
+mount -t sysfs /sys ./sys
+mount -t devpts /dev/pts ./dev/pts
+mount -t tmpfs tmpfs ./tmp
+
+put that to mount.sh
+
+chroot . /bin/bash
+vim source.me
+#!/bin/bash
+export PATH=/sbin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
+export TERM=vt100
+source source.me
+passwd root
+su root
+cd
+useradd -m john
+passwd john
+
+vi /etc/group
+inet:x:3003:root
+net_raw:x:3004:root
+
+su root
+ping 192.168.1.1
+
+vi /etc/resolv.conf
+nameserver 8.8.8.8
+
+when you use outline vpn in android,
+you can't get network in chroot
+
+vi /etc/apt/source.list
+deb http://mirrors.aliyun.com/debian sid main non-free contrib
+
+chroot . /bin/su - root
+
+chmod 777 /etc/resolv.conf   # this is important! otherwise you can ping repo server, but apt can't resolve it
+usermod -g inet _apt
+groups _apt # check if inet is the primary group for user _apt
+# https://wiki.debian.org/ChrootOnAndroid
+su root
+
+apt update
+
+click Google Play -> menu -> Settings -> Play Store version several times to update it to latest version, just like that enable developer options
+
+MX Player can play movies on amd64 android, and also it can rotate the screen
+
+rotate who android screen by a player, what a surprise!
+
+https://github.com/phusion/baseimage-docker/issues/58
+dpkg-reconfigure debconf
+
+./mount.sh
+chroot . /bin/bash
+source ./source.me
+source /root/.bashrc
+su root
+su john
+/bin/bash
+cd
+source ./bashrc
+
+./umount.sh
+/system/bin/umount ./tmp
+/system/bin/umount ./dev/pts
+/system/bin/umount ./dev
+/system/bin/umount ./proc
+/system/bin/umount ./sys
+
+--------------------------------------------
+android x86   
+solve that after sleep by power button, you can't get back
+
+These are properties, not kernel cmdline.
+You may add them to /system/build.prop. 
+You can just set the property: sleep.state=none 
+
+https://groups.google.com/forum/#!topic/Android-x86/CVbQm8lq4Fo
+https://groups.google.com/forum/#!topic/android-x86/_vU8nNLKicI
+https://groups.google.com/forum/#!topic/android-x86/OOdwiY9XRKU
+
+------------------------------------------------
 about effects,
 Maybe a has Just a and Nothing,
 make any f work on Nothing, it returns Nothing
