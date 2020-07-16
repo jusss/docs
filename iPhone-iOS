@@ -1,6 +1,14 @@
+iPhone to PC
+choose video from Photos, then "Save to Files" to vlc,
+then vlc Network -> Sharing via WiFi,
+visit that ip on your PC with browser, click the video you want to download
+---------------------------------------------
+PC to iPhone
 
-Passing files from PC to iPhone
+vlc Network -> Sharing via WiFi,
+visit that ip on your PC with browser, drug video into this browser
 
+another way
 PC: 
 cp a.mp4 /tmp/
 cd /tmp/
@@ -8,6 +16,9 @@ python -m http.server 8080
 
 iPhone:
 vlc - Network - Downloads - http://PC-IP:8080/a.mp4
+
+you can put this a.mp4 into galary,
+choose this a.mp4, long press, "Share" -> "Save Video" to Photos
 
 --------------------------------------
 pacman -S ifuse libimobiledevice
