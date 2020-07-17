@@ -1,3 +1,65 @@
+
+
+sudo rsync -RrvP IMG/ /mnt/ # this is like cp -r IMG/ /mnt/
+-------------------------------------------------
+
+<glguy> embed :: Functor f => f a -> (forall b. (a -> b) -> f b); embed x f =
+        fmap f x
+<glguy> unembed :: Functor f => (forall b . (a -> b) -> f b) -> f a; unembed f
+        = f id
+
+<glguy> liiae: Looks like
+        http://hackage.haskell.org/package/kan-extensions-5.2/docs/Data-Functor-Yoneda.html
+        liftYoneda and lowerYoneda
+<liiae> glguy: is it useful in real programming?                        [09:36]
+<glguy> I've seen it used to help GHC optimize uses of Lens, and it comes up
+        in a small way in the way my configuration schema library is
+        implemented, among other places                                 [09:37]
+<liiae> glguy: I've seen some articles about yoneda lemma, but I still have no
+        idea what it's about
+<glguy> liiae: two things really, making it more efficient to repeatedly use
+        fmap on something
+<glguy> and making it possible to use fmap on something at all when it isn't
+        already a functor
+<liiae> glguy: is it related to CPS?                                    [09:43]
+<lambdabot> Axman6 said 38m 11s ago: You might find these slides useful for
+            understanding Yoneda and a few other similar ideas. Sadly it
+            doesn't look like it was
+            recorded. https://slides.yowconference.com/                 [11:11]
+<lambdabot>
+            yowlambdajam2017/Humphries-ContinuationsAllTheWayDown.pdf?feature=oembed
+            (talk info
+            https://yowconference.com/talks/tim-humphries/yow-lambda-jam-2017/continuations-all-the-way-down-12518)
+<liiae> are there some exercise to help beginner to learn parsec?       [11:10]
+<hololeap> liiae: i would say play around with parseTest                [11:40]
+<hololeap> you give it a parser and a string and it prints the result to
+           stdout
+<hololeap> % import qualified Text.Parsec as P                          [11:45]
+<hololeap> % parseTest (string "hello" *> P.space *> string "world") "hello
+           world"
+<yahb> hololeap: "world"
+<hololeap> liiae: it also helps to understand how Applicative works. parsec
+           will help you develop a better intuition for
+           Applicative/Alternative                                      [11:46]
+<hololeap> % parseTest (string "hello" <* P.space <* string "world") "hello
+           world"                                                       [11:48]
+<yahb> hololeap: "hello"
+
+-----------------------------------------------
+#Sum of Facts
+-- f n = 1! + 2! + 3! + 4! + 5! + .. + n!
+fact 1 = 1
+fact n = n * (fact (n-1))
+f n = sum $ fmap fact [1..n]  -- O(n)
+
+main = print $ f 3
+
+--------------------------------------------------------
+#debian #mirror
+there're two mirrors, repo mirrors and cd mirrors
+https://mirrors.tuna.tsinghua.edu.cn/debian/ and http://mirrors.aliyun.com/debian/ are repo mirrors,
+http://www.debian.org/CD/http-ftp/#mirrors is cd mirror
+-----------------------------------------------------------
 forever, replicate and cycle
 
 replicate 3 9 == [9,9,9]

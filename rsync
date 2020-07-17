@@ -1,3 +1,5 @@
+sudo rsync -RrvP IMG/ /mnt/ # this is like cp -r IMG/ /mnt/
+
 mkstemp function not implemented
 
 rsync -avP --no-p --no-o --no-g a.mp4 ~/emp/
