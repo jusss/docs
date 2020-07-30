@@ -1,0 +1,44 @@
+
+reader take a value
+
+cont take an unary function which is continuation
+
+(a->r)->r is a continuation passing computation
+
+a->r is the continuation
+
+Reader f >>= g = \a -> g (f a) a
+
+f :: e-> a
+
+g :: a -> (e-> b)
+
+f >>= g :: e-> b    it takes e
+
+e-> is the monad, keep e-> structure not change
+
+Cont f >>= g = \ar -> f (\a -> g a ar)
+
+f :: (e->a)->a
+
+g :: a -> (e->b) -> b
+
+f >>= g :: (e->b)->b   it takes (e->b)
+
+(e->a)-> is the cont monad?
+
+lift (e->r) to Reader r e
+
+lift (a->r)->r to Cont r a structure
+
+so you can just use it without lift them into the structure
+
+express monad without structure in function
+
+IO a can't be isomorphic to any type
+
+there's no function has IO a -> a
+
+only a -> IO a
+
+so we can have bindCont bindReader bindWriter in py/js
