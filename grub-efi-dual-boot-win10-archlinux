@@ -1,3 +1,10 @@
+after update windows 10, windows overwrite grub, it can't boot up
+press ESC when press power button, then get boot choice, choose linux,
+then you can get into grub2, `configfile (hd1,gpt7)/boot/grub/grub.cfg`
+so you can get into archlinux, then
+`grub-install --target x86_64-efi --efi-directory /efi/`
+now you can choose boot windows or archlinux up
+--------------------------------------------------
 woeusb 和 winusb两款工具可在linux上使用windows的iso制作windows的启动盘
 -----------------------------
 old version of grub bug , wipe out /boot/esp and cann't install efi
