@@ -1,3 +1,6 @@
+ssh over stunnel or ssh over kcptun both are ok,
+there's no need to use ssh over stunnel over kcptun
+-----------------------------------
 IEPL IPLC
 
 BGP, MPLS VPN
