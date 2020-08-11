@@ -1,0 +1,17 @@
+
+bootia32.efi in /boot/efi/
+bios choose boot from efi file, then choose this bootia32.efi
+grub2 is inside this bootia32.efi
+
+make sure it's fat32 file system
+
+or mkdir -p /mnt/boot/efi
+grub-install --efi-directory /mnt/boot/efi --boot-directory /boot --target i386-efi
+then you can copy all the mod from /mnt/boot/grub/i386-efi/
+
+
+android and windows,
+mount -o x.iso /mnt
+copy those /mnt/ files to usb-stick, make usb-stick with mkfs.vfat
+
+linux distros, use dd if=x.iso of=/dev/sdb bs=512k
