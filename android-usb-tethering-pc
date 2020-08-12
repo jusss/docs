@@ -1,0 +1,22 @@
+android's camera as a plug-in camera of a laptop
+
+download IP Webcam by Pavel Khlebovich from Google Play,
+turn laptop and android wifi and data off, then connect laptop
+and android with usb cable, enable android usb-tethering for that
+laptop can get an IP from android, once laptop get an IP from android
+via dhcp, now run IP Webcam on android, click the last option "enable server",
+android will open camera and show an IP address you need to connect with browser,
+once you get there, click "browser" tag not "flash" in "Video" section on that website
+and click "fullscreen" it will pop up a new website, click the video and it will expand,
+then press F11 to fullscreen, and also you can plug an external monitor via hdmi/vga,
+you can make what android's camera captured to show in the external monitor at the
+same time.
+
+same usage to Xserver XSDL, 
+
+use usb cable to form an ethernet between android devices and PC,
+it's really fast to do something like passing files, ssh -XY, etc
+
+but I wonder how to form an ethernet between Windows 10 and Linux with
+A single usb cable?
+
