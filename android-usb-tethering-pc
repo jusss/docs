@@ -19,4 +19,5 @@ it's really fast to do something like passing files, ssh -XY, etc
 
 but I wonder how to form an ethernet between Windows 10 and Linux with
 A single usb cable?
-
+also there is a reverse tethering, so android could use PC's network,
+gnirehtet on github
