@@ -1,3 +1,6 @@
+xss-lock and xlock cause screen tear issue,
+just don't use them
+-----------------------------------
 如果想合上盖子就锁屏，
 /etc/systemd/logind.conf
 HandleLidSwitch=lock
