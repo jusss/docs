@@ -1,3 +1,10 @@
+xss-lock and xlock cause screen tear issue,
+just don't use them
+
+------------------------
+screen tear,
+https://wiki.gentoo.org/wiki/Intel#Modesetting_DDX
+------------------------------------------------------------------
 holy shit!
 字体发虚 屏幕亮度用xbacklight无法调节，因为显卡驱动默认用的modesetting!而不是intel驱动
 archlinux默认用modesetting!
