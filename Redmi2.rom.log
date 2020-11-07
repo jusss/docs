@@ -1,6 +1,18 @@
 lineage-17.1-20201107-nightly-wt88047-signed.zip enabled "allow clients to use VPNs"
 in hotspot tethering, so this phone can be a route for other devices,
 and they don't need VPN to visit google
+
+if you want to make PC use android's VPN, but don't use mobile data
+1, disable mobile data then connect phone to router with wifi
+2, connect phone to PC with usb cable
+3, enable usb-tethering and allow clients to use VPNs
+
+or you can use mobile data, and by usb-tethering or hostspot to share VPN to other devices
+
+if you want share with hostspot, you must use mobile data
+if you want share with usb-tethering, you can use mobile data or wifi
+if you want share vpn over wifi, you must use usb-tethering
+
 ---------------------------------------
 Redmi2 MIUI6 Official Global version
 http://en.miui.com/thread-160067-1-1.html
