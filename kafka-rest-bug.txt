@@ -1,0 +1,12 @@
+kafka-rest, when you do subscription, "no content in response" , so I didn't read the response,
+then when I use GET to get messages, error 500 show up,
+but if I read the response, which is null, then I can get messages for server, it's weird!
+
+https://docs.confluent.io/5.5.2/kafka-rest/quickstart.html
+
+curl -X POST -H "Content-Type: application/vnd.kafka.v2+json" --data '{"topics":["jsontest"]}' \
+ http://localhost:8082/consumers/my_json_consumer/instances/my_consumer_instance/subscription
+# No content in response
+
+httpurlconnection and okhttp is same, kind of low level
+try ktor-client
