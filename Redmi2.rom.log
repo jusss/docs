@@ -1,3 +1,15 @@
+
+make sure put sim card in slot 2,
+if it's in slot 1, it may be no mobile data
+also there's recovery.img in lineageos
+reboot to bootloader mode with advanced reboot function,
+then plug it to PC,
+sudo fastboot devices // if you see some digits, it means it's connected
+sudo fastboot flash recovery lineageos.recovery.img
+sudo fastboot reboot
+
+---------------------------------------------
+
 lineage-17.1-20201107-nightly-wt88047-signed.zip enabled "allow clients to use VPNs"
 in hotspot tethering, so this phone can be a route for other devices,
 and they don't need VPN to visit google
