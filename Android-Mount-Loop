@@ -1,0 +1,59 @@
+https://en.wikipedia.org/wiki/Loop_device
+losetup /dev/loop0 example.img
+mount /dev/loop0 /home/you/dir
+losetup -f # create a loop device or use mknod /dev/loop8 b 7 8
+mount -o loop example.img /home/you/dir
+
+also it needs kernel to enable config
+CONFIG_BLK_DEV_LOOP = y
+
+cp /proc/config.gz /sdcard/kernel_config.gz
+adb pull /sdcard/kernel_config.gz
+
+
+
+mount -t iso9660 -o ro /dev/block/loop0   /mnt
+
+mount -o loop Download/arch.img   tmp/
+chroot tmp /bin/bash
+
+
+mount -o loop example.img /home/you/dir
+
+--------------------------------------------------
+
+kona:/sdcard # mkdir tmp
+kona:/sdcard # mount -o loop Movies/arch.img  tmp/
+mount: '/dev/block/loop0'->'tmp/': Block device required
+1|kona:/sdcard # losetup -f
+losetup: /dev/block/loop1: No such device or address
+1|kona:/sdcard # mknod /dev/loop8 b 7 8
+kona:/sdcard # ls /dev/loop8 -lh
+brw-rw---- 1 root root 7,   8 2020-11-18 15:09 /dev/loop8
+kona:/sdcard # losetup /dev/loop8 /sdcard/Movies/arch.img
+kona:/sdcard # mount /dev/loop8 tmp
+kona:/sdcard # ls tmp
+bin boot dev etc home lib lost+found mnt opt proc root run sbin srv sys tmp usr var
+kona:/sdcard # cd tmp
+kona:/sdcard/tmp # chroot . /bin/bash
+[root@localhost /]#
+
+-----------------------------------------------
+mount -o bind /dev ./dev
+mount -t proc /proc ./proc
+mount -t sysfs /sys ./sys
+mount -t devpts /dev/pts ./dev/pts
+chroot . /bin/bash
+su
+cd
+vi /etc/group
+inet:x:3003:root
+net_raw:x:3004:root
+rm /etc/resolv.conf
+vi /etc/resolv.conf
+nameserver 8.8.8.8
+vi /etc/pacman.d/gnupg/gpg.conf
+keyserver hkp://keys.gnupg.net
+pacman -Su archlinux-keyring
+vi /etc/pacman.conf
+SigLevel = Never
