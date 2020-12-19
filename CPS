@@ -1,5 +1,28 @@
 
+ar = \f -> f 3    a cont computation
+g r c = c r    :: a -> m b
 
+(ar >>= g) (+1) == 5     c is (+1), r is (+1) 3, f is (+1)
+
+g2 r c = (+3) r
+(ar >>= g >>= g2) (+1) == 8   r is 5, c is (+1) in g2
+
+g3 r c = (+9) r
+(ar >>= g >>= g2 >>= g3) (+1) == 17
+
+g3 = \r _ -> (+9) r
+g2 = \r _ -> (+3) r
+g = \r _ -> _ r
+
+
+
+
+
+
+
+
+
+-----------------------------------------------
 
 [周三 9月 18 2019]
 *** You have joined channel #haskell                                    [09:10]

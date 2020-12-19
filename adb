@@ -1,3 +1,21 @@
+adb over wifi
+
+#ADB #Android 
+
+set this 
+%LOCALAPPDATA%\Android\sdk\platform-tools
+on $PATH on windows 10, if you have installed android studio,
+then you already have this adb tools,
+cmd - adb tcpip 5555; adb connect deviceIp:5555
+then you in device, enable adb on development mode and accept this connection
+then in you android studio, just click run, it will show the connection
+
+adb tcpip 5555
+adb connect 192.168.124.8:5555  # assume android's ip is 192.168.124.8 and enable adb in development mode by press seven times on base build number in settings
+adb install Brook.apk
+adb push *.txt /sdcard/Download/
+
+--------------------------------------------------
 sudo adb reboot bootloader
 sudo adb reboot recovery
 sudo fastboot reboot
