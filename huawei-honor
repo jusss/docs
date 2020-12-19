@@ -1,0 +1,23 @@
+huawei honor 6a comes with google services, you need choose the right country,
+1. Settings -> Advanced settings -> Backup & reset -> Factory data reset
+2. choose English/US(or Chinese/Singapore), then it will enable google services, you only need GooglePlay.apk
+3. download GooglePlay.apk from apkmirror.com then install it, and brook, you can use google services now
+Battery give them permit run as backgroud, won't be killed by screen off
+
+------------------------------
+honor 6a, emui 5.1, android 7.0
+use gms installer 44.06M version, not 55M version
+download it from https://www.25game.com/Android/View/20104/
+in settings, enable unknown source and outside source app install without check
+download google play apk from apkmirror.com
+if wireguard from f-droid can't work for google play, then use brook from github, or outline
+
+How to install Google Play on Huawei EMUI 5.X on Youtube
+https://youtu.be/bNItrFFp4MQ
+
+run youtube in backgroud
+settings -> battery -> give youtube and wireguard permit to run in backgroup
+press 'switching' key to show backgroud app, then press the lock right on youtube and wireguard to avoid they can be killed
+
+reference https://club.huawei.com/thread-15646351-1-1.html
+
