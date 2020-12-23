@@ -1,0 +1,33 @@
+in kotlin or haskell, you can't put different type values in one list, 
+like [1, "a", True] is not ok
+if you use [Any] for kotlin, that would be meaningless
+but we can put data structure in it,
+
+data T = V Int String Bool
+
+[V 1 "a" True, V 2 "b" False] :: [T]
+
+or class in kotlin
+
+data class C(val i: Int, val s: String, val b: Bool)
+
+[C(1,"a",True), C(2,"b",False)] :: List<C>
+
+
+if you want vist them, then use record syntax for haskell
+use class for kotlin
+
+data T = V {runInt:: Int, runString:: String, runBool:: Bool}
+
+runInt $ V 1 "a" true == 1
+
+class C (val i: Int, val s: String, val b: Bool) {
+       val i = i
+       val s = s
+       val b = b
+}
+val v = C(1,"a",True)
+v.i == 1
+
+
+
