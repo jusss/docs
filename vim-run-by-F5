@@ -1,0 +1,7 @@
+nnoremap <F5> <esc>:w<enter>:!runghc %:p<enter>
+inoremap <F5> <esc>:w<enter>:!runghc %:p<enter>
+"nnoremap <F5> <esc>:w<enter>:!python %:p<enter>"
+"inoremap <F5> <esc>:w<enter>:!python %:p<enter>"
+
+! will run command in current buffer
+% is current file name

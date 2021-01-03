@@ -1,0 +1,4 @@
+"comment"
+map <F3> :s/^/--/<CR>
+map <F4> :s/^--/<CR>
+
