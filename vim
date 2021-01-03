@@ -1,3 +1,14 @@
+"F5 run"
+nnoremap <F5> <esc>:w<enter>:!runghc %:p<enter>
+inoremap <F5> <esc>:w<enter>:!runghc %:p<enter>
+"nnoremap <F5> <esc>:w<enter>:!python %:p<enter>"
+"inoremap <F5> <esc>:w<enter>:!python %:p<enter>"
+"install supertab for auto-complete"
+"comment"
+map <F3> :s/^/--/<CR>
+map <F4> :s/^--/<CR>
+
+---------------------------------------------
 vim doesn't support high lights on python code
 ~/.vimrc
 filetype plugin on

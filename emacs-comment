@@ -1,0 +1,22 @@
+comment-or-uncomment-region or comment-dwim is the command
+
+(add-hook 'haskell-mode-hook
+          (lambda () (local-set-key (kbd "<f5>") 'my-haskell-compile)
+            (local-set-key (kbd "<f6>") 'my-haskell-compile2)
+            (local-set-key (kbd "C-c r") 'my-haskell-compile)
+            (local-set-key (kbd "C-c e") 'my-haskell-compile2)
+            (local-set-key (kbd "C--") 'comment-or-uncomment-region)
+            (haskell-indentation-mode -1)
+            (haskell-indent-mode -1) ;;; just won't work, I don't know why
+))
+
+
+(add-hook 'python-mode-hook
+          (lambda () (local-set-key (kbd "<f5>") 'my-python-compile)
+            (local-set-key (kbd "<f6>") 'my-python-compile2)
+            (local-set-key (kbd "C-c r") 'my-python-compile)
+            (local-set-key (kbd "C-c e") 'my-python-compile2)
+            (local-set-key (kbd "C--") 'comment-or-uncomment-region)
+            (setq-local eldoc-documentation-function #'ignore)
+))
+

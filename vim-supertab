@@ -1,0 +1,8 @@
+https://www.vim.org/scripts/script.php?script_id=1643
+
+install details
+1. Download supertab.vmb to any directory.
+2. Open the file in vim ($ vim supertab.vmb).
+3. Source the file (:so %).
+
+
