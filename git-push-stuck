@@ -1,0 +1,8 @@
+vim ~/.ssh/config
+
+comment Host *
+#Host * may cause stuck
+#ControlPersist yes
+#ControlMaster auto
+#ControlPath ~/.ssh/master-%r@%h:%p
+
