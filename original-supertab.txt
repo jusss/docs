@@ -1,0 +1,6 @@
+download the original supertab from https://www.vim.org/scripts/script.php?script_id=182
+it's a supertab.vim file, then move it to ~/.vim/plugin/supertab.vim
+it will be enabled by default, use tab to complete your word and C-n or C-p to choose the candidate
+
+and the new version is https://www.vim.org/scripts/script.php?script_id=1643
+it's a supertab.vmb file, vim supertab.vmb then :so % to install it

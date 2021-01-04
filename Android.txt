@@ -1,0 +1,68 @@
+
+Android 10 change it storage stratege
+
+https://zhuanlan.zhihu.com/p/89355975
+
+1. targetSDK = 29, 默认开启 Scoped Storage, 但可通过在 manifest 里添加 requestLegacyExternalStorage = true 关闭
+
+2. targetSDK < 29, 默认不开启 Scoped Storage, 但可通过在 manifest 里添加requestLegacyExternalStorage = false 打开
+build.gradle
+  targetSdkVersion 29
+
+in AndroidManifest.xml
+  <application 
+      android:requestLegacyExternalStorage="true"
+ 
+  </application>
+-----------------------------------------------
+Java的static变量对应的就是python的类变量
+单例就是一个类只有一个实例，不能被初始化，但可以直接修改属性
+Kotlin的伴生对象，和类初始化之后是两个完全不同的实例，
+伴生对象不是类的内部类，无法直接访问类的属性，但可以
+在类初始化时访问伴生对象，并修改伴生对象的属性,
+
+伴生对象无法访问类的属性，但是可以类初始化时访问伴生对象的属性
+
+
+python类变量, Java public static变量, Kotlin伴生对象
+如果伴生对象有名字就用 ClassName.CompanionName.attr去访问
+没有名字就直接ClassName.attr去访问
+
+------------------------------------------------------
+
+1. 在MainActivity里修改其它类的类变量
+2. 在其它类获取MainActivity的属性
+3. 以接口的方式把MainAcitivity实例传给其它类，来获取MainActivity的属性
+
+0. 在main_activity.xml里用RelativeLayout创建个容器，在MainActivity获取容器的id然后addView添加用类写的View
+1. 在MainActivity里实例化该类，并把MainActivity的参数传递给该类
+2. Java用constructor创建类并接受参数
+public class A {
+ public String val;
+ public A(String x){
+  this.val = x
+ }
+}
+
+
+-----------------------------------------
+
+
+android 10  android:requestLegacyExternalStorage="true"
+android 9   android:usesCleartextTraffic="true"
+
+adb run application, get apk's packages ID by "package name viewer" apk
+
+kona:/ $ am start -n com.termux/com.termux.app.TermuxActivity
+Starting: Intent { cmp=com.termux/.app.TermuxActivity }
+kona:/ $ am start -n com.aidlux/com.aidlux.app.AidluxActivity
+Starting: Intent { cmp=com.aidlux/.app.AidluxActivity }
+
+https://github.com/GitLqr/LQRRecordProgress
+
+1. import module from that files
+2. Project Structure -> Dependencies -> click 'app' then All depencdencies '+' -> Module dependency -> choose that files -> apply
+3. copy layout from github to your project's layout and code in MainActivity.kt, choose '...' view if in layout not reference shows up
+
+circle progress bar, https://www.jianshu.com/p/045aacf29891
+copy AppGlobals.java CircleProgressBar.java PixUtils.java activity_main.xml and colors.xml from CircleProgressBar to your project
