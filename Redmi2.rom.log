@@ -1,3 +1,7 @@
+click build number seven times, get into developers mode, enable adb
+run adb shell 
+then choose file transfer not no data transfer, it may pop up auth check
+------------------------------
 I. flash recovery
 download recovery from https://wiki.lineageos.org/devices/wt88047/install
 then use fastboot flash recovery recovery.img 
