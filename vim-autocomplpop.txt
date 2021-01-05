@@ -1,0 +1,14 @@
+https://github.com/vim-scripts/AutoComplPop
+https://www.vim.org/scripts/script.php?script_id=1879
+https://stackoverflow.com/questions/5169638/autocompletion-in-vim
+
+it pops up candidates by default, better than supertab
+
+Download vim-AutoComplPop.zip
+
+install: 
+    unzip it, copy plugin, autoload, doc to ~/john/.vim/
+
+it will be enabled by default
+
+enter to choose current candidate, C-n or C-p to jump on candidates
