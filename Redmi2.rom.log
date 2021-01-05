@@ -1,4 +1,31 @@
+I. flash recovery
+download recovery from https://wiki.lineageos.org/devices/wt88047/install
+then use fastboot flash recovery recovery.img 
 
+II. update firmware
+
+Redmi2 4.4 need to update firmware, 5.1 no need
+https://wiki.lineageos.org/devices/wt88047/install
+
+If you are installing from LP (5.x) stock MIUI, nothing needs to be done.
+If you are installing from KK (4.4) stock MIUI, you will have to update the device’s firmware.
+To find your model number, “Open “Settings”, navigate to “Phone Info”, and take note of the model number below the “model” header:
+Devices with model numbers 2014811, 2014812, 2014817 2014818, 2014819, and 2014821 should download the firmware labeled wt88047.
+Devices with model numbers 2014813, and 2014112 should download the firmware labeled wt86047.
+Download the relevant firmware zip file from here.
+Sideload the firmware .zip package:
+On the device, select “Advanced”, “ADB Sideload”, then swipe to begin sideload.
+On the host machine, sideload the package using: adb sideload filename.zip.
+
+III. flash ROM
+
+reboot to recovery mode, and "enable ADB" in "Advance", then 
+adb sideload wt88047-firmware_V9.2.5.0.LHJMIEK.zip 
+serving: 'wt88047-firmware_V9.2.5.0.LHJMIEK.zip'  (~47%)    adb: failed to read command: Success
+this mean it is success
+
+
+---------------------------------------------------
 make sure put sim card in slot 2,
 if it's in slot 1, it may be no mobile data
 also there's recovery.img in lineageos
