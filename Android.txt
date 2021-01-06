@@ -1,4 +1,48 @@
+--------------------------------------------------------
+android input dialog
+https://www.cnblogs.com/gzdaijie/p/5222191.html
+ private void showInputDialog() {
+        /*@setView 装入一个EditView
+         */
+        final EditText editText = new EditText(MainActivity.this);
+        AlertDialog.Builder inputDialog =
+                new AlertDialog.Builder(MainActivity.this);
+        inputDialog.setTitle("请输入要创建的目录名称").setView(editText);
+        inputDialog.setPositiveButton("确定",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(MainActivity.this,
+                                editText.getText().toString(),
+                                Toast.LENGTH_SHORT).show();
+                    }
+                }).show();
+    }
 
+  findViewById<Button>(R.id.createDirecotry).setOnClickListener {
+            var newDir = ""
+            val editText = EditText(this@MainActivity)
+            val inputDialog = AlertDialog.Builder(this@MainActivity)
+            inputDialog.setTitle("请输入要创建的目录名称").setView(editText)
+            inputDialog.setPositiveButton("确定") { dialog, which ->
+                newDir =  editText.text.toString()
+                updateUIScope.launch {
+                    withContext(Dispatchers.IO) {
+                        println("you input $newDir for dir")
+                        rl.createDirecotry(baseUrl + currentDirectory() + newDir + createDirOp)
+                        refreshUI(baseUrl + currentDirectory() + listOp)
+                    }
+                }
+            }.show()
+        }
+----------------------------------------
+kotlin android debug
+
+val checkeditems = listView.checkedItemPositions
+println("this is checkeditems $checkeditems")
+
+logcat search "checkeditems"
+-----------------------------------------------------
 Android 10 change it storage stratege
 
 https://zhuanlan.zhihu.com/p/89355975
