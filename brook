@@ -1,4 +1,5 @@
-
+make sure the server and the client have the same version! it's important!
+---------------------------------------
 
 # create system account sarah, sarah is like nobody, no password, no home, no shell
 useradd -r -s /usr/sbin/nologin sarah
