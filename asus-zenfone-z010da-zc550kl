@@ -1,3 +1,25 @@
+TWRP recovery sucks! don't use it! it asks MD5 key to check ROM file, WTF
+unzip UL-ASUS_Z010-WW-12.8.10.56-user.zip and get boot.img, system.transfer.list and system.new.dat 
+/sdat2img.py system.transfer.list system.new.dat system.img to generate system.img
+enable adb in developers mode, then
+adb shell 
+exit
+voice up + power button into bootloader
+sudo fastboot erase system
+sudo fastboot flash system ./system.img
+sudo fastboot flash boot ./boot.img
+don't run adb reboot, just long press power button to reboot system
+this will erase TWRP recovery, get the official recovery back,
+
+voice down + power button into recovery mode,
+swip data/cache partition,
+get update from adb
+sudo adb sideload UL-ASUS_Z010-WW-13.8.26.92-user.zip
+reboot system
+don't try just flash boot.img and system.img, it may stuck at boot logo
+
+this will get into android 6.0
+----------------------------------------------
 https://www.youtube.com/watch?v=ja6yK6QWuiA
 https://drive.google.com/file/d/0B0ixxJIu61aDajNqTTZ4MVZBaDQ/view
 download the TWRP Max.zip for root
