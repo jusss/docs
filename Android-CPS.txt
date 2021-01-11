@@ -1,0 +1,18 @@
+callback b(x)
+
+a(b(c(x)))
+blocking callback
+
+c(x,b)
+b(x,a)
+a(x,f)
+blocking cps
+
+add select to blocking cps 
+then async cps
+
+class's function return function lambda
+class never run, function does
+Id class. id function 
+oop class like haskell module
+
