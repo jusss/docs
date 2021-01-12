@@ -1,4 +1,5 @@
-
+adb reboot recovery
+---------------------------
 click build number seven times, get into developers mode, enable adb
 run adb shell 
 then choose file transfer not no data transfer, it may pop up auth check
