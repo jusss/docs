@@ -1,3 +1,10 @@
+interface T { fun g() }
+f(x:T) { x.g() }
+
+in typeclass, typeclass T required implemnet function g
+Type inherit T
+x :: Type then g must work on x
+----------------------------------------
 higher-kinded polymorphism
 
 type after parameter in function is return type, like fun f(x: A): B {...}
