@@ -1,3 +1,18 @@
+ktor client upload 
+val client = HttpClient(CIO) {
+        followRedirects = false
+    }
+suspend fun uploadFile(addr: String, uri: Uri, updateUi: UpdateUi) {
+        val output = client.put<HttpResponse>(addr)
+        println("this is upload test ${output.headers["Location"]}")
+        val realUrl = output.headers["Location"]?:""
+//        val re = client.put<HttpResponse>(realUrl){
+//            body = "aha"
+//        }
+        client.put<ByteArray>(realUrl){
+            body = "aha".toByteArray()
+        }
+-----------------------------------
 ktor-client redirect download file
     suspend fun getFile(name: String, addr: String) {
         val filePath = Environment.getExternalStorageDirectory().path + "/" + name
