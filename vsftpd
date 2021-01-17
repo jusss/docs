@@ -1,0 +1,220 @@
+THIS IS ON DEBIAN, NOT ARCHLINUX
+
+root@Mars:~# grep -v '#' /etc/vsftpd.conf 
+listen=NO
+listen_ipv6=YES
+anonymous_enable=NO
+local_enable=YES
+write_enable=YES
+dirmessage_enable=YES
+use_localtime=YES
+xferlog_enable=YES
+connect_from_port_20=YES
+chroot_local_user=YES
+chroot_list_enable=YES
+chroot_list_file=/etc/vsftpd.chroot_list
+
+secure_chroot_dir=/var/run/vsftpd/empty
+pam_service_name=vsftpd
+rsa_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem
+rsa_private_key_file=/etc/ssl/private/ssl-cert-snakeoil.key
+ssl_enable=NO
+
+root@Mars:~# cat /etc/vsftpd.chroot_list 
+john
+
+reference https://itsfoss.com/set-ftp-server-linux/
+there're two mode for ftp server, pasv is what you want
+you connect ftp server via port 21, you want to download a file,
+ftp server give you another port, you use that port to download,
+that's pasv
+the another way is port mode, you want to download a file,
+let ftp server to connect your ip port, that's not gonna work for NAT network which you are in
+
+reference https://blog.csdn.net/enweitech/article/details/51330664
+
+//Active Mode 
+Port_enable=YES
+Connect_from_port_20=YES
+Ftp_date_port=60020 // if above is NO, special here
+
+//Passive Mode
+PASV_enable=YES
+PASV_min_port=5000
+PASV_max_port=5002
+
+
+secure_chroot_dir=/var/run/vsftpd/empty
+this will upload file to ~/ 
+
+the default port is 21
+visit ftp://ip:21
+
+listen_port=60021 to change port to 60021
+visit ftp://ip:60021
+
+`ftp ip 60021` to login, not like ssh -p port user@ip
+
+write_enable=YES enable upload
+local_root=/mnt change upload path
+put and get are commands to passing files
+
+after login, run `passive mode`
+`user yourname` to login in ftp mode
+
+----------------------------------------------------------------
+root@Mars:~# grep -v '#' /etc/vsftpd.conf 
+listen=NO
+listen_ipv6=YES
+anonymous_enable=NO
+# use regular user to login 
+local_enable=YES
+# enable upload file 
+write_enable=YES
+dirmessage_enable=YES
+use_localtime=YES
+xferlog_enable=YES
+chroot_local_user=YES
+chroot_list_enable=YES
+chroot_list_file=/etc/vsftpd.chroot_list
+
+secure_chroot_dir=/var/run/vsftpd/empty
+pam_service_name=vsftpd
+rsa_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem
+rsa_private_key_file=/etc/ssl/private/ssl-cert-snakeoil.key
+ssl_enable=NO
+
+utf8_filesystem=YES
+# change default login port 
+listen_port=60021
+# change default direcotry to upload file
+local_root=/home/john/vsftpd
+pasv_promiscuous=YES
+pasv_enable=YES
+pasv_min_port=9000
+pasv_max_port=9002
+-------------------------------------------------
+ftp ip 60021
+passive mode
+ls
+----------------------------------------
+vim /etc/vsftpd.virtual.user
+user   // for exampe scheme
+password
+
+vim /etc/vsftpd.chroot_list 
+scheme
+
+apt install db-util
+db_load -T -t hash -f vsftpd.virtual.user vsftpd.virtual.user.db
+rm vsftpd.virtual.user
+chmod 600 vsftpd.virtual.user.db 
+
+append this in /etc/vsftpd.conf
+virtual_use_local_privs=YES
+pam_service_name=vsftpd.virtual
+guest_enable=YES
+user_sub_token=$USER
+local_root=/srv/ftp/$USER
+hide_ids=YES
+allow_writeable_chroot=YES
+
+root@Mars:/etc# cat /etc/pam.d/vsftpd.virtual            //there's no db postfix here
+#%PAM-1.0
+auth       required     pam_userdb.so db=/etc/vsftpd.virtual.user
+account    required     pam_userdb.so db=/etc/vsftpd.virtual.user
+session    required     pam_loginuid.so
+
+mkdir /srv/ftp/scheme
+chown -R ftp:ftp /srv/ftp/
+
+systemctl restart vsftpd
+
+ftp ip 60021
+user scheme
+passive mode
+ls
+put /tmp/ktor.kt ktor.kt
+// the upload file will be /srv/ftp/scheme/
+----------------------------------------------------
+root@Mars:/etc# grep -v '#' /etc/vsftpd.conf 
+listen=NO
+listen_ipv6=YES
+anonymous_enable=NO
+local_enable=YES
+write_enable=YES
+dirmessage_enable=YES
+use_localtime=YES
+xferlog_enable=YES
+chroot_local_user=YES
+chroot_list_enable=YES
+chroot_list_file=/etc/vsftpd.chroot_list
+
+secure_chroot_dir=/var/run/vsftpd/empty
+pam_service_name=vsftpd
+rsa_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem
+rsa_private_key_file=/etc/ssl/private/ssl-cert-snakeoil.key
+ssl_enable=NO
+
+utf8_filesystem=YES
+listen_port=60021
+# if you use regular user john to login, not virtual user, file upload here
+local_root=/home/john/vsftpd
+pasv_promiscuous=YES
+pasv_enable=YES
+pasv_min_port=9000
+pasv_max_port=9002
+
+virtual_use_local_privs=YES
+pam_service_name=vsftpd.virtual
+guest_enable=YES
+user_sub_token=$USER
+local_root=/srv/ftp/$USER
+allow_writeable_chroot=YES
+hide_ids=YES
+root@Mars:/etc# 
+-----------------------------------------------------------
+reference
+https://help.ubuntu.com/community/vsftpd
+https://www.linuxcloudvps.com/blog/setup-virtual-users-in-vsftpd/#:~:text=By%20default%20vsftpd%20is%20configured,only%20to%20their%20own%20files.
+https://wiki.archlinux.org/index.php/Very_Secure_FTP_Daemon#PAM_with_virtual_users
+
+--------------------------------
+ON ARCHLINUX
+
+rsa_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem
+rsa_private_key_file=/etc/ssl/private/ssl-cert-snakeoil.key
+ssl_enable=NO
+utf8_filesystem=YES
+
+those are not available
+they are
+rsa_cert_file=/etc/ssl/certs/vsftpd.pem
+rsa_private_key_file=/etc/ssl/certs/vsftpd.pem
+
+fuck! 
+/usr/lib/x86_64-linux-gnu/security/pam_userdb.so in DEBIAN
+but not in ARCHLINUX
+
+so that pam auth on debian is not gonna work on archlinux
+archlinux use pam_pwdfile.so
+use that /etc/pam.d/vsftpd.virtual is not like debian
+
+https://wiki.archlinux.org/index.php/Very_Secure_FTP_Daemon#PAM_with_virtual_users
+
+install pam_pwdfile from https://aur.archlinux.org/packages/libpam_pwdfile/
+
+[root@li etc]# cat /etc/pam.d/vsftpd.virtual 
+#%PAM-1.0
+auth required pam_pwdfile.so pwdfile /etc/vsftpd.virtual.user
+account required pam_permit.so
+
+openssl passwd -1
+input your password and it will generate one for example PASSWORD
+
+vim vsftpd.virtual.user 
+scheme:PASSWORD 
+
+systemctl restart vsftpd
+
+file upload in /srv/ftp/scheme/
