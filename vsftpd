@@ -285,7 +285,9 @@ https://wiki.archlinux.org/index.php/Very_Secure_FTP_Daemon#Using_SSL/TLS_to_sec
 
 # cd /etc/ssl/certs
 # openssl req -x509 -nodes -days 7300 -newkey rsa:2048 -keyout vsftpd.pem -out vsftpd.pem
-# chmod 600 vsftpd.pem
+# cp vsftpd.pem vsftpd.key
+# vim vsftpd.pem delete key part
+# chmod 600 vsftpd.pem vsftpd.key
 
 vim /etc/vsftpd.conf
 ssl_enable=YES
@@ -306,7 +308,7 @@ force_local_data_ssl=NO
 # provide the path of your certificate and of your private key
 # note that both can be contained in the same file or in different files
 rsa_cert_file=/etc/ssl/certs/vsftpd.pem
-rsa_private_key_file=/etc/ssl/certs/vsftpd.pem
+rsa_private_key_file=/etc/ssl/certs/vsftpd.key
 
 # this setting is set to YES by default and requires all data connections exhibit session reuse which proves they know the secret of the control channel.
 # this is more secure but is not supported by many FTP clients, set to NO for better compatibility
@@ -352,7 +354,7 @@ ssl_sslv2=NO
 ssl_sslv3=NO
 
 rsa_cert_file=/etc/ssl/certs/vsftpd.pem
-rsa_private_key_file=/etc/ssl/certs/vsftpd.pem
+rsa_private_key_file=/etc/ssl/certs/vsftpd.key
 
 require_ssl_reuse=NO
 ---------------------------------------------
@@ -361,3 +363,68 @@ try stunnel
 
 FileZilla use Require explicit FTP over TLS 
 
+----------------------------------
+
+# You may specify an explicit list of local users to chroot() to their home
+# directory. If chroot_local_user is YES, then this list becomes a list of
+# users to NOT chroot().
+
+chroot_local_user=YES
+chroot_list_enable=YES
+chroot_list_file=/etc/vsftpd.chroot_list
+
+then user name in /etc/vsftpd.chroot_list won't be jailed!
+
+1. 
+chroot_list_enable=NO   then the list is invalid
+
+or 2. chroot_local_user=NO then local user not in jailed, virtual user are
+or 3. do that and just make the list is empty
+
+----------------------------------------------------
+
+root@Mars:~# grep -v '#' /etc/vsftpd.conf 
+listen=NO
+listen_ipv6=YES
+anonymous_enable=NO
+local_enable=YES
+write_enable=YES
+dirmessage_enable=YES
+use_localtime=YES
+xferlog_enable=YES
+chroot_local_user=YES
+chroot_list_enable=NO
+chroot_list_file=/etc/vsftpd.chroot_list
+
+secure_chroot_dir=/var/run/vsftpd/empty
+pam_service_name=vsftpd
+rsa_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem
+rsa_private_key_file=/etc/ssl/private/ssl-cert-snakeoil.key
+ssl_enable=YES
+allow_anon_ssl=NO
+force_local_data_ssl=YES
+force_local_logins_ssl=YES
+ssl_tlsv1=YES
+ssl_sslv2=NO
+ssl_sslv3=NO
+require_ssl_reuse=NO
+ssl_ciphers=HIGH
+utf8_filesystem=YES
+listen_port=60021
+pasv_promiscuous=YES
+pasv_enable=YES
+pasv_min_port=9000
+pasv_max_port=9002
+
+virtual_use_local_privs=YES
+pam_service_name=vsftpd.virtual
+guest_enable=YES
+user_sub_token=$USER
+local_root=/srv/ftp/$USER
+allow_writeable_chroot=YES
+hide_ids=YES
+passwd_chroot_enable=YES
+root@Mars:~# 
+------------------------------------------------
+WORK ON DEBIAN ONLY 
+THIS WON'T WORK ON ARCHLINUX, FUCK ARCHLINUX
