@@ -1,0 +1,16 @@
+two states, one eval, one not eval,
+list eval return list
+funtione eval return value
+
+list and function are Funtion in not eval state
+think function like list in not eval state 
+f x, is a structure, just like [x]
+so in not eval state, [ (g x) ]
+so f (g x)
+
+fmap g [x] = [ (g x) ]
+fmap g (f x) = f (g x)
+but f x would be evaluated by eval stratege
+so fmap g f = \x -> f (g x)
+
+WRONG!
