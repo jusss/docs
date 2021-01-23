@@ -1,0 +1,21 @@
+in chroot env,
+/etc/init.d/ssh start
+host use stunnel 1991 -> 1990, 1992 -> 443 /etc/iptables/iptables.rules 
+/etc/stunnel/stunnel.conf 
+inside sshd listen 443
+
+don't forget chroot on host and enable sshd first!
+
+apt install fakechroot
+
+mkdir /home/ruby/bin/
+cp /bin/bash /home/ruby/bin/
+cp /bin/sh /home/ruby/bin/
+fakechroot chroot /home/ruby/
+
+ssh -p 1992  -o PreferredAuthentications=password -o PubkeyAuthentication=no ruby@moon
+
+use password, not key
+
+
+
