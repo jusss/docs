@@ -1,0 +1,26 @@
+https://wiki.archlinux.org/index.php/SCP_and_SFTP
+
+# mkdir -p /var/lib/jail
+# mkdir -p /mnt/data/share
+# chmod 755 /mnt/data/share
+# mount -o bind /mnt/data/share /var/lib/jail
+# vim /etc/fstab 
+/mnt/data/share /var/lib/jail none bind 0 0
+groupadd sshusers
+useradd -g sshusers -d /var/lib/jail USER
+passwd USER
+
+cd /var/lib/jail/
+mkdir uploads
+chown :sshusers uploads/
+chmod 770 /var/lib/jail/uploads/
+
+vim /etc/ssh/sshd_config 
+Match group sshusers
+  ChrootDirectory %h
+  X11Forwarding no
+  AllowTcpForwarding no
+  PasswordAuthentication yes
+  ForceCommand internal-sftp -d /uploads
+
+systemctl restart sshd
