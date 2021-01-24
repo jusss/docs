@@ -1,0 +1,23 @@
+files changed, but no add and commit
+git checkout -- .      
+or 
+git checkout .
+or
+git restore .
+
+for one file
+git restore path/to/file
+or
+git checkout -- path/to/file
+
+after commit
+
+git log  // get previous commint id
+git checkout previous-commit-id
+git status // now it reminders you there're file changed
+git add *
+git commit -m 'tmp change to new branch'
+git checkout -b tmp
+git checkout master
+
+git checkout tmp // will back to that changed files

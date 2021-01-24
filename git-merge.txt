@@ -1,0 +1,12 @@
+two people working on one master branch
+one create dev, one still use master
+git checkout -b dev
+git branch
+git push origin dev
+
+git checkout master
+git pull master
+git merge dev
+git push
+git config --global core.editor "vim"
+
