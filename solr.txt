@@ -1,0 +1,35 @@
+
+
+{"name":"Avengers.mp4","link":"http://ip:9864/webhdfs/v1/Avengers.mp4?op=OPEN&namenoderpcaddress=ip:9000&offset=0","size":"18M","date":"2021-01-19","owner":"john"}
+put this into document
+then q name: Avengers, sort _version_ desc,
+
+------------------------------------------------------
+1. create document
+2. query in that document, default query will return everything
+3. default is 10 rows, it may not show what you just input
+so use rows=100 or des
+
+sort=<field name>+<desc|asc>[,<fieldname>+<desc|asc>]
+curl "http://ip:8983/solr/_default/select?q=*%3A*&rows=100&sort=id+asc"
+filed name is "id", use ascending or descending
+
+descending date
+curl "http://ip:8983/solr/_default/select?q=*%3A*&rows=100&sort=_version_+desc"
+
+in query web page, sort set "_version_ desc", rows set 500
+
+
+https://blog.csdn.net/gufengshanyin/article/details/21098879
+
+q id:006
+fq ____first_name:Archana
+
+the q is first result, the fq is work on the first result, query then filter query
+like ls|grep id|grep name 
+
+http://ip:8983/solr/_default/select?fq=____first_name%3AArchana&q=id%3A006&rows=500&sort=_version_%20desc
+https://stackoverflow.com/questions/25307225/solr-search-query-using-rest-api
+
+
+

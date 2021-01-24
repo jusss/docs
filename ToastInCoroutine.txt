@@ -1,0 +1,58 @@
+val updateUI = Job()
+val updateUIScope = CoroutineScope(Dispatchers.Main + updateUI)
+updateUIScope.launch {
+      withContext(Dispatchers.IO) {
+      Toast.makeText(this@SearchActivity,"not found!",Toast.LENGTH_LONG).show()
+}}
+
+may error, Toast need Loop.prepare and Loop.loop in other thread
+
+use withContext(Dispatchers.Main) { } avoid
+
+
+updateUIScope.launch {
+      withContext(Dispatchers.IO) {
+        doSomethingIO
+        withContext(Dispatchers.Main) { 
+            Toast.makeText(this@SearchActivity,"not found!",Toast.LENGTH_LONG).show()
+}}}
+
+or
+updateUIScope.launch {
+    doSomethingIO
+    withContext(Dispatchers.Main) { 
+            Toast.makeText(this@SearchActivity,"not found!",Toast.LENGTH_LONG).show()
+    }}
+
+or 
+
+updateUIScope.launch {
+    withContext(Dispatchers.IO) { 
+        doSomethingIO
+    }
+    Toast.makeText(this@SearchActivity,"not found!",Toast.LENGTH_LONG).show()
+    }
+
+
+
+
+MainScope().launch {
+    withContext(Dispatchers.Default) {
+        //TODO("Background processing...")
+    }
+    TODO("Update UI here!")
+}
+
+
+
+GlobalScope.launch {
+    //TODO("Background processing...")
+    withContext(Dispatchers.Main) {
+        // TODO("Update UI here!")
+    }
+    TODO("Continue background processing...")
+}
+
+https://stackoverflow.com/questions/5161951/android-only-the-original-thread-that-created-a-view-hierarchy-can-touch-its-vi 
+
+
