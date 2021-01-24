@@ -1,0 +1,26 @@
+chroot sid /bin/bash 
+source source.me
+su
+cd
+mkdir -p /var/lib/jail
+groupadd sshusers 
+useradd -g sshusers -d /var/lib/jail/ user 
+passwd user 
+cd /var/lib/jail/
+mkdir uploads
+chown :sshusers uploads/
+chmod 770 /var/lib/jail/uploads/
+vim /etc/ssh/sshd_config 
+Port different-to-host
+Match group sshusers
+  ChrootDirectory %h
+  X11Forwarding no
+  AllowTcpForwarding no
+  PasswordAuthentication yes
+  ForceCommand internal-sftp -d /uploads
+
+/etc/init.d/ssh restart
+
+make sure sshd in chroot has a different port to the host sshd port,
+the host may allow redirect-ssh connection only,
+the guest could do direct connection
