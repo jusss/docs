@@ -1,0 +1,42 @@
+
+error/Exception, null, failure computation
+
+
+IO may produce null,
+1/0 produces an error,
+Nothing is a specific value, 
+
+head [] case an Exception, it can't return a Nothing, 
+but you could check it if it's empty before head,
+and if it's empty, you can return a Nothing to tell it's empty 
+
+but this means you detect it if it's empty before the computation
+
+there's no null in Haskell
+
+anything produce an error, I call it a failure computation
+Nothing is not a failure computation
+abort computation I think it's called failure computation
+
+1/0 is an abort computation, it's an error, it's a failure computation
+
+read socket is an IO, IO may produce a null value because Java design it, but in Java, it's not an error, 
+only when you do some functions work on that null value may abort computation, case an error,
+
+but you can't expect read Nothing from IO, unless you detect it may cause an error before the computation, 
+and then you can return a value like Nothing or other else to tell it may cause an error
+
+there's no null in Haskell, bottom value _ is just magic stuff only in GHC, not Haskell
+
+in Java, only IO can produce null, others produce error like 1/0
+
+there's no null design in Haskell, only error
+
+Java design null, Haskell doesn't design null.
+
+
+
+
+
+
+
