@@ -1,0 +1,8 @@
+https://www.jianshu.com/p/8f652fa40218
+
+use the old protocal, not the new one
+
+https://open.iot.10086.cn/develop/global/product/#/public?protocol=3&other=1
+
+
+https://open.iot.10086.cn/doc/multiprotocol/
