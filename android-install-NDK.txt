@@ -1,0 +1,3 @@
+android studio install ndk, failed on read time out,
+cd C:\Users\22933\AppData\Local\Android\Sdk\ndk
+then delete all the files, then install again, it will be ok.
