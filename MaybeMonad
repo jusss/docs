@@ -1,0 +1,36 @@
+Maybe Monad, I'd like to call it DetectError Monad, or PreventFailure Monad 
+think 1/0 in python
+
+def div(x,y):
+  if x==0:
+    print("x is 0")
+  else:
+    return y/x
+
+it return None or Int
+
+but this can't happen in Haskell, because return values have one type, 
+you can't return two types as values' types (related to generics, ad-hoc, polymorphics result)
+anyway, so you can use Sum type (enum in Java, dataclass in Kotlin) (related to Product type, ADT)
+
+so it must be Nothing :: Maybe Int or Just (y/x) :: Maybe Int
+
+div :: Int -> Int -> Maybe Int 
+div 0 y = Nothing
+div x y = Just (y/x)
+
+this Maybe detect that y/x may be failed and prevent it by before running it.
+detect fail computation before running it can avoid errors, no need for exception
+
+so I call it DetectError Monad 
+
+also it has to implement bind and apply and fmap to make it as a monad
+
+once it's Nothing then all next fmap/apply/bind computations are stopped
+because you defined that, other functions won't stop 
+
+like it's null then stop all next computations in Java and you must define that 
+
+PreventFailure Monad, use it where the computation could fail, like 1/0, apply functions on null from IO
+
+since fmap is implement to avoid Nothing computation, so put other functions in fmap to avoid fail computation
