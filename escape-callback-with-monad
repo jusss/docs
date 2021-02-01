@@ -1,0 +1,40 @@
+f(x,g) = g x
+g is a callback
+
+it equals to f(x)(g), still callback
+
+bind instead of map?
+
+https://philipnilsson.github.io/Badness10k/escaping-hell-with-monads/
+
+var a = getData();
+if (a != null) {
+  var b = getMoreData(a);
+  if (b != null) {
+     var c = getMoreData(b);
+     if (c != null) {
+        var d = getEvenMoreData(a, c)
+        if (d != null) {
+          print(d);
+        }
+     }
+  }
+}
+
+Ad hoc solution: Elvis operators
+var a = getData();
+var b = a?.getMoreData();
+var c = b?.getMoreData();
+var d = c?.getEvenMoreData(a);
+print(d);
+
+Maybe monad 
+
+do
+  a <- getData
+  b <- getMoreData a
+  c <- getMoreData b
+  d <- getEvenMoreData a c
+  print d
+
+
