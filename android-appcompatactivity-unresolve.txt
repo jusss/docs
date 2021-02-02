@@ -1,0 +1,11 @@
+1-Exit Android studio.
+
+2-Go to your project directory.
+
+3-Something like this in my case( F>Android->YourProjectName->.idea).
+
+4)-delete libraries folder present in .idea folder.
+
+5)-restart your android studio. and your issue is resolved.
+
+https://stackoverflow.com/questions/29199891/cannot-resolve-symbol-appcompatactivity
