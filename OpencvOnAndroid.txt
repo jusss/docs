@@ -1,0 +1,9 @@
+opencv 4.5.0 on android
+0. download opencv for android sdk
+1. import module choose to sdk directory, not sdk/java
+2. project structure -> Dependencies -> app -> "+" in right side -> module dependencies -> choose sdk -> ok
+
+MainActivity.kt
+onCreate(){
+OpencvLoader.initDebug()
+}
