@@ -1,4 +1,30 @@
+ffmpeg on windows with amd gpu accel
 
+download ffmpeg from http://gyan.dev/ffmpeg/builds/
+choose ffmpeg-release-full.7z
+
+ffmpeg -hwaccel auto -i video1.mp4 -i video2.mp4 -filter_complex "hstack" -c:v h264_amf output.mp4 
+
+-c:v h264_amf is amd gpu accel,or -c:v hevc_amf
+-hwaccel dxva2   is for windows 
+
+vstack for up/down, hstack for left/right
+
+https://stackoverflow.com/questions/11552565/vertically-or-horizontally-stack-mosaic-several-videos-using-ffmpeg
+
+
+ffmpeg -hwaccel dxva2 -i a.webm -c:v hevc_amf a.mp4 
+
+about webm, it can't use hwaccel
+
+ffmpeg -i a.webm -i b.webm -vsync 0 -filter_complex hstack ab.webm 
+
+ffmpeg -hwaccel -i a.mp4 -i b.mp4 -vsync 0 -filter_complex hstack ab.mp4 
+
+clip two minutes from a video 
+ffmpeg -hwaccel auto -ss 00:12:00 -t 00:03:00 -i a.mp4 -c:v h264_amf b.mp4 
+
+---------------------------------------------
 ffmpeg concat videos
  
 vi mylist.txt
