@@ -1,0 +1,286 @@
+
+fmap changes the input a outside of the context ( ->r)->r , in Reader r a, fmap changes Reader's the result a which is outside of context r->
+Cont (a->r)->r, the context monad m is (  ->r)->r
+Reader (r->a),  the context monad m is (r->  )
+fmap :: (a->b)  ->     Cont (a -> r) -> r     ->   Cont (b -> r) -> r
+fmap :: (a->b)  ->     Reader (r->a)          ->   Reader (r->b)
+
+I. since every Cont r a must contain an identified constant value a
+so like 
+cont (\k -> k 3) :: Cont String Int   -- cont will lift this function into a Cont String Int, wrap it, construct it, type notation is Cont (Int -> String) -> String 
+a is 3 :: Int, r is String , k :: Int -> String 
+what if we want to change 3 to 5 or other type?
+use fmap can do it 
+fmap (+2) $ cont (\k -> k 3)   ==   cont (\k -> k 5)
+
+import Control.Monad.Trans.Cont 
+cps :: Cont String Int 
+cps = cont (\k -> k 3)         -- cont will wrap function to data type
+cps2 = fmap (+2) cps 
+runCont cps2 show   ==   "5"   -- runCont will unwrap data type to function
+
+II. continuation k is a->r,  type notation Cont (a->r)->r is a cps computation
+
+III. >>= is just an if-else version fmap, fmap should be named "access"
+>>= :: Cont (a->r)->r   ->   (a -> Cont (b->r)->r)   ->   Cont (b->r)->r 
+use function a -> Cont (b->r)->r to change Cont (a->r)->r to Cont (b->r)->r
+just like fmap, but fmap use a->b
+
+for example change cont (\k -> k 3) to cont (\k -> k "3") if 3 > 0
+else to cont (\k -> k "5") 
+or more specific like
+
+import Control.Monad.Trans.Cont 
+f :: Int -> Cont String String
+f x = if (x>3) then cont (\k -> k "greater than 3") else cont (\k -> k "less than 3")
+cps = cont (\k -> k 2) >>= f
+runCont cps id == "less than 3"
+cps2 = cont (\k -> k 5) >>= f
+runCont cps2 id = "greater than 3"
+
+IIII. and finally, callCC, there's no magic, just look at its type
+callCC :: ((a -> ContT r m b) -> ContT r m a) -> ContT r m a
+since m could be Identity
+callCC :: ( (a -> Cont (b->r)->r  )   ->   Cont (a->r)->r  )  ->  Cont (a->r)->r
+
+callCC $ \abort -> ...
+abort :: a -> Cont (b->r)->r
+
+callCC $ \_ -> f is the same as just `f`
+
+callCC take one argument (a -> m b) -> m a
+f :: (a-> m b) -> m a
+callCC f :: m a
+turn f into a lambda
+callCC $ \e -> ...
+e :: (a-> m b)
+so if we give e an a, then it exits whole callCC computation with result m b
+
+callCC alwasys return a Cont r a, based on its type
+
+let's say the body r :: m a
+
+callCC $ \e -> r 
+
+inside the lambda we can access a special e
+
+runCont (callCC $ \e -> r) k
+e :: a -> m b
+k :: a -> r
+what's the relation between e and k?
+
+runCont just unwrapp function from data type, no magic here, look at its type, like cont lift function into data type 
+
+
+callCC $ \e -> r 
+e is a sort of exception/escape hatch/goto, it aborts the rest of the computation
+you can call e anywhere inside r, even if that's a deeply nested block
+it doesn't matter where, which is why it has type `a->m b`, in the sense that you can use it in any place,
+`b` is completely free
+
+callCC $ \e -> do 
+    <someCode>
+    when condition (e 42)
+    <more code>
+
+if the condition is true, then it immediately abort and create the new suspended computation
+note that the entire return type of callCC is still `m a` here 
+this function e is a -> m b
+
+so the condition is true, the callCC return `cont $ \k -> k 42`
+the point of the `m b` is that you can use it in any place, but the function e still demands an `a`,
+because that's what the entire `callCC <stuff>` produces as an "intermediate result"
+
+`e 42` will abort the entire rest of the continuations inside the callCC, and transfer control back to the point where callCC was applied
+and then resume with 42. if you like you can think of `callCC` as a sort of `catch` and `e` as a throw.
+
+callCC $ \e -> do
+    a <- someThing
+    when a (e 42)   -- non-local exit
+    pure 16         -- normal exit 
+
+if a is true, then callCC return `cont $ \k -> k 42`, otherwise callCC return `cont $ \k -> k 16`, callCC is like >>= can do if-else 
+
+this `m b` is just to satisfy the type system, it sort of says "you can use it anywhere, regardless of what the continuation in that spot demands as a result.
+but the value you stuff in there is specified in the argument, i.e. in the `a` of `a->m b`, not the return type 
+the return type just says where you are allowed to use the `e` applied to 42.
+and since `b` is completely polymorphic, it means you can use it anywhere. the reason you can use it anywhere, is because it instantly shortcircuits and never
+resumes there anyway
+that's `e 42 :: m ()` is fine, it will never resume at that point anywhere, it doesn't produce any intermediate result 
+
+callCC :: ((a -> m ()) -> m a) -> m a
+this would be equivalent, just more annoying to use.
+it's just way more comfortable to allow the return type of that `e` to be arbitrary
+
+look at callCC type, it always return `m a`
+that e takes an `a` to return `m a`
+so applying `e` to some value of type `a` instantly aborts the inner of callCC and resumes the entirety
+
+getInt = do 
+    x <- getLine
+    case readMaybe x of 
+        Just int -> pure int 
+        Nothing -> throwIO (userError "not a number")
+that throwIO () :: IO Int is fine, this IO action will not actually produce an `Int`, because well an exception is thrown anywhere 
+but the case expression both branches must be of type `IO Int`
+so `e 42` :: m () is fine, since `pure 16 = cont $ \k -> k 16 :: Cont r Int` so `e 42` :: m Int is ok
+
+insdide callCC, we use e to escape whole computation
+
+`e 42` in callCC would return `cont $ \k -> k 42`, it replaces the entirety of `callCC $ \e -> ...` with a suspended computation, resuming with 42.
+the return type of `e` is completely free, because it just says it can be used locally anywhere, for the same reason that throwIO is polymorphic in a.
+
+callCC $ \e -> do { x <- someNumber; when (even a) (e 42); pure 16 }
+callCC $ \e -> do { x <- someNumber; str <- if (even e) then (e 42) else getString; ... }
+getString :: m String, so `e 42 :: m String` too (because of how if-then-else works)
+which is fine, because e 42 will never produce an intermediate result, it aborts the local computation, it's essentially an exception inside cont 
+in fact, we could write something like callCC in IO too it'd be highly brittle and error prone 
+
+callCC return `m a`, the entirety callCC is some suspended computation of intermediate type a,
+inside the nested body of `callCC` its your job to come up with some `a`, `e` lets you abort the rest and say "this is the value of type `a`"
+like "stop here. dont go any further. dont proceed. here is the result"
+
+a must be already defined in `cont $ \k -> k a`
+cont (\k -> k 42) :: Cont r Int 
+cont (\k -> k x) is wrong, x is undefined
+
+f x = cont (\k -> k x)
+f is a defined value, `f 3` is a defined value, `f x` isn't, because x isn't defined
+cont $ \k -> k x is a value only if x is defined! 
+
+so every Cont r a value `cont $ \(a->r) -> r`, that a is a defined constant inside that Cont r a
+like `cont $ \k -> k 42`, a is 42 here.
+so `a` must defined inside r from `callCC $ \e -> r`, so `e a` to escape from whole callCC computation and return `cont $ \k -> k a` as callCC result
+
+callCC implement reference in value level with function form
+https://jsdw.me/posts/haskell-cont-monad/
+
+
+--------------------------------------------------------------------------------
+
+wrap a function into a data type, then use another function to extract it from a data type,
+
+
+what's the point?
+
+runState :: State s a -> s -> (a, s)
+
+in OOP, it's wrap a function into an object, and use object.function to call it
+
+instead of passing functions with data types or objects
+
+data type is object 
+
+class State(s : Foldable, a: A) {
+    fun runState(s : Foldable): (A, Foldable) {
+        ...
+    }
+}
+
+State.runState in OOP is runState in Haskell
+
+
+passing objects instead of functions
+
+passing data types instead of functions
+
+data type is class in OOP
+
+data Alg = Alg { name :: String; approx :: String -> Int } 
+
+object Alg (_name : String, _approx : (String) -> Int) {
+    fun name() : String {
+        return _name
+    }
+    fun approx() : (String) -> Int {
+        return _approx
+    }
+}
+
+think monads with OOP way?
+
+so
+
+cont lift a function into a data type Cont r a
+
+fun <R,A> cont (f: ((A) -> R) -> R) : Cont<R,A> = Cont<R,A>(f)
+
+class Cont<R,A>(f: ((A) -> R) -> R){
+    fun runCont(g: (A) -> R): R {
+        return f(g)
+    }
+    
+    // every cont must contain a 
+    fun <A> return (a: A): Cont<Any,A> = Cont<R,a> { f -> f(a) }
+
+    fun fmap
+    fun apply
+    fun bind
+}
+
+fun <A,R,B> callCC (f: ((A) -> Cont<R,B>) -> Cont<R,A>): Cont<R,A> = { g: (A) -> Cont<R,B> -> f(g) }
+
+
+
+
+
+f :: (a -> r) -> r     so a->r need a is mutst defined in f
+f = \g -> g 3   3 is must defined
+
+based on ContT r m a = ContT (a ->  ...
+get Cont r a = Cont ....
+
+
+
+
+no need  fun cont to construct Cont,
+just  data constructor Cont to  construct Cont will be fine
+
+fmap is access
+bind is if-else access
+
+
+
+fmap :: (a->b) -> (e->a) -> (e->b)
+so fmap make f work on (e->a)'s result, so fmap f g = \x -> f(g(x))
+e->a      (a->b) work on a, so it be e->b
+
+fmap :: (a->b) -> ((a->r) -> r) -> ((b->r) -> r)
+so fmap make f work on a,
+fmap f g = \ar -> g (ar . f)
+
+
+
+
+
+continuation is a->r
+continuation computation is (a->r)->r
+
+Cont (a->r) -> r :: Cont r a
+data type Cont r a is type level, computate is in value level
+datat type contain a computation
+wrap or unwrap, construct or destruct, from value to type, but in value computation, it need unwrap
+
+return a into Cont r a to create a Cont 
+
+Cont Monad, Escape Monad, Exit Monad,
+
+  
+
+
+g ::  (a -> Cont (b->r)->r  )   ->   Cont (a->r)->r
+callCC g == g  (a -> Cont (b->r)->r  )   ::   Cont (a->r)->r
+fix g == g (fix g)
+looks familiar
+callCC, goto, fixed point,
+
+g takes a function f :: a-> Cont (b->r)->r, 
+change the input a to b,
+return Cont (a->r)->r 
+
+f :: Int -> Cont String String
+f x = if (x>3) then cont (\k -> k "greater than 3") else cont (\k -> k "less than 3")
+
+callCC \k -> ...
+k take a will return imitaly
+k take a-> Cont (b->r)->r ? 
