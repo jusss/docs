@@ -1,3 +1,11 @@
+test your web camera
+
+mpv av://v4l2:/dev/video0 --profile=low-latency --untimed
+
+mplayer tv:// -tv driver=v4l2:device=/dev/video2:brightness=40 -vf mirror -fps 30
+change the /dev/video2 part if necessary
+
+----------------------------------------
 modesetting还可以用vaapi或者vdpau解码， 不需要xf86-video-intel，只需要libva-intel-driver 或libva-vdpau-driver
 pacman -S libva-intel-driver libva-vdpau-driver
 mpv -vo vaapi x.mp4
