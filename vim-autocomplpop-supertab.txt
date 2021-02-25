@@ -1,0 +1,41 @@
+# install autocomplpop
+git clone https://github.com/othree/vim-autocomplpop.git -b master
+
+cp vim-autocomplpop/autoload/ .vim/ -r
+cp vim-autocomplpop/doc/ .vim -r
+cp vim-autocomplpop/plugin/ .vim -r
+
+# install L9 library
+mkdir vim-l9
+cd vim-l9
+wget https://www.vim.org/scripts/download_script.php?src_id=13948
+mv download_script.php\?src_id\=13948 vim-l9.zip
+unzip vim-l9.zip
+cp autoload/* ~/.vim/autoload/ -r
+cp doc/* ~/.vim/doc/
+cp plugin/* ~/.vim/plugin/
+
+# by default, autocomplpop use C-n C-p to switch candidates, not tab
+# and supertab use tab to switch candidates but not pop up them
+# so use autocomplpop to pop up and supertab to tab switch
+
+# add option to not preselect first completion
+# https://github.com/othree/vim-autocomplpop/issues/5
+vim .vimrc
+let g:AutoComplPopDontSelectFirst = 1
+
+# https://github.com/ervandew/supertab/issues/107
+# install old supertab 
+mkdir old-supertab; cd old-supertab
+wget https://www.vim.org/scripts/download_script.php?src_id=21752
+mv download_script.php\?src_id\=21752 supertab.vmb
+vim supertab.vmb
+:so %
+:q!
+
+# now it should pop up candidates by autocomplpop and use tab to switch
+# candidates by supertab, but supertab switch candidates by bottom to top
+# https://stackoverflow.com/questions/17104861/vim-supertab-plugin-reverses-the-direction-when-navigating-completion-menu
+# make supertab tab complete from top to bottom
+vim .vimrc
+let g:SuperTabDefaultCompletionType = "<c-n>"
