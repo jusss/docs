@@ -1,0 +1,14 @@
+http://git-scm.com/downloads
+download and install it
+in D disk, create git dir,
+get into git, right click "git cli" here, open a terminal on current path
+git config --global user.name "john"
+git config --global user.email "john@somewhere.net"
+ssh-keygen -t rsa -b 4096
+git config --global http.sslVerify false
+git clone http://example.com/repo.git -b master
+cd repo
+git config credential.helper store
+git add *
+git commit -m '.'
+git push
