@@ -1,0 +1,151 @@
+https://material.io/components/bottom-navigation/android#using-bottom-navigation
+https://www.cnblogs.com/lichenwei/p/4444750.html
+
+1, make sure layout use LinearLayout, not ConstraintLayout
+res/layout/activity_bottom_navigation.xml
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+  ...
+-- REMEMBER THE PREVIOUS LAYOUT HEIGHT = "0dp" WIGHT = "1"
+  <com.google.android.material.bottomnavigation.BottomNavigationView
+      android:id="@+id/bottom_navigation"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:background="@color/white"
+      android:layout_gravity="bottom"
+      app:menu="@menu/bottom_navigation_menu" />
+
+</LinearLayout>
+
+2, create res/menu/bottom_navigation.xml
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+  <item
+      android:id="@+id/item1"
+      android:enabled="true"
+      android:icon="@drawable/icon_1"
+      android:title="home"/>
+  <item
+      android:id="@+id/item2"
+      android:enabled="true"
+      android:icon="@drawable/icon_2"
+      android:title="share"/>
+</menu>
+
+3, reflect when click bottom 
+override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_bottom_navigation)
+
+ findViewById<BottomNavigationView>(R.id.bottom_navigation).setOnNavigationItemSelectedListener {
+                item ->
+            when(item.itemId) {
+                R.id.item1 -> {
+                    // Respond to navigation item 1 click
+                    Toast.makeText(this,"Home",Toast.LENGTH_LONG).show()
+                    true
+                }
+                R.id.item2 -> {
+                    // Respond to navigation item 2 click
+                    Toast.makeText(this,"Share",Toast.LENGTH_LONG).show()
+                    true
+                }
+                else -> false
+            }
+        }
+
+--------------------------------------------------
+example
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <include layout="@layout/activity_top" />
+
+    <FrameLayout
+        android:id="@+id/fl_content"
+        android:layout_width="match_parent"
+        android:background="#ffffff"
+        android:layout_height="0dp"
+        android:layout_weight="1" >
+    </FrameLayout>
+
+    <include layout="@layout/activity_bottom" />
+
+</LinearLayout>
+--------------------------------------------------------------------
+example
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:gravity="center_horizontal"
+            android:textSize="20dp"
+            android:text="存储" />
+
+        <SearchView
+            android:id="@+id/search"
+            android:queryHint="搜索"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/picture"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="图片" />
+
+            <Button
+                android:id="@+id/video"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="视频" />
+
+            <Button
+                android:id="@+id/audio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="音频" />
+
+            <Button
+                android:id="@+id/document"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="文档" />
+        </LinearLayout>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:layout_gravity="bottom"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:labelVisibilityMode="labeled"
+        android:layout_alignParentBottom="true"
+        app:menu="@menu/bottom_navigation_menu" />
+</LinearLayout>
