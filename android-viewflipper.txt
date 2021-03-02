@@ -1,0 +1,45 @@
+https://abhiandroid.com/ui/viewflipper
+1. activity_storage.xml
+    <ViewFlipper
+        android:id="@+id/flipper"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+    <ImageView
+        android:id="@+id/flip1"
+        android:layout_width="match_parent"
+        android:layout_height="170dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="30dp"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/green" />
+        <ImageView
+            android:id="@+id/flip2"
+            android:layout_width="match_parent"
+            android:layout_height="170dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="30dp"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/brown" />
+        <ImageView
+            android:id="@+id/flip3"
+            android:layout_width="match_parent"
+            android:layout_height="170dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="30dp"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/orange" />
+
+    </ViewFlipper>
+
+2. StorageActivity.kt
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_storage)
+
+           findViewById<ViewFlipper>(R.id.flipper).startFlipping()
+
