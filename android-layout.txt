@@ -1,0 +1,21 @@
+1. RelativeLayout doesn't have android:orientation="vertical", but you view set width=match_parent then it will up/down, and next item set above and below
+2. ScrollView use android:layout_above and android:layout_below to out of something you want them in ScrollView
+android:isScrollContainer="false" to disable bottom pop up
+also ScrollView should contain just one layout, so put something you want to scroll into one LinearLayout or RelativeLayout
+3. BottomNavigationView out of ScrollView inside RelativeLayout
+use android:layout_alignParentBottom="true" make it stay bottom
+app:labelVisibilityMode="labeled" make all items show up
+4. layout_width should be match_parent, height should be wrap_content
+only in LinearLayout, has weight
+horizon, layout_width="0dp" height="wrap_content" weight="1", it will fill full, another one in it and weight="2", it will scale 1:2 those two take part
+vertical, width=match_parent height="0dp" weight="1", same as above
+5. delete default ConstraintLayout, type <Relative will complete
+6. <include layout=> could import other xml file into current
+7. gravity="center" make text center, or centerHorizontal="true"
+8. marginTop "30dp" marginLeft set margin to top or left size
+9. ViewFlipper play pictures loop, use findView...startFlipping() to run
+10. SearchView show default input without pop up input method, findViewById<SearchView>(R.id.search).setIconifiedByDefault(false) 
+11. write an adapter layout xml file, then use Adapter to handle id inside that layout xml file, create a ListView in caller layout xml file, and findView that listView on caller code, then listView.setAdapter to bind that adapter to listView
+12. BottomNavigationView is very like that ListView, create a menu layout xml in res/menu/, then in caller xml, app:menu="@menu/bottom_navigation_menu"
+  findViewById<BottomNavigationView>(R.id.bottom_navigation).setOnNavigationItemSelectedListener {item -> when(item.itemId) {R.id.item1 -> { ...  true } R.id.item2 -> { ... true }} else -> false}
+  item1 and item2 match id inside that menu layout xml in res/menu/,    set click listener on menu item click
