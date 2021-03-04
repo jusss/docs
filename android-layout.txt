@@ -13,9 +13,71 @@ vertical, width=match_parent height="0dp" weight="1", same as above
 6. <include layout=> could import other xml file into current
 7. gravity="center" make text center, or centerHorizontal="true"
 8. marginTop "30dp" marginLeft set margin to top or left size
-9. ViewFlipper play pictures loop, use findView...startFlipping() to run
+9. ViewFlipper play pictures loop, use findView...startFlipping() to run, ViewFlip, ViewPager, android banner, are very likely to play pictures in a loop
 10. SearchView show default input without pop up input method, findViewById<SearchView>(R.id.search).setIconifiedByDefault(false) 
 11. write an adapter layout xml file, then use Adapter to handle id inside that layout xml file, create a ListView in caller layout xml file, and findView that listView on caller code, then listView.setAdapter to bind that adapter to listView
 12. BottomNavigationView is very like that ListView, create a menu layout xml in res/menu/, then in caller xml, app:menu="@menu/bottom_navigation_menu"
   findViewById<BottomNavigationView>(R.id.bottom_navigation).setOnNavigationItemSelectedListener {item -> when(item.itemId) {R.id.item1 -> { ...  true } R.id.item2 -> { ... true }} else -> false}
   item1 and item2 match id inside that menu layout xml in res/menu/,    set click listener on menu item click
+13. the number of items is uncertainly, use listview, otherwise use fixed layout 
+14. in current xml file, you can use "@layout/others_layout" to import them into current layout if there's an option
+15. every layout xml file import to current current xml file, and in current code activity, you can findViewById handle that imported xml items
+16. click menu icon on the right of toolbar, pop up menu, it's nothing to do with toolbar, it's PopupMenu
+it can bind to button, not just toolbar
+Popup Menu position is related to the view pass into it?
+https://stackoverflow.com/questions/48626995/how-to-create-custom-popup-menu-using-kotlin-in-androidstudio
+I. res/menu/toolbar_action_menu.xml write you pop up item menu here
+II. in activity, define showPopup(view: View) {         val popup = PopupMenu(this, view) // bind MainActivity to menu icon view on toolbar
+        popup.inflate(R.menu.toolbar_action_menu) // bind menu icon view to pop up menu layout
+...
+}
+III.  val titleBar = findViewById<CommonTitleBar>(R.id.titlebar)
+        titleBar.rightCustomView.setOnClickListener {
+                    showPopup(it) // bind menu icon on toolbar to pop up menu
+        }
+17. res/values/strings.xml set "app_name" then use "@string/app_name" in other layout
+18. spinner to show items to choose just like Popup Menu
+https://www.geeksforgeeks.org/spinner-in-kotlin/
+   val spinner = findViewById<Spinner>(R.id.spinner)
+
+        val category = arrayListOf<String>("2020-10", "2020-11", "2020-12")
+        val timeAdapter = ArrayAdapter<String>(mainThis,android.R.layout.simple_spinner_item,category)
+        timeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinner.adapter = timeAdapter
+
+        spinner.onItemSelectedListener = object :
+            AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>,
+                                        view: View, position: Int, id: Long) {
+                Toast.makeText(mainThis,category[position],Toast.LENGTH_LONG).show()
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {
+                // write code to perform some action
+            }
+        }
+
+19. trisection in LinearLayout, 
+ <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+  <Spinner
+             android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+
+        <TextView
+              android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"/>
+        <TextView
+               android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"/>
+</LinearLayout>
+
+20. RelativeLayout use 
+android:layout_below="@+id/option"
+android:layout_above="@+id/bottom_navigation"
+to lay items
