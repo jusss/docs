@@ -1,3 +1,8 @@
+ffmpeg -ss 01:45:07 -t 00:03:11 -i Wrong.Turn.2021.1080p.BluRay.x265-RARBG.mp4 -acodec copy -vcodec copy clip1.mp4
+
+this is so fast! it even doesn't take one second, the source is hevc 1920x804 23.976fps, aac 6ch 48000Hz, encoder Lavf58.20.100
+and use ffmpeg version n4.3.1
+-----------------------------------------
 ffmpeg on windows with amd gpu accel
 
 download ffmpeg from http://gyan.dev/ffmpeg/builds/
