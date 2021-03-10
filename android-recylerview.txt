@@ -1,0 +1,27 @@
+adapter class match and bind item view which inside recyclerview
+then bind adapter class with recyclerview
+use wrap_content in inside recylerview
+change recylerviewAdapter-onBindViewHolder item attributes
+same as ListViewAdapter - getView
+
+in listview's adapter class's getview function, bind recyclerview and recyclerview's adapter
+
+recyclerview inside listview
+because listview doesn't have horizontal oritation
+but recyclerview has grid layout
+
+1. recylerview_item.xml
+2. RecyclerviewAdapter.kt bind recylerview_item.xml
+3. listview_item.xml create recylerview
+4. in ListviewAdapter.kt - Adapter class - getView function
+bind ListviewAapter to listview_item.xml
+bind RecyclerviewAdapter to recylerview
+5. in activity, create listview, bind ListviewAdapter to listview
+
+if you want recylerview inside recyclerview
+in parent recylerview Adapter - onBindViewHolder
+bind child recylerview Adapter to recylerview inside parent layout
+
+https://medium.com/android-news/easily-adding-nested-recycler-view-in-android-a7e9f7f04047
+
+item number is unknown, so use listiview or recylerview
