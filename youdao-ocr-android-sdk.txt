@@ -1,0 +1,5 @@
+youdao OCR android sdk, download
+and find orc-demo,
+use project view instead of android 
+1. in your project, same level at main, create jniLabs, put .so files in
+2. in src level, create libs, put .jar files in, right click `import as library'
