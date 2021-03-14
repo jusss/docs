@@ -3,6 +3,12 @@ then bind adapter class with recyclerview
 use wrap_content in inside recylerview
 change recylerviewAdapter-onBindViewHolder item attributes
 same as ListViewAdapter - getView
+click bind in onBindViewHolder
+        viewHolder.imageView.setOnClickListener {
+                    OpenPicture.open(context, arrayOf(dataSet[position]))
+                    println(dataSet[position] + " is clicked!")
+        }
+
 
 in listview's adapter class's getview function, bind recyclerview and recyclerview's adapter
 
@@ -17,6 +23,7 @@ but recyclerview has grid layout
 bind ListviewAapter to listview_item.xml
 bind RecyclerviewAdapter to recylerview
 5. in activity, create listview, bind ListviewAdapter to listview
+6. in ListviewAdapter its datasource would be ArrayList<ArrayList<A>>, RecyclerviewAdapter datasource would be ArrayList<A>
 
 if you want recylerview inside recyclerview
 in parent recylerview Adapter - onBindViewHolder
@@ -25,3 +32,70 @@ bind child recylerview Adapter to recylerview inside parent layout
 https://medium.com/android-news/easily-adding-nested-recycler-view-in-android-a7e9f7f04047
 
 item number is unknown, so use listiview or recylerview
+
+package com.hybroad.remotefilemanager.pictures
+
+import android.content.Context
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.hybroad.remotefilemanager.NaP
+import com.hybroad.remotefilemanager.R
+import com.hybroad.remotefilemanager.utils.OpenPicture
+
+class PictureRecyclerviewAdapter(val context: Context, val dataSet: ArrayList<String>, val whole: Boolean) :
+    RecyclerView.Adapter<PictureRecyclerviewAdapter.ViewHolder>() {
+
+    /**
+     * Provide a reference to the type of views that you are using
+     * (custom ViewHolder).
+     */
+    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val imageView: ImageView
+
+        init {
+            // Define click listener for the ViewHolder's View.
+            imageView = view.findViewById(R.id.image)
+        }
+    }
+
+    // Create new views (invoked by the layout manager)
+    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ViewHolder {
+        // Create a new view, which defines the UI of the list item
+        val view = LayoutInflater.from(viewGroup.context)
+            .inflate(R.layout.picture_recyclerview_item, viewGroup, false)
+
+        return ViewHolder(view)
+    }
+
+    // Replace the contents of a view (invoked by the layout manager)
+    override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
+
+        // Get element from your dataset at this position and replace the
+        // contents of the view with that element
+
+        viewHolder.imageView.setOnClickListener {
+                    OpenPicture.open(context, arrayOf(dataSet[position]))
+                    println(dataSet[position] + " is clicked!")
+        }
+
+        Glide.with(context)
+            .load(dataSet[position].split("&").get(0).replace("9864","9870"))
+            .centerCrop()
+            .placeholder(R.drawable.file)
+            .into(viewHolder.imageView)
+
+
+    }
+
+    // Return the size of your dataset (invoked by the layout manager)
+//    override fun getItemCount() = dataSet.size
+    override fun getItemCount(): Int =  if (whole) dataSet.size else 8
+
+}
+
+
