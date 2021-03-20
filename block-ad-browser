@@ -1,0 +1,8 @@
+chromium
+press f12, find the ad's js address
+then in /etc/hosts use 127.0.0.1 address to block them
+use ping address to check out if ad is blocked
+--------------------------
+127.0.0.1 www.ofgksa.com
+127.0.0.1 v1.cnzz.com
+
