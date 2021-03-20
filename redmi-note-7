@@ -1,0 +1,44 @@
+android 9.0
+
+install gms
+
+https://baijiahao.baidu.com/s?id=1676690451239209129&wfr=spider&for=pc
+
+goto apkmirror
+
+1. download google services framework, android 9.0 version, date near 2019.02
+2. google play services 
+3. google play store
+
+
+use jmtp mount this phone's storage to PC, then 
+cp them into /sdcard/Download/
+
+insert sim card then install them by sequency,
+google services framework first
+google play services second
+google play store last
+this MIUI ask sim card installed to install third-party apps, but you can turn on flying-mode and still use wifi
+
+then install google pinyin, wireguard, brook, and outline
+
+login in google play, prefer brook 
+
+open Download app, turn xunlei engine off, and set download unlimited
+
+google play - settings - click play store version to update 
+turn off app auto update 
+settings - turn off android auto update , notifications & status bar turn on show connection speed
+
+after google play update to latest, then install twitter, youtube whatever
+
+https://www.apkmirror.com/wp-content/uploads/2018/09/5b9888ab3b491/com.google.android.gsf_9-28_minAPI28(nodpi)_apkmirror.com.apk?verify=1616216458-PLHmwlbWYxVJ7YSXgp1IkTD7AfjcFO50Iz75ExVzFQ4
+
+https://www.apkmirror.com/wp-content/uploads/2019/01/5c5216d3a7d36/com.google.android.gms_15.0.90_(100400-231259764)-15090037_minAPI28(arm64-v8a,armeabi-v7a)(nodpi)_apkmirror.com.apk?verify=1616216657-5d8lw2a55eYtWtvx91MqtqU3jrqHtgbsThtXv_suJC0
+
+https://www.apkmirror.com/wp-content/uploads/2019/02/5c63317820e3f/com.android.vending_13.5.56-all_0_PR_233508088-81355600_minAPI16(armeabi,armeabi-v7a,mips,mips64,x86,x86_64)(nodpi)_apkmirror.com.apk?verify=1616217224-SKpAYGgXey_jvtkQkwG_9dPKuV0CQEpNnWgAGArroLo
+
+
+
+
+
