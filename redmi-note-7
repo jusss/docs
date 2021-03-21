@@ -1,3 +1,16 @@
+unlock bootloader first 
+'cause this action would clear your data
+
+1. http://www.miui.com/unlock/download.html
+download the tool on Windows PC, connect your phone to PC
+2. on Phone, in Development Mode, enable adb, then click 
+Mi Unlock status create an account, it may ask you using mobile data 
+not wifi,then login in, remember the user and password
+3. on PC, run miflash_unlock.exe, login in, it may ask SMS to
+identify your login
+4. power off the Phone, hold Power and Volumn down, get into bootloader
+5. on PC, click unlock button to unlock it, done!
+--------------------------------------------
 android 9.0
 
 install gms
@@ -21,10 +34,10 @@ google play store last
 this MIUI ask sim card installed to install third-party apps, but you can turn on flying-mode and still use wifi
 
 then install google pinyin, wireguard, brook, and outline
-
-login in google play, prefer brook 
-
 open Download app, turn xunlei engine off, and set download unlimited
+
+if there is a connection issue with google play app, then use redmi2 as wifi spot, and using wireguard on redmi2 for global access
+after login in google play, disconnect redmi2, connect to wifi, use brook
 
 google play - settings - click play store version to update 
 turn off app auto update 
