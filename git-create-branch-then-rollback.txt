@@ -1,0 +1,15 @@
+git add *
+git commit -m 'latest changes'
+git checkout -b tmp
+
+git checkout master
+git log // show commit id, for example latest is a1, previous is a2, let's jump back to a2
+git reset --hard a2-commit // now master will jump to previous
+git status
+git log
+
+git checkout tmp // will jump that tmp branch, it has latest changes
+git log
+git checkout master // jump back previous changes
+git log
+git push

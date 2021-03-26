@@ -1,0 +1,22 @@
+ealier exit in map
+map (+1) [1,2,3,5,7] 
+how to let it once meet 3 then exit whole computation?
+callCC ? ContT r [] a?
+without map, recursion function can do that
+in other languages's iteration, break and return can do that
+
+but not all the languages support TCO except haskell and scheme
+
+and kotlin doesn't too
+
+ fun foo() {
+        val t = run loop@{
+            listOf(1, 2, 3, 4, 5).forEach {
+                if (it == 1) return@loop 1 // non-local return from the lambda passed to run
+                if (it == 3) return@loop 3 // non-local return from the lambda passed to run
+            }
+        }
+        println(t)
+
+    }
+    foo()
