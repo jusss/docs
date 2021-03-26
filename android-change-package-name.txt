@@ -1,0 +1,6 @@
+use Project view,  click left toolbar right upside corner setting
+toggle off Flatten Packages and Compact Middle Packages
+right click on which package you want to rename,
+choose Refactor - Rename - Choose Package, then rename it
+checkout Manifest, if the packages name are changed
+then change build.gradle android{ defaultConfig { applicationId }}

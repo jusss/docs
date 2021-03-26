@@ -1,0 +1,79 @@
+1.  create companion object to store global variable
+class PictureAddrCache {
+    companion object {
+        lateinit var asyncPictureResult: Deferred<ArrayList<NaP<String,ArrayList<String>>>>
+}}
+
+2. create async IO class
+class AsyncInit {
+    fun run() {
+            PictureAddrCache.asyncPictureResult = CoroutineScope(NonCancellable).async(Dispatchers.IO) {
+            doSomeIO
+            return@async IOResult
+            }
+    }
+}
+
+3. run it at very first activity
+AsyncInit().run()
+
+4. wait the IO Result in another activity
+   CoroutineScope(NonCancellable).launch {
+                    withContext(Dispatchers.IO){
+                        val _r1 = PictureAddrCache.asyncPictureResult.await()
+                        println("---------- resutl $_r1 ---------------------")     
+                    }
+                    withContext(Dispatchers.Main){
+                       updateUI
+                    }
+                }
+
+//---------------------------------------------------------
+// think about Service or WorkManager?
+// Coroutine relate to Job, one to one, 
+// Coroutine has launch (no result) and async (result)
+// CoroutineScope(Dispatchers.Main).launch { ... }
+// coroutineScope {
+//            val deferredFirst = async { get("first") }
+//            val deferredSecond = async { get("second") }
+//            deferredFirst.await()
+//            deferredSecond.await()
+
+
+
+
+
+ViewModelScope, ViewModel is canceled once, Coroutine cancel too
+   viewModelScope.launch {
+            val articleList = withContext(Dispatchers.IO) {
+                articleDao.getAll()
+            }
+           adapter.clear()
+           adapter.addAllData(articleList)
+        }
+
+
+LifecycleScope, once you leave current Activity, cancel it
+lifecycleScope.launch { ... }
+
+https://mp.weixin.qq.com/s?__biz=MzIzNTc5NDY4Nw==&mid=2247483860&idx=1&sn=d8a4441912d0d1eee189d97506bb4689&chksm=e8e0f844df977152652d69a3b4cc3cd1d1a148609f4295b6142e6d577156b76905e1cb6b95be&token=1091218095&lang=zh_CN#rd
+
+https://zhuanlan.zhihu.com/p/297543508
+
+coroutineScope : CoroutineScope
+
+lifecycleScope.launch {...} return a Job object, Job can connect with other Jobs, Job has isActivity, isCompleted, isCancelled
+more details search SupervisorJob
+
+CoroutineScope(NonCancellable).lauch {} or .async{} return a Job, this Job won't be cancelled automatelly
+CoroutineScope.async{} would return a Deferred object, you can use await on that object to get result
+
+Scope would return Job, you can use Job connect other Jobs, or check Job status, or cancel Job
+when Job is done, there're is null, is CancellationException, Otherwise three status
+inside coroutine, function join would run its Job, stuck others jobs until its job is done
+
+
+Work Manager or Event Bus?
+https://developer.android.com/courses
+
+
