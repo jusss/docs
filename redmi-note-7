@@ -1,3 +1,54 @@
+tutorial https://c.mi.com/thread-1857937-1-1.html?t=1581610451162
+
+download miflash20191206 from 
+https://drive.google.com/file/d/16IrK_3imrXVDt6E70ODZNDcz4898MwFF/view
+https://doc-00-5g-docs.googleusercontent.com/docs/securesc/rsmln6dbfkkrl24upds27hm5sj59o1tg/ht2vp6ohr1614br0rqcu4rnrdeprj8pj/1616824425000/11951457073803042793/09975449114211548872/16IrK_3imrXVDt6E70ODZNDcz4898MwFF?e=download&authuser=0&nonce=qvcaufetvior2&user=09975449114211548872&hash=p7m9g18c9vkeeh5cnrj022v429uqinkc
+
+download fastboot version rom miui.10.3.5.tgz from 
+https://c.mi.com/thread-1907769-1-0.html 
+aria2c 'http://bigota.d.miui.com/V10.3.5.0.PFGMIXM/lavender_global_images_V10.3.5.0.PFGMIXM_20190424.0000.00_9.0_global_634f185f7e.tgz'
+
+other resources
+https://c.mi.com/thread-2460421-2-1.html 
+https://c.mi.com/thread-2460421-1-1.html 
+https://c.mi.com/thread-2460421-1-0.html
+
+https://bigota.d.miui.com/V10.3.6.0.PFGMIXM/miui_LAVENDERGlobal_V10.3.6.0.PFGMIXM_8c74282d30_9.0.zip
+aria2c 'http://bigota.d.miui.com/V11.0.4.0.PFGMIXM/lavender_global_images_V11.0.4.0.PFGMIXM_20191110.0000.00_9.0_global_774a3e8c73.tgz'
+
+DO NOT INSERT SIM CARD!
+use Power - Volumn minus key get into fastboot mode, connect it to PC
+run miflash.exe then it reminder you to install some drivers it contains, install it 
+then re-run it, click load device button, it will load the device and show its item,
+then choose clean data in the right below corner, not save data, not flash with lock,
+then choose your fastboot version rom, and flash it!
+
+it may take 5 minutes, then it will reboot automatelly, when the flash bar is full green,
+unplug it, it means successfully
+
+now use redmi2 as wifi spot, wireguard on it, 
+install google play games, then install mobile legends bang bang within google play games,
+
+---------------------------------
+Global India EU and China four rom versions
+there're two official roms, recovery and fastboot version,
+recovery version is download from the official website,
+fastboot version is used with miflash.exe in fastboot mode,
+
+in miui 10, click the logo icon ten times, it will enable "choose update package"
+update with local recovery version rom, but global recovery version rom can't install by this
+
+so there's only one way to flash Chines phone with global version rom,
+it is using fastboot version rom, flash with miflash.exe
+
+and there's another option, fuck miui, just download lineageos's recovery.img
+then flash it in bootloader, then install lineageos rom
+or flash TWRP Recovery to flash any rom
+
+lineageos for Redmi note 7
+https://wiki.lineageos.org/devices/lavender/install
+https://download.lineageos.org/lavender
+----------------------------------------
 unlock bootloader first 
 'cause this action would clear your data
 
