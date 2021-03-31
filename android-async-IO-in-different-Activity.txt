@@ -1,3 +1,26 @@
+
+CoroutineScope.launch {
+ withContext(Dispatchers.IO) {...}
+ withContext(Dispatchers.Main) {..}
+}
+the next withContext will wait for the previous withContext, IO and Main are in different thread 
+
+CoroutineScope.lanuch {
+val a1 = async(Dispatchers.IO) { ... }
+val a2 = async(Dispatchers.IO) {...}
+}
+a2 won't wait for a1, they're parallel
+
+so we can do do 1000 web request at the same time
+deferredList :: [Deferred<T>]
+result :: [T]
+["apiRequestOne", "apiRequestTwo",...].map {
+  deferredList.add( CoroutineScope.async(Dispatchers.IO) { doSomething with it; return@async IOResult} )
+} 
+CoroutineScope.lanch(Dispatchers.IO){
+deferredList.map { result.add(it.await()) }
+}  // async default use Dispatchers.Main, so declare Dispatchers.IO here, lanuch won't return value, so here use launcher
+----------------------------------------------------------
 1.  create companion object to store global variable
 class PictureAddrCache {
     companion object {

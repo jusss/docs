@@ -1,0 +1,8 @@
+merge master to dev2 branch
+
+git checkout dev2
+git merge master
+then it shows two files conflicted
+vim those two files, change <<< === >>> conflict sections
+git add *
+git commit -m '.'
