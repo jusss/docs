@@ -1,3 +1,33 @@
+provide dns service with ad-block
+
+On VPS
+
+/etc/dnsmasq.conf
+port=53
+server=1.1.1.1
+interface=eth0
+listen-address=vps-ip
+addn-hosts=/etc/dnsmasq.blacklist.hosts
+
+vim /etc/dnsmasq.blacklist.hosts
+# Static table lookup for hostnames.
+# See hosts(5) for details.
+127.0.0.1	localhost
+127.0.0.1 www.ofgksa.com
+127.0.0.1 v1.cnzz.com
+
+systemctl start dnsmasq
+systemctl enable dnsmasq
+
+now use
+nslookup jd.com vps-ip // check 
+nslookup v1.cnzz.com vps-ip
+
+On Local
+
+change your dns server to vps-ip 
+
+----------------------------------
 服务器上装个dnsmasq，开启dns server功能,登录你的vps从remote access查到你的dns resolvers,比如是1.1.1.1, 2.2.2.2
 参考http://www.knowsky.com/888297.html
 apt-get install dnsmasq resolvconf
