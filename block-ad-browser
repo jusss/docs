@@ -1,3 +1,33 @@
+provide dns service with ad-block
+
+On VPS
+
+/etc/dnsmasq.conf
+port=53
+server=1.1.1.1
+interface=eth0
+listen-address=vps-ip
+addn-hosts=/etc/dnsmasq.blacklist.hosts
+
+vim /etc/dnsmasq.blacklist.hosts
+# Static table lookup for hostnames.
+# See hosts(5) for details.
+127.0.0.1	localhost
+127.0.0.1 www.ofgksa.com
+127.0.0.1 v1.cnzz.com
+
+systemctl start dnsmasq
+systemctl enable dnsmasq
+
+now use
+nslookup jd.com vps-ip // check 
+nslookup v1.cnzz.com vps-ip
+
+On Local
+
+change your dns server to vps-ip 
+
+----------------------------------
 chromium
 press f12, find the ad's js address
 then in /etc/hosts use 127.0.0.1 address to block them
