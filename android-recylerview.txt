@@ -1,3 +1,41 @@
+recyclerview set item binding inside Adapter class,
+listview set item binding inside Activity class,
+vertical layout item
+recyclerView.layoutManager = LinearLayoutManager(this)
+layout item horizon and disable swipe
+            recyclerView?.layoutManager = object : GridLayoutManager(context,4){
+//                override fun canScrollHorizontally(): Boolean {
+//                    return false
+//                }
+                override fun canScrollVertically(): Boolean {
+                    return false
+                }
+            }
+
+
+-----------------------------------
+in RecyclerViewAdapter.kt
+in onBindViewHolder do 
+viewHolder.itemView.setOnClickListener { ... } // whole item binding
+viewHolder.image.setOnClickListener just do image inside item binding
+use `context.startActivity()` to jump activity, 
+because the whole RecyclerViewAdapter is based on RecyclerView.Adapter<T>
+it doesn't has startActivity, so use the passing throught parameter context to do it
+------------------------------------------------------
+recyclerview item layout height use wrap_content, 
+don't use match_parent, it may cause extremely large margin
+activity_storage_video_item.xml
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:paddingBottom="10dp"
+    android:layout_height="wrap_content">
+...
+</RelativeLayout>
+----------------------------------------------------------
 adapter class match and bind item view which inside recyclerview
 then bind adapter class with recyclerview
 use wrap_content in inside recylerview
