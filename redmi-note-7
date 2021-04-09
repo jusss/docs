@@ -5,11 +5,36 @@ download gapps from https://opengapps.org/
 download lineageos from https://download.lineageos.org/lavender 
 use magisk for root privilege manager
 
-make sure you enabled Development mode first
-adb reboot bootloader 
-sudo fastboot devices // check if detected
-sudo fastboot flash recovery twrp.img 
-sudo fastboot reboot 
+make sure you enabled Development mode first, enabled adb 
+download twrp.img, then goto into Windows 10, sometimes fastboot flash recovery has some errors on linux
+find the Android Studio's adb.exe, in C:\Users\user\AppData\Local\Android\Sdk\platform-tools\
+set it to Path envrionment,
+plug your phone to PC, choose `file trans`, run `adb shell`, if it works,
+then copy lineageos ROM and gapps to internal storage, 
+poweroff your phone, then Power with Volumn down key to fastboot mode,
+run `fastboot devices` to check if it's detected,
+if so, then `fastboot flash recovery twrp-3.5.1_9-0-lavender.img`, `fastboot reboot`,
+press Power with Volumn up key to get into twrp recovery mode,
+this would prevent the official recovery get back
+
+if it doesn't work, pop up some errors like "invalid parameter" or "too many links"
+just try another PC, and with USB 2.0, not USB 3.0,
+also, install miflash20191206 for the drivers 
+
+after you installed twrp then reboot your phone,
+then get into twrp,"Wipe" swip to factory reset, not "Format", because it formats your ROM
+flash lineageos then flash gapps, flash them at the same time,
+if you only flash lineageos then get into it, then you need wipe cache then flash gapps
+now reboot system, if it stucks in lineageos logo, then get into twrp,
+"Wipe" -> "Format" -> input yes, format whole user data including your ROM,
+then reboot system, it will get into lineageos!
+
+REMEMBER! put sim card out of redmi note 7, use redmi2 create a wifi spot cross gfw 
+then redmi note 7 connect it
+
+everytime, flash recovery, make sure `adb shell` is working and `fastboot devices` detected the device
+press seven times enable developer mode, enable adb, then connect it to PC, choose `trans files` usb option,
+then `adb shell` to check if it works
 
 -----------------------------------------
 change region to India, so Global version could change fonts in theme app
