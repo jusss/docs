@@ -1,8 +1,14 @@
 gapps and lineageos need to be flash at the same time, otherwise wipe lineageos data and cache in recovery then flash gapps
 use TWRP recovery to flash gapps, lineageos has signature auth,
 download TWRP from https://twrp.me/ 
+twrp-3.5.1_9-0-lavender.img
+
 download gapps from https://opengapps.org/
+open_gapps-arm64-10.0-nano-20210406.zip
+
 download lineageos from https://download.lineageos.org/lavender 
+lineage-17.1-20210330-nightly-lavender-signed.zip
+
 use magisk for root privilege manager
 
 make sure you enabled Development mode first, enabled adb 
