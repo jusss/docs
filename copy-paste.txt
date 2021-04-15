@@ -1,0 +1,2 @@
+ctrl-insert to copy like C-c
+shift-insert to paste like C-v
