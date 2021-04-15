@@ -25,6 +25,7 @@ fun main(){
     println(t2.a)
 }
 
+1. 
 data class DownloadStructure(var name: String, var link: String, var size: Int)
 
 // this make DownloadStructure String   Int as a Functor to DownloadStructure String a Int, so all next operations no need point it.link
@@ -33,6 +34,15 @@ fun DownloadStructure.fmap(f: (String) -> String): DownloadStructure{
     return this
 }
 
+2.
+// fun DownloadStructure(val name: String, val link: String, val size:Int).fmap (f: (String) -> String) = DownloadStructure(name, f (link), size)
+
+3.
+class DownloadStructure(val name: String, val link: String, val size: Int) {
+  fun fmap (f: (String) -> String): DownloadStructure = DownloadStructure(name, f(link), size)
+}
+
+1.
 class DownloadStructureT(val a: ArrayList<DownloadStructure>) {
     fun fmap(f: (String) -> String): DownloadStructureT {
         a.map {
@@ -44,6 +54,7 @@ class DownloadStructureT(val a: ArrayList<DownloadStructure>) {
 
 after DownloadStructure String Int as a Functor, so it could be 
 
+2.
 class DownloadStructureT(val a: ArrayList<DownloadStructure>) {
     fun fmap(f: (String) -> String): DownloadStructureT {
         a.map {
