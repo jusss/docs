@@ -1,3 +1,5 @@
+// make a monad transformer when you need fmap or bind work on a directly
+
 fun main(){
 
     val reverse2 = {i: String -> i.reversed()}
