@@ -22,45 +22,56 @@ fun main(){
     t1.add(DownloadStructure("file2", "web3", 30))
 
     val t2 = DownloadStructureT(t1).fmap(reverse2)
-    println(t2.a)
+    t2.runDownloadStructureT().map {
+        println(it.link)
+    }
 }
 
-1. 
-data class DownloadStructure(var name: String, var link: String, var size: Int)
-
-// this make DownloadStructure String   Int as a Functor to DownloadStructure String a Int, so all next operations no need point it.link
-fun DownloadStructure.fmap(f: (String) -> String): DownloadStructure{
-    this.link = f(this.link)
-    return this
-}
-
-2.
-// fun DownloadStructure(val name: String, val link: String, val size:Int).fmap (f: (String) -> String) = DownloadStructure(name, f (link), size)
-
-3.
+//1.
+//data class DownloadStructure(var name: String, var link: String, var size: Int)
+//
+//// this make DownloadStructure String   Int as a Functor to DownloadStructure String a Int, so all next operations no need point it.link
+//fun DownloadStructure.fmap(f: (String) -> String): DownloadStructure{
+//    this.link = f(this.link)
+//    return this
+//}
+//
+//2.
+//// fun DownloadStructure(val name: String, val link: String, val size:Int).fmap (f: (String) -> String) = DownloadStructure(name, f (link), size)
+//
+//3.
 class DownloadStructure(val name: String, val link: String, val size: Int) {
   fun fmap (f: (String) -> String): DownloadStructure = DownloadStructure(name, f(link), size)
 }
 
-1.
+//1.
+//class DownloadStructureT(val a: ArrayList<DownloadStructure>) {
+//    fun fmap(f: (String) -> String): DownloadStructureT {
+//        a.map {
+//            it.link = f(it.link)
+//        }
+//        return DownloadStructureT(a)
+//    }
+//}
+//
+//after DownloadStructure String Int as a Functor, so it could be
+//
+//2.
+//class DownloadStructureT(val a: ArrayList<DownloadStructure>) {
+//    fun fmap(f: (String) -> String): DownloadStructureT {
+//        a.map {
+//            // it.link = f(it.link)
+//            it.fmap(f)
+//        }
+//        return DownloadStructureT(a)
+//    }
+//}
+//
+//3.
 class DownloadStructureT(val a: ArrayList<DownloadStructure>) {
-    fun fmap(f: (String) -> String): DownloadStructureT {
-        a.map {
-            it.link = f(it.link)
-        }
-        return DownloadStructureT(a)
+    fun fmap(f: (String) -> String) : DownloadStructureT {
+        return DownloadStructureT(a.map { it.fmap(f) } as ArrayList<DownloadStructure>)
     }
-}
 
-after DownloadStructure String Int as a Functor, so it could be 
-
-2.
-class DownloadStructureT(val a: ArrayList<DownloadStructure>) {
-    fun fmap(f: (String) -> String): DownloadStructureT {
-        a.map {
-            // it.link = f(it.link)
-            it.fmap(f)
-        }
-        return DownloadStructureT(a)
-    }
+    fun runDownloadStructureT(): ArrayList<DownloadStructure> = a
 }
