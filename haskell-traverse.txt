@@ -1,0 +1,50 @@
+sequence $ fmap print [1,2,3]
+sequenceA_ $ fmap print [1,2,3]
+mapM print [1,2,3]
+mapM_ print [1,2,3]
+traverse print [1,2,3]
+traverse_ print [1,2,3]
+
+traverse f = sequence . fmap f
+mapM = traverse
+
+fmap print [1,2,3] :: [IO ()],  will create a list contain IO actions
+but IO actions inside a list won't run
+so use `sequence` to run that IO actions inside a list, and results stay in that list
+
+traverse apply a function to every element of a list and then execute the resultin IO actions
+
+for example
+fetchUrl :: Url -> IO ByteString -- this function fetch some data from a web link
+what if there's a list contain a lots web links we need to fetch?
+then use `traverse fetchUrl [Url1, Url2]` and the IO result stay in that list
+
+
+Traversable is a typeclass, so there's no 
+data Traversable IO (Tree A) = Traversable Tree IO A
+only types as its instances
+
+sequence [Nothing, Just 1] == Nothing
+sequence [Just 1, Just 2] == Just [1,2]
+
+sequence :: t (m a) -> m (t a)
+
+[Nothing, Just 1] :: [Maybe a]
+Just [1,2] :: Maybe [a]
+
+
+
+
+
+
+
+λ> import Data.Traversable
+λ> let qs = ["name", "quest", "favorite color"]
+λ> traverse (\thing -> putStrLn ("What is your " ++ thing ++ "?") *> getLine) qs
+What is your name?
+Sir Lancelot
+What is your quest?
+to seek the holy grail
+What is your favorite color?
+blue
+["Sir Lancelot","to seek the holy grail","blue"]

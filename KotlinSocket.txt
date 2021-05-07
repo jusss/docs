@@ -1,0 +1,77 @@
+    
+1. let's use "\r\n" as end symbol
+
+2. 
+    val sock = Socket("192.168.31.147", 50017)
+    var size = 0
+    sock.use {
+        it.outputStream.write("/sdcard/wnyphone/icon/1615358705890.png".toByteArray(
+            Charsets.UTF_8
+        ))
+        it.outputStream.flush()
+        var aob = ByteArray(1024000)
+        size = it.inputStream.read(aob)
+        var recvMsg = String(aob.sliceArray(0 until size), Charsets.UTF_8)
+        println(recvMsg)
+        while ( recvMsg.endsWith("\r\n").not()) {
+            size = it.inputStream.read(aob)
+            recvMsg += String(aob.sliceArray(0 until size), Charsets.UTF_8)
+        }
+        println(recvMsg)
+
+3. another version is 
+fun updateUI(){
+        socketScope.launch {
+            withContext(Dispatchers.Main) {
+                //    val showTextView = findViewById<TextView>(R.id.text1)
+                showTextView.text = "socket init..."
+            }
+            val server = ServerSocket(30017)
+            withContext(Dispatchers.Main) {
+                    showTextView.text = "socket init done"
+                    //variable?.async()?.setValue("changed")
+            }
+            var size: Int = 0
+            var recvMsg: String
+            var outputMsg: List<String>
+            var aob = ByteArray(1023)
+            var client = this@MainActivity.netInit(server)
+            var sayMsg: String?
+            while (true) {
+                // shutdown without exit signal
+                try {
+                    size = client.inputStream.read(aob)
+                    if (size != -1) {
+                        client.outputStream.write(aob.sliceArray(0 until size))
+                        client.outputStream.flush()
+                    }
+                }
+                catch(e: Exception) {
+                    client.close()
+                    client = netInit(server)
+                    size = 0
+                }
+                //shutdown with exit signal
+                if (size == -1) {
+                    client.close()
+                    client = netInit(server)
+                    size = 0
+                }
+                recvMsg = String(aob.sliceArray(0 until size), Charsets.UTF_8)
+                println(recvMsg)
+                if (recvMsg.contains("end")) {
+                    break
+                }
+                outputMsg = recvMsg.split("\r\n")
+                if (outputMsg.size >= 2) {
+                    withContext(Dispatchers.Main){
+                        showTextView.setText("")
+                        showTextView.text=recvMsg
+                        qiChatVariable?.async()?.setValue(recvMsg)
+                    }
+                }
+            }
+            client.close()
+            server.close()
+        }
+    }

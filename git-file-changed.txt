@@ -1,0 +1,2 @@
+git log -p RemoteFileManager/app/build.gradle
+git blame RemoteFileManager/app/build.gradle
