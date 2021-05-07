@@ -1,0 +1,13 @@
+json array like
+
+[{"text": "园", "position": [806, 19], "confident_threshold": -3.6559643745422363}, {"text": "上午10:11", "position": [37, 21], "confident_threshold": -5.583799839019775}]
+
+
+val result2 : Array<JsonResult> = Gson().fromJson(jsonResult, Array<JsonResult>::class.java)
+       
+result2.map {
+            print(it.text)
+            println(it.position)
+}
+
+data class JsonResult(val text: String, val position: List<Integer>, val confident_threshold: Double)

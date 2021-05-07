@@ -1,0 +1,188 @@
+
+Coroutine On UI
+1. arrow-kt, IO use continueOn switch UI and IO, use unsafeRunSync and unsafeRunAsync to do block IO and async IO
+2. kotlinx, inside scope, use withContext(Dispatchers.IO) or Dispatchers.Main switch UI and IO, CoroutineScope.async(Dispatchers.IO) and CoroutineScope.launch to do async IO and block IO
+also there's runBlocking { }
+
+3. now arrow-kt use suspend to replace IO
+switch UI and IO
+either {
+  withContext(main) { updateUI.bind() } // .bind() will run, updateUI and doIO need to be suspend function
+  withContext(background) { doIO.bind() }
+}
+
+async IO
+
+val res: Either<Stirng, Int> =
+  either<String, Int> {
+     val task: Deferred<Either<String, Int>> = scope.async(Dispatchers.IO) { delay(1000); 1.right() }
+     ...
+     task.await().bind()
+  }
+
+either { ... }  It works the same as Either.fx<A,B> {...} but it no longer uses the Monad interface underneath and works much more efficiently.
+The either { } version also allows for suspension to go through, which wasn't the case with fx.
+If you want a DSL that returns immediately instead of doing suspend there is also either.eager { } .
+
+the documentation is still a bit lacking in those places :disappointed:
+Here is a little bit more info:
+https://arrow-kt.io/docs/effects/io/#suspend----eithere-a
+It's 100% better to use than Either.fx, and you can use it exactly the same as Either.fx. Actually, either { } is more powerful than Either.fx and can do more.
+----------------------------------------------------
+
+I saw that
+IO.fx { 
+ continueOn(main)
+ effect { updateUI }.bind()
+ continueOn(backgroud)
+ effect { doIO }.bind()
+}
+if with
+suspend () -> Either<A,B>
+how to express that inside
+either { ... }?
+continueOn is available inside either ?
+
+continueOn is not available anymore in favor of withContext from KotlinX.
+either {
+  withContext(main) { updateUI.bind() }
+  withContext(background) { doIO.bind() }
+}
+
+Assuming that updateUI and doIO return Either and/or are suspend
+
+ IO has
+unsafeRunAsync
+KotlinX has
+CoroutineScope.async(Dispatchers.IO) {...}
+for async IO, how to do that inside
+either {...}?
+
+You can safely mix-and-match these patterns now.
+val res: Either<Stirng, Int> =
+  either<String, Int> {
+     val task: Deferred<Either<String, Int>> = scope.async(Dispatchers.IO) { delay(1000); 1.right() }
+     ...
+     task.await().bind()
+  }
+
+so KotlinX's
+runBlocking { ... } 
+is also availabel inside either { ... } just like scope.async?
+
+Simon Vergauwen [Λrrow]  16 hours ago
+Yes
+------------------------------------------------------------
+IO <A> is depreciated, use suspend () -> A
+ It’s actually deprecated in favor of suspend () -> A More info here: https://arrow-kt.io/docs/effects/io/
+
+Either plays nice with it because most if not all Either relevant functions are inline and they can be mixed transparently with suspend
+what about IO.fx {...} ? is depreciated too?
+yes, IO bind is now just suspend function application. The entire IO data type is gone in 0.13.x (edited) 
+You can use the either DSL instead if you’re dealing with suspend functions. Be aware that this will not catch exceptions. If you need that then use suspend Either.catch { throw Throwable("") } in combination. Migrating from IO and IO.fx to suspend and Either was fairly straightforward in my experience. Removes the need for dealing with Throwables and nested IO<Either<Error, Unit>>
+e.g:
+suspend fun insert(val item: Item): Either<Error, Unit> = 
+either {
+  repo.save(item).bind()
+}
+
+-----------------------------------------------------
+
+IO <A>  https://www.pacoworks.com/2019/12/15/kotlin-coroutines-with-arrow-fx/
+replace IO <A> https://jorgecastillo.dev/please-try-to-use-io
+Either handle Error https://arrow-kt.io/docs/patterns/error_handling/
+old IO https://lambda.show/blog/arrow-io-monad
+
+either { ... } usage
+suspend fun prepareEither(): Either<CookingException, Salad> =
+  either {
+    val lettuce = takeFoodFromRefrigerator().bind() // they need to be `suspend` function
+    val knife = getKnife().bind()
+    val salad = lunch(knife, lettuce).bind()
+    salad
+  }
+
+arrow kt 0.9 old way 
+fun attackEither(): Either<NukeException, Impacted> =
+  binding {
+    val (nuke) = arm()
+    val (target) = aim()
+    val (impact) = launch(target, nuke)
+    impact
+  }
+  
+attackEither()
+
+new way,  https://arrow-kt.io/docs/effects/io/#suspend----eithere-a
+
+import arrow.core.computations.either
+
+suspend fun suspendProgram(): Either<PersistenceError, ProcessedUser> =
+  either {
+    val user = fetchUser().bind() // IO suspend function
+    val processed = user.process().bind()
+    processed
+  }
+------------------------------------------------------------------
+
+IO <A> is depreciated, also IO.fx { ... }
+IO <A> is replaced by suspend () -> A
+https://arrow-kt.io/docs/effects/io/
+
+IO<Either<E, A>> replaced by suspend () -> Either<E, A>
+
+fun ioProgram(): IO<Either<PersistenceError, ProcessedUser>> =
+  IO.fx { ... }
+
+suspend fun suspendProgram(): Either<PersistenceError, ProcessedUser> =
+  either { ... }
+
+Either plays nice with it because most if not all Either relevant functions are inline and they can be mixed transparently with suspend
+
+IO bind is now just suspend function application. The entire IO data type is gone in 0.13.x 
+
+You can use the either DSL instead if you’re dealing with suspend functions. 
+Be aware that this will not catch exceptions. If you need that then use 
+suspend Either.catch { throw Throwable("") } in combination. Migrating from IO and IO.fx 
+to suspend and Either was fairly straightforward in my experience. 
+Removes the need for dealing with Throwables and nested IO<Either<Error, Unit>>
+e.g:
+suspend fun insert(val item: Item): Either<Error, Unit> = 
+either {
+  repo.save(item).bind()
+}
+
+
+----------------------------------------------------------
+https://arrow-kt.io/docs/0.10/fx/async/
+https://www.pacoworks.com/2019/12/15/kotlin-coroutines-with-arrow-fx/
+https://stackoverflow.com/questions/63676633/difference-between-kotlin-arrow-io-io-fx-io-effect
+
+two ways do coroutine, kotlinx-coroutines and arrow-kt
+CoroutinesScope.launch{
+    with(Dispatchers.Main){
+        updateUI
+    }
+    with(Dispatchers.IO){
+        doIO
+    }
+}
+
+val background = IO.dispatchers().io()
+val main = IO.dispatchers().default()
+IO.fx {
+    continueOn(backgroud)
+    doIO
+    continueOn(main)
+    updateUI
+    effect { doIO }.bind() // will run 
+    effect { doIO } // won't run until .bind()
+} // won't run until .unsafeRunSync() or .unsafeRunAsync()
+
+this doIO will wait for updateUI
+---------------------------------------------
+val r1 = CoroutineScope(NonCancellable).async(Dispatchers.IO) {...}
+val r2 = CoroutineScope(NonCancellable).async(Dispatchers.IO) {...}
+this r1 and r2 are async, r2 won't wait for r1, r1 won't block r2
+use r1.await() or r2.await() to block for result
+

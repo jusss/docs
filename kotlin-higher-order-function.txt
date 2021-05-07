@@ -1,5 +1,23 @@
+
+:: pass reference itself
+
+ val result2 = gson.fromJson(result, JsonResult2::class.java)
+pass class JsonResult2 itself to gson.fromJson, so it can use the class not object
+
+test2(::test1) pass function test1 itself to test2
+
+fun main (){
+    println(test2(test1_))
+    println(test2(::test1))
+}
+
+fun test1(x: Int): Int = x +1
+fun test2(f: (Int) -> Int): Int = f(2)
+val test1_ = {x:Int -> x + 1}
+-----------------------------------------------
+
+
     val reverse2 = {i: String -> i.reversed()}
 
     //1. function take function as parameter, function need to be defined with lambda expression?
-    // fun reverse1(val x: String): String = x.reversed() is not taken by fmap(f: (String) -> String)
-   // fmap(reverse1) is not ok, but fmap(reverse2) is ok
+    // fun reverse2(val x: String): String = x.reversed() is not take by fmap(f: (String) -> String)
