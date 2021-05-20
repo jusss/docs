@@ -1,0 +1,26 @@
+Android MediaPlayer only play three seconds, because it's canceled by GC
+
+https://stackoverflow.com/questions/6241687/mediaplayer-stop-playing-after-about-5-seconds
+
+so set it as private vairiable to avoid that or companion object
+
+    companion object {
+        var mediaPlayer = MediaPlayer()
+    }
+
+
+class MainActivity : AppCompatActivity() {
+    private var mediaPlayer : MediaPlayer = MediaPlayer()
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        val url2 = "http://192.168.31.152:8080/test.mp3"
+        mediaPlayer.apply {
+            reset()
+            setAudioStreamType(AudioManager.STREAM_MUSIC)
+            setDataSource(url2)
+            prepareAsync()
+            setOnPreparedListener({player -> player.start() })
+        }
+    }
+}
