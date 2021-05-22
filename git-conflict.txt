@@ -1,4 +1,11 @@
 git pull when it confilicts
 it will show the confilict files, then vim them to change
-<<< is a version >>> is another version , comment one of them, or delete <<< === and >>>
-then git add those files, git commit -m 'fix conflicts' 
+<<<  to === is local version without push  
+
+=== to >>> is remote version , 
+
+comment one of them, or delete <<< === and >>>
+then git add those files, 
+git commit -m 'fix conflicts' 
+git push
+git pull
