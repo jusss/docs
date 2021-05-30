@@ -1,3 +1,24 @@
+update lineageos 17.1 to 18.1
+download lineageos from https://laotzu.ftp.acc.umu.se/mirror/lineageos/full/lavender/20210525/lineage-18.1-20210525-nightly-lavender-signed.zip 
+download gapps from https://mva2.androidfilehost.com/dl/Wpxg-0s9q3gpY_JQdg_vVQ/1622442258/2188818919693781602/MindTheGapps-11.0.0-arm-20210412_124103.zip? 
+reference https://wiki.lineageos.org/gapps.html 
+
+enable adb in Development mode 
+choose usb preferences to `File Transfer` not `No data transfer`
+
+then `adb shell` check if it works,
+copy all pictures and videos to /sdcard/backup
+adb pull /sdcard/backup/ ./AndroidMedia/
+adb push MindTheGapps-11.0.0-arm-20210412_124103.zip /sdcard/ 
+adb push lineage-18.1-20210525-nightly-lavender-signed.zip /sdcard/
+
+in Development mode enable 'advanced reboot', then reboot into recovery
+then get into twrp,"Wipe" swip to factory reset, not "Format", because it formats your ROM
+flash lineageos then flash gapps, flash them at the same time, then reboot system,
+
+REMEMBER! put sim card out of redmi note 7, use redmi2 create a wifi spot cross gfw 
+then redmi note 7 connect it
+-------------------------------------------------------------
 gapps and lineageos need to be flash at the same time, otherwise wipe lineageos data and cache in recovery then flash gapps
 use TWRP recovery to flash gapps, lineageos has signature auth,
 download TWRP from https://twrp.me/ 
