@@ -1,3 +1,7 @@
+download client_linux_arm7 and run it inside termux on android,
+then `adb shell` run `ssh xxx` over that kcp tunnel,
+ssh comes with android in lineage os 18.1
+--------------------------------
 consider wireguard over kcptun for udp proxy
 -----------------------------------
 https://github.com/xtaci/kcptun
