@@ -1,0 +1,45 @@
+android could use miracast to cast screen to windows through wifi
+but google remove miracast, so does AOSP, so lineage OS too
+google use chromecast now
+
+and windows 10 use miracast as default, if your android ROM can do miracast,
+then it can cast screen on windows, if it's lineage OS , then no 
+
+there's another way, use scrcpy, through adb show android screen on windows,
+and even you can operate it
+
+https://github.com/Genymobile/scrcpy 
+
+https://wiki.lineageos.org/how-to/adb-over-wifi
+on Android 11, lineageos 18.1
+enable use debugging, wireless debugging, choose pair device with pairing code
+
+on Windows
+adb pair android-ip:port
+input pair code
+scrcpy 
+
+below Android 11, lineageos 17.1
+on android
+enable wireless debugging
+
+on windows
+adb tcpip 5555
+adb connect android-ip:5555
+scrcpy --window-borderless -f -Sw
+
+
+
+also there're some android phones could do video output to monitor directly,
+like Samsung phone with dex, OnePlus phone
+
+android development mode has force desktop mode on second display 
+it needs your phone support DisplayPort Alt Mode,
+Qualcomm 835, 845, 855 support it, 
+Samsung Tab S4, call it DeX 
+Tab S5e, S6, S6 Lite, S7, S7+, iPad Air 4th, iPad Pro 5th,
+iPhone all series
+Huawei Mate and P
+OnePlus 7/7Pro, 8
+Asus ROG, II, 3
+

@@ -1,0 +1,27 @@
+mkdir pack
+dpkg -x ghc.deb pack
+cd pack # usr/local/bin
+# add cabal into ghc.deb
+cp cabal usr/local/bin/
+
+mkdir DEBIAN
+vim DEBIAN/control
+
+Package: ghc
+Version: 8.10.5
+Depends: libnuma-dev, build-essential, llvm-dev
+Section: custom
+Priority: optional
+Architecture: arm64
+Essential: no
+Maintainer: None
+Description: ghc on arm64
+
+# vim DEBIAN/control, arm64, add libnuma-dev, build-essential, llvm-dev dependencies
+
+dpkg -b pack
+
+# add description, run ghci, cabal update
+
+# write a wiki, 1, install proot-distro, debian-buster in termux, 2, install ghc.deb 3, ghci, cabal update, to run 
+

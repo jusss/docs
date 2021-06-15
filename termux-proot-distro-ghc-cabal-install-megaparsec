@@ -1,0 +1,8 @@
+download cabal-install from downloads.haskell.org
+it's binary file
+./cabal update
+apt install llvm-dev build-essential libnuma-dev
+./cabal install megaparsec
+cp cabal /usr/bin/
+cabal install --lib megaparsec
+
