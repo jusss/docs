@@ -1,0 +1,58 @@
+1. with root, https://github.com/termux/termux-app/issues/77
+2. without root, adb port forwarding, enable telnetd or sshd on termux
+3. without root, ttyd, https://github.com/tsl0922/ttyd
+
+----------------------------------
+this can do phone and PC are not in the same LAN,
+they're connected by usb cable, I wonder if this can bring a good stuff to ssh -XY, or tigerVNC?
+
+on termux
+proot-distro login debian-buster
+useradd -m john
+passwd john
+apt install openssh-server
+vim /etc/ssh/sshd_config
+Port 60022
+#enable root login or not
+/etc/init.d/ssh start
+
+connect your phone to PC by usb cable
+
+on PC
+adb shell #check if it's connected, if it's not, then choose "file transform" over "charge only" on use option
+adb forward tcp:60022 tcp:60022
+ssh -p 60022 john@localhost # don't use root, it can't be used if you enabled it in /etct/ssh/sshd_config
+--------------------------------------------
+on termux 
+
+apt install xfce4 xfce4-goodies
+apt install tightvncserver
+vncserver #set your vnc password
+vncserver -kill :1
+vim  ~/.vnc/xstartup
+xrdb $HOME/.Xresources
+startxfce4 &
+
+chmod +x ~/.vnc/xstartup
+vncserver
+
+on PC
+adb forward tcp:5901 tcp:5901
+download tigervnc or tightvnc viewer, then 
+https://jaist.dl.sourceforge.net/project/tigervnc/stable/1.11.0/vncviewer64-1.11.0.exe
+https://www.tightvnc.com/download/2.8.59/tightvnc-2.8.59-gpl-setup-64bit.msi
+connect to 127.0.0.1:5901 with that vnc password
+----------------------------
+on termux 
+proot-distro login debian-buster
+/etc/init.d/ssh start 
+
+on Linux
+adb forward tcp:60022 tcp:60022
+ssh -p 60022 john@localhost #check if it works
+tty2$ Xorg :1 vt2
+env DISPLAY=:1 ssh -p 60022 -XY john@127.0.0.1
+xterm&
+switch to tty2, now it has a xterm, run `startxfce4`
+
+it has a better screen resolution than vnc 

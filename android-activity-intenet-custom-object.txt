@@ -1,0 +1,11 @@
+1.         val _result  : ArrayList<DownloadStructure> = arrayListOf()
+            val intent = Intent(mainThis, MultipleDownloadActivity::class.java)
+            intent.putExtra("download", _result as Serializable)
+            startActivity(intent)
+2.
+        val _fromIntent : ArrayList<DownloadStructure> = intent.extras?.get("download") as ArrayList<DownloadStructure>
+
+
+data class A(val c:B, val d:E) : Serializable
+
+then B and E must inherit Serializable 

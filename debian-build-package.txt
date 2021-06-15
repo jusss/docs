@@ -1,0 +1,140 @@
+http://downloads.haskell.org/
+download ghc and cable-install
+
+ghc-arm64
+http://downloads.haskell.org/~ghc/8.10.5/ghc-8.10.5-aarch64-deb10-linux.tar.xz
+reference https://www.haskell.org/ghc/blog/20200515-ghc-on-arm.html and that configure parameter no need
+
+in aid learning debian buster arm64
+1. 
+apt install libc-dev # libc6-dev special
+
+2.
+tar -xvJf ghc.tar.xz
+cd ghc-8.10.5
+vim configure
+3947 G
+for ... in -V --version -qversion -v,  delete that -V and -qversion, those two parameters are invalid
+
+3.
+./configure     # you can specify the path with --prefix=/path/to/install the add to PATH or default is /usr/local/
+
+4. make install
+
+5. ghci
+
+install cabal-install
+http://downloads.haskell.org/~cabal/cabal-install-latest/cabal-install-3.4.0.0-aarch64-ubuntu-18.04.tar.xz
+it's a binary file, no need to compile, just add it to PATH
+
+6. build a deb package
+https://linuxconfig.org/easy-way-to-create-a-debian-package-and-local-package-repository
+./configure --prefix=/root/User/demo/BuildPackage
+make install # will install on that path
+
+cd /root/User/demo/BuildPackage
+ls
+bin lib share
+mkdir DEBIAN
+vim DEBIAN/control
+
+Package: ghc
+Version: 8.10.5
+Section: custom
+Priority: optional
+Architecture: all
+Essential: no
+Maintainer: None
+Description: ghc on arm64
+
+cd /root/User/demo/
+copy this BuildPackage to PC, 'cause 
+dpkg-deb --build BuildPackage/     # failed to fstat ar member file data.tar.xz operation not permitted
+then on PC, run dpkg -b BuildPackage
+
+https://stackoverflow.com/questions/11307465/destdir-and-prefix-of-make
+./configure --prefix=/path/to/install/on/another/machine
+make install DESTDIR=/path/to/pack/on/current/machine, 
+but this would be installed on /path/to/pack/on/current/machin/path/to/install/on/another/machine/bin
+it may not be DESTDIR, it may be INSTALL_PREFIX or 
+make install prefix=/path/to/pack, this would be installed on /path/to/pack/bin
+
+echo $PREFIX on termux, it is /data/data/com.termux/files/usr
+
+1. dpkg -b pack-ghc,  should be pack-ghc/data/data/com.termux/files/usr/bin
+
+so ./configure --prefix=/data/data/com.termux/files/usr
+make install prefix=/root/User/demo/pack-ghc
+mkdir /root/User/demo/pack-ghc/DEBIAN
+vim /root/User/demo/pack-ghc/DEBIAN/control
+tar -cvf pack-ghc.tar /root/User/demo/pack-ghc
+cp pack-ghc.tar /sdcard/
+on PC
+adb pull /sdcard/pack-ghc.tar Downloads\
+tar -xvf pack-ghc.tar
+cd pack-ghc
+dpkg -b pack-ghc
+
+
+
+
+
+equivs, dh_make, debuild, check
+
+INSTALL TO SPECIFIC PATH
+
+https://stackoverflow.com/questions/23077151/set-install-path-using-dpkg
+dpkg install package to specific path, 'cause termux root is /data/data/com.termux/files/usr/
+dpkg-deb -x ghc.deb $PREFIX
+--------------------------------------------------
+succesful, pack a deb for adi learning debian on arm, not termux
+
+on aid learning
+
+cd ghc-8.10.5/
+./configure    ### use default, don't use --prefix= to point path 
+ mkdir pack   ### don't use absolute path
+make install DESTDIR=pack/   ### don't use absolute path
+
+tar -cvf pack.tar pack
+ cp pack.tar /sdcard/
+
+on PC
+
+adb pull /sdcard/pack.tar ~
+cd ~
+tar -xvf pack.tar
+mkdir pack/DEBIAN
+vim pack/DEBIAN/control
+
+dpkg -b pack ### build the package to deb
+
+on another debian arm machine
+
+dpkg -i pack.deb
+
+------------------------------------------------------------------------
+
+termux, need make install prefix=/data/data/...,   not configure --prefix
+-----------------------------------------------------
+succesful, run ghc on termux
+
+termux is different from chroot
+https://wiki.termux.com/wiki/Differences_from_Linux
+
+install debian rootfs on termux
+https://wiki.termux.com/wiki/PRoot#Installing_Linux_distributions
+
+pkg install proot
+pkg install proot-distro
+proot-distro install debian-buster
+proot-distro login debian-buster
+dpkg -i pack.deb
+
+apt update
+apt install libnuma-dev
+apt install build-essential
+ghci
+
+
+
