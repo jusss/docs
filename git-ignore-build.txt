@@ -1,0 +1,5 @@
+project's .gitignore
+add `build` will ignore all build directory
+in Android Studio, build dir will be orange
+D:\git\mobile\RemoteFileManager\.gitignore
+same level to app .gradle or build.gradle
