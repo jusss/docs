@@ -1,3 +1,8 @@
+scrcpy, control android in PC
+gnirehtet, android use PC's network, reverse usb-tethering
+android 11, use adb pair to connect over wifi, not adb connect
+
+----------------------------
 adb reboot recovery
 ---------------------------
 click build number seven times, get into developers mode, enable adb
