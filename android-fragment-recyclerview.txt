@@ -1,0 +1,22 @@
+in Fragement.kt
+0.
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View? {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_upload, container, false)
+    }
+
+1.
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        initView()
+    }
+
+2.
+    fun initView(){
+        val recyclerView = activity?.findViewById<RecyclerView>(R.id.recycler_view)
+        recyclerView?.layoutManager = LinearLayoutManager(context)
+        val adapter = MultipleUploadAdapter(context!!)
+        recyclerView?.setAdapter(adapter)
+        adapter.notifyDataSetChanged()
+    }

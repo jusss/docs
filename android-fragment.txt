@@ -1,0 +1,65 @@
+fragments need layout on an activity, just like adapter on ListView
+https://www.cnblogs.com/liuleliu/p/12304794.html
+
+0. generate UploadFragment.kt and its fragment_upload.xml by right-click new fragment blank fragment
+   and DownloadFragment, BackupFragment
+
+1. on activity_main.xml layout fragment
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/tab"
+        android:layout_below="@id/titlebar">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/upload"
+            android:text="upload"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/download"
+            android:text="download"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/backup"
+            android:text="backup"/>
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tablet"
+        android:layout_below="@+id/tab"/>
+
+
+2. on MyActivity.kt
+
+        findViewById<Button>(R.id.upload).setOnClickListener {
+            supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.tablet, UploadFragment())
+                .commit()
+        }
+
+        findViewById<Button>(R.id.download).setOnClickListener {
+            supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.tablet, DownloadFragment())
+                .commit()
+        }
+        findViewById<Button>(R.id.backup).setOnClickListener {
+            supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.tablet, BackupFragment())
+                .commit()
+        }
+
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.tablet, UploadFragment())
+            .commit()
