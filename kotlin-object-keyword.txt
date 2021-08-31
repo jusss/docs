@@ -1,0 +1,6 @@
+object: InterfaceClass(){override fun ...}  put cursor on object, press Alt-Enter, implement memebers, Ctrl-A, Enter, generate all members
+
+class Class{ companion object { } }  same static class in Java to store global variable
+
+object Singleton() {}  same as singleton in java, it means class only has one instance
+

@@ -1,0 +1,5 @@
+kotlin auto generate interface 
+if CountDownTimer is an interface
+then object: CountDownTimer(...)
+object is red, now put cursor on object, press Alt Enter, choose "implement members"
+then press Ctrl-a to choose all method, press Enter to generate all

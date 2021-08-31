@@ -1,0 +1,18 @@
+            CoroutineScope(Dispatchers.Main).launch {
+                delay(3000)
+                viewHolder.pause.isClickable = true
+                viewHolder.pause.isEnabled = true
+            }
+
+
+or
+
+Timer().schedule(timerTask { doSomething }, 3000)
+or Timer().schedule(3000) { doSomething }
+
+Handler().postDelayed( {doSomething} , 3000)
+or Handler(Looper.getMainLooper()).postDelayed( {lambda}, 3000)
+
+{doSomething} is a lambda expression here, otherwise you need to define a function
+
+lambda reduces function definition

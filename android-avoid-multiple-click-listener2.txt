@@ -1,0 +1,290 @@
+function visit and change outside variable, is closure
+
+function's closure is very like OOP's instance, they implement the same function,
+run one same function repeatly, and get different result, and store that result out side of function
+so it can't be reset in every function call
+ 
+kotlin doesn't have non-local keyword, so you can't change the outside variable inside the function
+but function can visit it, if they are in same scope
+haskell can't define function inside another function, and variable is constant 
+
+1. function closure
+js
+function initCounter() {
+  var x = 0;
+  function counter() {
+    x += 1;
+    console.log(x);
+  }
+  return counter;
+}
+
+counter = initCounter();
+
+counter() // 1
+counter() // 2
+counter() // 3
+##############
+python
+def counter():
+  count=0
+  def inner():
+    nonlocal count
+    count += 1
+    print(count)
+  return inner
+
+c = counter()
+c() // 1
+c() // 2
+c() //3
+
+2. OOP use object.attribute to store value that inner function changed
+kotlin
+class Counter() {
+  var count: Int
+  init {
+    count = 0
+  }
+  fun getCount(){
+    count += 1
+    println(count)
+  }
+}
+
+val counter = Counter()
+counter.getCount() // 1
+counter.getCount() // 2
+counter.getCount(0 // 3
+
+3. function and OOP, on closure, they always want to change the variable out side of function,
+so the function every time run, won't reset that variable
+///////////////////////////////////////////////////////
+new two
+
+    override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
+
+
+
+        viewHolder.pause.setOnClickListener {
+            if (System.currentTimeMillis() - MultipleUploadProgress.list[position].pauseClickTime > 3000L){
+                println("*** ${System.currentTimeMillis()} was clicked!")
+                println("*** position is ${position}")
+                println("*** pauseClickTime is ${MultipleUploadProgress.list[position].pauseClickTime}")
+                MultipleUploadProgress.list[position].pause = MultipleUploadProgress.list[position].pause.not()
+                if (!MultipleUploadProgress.list[position].pause) remoteList.append(MultipleUploadProgress.list[position])
+            }
+            MultipleUploadProgress.list[position].pauseClickTime = System.currentTimeMillis()
+        }
+
+
+        viewHolder.itemView.setOnClickListener{
+
+            if (System.currentTimeMillis() - MultipleUploadProgress.list[position].cancelClickTime > 3000L){
+                if (MultipleUploadProgress.list[position].percent != 100) {
+                    if (!MultipleUploadProgress.list[position].cancel) {
+                        cancelDialog.pop(context, MultipleUploadProgress.list[position])
+                    }
+                }
+                else {
+                    cancelDialog.removeFromList(context, MultipleUploadProgress.list[position])
+                }
+            }
+
+            MultipleUploadProgress.list[position].cancelClickTime = System.currentTimeMillis()
+        }
+
+   }
+
+
+
+//////////////////////////////////////////////
+new one
+
+in Android, avoid multiple click in the same time
+
+you can't change function binding, but you can change lambda binding
+like fun f() = {}, you can't re-assign function f
+but var f = {}, but you can re-assign f = {println("hello")}
+{} :: () -> Unit
+{println("hello")} is { _ -> println("hello") } or { _, __, ___ -> println("hello") }
+
+three parts
+
+part one, implement View.setOnClickListener 
+
+    class AvoidMultipleClick2 : View.OnClickListener{
+        var initTime = 0L
+        var clickListener: () -> Unit = {}
+        override fun onClick(view: View){
+            if (System.currentTimeMillis() - initTime > 3000L){
+                clickListener()
+            }
+            initTime = System.currentTimeMillis()
+        }
+    }
+
+part two, create this object in ViewHolder class, so this object can only initialize once, if you put it in onBindViewHolder function, it will be repeatly initialize
+
+    class ViewHolder(view: View) : RecyclerView.ViewHolder(view){
+
+          val avoidMultiplePauseClick = AvoidMultipleClick2()
+          val avoidMultipleCancelClick = AvoidMultipleClick2()
+     }
+
+part three, call it in onBindViewHolder, so it can be called repeatly, but avoidMultiplePauseClick.initTime won't reset, it always keep one latest click time
+
+    override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
+
+       // put those at first, before it call by View.setOnClickListener
+       viewHolder.avoidMultiplePauseClick.clickListener = {
+           println("*** ${System.currentTimeMillis()} was clicked!")
+           println("*** position is ${position}")
+           MultipleUploadProgress.list[position].pause =
+               MultipleUploadProgress.list[position].pause.not()
+           if (MultipleUploadProgress.list[position].pause) {
+               viewHolder.speed.text = ""
+               viewHolder.pause.setImageResource(R.drawable.play)
+           } else {
+               viewHolder.pause.setImageResource(R.drawable.pause)
+               remoteList.append(MultipleUploadProgress.list[position])
+           }
+       }
+
+        viewHolder.avoidMultipleCancelClick.clickListener = {
+            if (MultipleUploadProgress.list[position].percent != 100) {
+                if (!MultipleUploadProgress.list[position].cancel) {
+                    cancelDialog.pop(context, MultipleUploadProgress.list[position])
+                }
+            }
+            else {
+                cancelDialog.removeFromList(context, MultipleUploadProgress.list[position])
+            }
+        }
+
+       
+       // call it
+        viewHolder.pause.setOnClickListener(viewHolder.avoidMultiplePauseClick)
+        viewHolder.itemView.setOnClickListener(viewHolder.avoidMultipleCancelClick)
+    }
+
+
+
+
+/////////////////////////////////////////////////////////////////////
+old one
+
+in Adapter out ViewHolder
+java
+    abstract class SingleClickListener implements View.OnClickListener{
+        private long mLastClickTime = 0L
+        public void onClick(View view){
+            //
+            if(time - mLastClickTime < 1000){
+                onSingleClick(view);
+            }
+        }
+        protected abstract void onSingleClick(View view);
+    }
+
+abstract class could expand interface, like Monad expand Functor
+
+kotlin,  when to compare Long as condition, remember use 3000L not 3000
+
+4.
+     abstract class SingleClickListener: View.OnClickListener {
+        private var initTime = 0L
+        var index: Int = 0
+        var viewHolder: ViewHolder? = null
+        override fun onClick(view: View){
+            if (System.currentTimeMillis() - initTime > 3000L){
+                onSingleClick(view, index, viewHolder)
+            }
+            initTime = System.currentTimeMillis()
+        }
+        abstract  fun onSingleClick(view: View, index: Int, viewHolder: ViewHolder?)
+    }
+
+
+   
+
+in fun onBindViewHolder, every refresh, it will run, so 
+view.setOnClickListener(object: SignleClickListener{...}) will create repeat, initTime will be 0L repeat
+in class ViewHolder, it will only run once, so define this object in it
+5.
+class ViewHolder(view: View): RecyclerView.ViewHolder(view){
+val pauseClickListener: SingleClickListener
+  val itemViewClickListener: SingleClickListener
+
+init {
+                       pauseClickListener = object: SingleClickListener(){
+                override fun onSingleClick(view: View, index: Int, viewHolder: ViewHolder?){
+                        println("*** ${System.currentTimeMillis()} was clicked!")
+                        println("*** position is ${index}")
+                        MultipleUploadProgress.list[index].pause =
+                            MultipleUploadProgress.list[index].pause.not()
+                        if (MultipleUploadProgress.list[index].pause) {
+                            viewHolder?.speed?.text = ""
+                            viewHolder?.pause?.setImageResource(R.drawable.play)
+                        } else {
+                            viewHolder?.pause?.setImageResource(R.drawable.pause)
+                            remoteList.append(MultipleUploadProgress.list[index])
+                        }
+                }
+            }
+
+            itemViewClickListener = object: SingleClickListener(){
+                override fun onSingleClick(view: View, index: Int, viewHolder: ViewHolder?) {
+                        if (MultipleUploadProgress.list[index].percent != 100) {
+                            if (!MultipleUploadProgress.list[index].cancel) {
+                                cancelDialog.pop(view.context, MultipleUploadProgress.list[index])
+                            }
+                        }
+                        else {
+                            cancelDialog.removeFromList(view.context, MultipleUploadProgress.list[index])
+                        }
+                }
+            }
+
+}
+
+then use it in onBindViewHolder
+6.
+ override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
+        viewHolder.pauseClickListener.index = position // at first, so every refresh and click would get right position 
+        viewHolder.itemViewClickListener.index = position
+        viewHolder.pauseClickListener.viewHolder = viewHolder
+        viewHolder.itemViewClickListener.viewHolder = viewHolder
+
+
+        viewHolder.pause.setOnClickListener(viewHolder.pauseClickListener)
+        viewHolder.itemView.setOnClickListener(viewHolder.itemViewClickListener)
+}
+
+
+-------------------------------------------------------------------------------------
+another 
+
+        viewHolder.pause.setOnClickListener {
+            viewHolder.pause.isClickable = false  // won't be clickable
+            viewHolder.pause.isEnabled = false  // won't get focus
+            MultipleUploadProgress.list[position].pause = MultipleUploadProgress.list[position].pause.not()
+            if (MultipleUploadProgress.list[position].pause) {
+                viewHolder.speed.text = ""
+//                    // pausing, wait IO signal
+////                viewHolder.pause.setImageResource(R.drawable.next)
+////                // receive event bus then click again
+                viewHolder.pause.setImageResource(R.drawable.play)
+            } else {
+                viewHolder.pause.setImageResource(R.drawable.pause)
+                remoteList.append(MultipleUploadProgress.list[position])
+            }
+            CoroutineScope(Dispatchers.Main).launch {
+                delay(3000)
+                viewHolder.pause.isClickable = true
+                viewHolder.pause.isEnabled = true
+            }
+        }
+
+
+

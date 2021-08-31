@@ -1,0 +1,11 @@
+android recyclerview all inside adapter are reused
+there's no private variable in adapter
+
+for example, define var uploadCount = 0L inside ViewHolder class
+
+when data source is less than 5, it means items less than 5,
+every item has its own uploadCount, change item 1's uploadCount won't affect others,
+but when there're 6 items, item 6 and item 1 share the one same uploadCount,
+change item 1 means change item 6
+
+so only way is define uploadCount in the data source

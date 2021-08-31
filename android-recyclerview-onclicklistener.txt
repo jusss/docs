@@ -1,0 +1,8 @@
+recyclerview implement onClickLisener to get position on activity
+
+make an interface A, implement function clickReturnPosition
+Activity implement that interface A by implement clickReturnPosition, 
+inside it, it can visit Activity attribute
+use adapter = Adapter(this) in Activity, so adapter will have that function
+inside adapter's onBindViewHolder, view.setOnClickListener, run this.clickReturnPosition
+

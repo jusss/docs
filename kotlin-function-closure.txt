@@ -1,0 +1,17 @@
+kotlin no need `non local` keyword to change variable out of the function
+fun main(){
+    fun sameCallDifferentResult(): () -> Unit {
+        var a = 0
+        fun inner(){
+            a = a+1
+            println(a)
+        }
+        var lambda = { a = a + 1; println(a)}
+        return ::inner
+    }
+
+    val scdr = sameCallDifferentResult()
+    scdr()
+    scdr()
+    scdr()
+}

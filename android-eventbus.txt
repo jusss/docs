@@ -1,0 +1,29 @@
+adapter only bind UI and data
+notify data change in Activity
+use EventBus to notify data changed
+
+EventBus register need activity, so receive in activity, but post in IO
+
+1. register and subscribe
+override fun onCreate {
+
+        EventBus.getDefault().register(this)
+
+}
+
+    @Subscribe
+    fun event(msg: Message){
+        if (msg.what == 22){
+            adapter.notifyDataSetChanged()
+        }
+    }
+
+ override fun onDestroy() {
+        super.onDestroy()
+        EventBus.getDefault().unregister(this)
+    }
+
+2. post in IO
+        val msg = Message.obtain()
+        msg.what = 22
+           EventBus.getDefault().post(msg)

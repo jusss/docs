@@ -1,0 +1,11 @@
+SAM Single Abstract Method
+
+if an interface only aske one function to implement, then the function could be replaced with lambda
+
+val isEven = object: IntPredicate {
+	override fun accept(i: Int): Boolean = return (i % 2 == 0)
+}
+
+could be
+
+val isEven = IntPredicate { it % 2 == 0 }

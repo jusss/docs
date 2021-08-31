@@ -1,0 +1,1 @@
+adb.exe shell settings put global overlay_display_devices none 

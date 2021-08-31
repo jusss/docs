@@ -1,0 +1,27 @@
+        viewHolder.pause.setOnClickListener {
+            viewHolder.pause.isClickable = false
+            viewHolder.pause.isEnabled = false
+            MultipleUploadProgress.list[position].pause = MultipleUploadProgress.list[position].pause.not()
+            if (MultipleUploadProgress.list[position].pause) {
+                viewHolder.speed.text = ""
+//                    // pausing, wait IO signal
+////                viewHolder.pause.setImageResource(R.drawable.next)
+////                // receive event bus then click again
+                viewHolder.pause.setImageResource(R.drawable.play)
+            } else {
+                viewHolder.pause.setImageResource(R.drawable.pause)
+                remoteList.append(MultipleUploadProgress.list[position])
+            }
+            CoroutineScope(Dispatchers.Main).launch {
+                delay(3000)
+                viewHolder.pause.isClickable = true
+                viewHolder.pause.isEnabled = true
+            }
+        }
+
+
+or
+
+https://binkery.com/archives/116001.html
+https://www.twblogs.net/a/5ef1a0034a766ac09210ba6e/?lang=zh-cn
+https://zhuanlan.zhihu.com/p/34841081

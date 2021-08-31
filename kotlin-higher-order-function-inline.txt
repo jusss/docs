@@ -1,0 +1,13 @@
+inline fun inlined(block: () -> Unit) {
+	println("before")
+	block()
+	println("after")
+}
+
+inlined { println("do something here") }
+
+inline fun inlined won't create a function, only when inlined is called, then to expand it
+
+in order to reduce the memory overhead of such higher-order functions or lambda expressions
+
+it just replaces inline function call with its definition 

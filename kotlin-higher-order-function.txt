@@ -21,3 +21,20 @@ val test1_ = {x:Int -> x + 1}
 
     //1. function take function as parameter, function need to be defined with lambda expression?
     // fun reverse2(val x: String): String = x.reversed() is not take by fmap(f: (String) -> String)
+
+
+or use inline function
+
+inline fun inlined(block: () -> Unit) {
+	println("before")
+	block()
+	println("after")
+}
+
+inlined { println("do something here") }
+
+inline fun inlined won't create a function, only when inlined is called, then to expand it
+
+in order to reduce the memory overhead of such higher-order functions or lambda expressions
+
+it just replaces inline function call with its definition 

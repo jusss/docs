@@ -1,0 +1,3 @@
+Settings -> Phone -> Silence Unknown Callers On
+
+Do Not Distrub doesn't work

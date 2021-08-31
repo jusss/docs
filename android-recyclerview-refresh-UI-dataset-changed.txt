@@ -1,0 +1,16 @@
+adapter only refresh onBindViewHolder if data set changed
+
+in class Adapter are global variable
+
+define variable inside class ViewHolder, 
+use viewHolder.variabe to visit, this is independ, won't mess other variable, not global
+
+use eventbus send message in adapter, refresh UI with adapter.notifyDatasSetChanged in activity with receive eventbusg msg
+
+recyclerview.xml layout will refresh with onBindViewHolder after adapter.notifyDataSetChanged data source changed
+
+inside Adapter class , variable is global
+inside ViewHolder class is unique for every item
+onBindViewHolder will refresh UI after data source changed
+
+changed images define inside ViewHolder, and change in onBindViewHolder

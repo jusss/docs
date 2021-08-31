@@ -1,0 +1,6 @@
+newObject = alist[5]
+newObject.attribute = 6
+
+alist[5].attribute will be 6 too
+
+it's different with new newObject() to make a new instance

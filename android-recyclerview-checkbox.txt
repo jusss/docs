@@ -1,0 +1,18 @@
+    override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
+
+        if (dataSource[position].choosen)
+            viewHolder.checkboxImage.setImageResource(R.mipmap.selected_icon)
+        else
+            viewHolder.checkboxImage.setImageResource(R.mipmap.no_selected_icon)
+
+        viewHolder.checkboxImage.setOnClickListener {
+            dataSource[position].choosen = dataSource[position].choosen.not()
+            notifyDataSetChanged()
+        }
+    }
+
+// data source changed, but view won't, view is TextView ImageView etc, you have to set it in onBindViewHolder every time after data source changed
+by adapter.notifyDataSetChanged to call onBindViewHolder to refresh UI
+
+in Activity, use adapter.notifyDataSetChanged() to call onBindViewHolder
+in Adapter, inside onBindViewHolder, just use notifyDataSetChanged() or notifyItemChanged

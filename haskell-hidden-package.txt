@@ -1,0 +1,11 @@
+Could not load module ‘Network.HTTP.Types’, 
+It is a member of the hidden package ‘http-types-0.12.3’.
+
+
+rm -rf ~/.ghc/
+cabal install --lib warp http-types wai 
+
+or add it as a dependency in cabal file
+
+cabal init -- to generate config file
+

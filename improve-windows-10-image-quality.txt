@@ -1,0 +1,27 @@
+Redmi Note 7 Lineage OS 18.1 Android 11
+Cube i6 Air Windows 10 32bit
+scrcpy win32 v1.17
+
+1. use otg connect android to windows tablet
+2. developer options, enable Force Desktop mode, Force activies to be resizable, Enable freeform windows and Enable freeform siecompat
+3. there're two ways to set second display's resolution
+        one is use developer options's Simulate secondary displays
+        another is `adb shell settings put global overlay_display_devices 2048x1536/300` , change 2048x1536/300 to `none`  to close it
+4. right click on scrcpy.exe -> Properties -> Compatibility -> Change high DPI settings ->
+    Override high DPI scaling behavior -> Scaling performed by Application
+    this will solve fuzzy fonts and blur icons show on windows 10, this should improve VNC image quality
+5. on windows 10, run `scrcpy.exe --display 1 --window-borderless -f -Sw`, if display 1 is not available, it may be 2 or 3, check the error message
+
+'cause connected by usb type-c cable, so no need for adb over wifi, just run scrcpy will be ok
+before that, remember run `adb shell` to check if it's connected, if not, then choose MTP as usb connection option
+if you want use adb over wifi, then run `adb pair android-ip:port` input pair code, then run `scrcpy`
+make sure you enable adb wireless debugging first
+2048x1536 is tablet's resolution, change it to your screen's resolution, and 300 is density, like scale, if fonts and icons too big or small, change it
+
+windows 32bit, scrcpy can't use --render-driver opengl, it cause a blank screen, as default it uses direct3d
+
+https://github.com/jusss/docs/blob/bla2/android-screen-cast-windows
+https://github.com/Genymobile/scrcpy/issues/2114
+https://github.com/Genymobile/scrcpy/issues/1413
+https://github.com/Genymobile/scrcpy/issues/40
+https://www.google.com/search?q=scrcpy+desktop+mode+&rlz=1CDGOYI_enUS879US879&hl=en-US&sxsrf=ALeKk00tbDRaWQEsf-eDJbwAQIuiiGAKFg%3A1625252223065&ei=f2HfYPi4A8uTr7wPwbC_kA0&oq=scrcpy+desktop+mode+&gs_lcp=ChNtb2JpbGUtZ3dzLXdpei1zZXJwEAMyBggAEBYQHjIFCAAQhgMyBQgAEIYDMgUIIRCgAToECAAQR1DbNVi1SWC7ugFoAHABeACAAZICiAGXIZIBBjAuMTkuNJgBAKABAcgBCMABAQ&sclient=mobile-gws-wiz-serp

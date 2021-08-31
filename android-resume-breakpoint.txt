@@ -1,0 +1,268 @@
+use append implement resume-breakpoint
+
+    fun append(obj: MultipleUploadStructure){
+        obj.uploading = true
+        var realUrl = ""
+        obj.uploadAddr = (obj.uploadAddr.dropLast(6) + "APPEND").replace(" ","%20")
+
+//        FileNameCache.video.add(obj.fileName)
+        println("--- appending file name is ${obj.fileName}")
+        println("--- appending file path is ${obj.uploadAddr}")
+
+        CoroutineScope(Dispatchers.IO).launch {
+            // same file name check
+            try {
+                var output = httpClient.post<HttpResponse>(obj.uploadAddr)
+
+//                println(output.status)
+//                println(output.headers)
+                println("--- this is append redir addr ${output.headers["Location"]}")
+                realUrl = output.headers["Location"]?:""
+            }
+            catch (e: Exception){
+                e.printStackTrace()
+            }
+
+            val readInputStream = File(obj.filePath).inputStream()
+            val count = obj.fileSize
+            val result = httpClient.post<ByteWriteChannel>(realUrl) {
+                body = StreamAppend(readInputStream, count, obj)
+            }
+        }
+    }
+
+
+
+    fun upload(obj: MultipleUploadStructure){
+        obj.uploading = true
+        var realUrl = ""
+
+//        FileNameCache.video.add(obj.fileName)
+        println("--- uploading file name is ${obj.fileName}")
+        println("--- uploading file path is ${obj.uploadAddr}")
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                var output = httpClient.put<HttpResponse>(obj.uploadAddr)
+                println("--- this is upload test ${output.headers["Location"]}")
+                realUrl = output.headers["Location"]?:""
+            }
+            catch (e: Exception){
+                e.printStackTrace()
+            }
+
+            val readInputStream = File(obj.filePath).inputStream()
+            val count = obj.fileSize
+            val result = httpClient.put<ByteWriteChannel>(realUrl) {
+                body = StreamUpload(readInputStream, count, obj)
+            }
+        }
+    }
+
+class StreamUpload(private val inputStream: InputStream, val total: Long, val multipleUploadStructure: MultipleUploadStructure): OutgoingContent.WriteChannelContent() {
+    override suspend fun writeTo(channel: ByteWriteChannel) {
+        val readChannel = inputStream
+        var copiedBytes: Long
+        var count : Long = 0
+        var percent = 0.00
+        var previousPercent = 0.00
+        val msg = Message.obtain()
+        msg.what = EventBusWhatValue.NOTIFICATION_UPLOADING_CHANGE
+        val uploadAddr = multipleUploadStructure.uploadAddr
+        val eventBus = EventBus.getDefault()
+        val remoteList = RemoteList()
+        var previousTimestamp = System.currentTimeMillis()
+        var now = 0L
+        var previousCount = 0L
+
+        do {
+            if (multipleUploadStructure.cancel) {
+                println("--- uploading is canceled, ${multipleUploadStructure.uploadAddr}")
+                break
+            }
+            if (multipleUploadStructure.pause) {
+                println("--- uploading pause, ${multipleUploadStructure.uploadAddr}")
+                break
+            }
+
+            copiedBytes = readChannel.copyTo(channel, 1024)
+            count =  count + copiedBytes
+            percent = (count.toDouble() / total.toDouble()) * 100
+            multipleUploadStructure.percent = percent.toInt()
+            multipleUploadStructure.currentUpload = count
+//            if (percent - previousPercent > 1){
+//                eventBus.post(msg)
+//                previousPercent = percent
+//                println("reading file now! count is $count, total is $total, percent is $percent")
+//            }
+            // refresh UI per second, but multiple item will refresh multiple per second, so refresh in activity
+            now = System.currentTimeMillis()
+            if (now - previousTimestamp > 1000) {
+                previousTimestamp = now
+                multipleUploadStructure.speed = count - previousCount
+                previousCount = count
+                eventBus.post(msg)
+                println("appending, reading file now! count is $count, total is $total, percent is $percent")
+            }
+        } while (copiedBytes > 0)
+
+        println("*** uploading loop is out")
+
+
+//        if (multipleUploadStructure.cancel) {
+//            while (RemoteList().checkFileExist(multipleUploadStructure.uploadAddr.dropLast(6) + "OPEN")) {
+//                RemoteList().delete(multipleUploadStructure.uploadAddr.dropLast(6) + "DELETE")
+//                delay(200)
+//            }
+//        }
+
+        if (multipleUploadStructure.cancel) {
+//            delay(2000)
+            msg.what = EventBusWhatValue.NOTIFICATION_UPLOADING_CANCEL
+            msg.obj = multipleUploadStructure
+//            eventBus.post(msg)
+//            msg.arg1 = multipleUploadStructure.position
+            println("--- will send delete file request, $uploadAddr")
+//            delay(3000)
+            remoteList.delete(uploadAddr.dropLast(6) + "DELETE")
+        }
+        else if (multipleUploadStructure.pause){
+            println("*** uploading pause")
+            msg.what = EventBusWhatValue.NOTIFICATION_UPLOADING_CHANGE
+            eventBus.post(msg)
+        }
+        else {
+//            multipleUploadStructure.percent = 100
+            msg.what = EventBusWhatValue.NOTIFICATION_UPLOADING_DONE
+            eventBus.post(msg)
+        }
+
+
+        readChannel.close()
+        channel.flush()
+        channel.close()
+//        if (multipleUploadStructure.pause){
+//            multipleUploadStructure.pauseable = true
+//            msg.what = EventBusWhatValue.NOTIFICATION_UPLOADING_CHANGE
+//            eventBus.post(msg)
+//            println("*** uploading, IO is closed, now pause is clickable")
+//        }
+    }
+    override val contentLength: Long = total
+}
+
+class StreamAppend(private val inputStream: InputStream, val total: Long, val multipleUploadStructure: MultipleUploadStructure): OutgoingContent.WriteChannelContent() {
+    override suspend fun writeTo(channel: ByteWriteChannel) {
+        val readChannel = inputStream
+        readChannel.skip(multipleUploadStructure.currentUpload)
+        var copiedBytes: Long
+        var count : Long = multipleUploadStructure.currentUpload
+        println("*** append skip ${count}")
+        println("*** multipleUploadStructure percent is ${multipleUploadStructure.percent}")
+//        var percent = multipleUploadStructure.percent
+        var percent = 0.00
+        var previousPercent = 0.00
+//        var previousPercent = 0
+        val msg = Message.obtain()
+        msg.what = EventBusWhatValue.NOTIFICATION_UPLOADING_CHANGE
+        val uploadAddr = multipleUploadStructure.uploadAddr
+        val eventBus = EventBus.getDefault()
+        val remoteList = RemoteList()
+        var previousTimestamp = System.currentTimeMillis()
+        var now = 0L
+
+        do {
+            if (multipleUploadStructure.cancel) {
+                println("--- appending is canceled, ${multipleUploadStructure.uploadAddr}")
+                break
+            }
+
+            if (multipleUploadStructure.pause) {
+                println("--- appending is pause")
+                break
+            }
+
+            copiedBytes = readChannel.copyTo(channel, 1024)
+            count =  count + copiedBytes
+
+            percent = (count.toDouble() / total.toDouble()) * 100
+            multipleUploadStructure.percent = percent.toInt()
+            println("--- appending percent is $percent, total is $total, count is $count")
+
+            multipleUploadStructure.percent = percent.toInt()
+            multipleUploadStructure.currentUpload = count
+
+//            if (percent - previousPercent > 1){
+//                eventBus.post(msg)
+//                previousPercent = percent
+//                println("appending, reading file now! count is $count, total is $total, percent is $percent")
+//            }
+            // refresh UI per second
+            now = System.currentTimeMillis()
+            if (now - previousTimestamp > 1000) {
+                previousTimestamp = now
+                eventBus.post(msg)
+                println("appending, reading file now! count is $count, total is $total, percent is $percent")
+            }
+
+        } while (copiedBytes > 0)
+
+        println("*** appending loop is out")
+
+        if (multipleUploadStructure.cancel) {
+//            msg.what = EventBusWhatValue.NOTIFICATION_UPLOADING_CANCEL
+//            msg.obj = multipleUploadStructure
+//            eventBus.post(msg)
+//            msg.arg1 = multipleUploadStructure.position
+            println("--- will send delete file request, $uploadAddr")
+//            delay(3000)
+            remoteList.delete(uploadAddr.dropLast(6) + "DELETE")
+        }
+        else if (multipleUploadStructure.pause){
+            println("*** pause and exit appending")
+            msg.what = EventBusWhatValue.NOTIFICATION_UPLOADING_CHANGE
+            eventBus.post(msg)
+        }
+        else {
+//            multipleUploadStructure.percent = 100
+            msg.what = EventBusWhatValue.NOTIFICATION_UPLOADING_DONE
+            eventBus.post(msg)
+        }
+
+        readChannel.close()
+        channel.flush()
+        channel.close()
+
+//        if (multipleUploadStructure.pause){
+//            multipleUploadStructure.pauseable = true
+//            msg.what = EventBusWhatValue.NOTIFICATION_UPLOADING_CHANGE
+//            eventBus.post(msg)
+//            println("*** appending, IO is closed, now pause is clickable")
+//        }
+    }
+    override val contentLength: Long = total
+}
+
+
+        viewHolder.pause.setOnClickListener {
+            if (!ClickUtil.isFastClick()){
+                MultipleUploadProgress.list[position].pause = MultipleUploadProgress.list[position].pause.not()
+//                MultipleUploadProgress.list[position].pauseable = false
+//                eventBus.post(msg)
+//                println("*** in adapter, pause icon will be not clickable")
+//                println("*** in adapter pause is ${MultipleUploadProgress.list[position].pause}")
+                if (MultipleUploadProgress.list[position].pause) {
+                    viewHolder.speed.text = ""
+                    // pausing, wait IO signal
+//                viewHolder.pause.setImageResource(R.drawable.next)
+//                viewHolder.pause.isClickable = false
+//                // receive event bus then click again
+//                Thread.sleep(2000)
+                    viewHolder.pause.setImageResource(R.drawable.play)
+//                viewHolder.pause.isClickable = true
+                } else {
+                    viewHolder.pause.setImageResource(R.drawable.pause)
+                    remoteList.append(MultipleUploadProgress.list[position])
+                }
+            }
+        }

@@ -1,0 +1,35 @@
+startActivityForResult to get activity exit result then run code after activity is done
+
+//            val intent = Intent().setType("*/*").setAction(Intent.ACTION_GET_CONTENT)
+//            startActivityForResult(Intent.createChooser(intent, "Select a file"), 111)
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+
+        if (requestCode == 111 && resultCode == RESULT_OK) {
+            val selectedFileUri =
+                    data?.data ?: Uri.EMPTY //The uri with the location of the file
+
+
+use EventBus to communicate between Activity
+receive msg
+  @Subscribe(threadMode = ThreadMode.MAIN)
+    fun event(msg: Message) {
+        if (msg.arg1 == EventBusWhatValue.NOTIFICATION_REFRESH_STORAGE_VIDEO_ACTIVITY) {
+            println("--- received refresh video msg from eventbus")
+            refreshUI("fileType:video")
+        }
+    }
+
+send msg
+ override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_BACK && event?.getRepeatCount() == 0) {
+        val msg2 = Message.obtain()
+            println("--- sending refresh storage video msg")
+        msg2.arg1 = EventBusWhatValue.NOTIFICATION_REFRESH_STORAGE_VIDEO_ACTIVITY;
+        EventBus.getDefault().post(msg2);
+            this.finish()
+        }
+
+        return false

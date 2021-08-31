@@ -1,0 +1,6 @@
+@echo off
+adb.exe shell settings put global overlay_display_devices 2048x1536/300
+adb shell dumpsys display | findstr /r /c:"Display [1-9][0-9]*"
+set /p id="Enter display id: "
+REM echo %id%
+scrcpy.exe --display %id% --window-borderless -f -Sw  

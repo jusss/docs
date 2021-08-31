@@ -1,0 +1,24 @@
+position is evil! pass object itself to IO, and remove object in data source not position
+
+UI adapter -> change data structure CANCEL to true -> IO while loop check CANCEL to break
+-> EventBus post cancel message and object from data source -> UI activity receive cancel message and delete object from data source
+then adapter notify data changed to refresh UI 
+
+new
+UI adapter -> change data structure CANCEL to true -> EventBus post cancel message and 
+object from data source -> UI activity receive msg and object then delete in data source ->
+IO break loop by check structure CANCEL
+
+point is give object from data source to IO, remove object from data source, IO's object is still in memory
+
+
+----------------------------------
+UI -> IO -> UI
+UI click to cancel download, IO cancel, UI wait for IO action then remove item in data source
+this UI will stuck
+
+so don't remove item in data source, just hidden item in UI
+
+remove item in data source, may cause two problems
+one is IO refuse, visiting index 3 now, and remove one item, index will change, IO will visit wrong object
+another is out of list size, remove index 3 in UI, and IO still visit index 3 will cause this

@@ -1,0 +1,21 @@
+@echo off
+:: high resolution cause lag, image not sync
+:: without adb config, another way is enable 1080p in Simulate secondary displays of Developer options
+:: adb.exe shell settings put global overlay_display_devices 2048x1536/300
+:: windows tablet screen is 2048x1536, width/hight = 1.333333, 1439x1080/200, 1733x1300/260
+:: redmi note 7 is 2340x1080
+adb.exe shell settings put global overlay_display_devices 1440x1080/220 
+
+adb shell dumpsys display > tmp.txt
+:: set /p msg = < tmp.txt 
+findstr /r /c:"Display [1-9][0-9]*" tmp.txt > tmp2.txt
+set /p msg2= <tmp2.txt
+:: echo %msg2%
+for /f "tokens=1-20 delims=Display:" %%a in ("%msg2%") do (set DID= %%b)
+:: echo %DID%
+:: set /p id="Enter display id: "
+:: echo %id%
+del tmp.txt tmp2.txt
+
+scrcpy.exe --display %DID% --window-borderless -f -Sw
+:: REM "you can press left bottom corner icon to iconify on-screen keyboard when you have a wired keyboard connected to tablet"

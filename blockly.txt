@@ -1,0 +1,48 @@
+1. download blockly from github
+
+2. cp scotty.blockly.hs into that blockly-master, and runghc scotty.blockly.hs
+
+3. visit / should return demos/fixed/index.html, this is defined in scotty.blockly.hs
+
+4. add those nexe code to body in index.html to generate js code
+  <script src="../../blockly_compressed.js"></script>
+     <script src="../../javascript_compressed.js"></script>
+     <script src="../../blocks_compressed.js"></script>
+     <script src="../../msg/js/en.js"></script>
+
+<textarea id ="textarea" rows="36" cols="100">
+       // code output
+</textarea>
+
+ <script>
+      var workspace = Blockly.inject('blocklyDiv',
+         {media: '../../media/',
+          toolbox: document.getElementById('toolbox')});
+  function myUpdateFunction(event) {
+       var code = Blockly.JavaScript.workspaceToCode(workspace);
+        document.getElementById('textarea').value = code;
+  // or show code in console
+      console.log(code)
+  }
+  workspace.addChangeListener(myUpdateFunction);
+   </script>
+
+5. add eval button to eval
+ <button onclick="myEval()">evaluation</button>
+function myEval() {
+ 
+      try {
+           eval(document.getElementById('textarea').value);
+     } catch (error) {
+           console.log(error);
+      }
+ }
+
+
+
+
+
+
+https://publishing-project.rivendellweb.net/blockly-as-a-programming-teaching-tool/
+https://developers.google.com/blockly/guides/configure/web/code-generators
+https://blocklycodelabs.dev/codelabs/getting-started/index.html#8

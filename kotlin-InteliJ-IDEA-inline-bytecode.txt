@@ -1,0 +1,16 @@
+InteliJ IDEA, it keeps showing
+Cannot inline bytecode built with JVM target 1.8 into bytecode that is being built with JVM target 1.6
+under Either.applicative()
+
+turn out, in build.gradle, package 'wu.seal.jsontokotlin:library:3.6.1' cause this, not arrow-kt
+
+delete     implementation 'wu.seal.jsontokotlin:library:3.6.1'
+and add
+
+configure([compileKotlin, compileTestKotlin]) {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+
+https://stackoverflow.com/questions/54639351/intellij-refuses-to-set-the-kotlin-target-jvm-to-1-8
