@@ -1,0 +1,16 @@
+download ttyd from https://github.com/tsl0922/ttyd
+there're binary released, aarch64, arm, armhf
+
+in aid learning, or termux proot-distro
+chmod +x ttyd.aarch64
+./ttyd.aarch64 -p 60080 bash
+
+on browser visit 192.168.31.x:60080
+bash
+
+
+----------------------------------------------
+ttyd -p port -c user:password -S -C /etc/stunnel/server.crt -K /etc/stunnel/server.key bash
+
+on browser visit https://vps-ip:port
+
