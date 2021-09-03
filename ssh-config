@@ -1,0 +1,22 @@
+~/.ssh/config
+Host moon
+    HostName 127.0.0.1
+    User root
+    PreferredAuthentications publickey
+    Port 1990
+    IdentityFile ~/.ssh/id_rsa
+
+Host moon
+    HostName 127.0.0.1
+    User leo
+    PreferredAuthentications publickey
+    Port 1990
+    IdentityFile ~/.ssh/leo
+
+ServerAliveInterval 120
+ControlPersist yes
+ControlMaster auto
+ControlPath ~/.ssh/master-%r@%h:%p
+
+
+then `ssh leo@moon`
