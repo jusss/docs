@@ -1,3 +1,6 @@
+the latest lineageos rom has a bluetooth connect issue, but old ones doesn't.
+lineage-17.1-20200225-UNOFFICIAL-wt88047.zip is fine.
+------------------------------
 click build number seven times, get into developers mode, enable adb
 run adb shell 
 then choose file transfer not no data transfer, it may pop up auth check
