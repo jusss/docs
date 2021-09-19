@@ -1,0 +1,88 @@
+1. Callback has type like (a -> b) in other type signature, they can use lambda fit in.
+
+f :: a -> (a -> b) -> b
+f a (\a -> ...) 
+
+we can use lambda to fit in (a->b)
+
+f :: a -> a -> b
+f a (\a -> ...)
+
+same here, because a -> a-> b equals to a-> (a->b)
+
+withFile :: FilePath -> IOMode -> (Handle -> IO r) -> IO r
+
+(Handle -> IO r) is a Callback here, so we can fit a lambda in.
+
+withFile "inFile.txt" ReadMode $ \inHandle -> ...
+
+newtype ContT r m a = ContT { runContT :: (a -> m r) -> m r }
+
+withFile :: FilePath -> IOMode -> ContT r IO Handle
+withFile "inFile.txt" ReadMode $ do ,,, no
+
+copyFile :: ContT r IO Handle
+copyFile = do
+    inHandle <- withFile "inFile.txt" ReadMode
+    outHandle <- withFile "outFile.txt" WriteMode
+    liftIO (copy inHandle outHandle)
+
+
+2. see we turn withFile's return result to a ContT, so we can in outside of withFile use others same like ContT,
+
+
+3. we don't need to change withFile's type, but we can construct it to ContT 
+
+copyFile :: ContT r IO Handle
+copyFile = do
+    inHandle <- ContT $ withFile "inFile.txt" ReadMode
+    outHandle <- ContT $ withFile "outFile.txt" WriteMode
+    liftIO (copy inHandle outHandle)
+
+
+4. result type doesn't mean all the type inside do notation should be matched,
+   just match monad is ok
+
+v2 :: Maybe Int
+v2 = do
+ l <- Just "3"
+ m <- Just "2"
+ let n = l <> m
+ return (read n :: Int)
+
+v2 == Just 32
+
+copyFile :: ContT r IO ()
+copyFile = do
+      inHandle <- ContT $ withFile "inFile.txt" ReadMode
+      outHandle <- ContT $ withFile "outFile.txt" WriteMode
+      lift (copy inHandle outHandle)
+
+copy h1 h2 = do
+    str <- hGetContents h1
+    hPutStr h2 str
+
+main = runContT copyFile return
+
+
+5. there's lot of callback in js and scheme, they use lambda to fit callback, it's CPS actually,
+in haskell we turn callback to ContT so we can use do-notation to get a directly
+
+-- it would be withFile "inFile.txt" ReadMode $ \inHandle ->
+--                  withFile "outFile.txt" WriteMode $ \outHandle ->
+--                      copy inHandle outHandle
+copyFile :: ContT r IO ()
+copyFile = do
+      inHandle <- ContT $ withFile "inFile.txt" ReadMode
+      outHandle <- ContT $ withFile "outFile.txt" WriteMode
+      lift (copy inHandle outHandle)
+
+
+https://philipnilsson.github.io/Badness10k/escaping-hell-with-monads/
+https://hackage.haskell.org/package/managed-1.0.8/docs/Control-Monad-Managed.html
+https://ro-che.info/articles/2019-06-07-why-use-contt 
+
+
+
+
+
