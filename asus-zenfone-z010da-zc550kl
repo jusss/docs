@@ -1,3 +1,41 @@
+
+https://forum.xda-developers.com/t/rom-9-0-unofficial-lineageos-16-0-z010d-non-volte.3906516/
+ROM
+https://master.dl.sourceforge.net/project/zenfone-max-updates/Z010D/Recovery/TWRP/TWRP-3.3.1-0-ZC550KL.img?viasf=1
+TWRP
+https://altushost-swe.dl.sourceforge.net/project/zenfone-max-updates/Z010D/LineageOS/Pie/lineage-16.0-20190707-UNOFFICIAL-Z010D.zip 
+
+make sure the phone is flashed to official 6.0 version,
+press Power Volume plus key to get into fastboot mode,
+sudo fastboot devices
+sudo fastboot flash recovery TWRP-3.3.1-0-ZC550KL.img
+sudo fastboot boot TWRP-3.3.1-0-ZC550KL.img
+
+in TWRP
+swipe to factory, then sideload, swipe dalvik
+sudo adb sideload lineage-16.0-20190707-UNOFFICIAL-Z010D.zip
+
+install google play
+https://wiki.lineageos.org/gapps.html
+MindTheGapps 9.0 arm
+https://androidfilehost.com/?fid=6006931924117895958
+
+enable adb and advanced restart in developers mode, use usb cable connect to PC, choose File Transfer in
+USB Preferences, run `adb shell` in PC
+
+adb push MindTheGapps-9.0.0-arm-20190615_031401.zip /sdcard/
+
+restart to recovery
+or use 
+sudo fastboot boot TWRP-3.3.1-0-ZC550KL.img
+in bootloader mode
+
+wipe cache and install MindTheGapps
+use Redmi Note 7 with VPN as wifi spot, connect it to complete system initial
+for login google
+
+------------------------------------------------
+
 TWRP recovery sucks! don't use it! it asks MD5 key to check ROM file, WTF
 unzip UL-ASUS_Z010-WW-12.8.10.56-user.zip and get boot.img, system.transfer.list and system.new.dat 
 /sdat2img.py system.transfer.list system.new.dat system.img to generate system.img
