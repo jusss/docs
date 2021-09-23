@@ -1,0 +1,106 @@
+withFile :: FilePath -> IOMode -> (Handle -> IO r) -> IO r
+
+why withFile need Handle -> IO r, because that withFile can do close file after whatever Handle -> IO r done.
+
+when (Handle -> IO r) is done, the control return to withFile, so withFile can close the file.
+
+1. withFile's definition
+
+withFile path mode f = do
+    h <- openHandle mode path
+    r <- f h
+    closeHandle h
+    return r
+
+it's like that, after the continuation f is done, control back to withFile, so withFile can close the file.
+
+2. withFile's call
+
+withFile "inFile.txt" ReadMode $ \inHandle -> 
+    withFile "outFile.txt" WriteMode $ \outHandle ->
+        copy inHandle outHandle
+
+so in this \inHandle -> ... and \outHandle -> ... they don't need to close the files after they're done.
+
+that's good for callback, they's why js and scheme have lots of callback in function's parameter.
+
+
+it's look like CPS don't return value directly, instead of it takes a callback to work on that value,
+give its result to the callback
+
+
+CPS stricter version:
+always give result to callback, and call callback in the last so don't expect callback's return?
+
+CPS relax version:
+or call callback in the middle and expect callback's result, then return the result?
+
+ContT does't change any logic, it just lets you escape nesting
+
+do
+withFile "foo" RW (\h -> hPut h "hello")
+putStrLn "File is now closed"
+
+do
+h <- ContT $ withFile "foo" RW
+liftIO $ hPut "foo"
+putStrLn "File is still open here"  // unless you runContT on this do notation
+
+you only really want to use ContT on something like withFile if you need multiple handles open at the same time to do something
+
+IO r can only come from the function you pass to it, not withFile itself
+
+withFile will get control after the function you pass to it is done
+but it stores the result of you function then it close the file and return its stored
+
+you've got a baseline assumption that calling a continuation is the last thing a funciton does.
+and that's fair - that's what a continuation *is* - where to go next.
+but you've mistaken withFile for being an example of using a continuation because it has the same type as stuff that does
+but it's different, it's more of a traditional callback
+
+Cale: I think it's fine to think of it as a continuation of sorts, after all, you can use the Cont/ContT monad to work with such withFoo-style functions
+and handle all the nesting for you
+it's fine until your definition of "continuation" forbids what it does, and you get confused
+
+Cale: it's not an unbounded continuation-until-the-end-of-time sort of continuation, but one which specifies what happens up until the file get closed(or whatever)
+
+withFile will call f to handle its Handle, and when f is done, control return to withFile, then withFile close Handle
+
+f is a continuation?
+if your definition of continuation includes "the last thing a function does", then no, it's not
+if you relax the definition as Cale suggested, then sure
+
+what's the right definition? that most people using?
+awpr: the ContT monad evidently uses the relaxed version. 
+in the context of "CPS", it's the stricter version.
+I'm not sure I'd call either one "right" or "wrong", they're just two very similar concepts
+
+CPS stricter version:
+always give result to callback, and call callback in the last so don't expect callback's return?
+
+CPS relax version:
+or call callback in the middle and expect callback's result, then return the result?
+
+
+turn that (Handle -> IO r) -> IO r to ContT r IO Handle in withFile, who will close the handle, withFile itself or ContT?
+Cale: of course it will still be withFile, but that will happen at the end after pretty much the rest of the action you're runContT'ing executes,
+and things start to unravel. Basically, when you write 
+do
+v <- withFoo;
+...
+in the ContT monad, it's like withFoo (\v -> ...)
+Stuff like sequence in the Cont monad can be really useful if you want to get hold of an entire list of resources all at once
+runCont . sequence . map cont :: [(a->r)->r] -> ([a]->r)->r
+take a list of withFoo-style functions, and a function wich will get a list of their results,... and basically nest them in the obvious way
+of course, you could write this function by hand, but it'll be way harder to think about whether you got it right than this :)
+
+you mean when runContT is done, withFile close the file?
+Cale: pretty much, once the action is done, all the with-style stuff you ran along the way will start to unravel in the same way as if you'd nested it all by hand.
+the Cont/ContT monad just takes care of the nesting for you, and makes it appear like it's flattened out
+
+just like sugar syntax? nothing more?
+Cale: well, as I demonstrated there with sequence, it buys you a little more than syntax sugar, because you get to use all the stuff that works in any monad
+
+
+
+2021-9-21
