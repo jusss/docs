@@ -33,7 +33,7 @@ in bootloader mode
 wipe cache and install MindTheGapps
 use Redmi Note 7 with VPN as wifi spot, connect it to complete system initial
 for login google
-
+the ROM, reboot is power off, power off is reboot.
 ------------------------------------------------
 
 TWRP recovery sucks! don't use it! it asks MD5 key to check ROM file, WTF
