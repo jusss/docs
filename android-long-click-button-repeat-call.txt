@@ -1,0 +1,36 @@
+public class KeyboardActivity extends AppCompatActivity {
+
+    Handler handler;
+    Runnable runRepeat;
+
+   @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+//  repeat send backspace when hold Back key
+        findViewById(R.id.back).setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                int event = motionEvent.getAction();
+                if (event == MotionEvent.ACTION_DOWN){
+                    handler = new Handler();
+                    runRepeat = new Runnable(){
+                        @Override
+                        public void run() {
+                                sendSpecialChar(view);
+                                handler.postDelayed(this,200); // call run() every 200ms
+                        }
+                    };
+                    handler.post(runRepeat);
+                }
+
+                if (event == MotionEvent.ACTION_UP){
+                    handler.removeCallbacks(runRepeat);
+                }
+                return true;
+            }
+        });
+
+    }
+   }
+}
