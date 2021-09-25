@@ -1,0 +1,32 @@
+
+copy Chinese font to ~/.mplayer/subfont.ttf
+it will use that as default font
+
+~/.mplayer/config
+# Write your default config options here!
+#ao=pulse
+#vo=opengl
+#va=vaapi
+#mixer-channel=Master
+#default,set volume,it is PCM,i set it is Master
+#va=vaapi select vaapi video decoder driver
+#vo=vdpau
+#vc=ffmpeg12vdpau,ffwmv3vdpau,ffvclvdpau,ffh264vdpau,ffodivxvdpau
+#vc=ffmpeg12vdpau, select vdpau video codecs
+ass=yes
+sub-fuzziness=0
+subfont-text-scale=3.6
+#font= "WenQuanYi Micro Hei Mono"
+#font= "SimSun"
+#font= "YaHei Consolas Hybrid"
+#font="Microsoft YaHei"
+fontconfig=0
+subcp=enca:zh:UTF-8
+geometry=1024x600
+cache=8192
+ass-color=EEEEEE33
+ass-border-color=22222244
+#ass-color=00000000
+#ass-border-color=FFFFFFFF
+
+
