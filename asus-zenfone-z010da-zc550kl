@@ -1,6 +1,44 @@
+lineage-15.1-20180817-UNOFFICIAL-Z010D.zip bluetooth doesn't work
+
+in TWRP
+wipe -> Advanced wipe, System, data, dalvik, cache, don't wipe internal storage
+advanced -> sideload
+adb sideload Downloads/lineage-14.1-20170813-UNOFFICIAL-Z010D.zip 
+adb sideload Downloads/open_gapps-arm64-7.1-pico-20210929.zip 
+
+gapps pico is smaller than nano, and no the google app,
+
+lineage 16.0 android 9 pie, hotspot allowed client to use VPN
+
+but lineage-16.0-20190707-UNOFFICIAL-Z010D.zip doesn't have it
+about power off, power button choose power off, it will be reboot, then hold Volume minus and power button together.
+get into recovery mode, choose power off
+
+-------------------------------------------------
+
+EDL bug workaround, choose 'poweroff' option while long press power button,
+it will be reboot, then hold Volume minus and power button for seconds,
+get into TWRP Recovery mode, Reboot tag, choose power off
+https://forum.xda-developers.com/t/cr-droid-8-1-for-asus-zenfone-max-z010d.3859173/
+
+Offline charging means that you are able to charge your phone even if it is switched off. 
+if offline charge doesn't work, use recovery mode or fastboot mode to charge.
+
+developers mode, enable root access via adb only and android debugging,
+so it can be `adb shell reboot -p' poweroff
+EDL bug is that can't shutdown the phone, and the phone just reboot 
+Emergency Download mode, 
+https://forum.xda-developers.com/t/rom-8-1-unofficial-lineageos-15-1-z010d-volte.3938933/
+
+Same feedback as above. I don't really know about what EDL bug is but I found out that we can't shutdown the phone as shutdown timer crashes as soon as shutdown is tapped. The phone then just power cycles and turns on again.
+ 
+That's EDL bug.
+
+
+------------------------------------
 
 https://forum.xda-developers.com/t/rom-9-0-unofficial-lineageos-16-0-z010d-non-volte.3906516/
-ROM
+ROM has shutdown issue, EDL bug
 https://master.dl.sourceforge.net/project/zenfone-max-updates/Z010D/Recovery/TWRP/TWRP-3.3.1-0-ZC550KL.img?viasf=1
 TWRP
 https://altushost-swe.dl.sourceforge.net/project/zenfone-max-updates/Z010D/LineageOS/Pie/lineage-16.0-20190707-UNOFFICIAL-Z010D.zip 
@@ -12,7 +50,8 @@ sudo fastboot flash recovery TWRP-3.3.1-0-ZC550KL.img
 sudo fastboot boot TWRP-3.3.1-0-ZC550KL.img
 
 in TWRP
-swipe to factory, then sideload, swipe dalvik
+wipe -> Advanced wipe, System, data, dalvik, cache, don't wipe internal storage
+advanced -> sideload
 sudo adb sideload lineage-16.0-20190707-UNOFFICIAL-Z010D.zip
 
 install google play
@@ -33,7 +72,6 @@ in bootloader mode
 wipe cache and install MindTheGapps
 use Redmi Note 7 with VPN as wifi spot, connect it to complete system initial
 for login google
-the ROM, reboot is power off, power off is reboot.
 ------------------------------------------------
 
 TWRP recovery sucks! don't use it! it asks MD5 key to check ROM file, WTF
