@@ -1,0 +1,47 @@
+
+#!/bin/bash
+sudo ip6tables -t raw -A PREROUTING -i wlp3s0 -p udp -m bpf --bytecode "20,40 0 0 40,21 0 17 53,32 0 0 52,21 0 15 65537,32 0 0 56,21 0 13 0,40 0 0 0,84 0 0 65520,21 0 10 24576,40 0 0 44,7 0 0 0,64 0 0 24,21 5 0 3222011905,21 0 5 536936448,64 0 0 28,21 0 3 0,64 0 0 32,21 0 1 0,6 0 0 1,6 0 0 0" -j DROP
+
+sudo iptables -t raw -A PREROUTING -i wlp3s0 -p udp -m bpf --bytecode "43,40 0 0 20,21 0 40 53,32 0 0 36,21 0 38 0,32 0 0 32,21 5 0 65537,21 24 0 65538,21 0 34 65536,40 0 0 30,21 12 0 33152,6 0 0 0,40 0 0 30,21 15 0 34176,40 0 0 24,7 0 0 0,64 0 0 4,21 5 0 3222011905,21 0 24 536936448,64 0 0 8,21 0 22 0,64 0 0 12,21 0 20 0,32 0 0 4,21 6 0 0,21 17 0 16384,84 0 0 65535,21 3 0 16384,6 0 0 0,40 0 0 0,21 0 12 17680,6 0 0 1,32 0 0 4,21 0 9 0,40 0 0 30,21 0 7 33152,40 0 0 24,7 0 0 0,72 0 0 2,21 0 3 1,64 0 0 4,21 0 1 3222011905,6 0 0 1,6 0 0 0" -j DROP
+
+echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf
+
+
+https://twitter.com/gNodeB/status/1443975021840551941?s=20
+https://gist.github.com/llccd/1d19a5d859700366c8941eca5b0fadd6
+https://github.com/llccd/netfilter-spooftcp
+
+https://twitter.com/CarsonYangk8s/status/1446431187702931461?s=20
+https://github.com/ihciah/clean-dns-bpf
+
+https://twitter.com/real_Peter_Yang/status/1442127637753655299
+https://www.usenix.org/system/files/sec21-hoang.pdf
+
+bluebit
+@bluebit_cg
+·
+10月10日
+回复 
+@CarsonYangk8s
+ 和 
+@DebuggingNinja
+直接用TFO向8.8.8.8请求，连污染都没有岂不是更好。
+Linux的TFO不总是生效所以直接用很麻烦
+而DNSoverTCP是一次性的连接，所以不必使用原本Socket封装的TCP，用RawSocket直接构造一个有TFO扩展的SYN即可
+服务启动时先构造一个无Cookies的SYN请求Cookies，查询时按OverTCP的格式放入带Cookies的SYN的Payload中发给8.8.8.8
+支持TCP FastOpen的DNS服务不多，但8.8.8.8是支持的
+
+GFW的DNS污染看似强大，其实它发送的假DNS应答特征十分明显，可以很容易地区分出来。我写了两条iptables规则，可以准确匹配并丢弃GFW的伪造应答
+还需要解决GFW的TCP RST和黑洞路由，TCP RST可以通过一个自定义的iptables target搞定 https://github.com/llccd/netfilter-spooftcp ，黑洞路由目前无解，只能通过VPN绕过
+对，把ethX改成外网接口，需要先装iptables-mod-filter才有bpf模块，如果装完iptables-mod-filter还是没有bpf，说明你的OpenWrt版本太旧，需要升级
+不一定要raw表，放到mangle表或filter表都行
+
+ipv6
+23,40 0 0 40,21 0 20 53,32 0 0 52,21 0 18 65537,32 0 0 56,21 0 16 0,40 0 0 0,84 0 0 65520,21 0 13 24576,40 0 0 44,7 0 0 0,64 0 0 24,21 5 0 3222011905,21 0 8 536936448,64 0 0 28,21 0 6 0,64 0 0 32,21 3 4 0,64 0 0 30,37 2 0 255,53 0 1 64,6 0 0 1,6 0 0 0
+
+ipv4
+39,40 0 0 20,21 0 36 53,32 0 0 36,21 0 34 0,32 0 0 32,21 3 0 65537,21 0 31 65536,40 0 0 30,21 15 29 33152,40 0 0 30,84 0 0 65487,21 17 0 34176,40 0 0 24,7 0 0 0,64 0 0 4,21 5 0 3222011905,21 0 21 536936448,64 0 0 8,21 0 19 0,64 0 0 12,21 3 17 0,64 0 0 10,37 15 0 255,53 0 14 64,32 0 0 4,21 11 0 0,21 11 0 16384,84 0 0 65535,21 8 9 16384,40 0 0 6,21 0 7 0,40 0 0 24,7 0 0 0,64 0 0 6,21 0 3 65537,64 0 0 10,21 0 1 60,6 0 0 1,6 0 0 0
+
+
+
+
