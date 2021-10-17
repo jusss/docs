@@ -1,0 +1,25 @@
+//  repeat send backspace when hold Back key
+        findViewById(R.id.back).setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                int event = motionEvent.getAction();
+                if (event == MotionEvent.ACTION_DOWN){
+                    handler = new Handler();
+                    runRepeat = new Runnable(){
+                        @Override
+                        public void run() {
+                                sendSpecialChar(view);
+                                view.playSoundEffect(SoundEffectConstants.CLICK);
+                                handler.postDelayed(this,100);
+                        }
+                    };
+                    handler.post(runRepeat);
+                }
+
+                if (event == MotionEvent.ACTION_UP){
+                    handler.removeCallbacks(runRepeat);
+                }
+                return true;
+            }
+        });
+
