@@ -1,3 +1,28 @@
+
+//    private val profileListener : ProfileListener = object : ProfileListener {   will make the second ProfileListener not solved, weird! convert by AS
+    private val profileListener = object : ProfileListener {
+        @MainThread
+        override fun onDeviceStateChanged(device: BluetoothDevice, state: Int) {
+            // 0 = disconnected, 1 = connecting, 2 = connected
+            Log.d(TAG, "device state changed to $state")
+        }
+
+        @MainThread
+        override fun onAppUnregistered() {
+            Log.v(TAG, "app unregistered")
+            // unregister once app switch to background
+            hidDataSender!!.unregister(this)
+        }
+
+        @MainThread
+        override fun onServiceStateChanged(proxy: BluetoothProfile) {
+            Log.v(TAG, "service state changed to$proxy")
+        }
+    }
+
+
+-----------------------------------
+
 object: InterfaceClass(){override fun ...}  put cursor on object, press Alt-Enter, implement memebers, Ctrl-A, Enter, generate all members
 
 class Class{ companion object { } }  same static class in Java to store global variable
