@@ -1,0 +1,19 @@
+1. generate signature
+
+Build -> Generate Signed Bundle/APK -> choose APK -> Next -> Create new...  for example keystore.jks into D:\
+it will pop a warning about trans it to PKCS12
+
+2. set environment JAVA_HOME to where File -> Project Structure -> SDK Location point
+
+3. cmd run
+keytool -importkeystore -srckeystore D:\keystore.jks -destkeystore D:\keystore.jks -deststoretype pkcs12
+
+it will generate new D:\keystore.jks for use
+
+4. pass this step left botton corner, Build Variants -> Active Build Variant -> release  
+
+5. now redo Build -> Generate Signed Bundle/APK -> choose APK -> Next -> Choose existing D:\keystore.jks and remember passwords -> Next ->
+choose release then choose V1 and V2  (default output is Project\app) -> Finish -> click left top corner, change Android view to Project,
+app\release\app-release.apk
+
+6. now you can copy and pass this apk to others
