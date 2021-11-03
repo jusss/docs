@@ -1,0 +1,10 @@
+on archlinux/debian, use snap to install android-studio
+
+# install snap
+apt update
+apt install snapd
+snap install core
+
+# install android studio
+sudo snap install android-studio --classic
+snap run android-studio

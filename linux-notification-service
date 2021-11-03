@@ -1,0 +1,14 @@
+it needs a notify daemon to take message and show it,
+
+1. add this file 
+/usr/share/dbus-1/services/org.freedesktop.Notifications.service 
+org.freedesktop.Notifications.service
+
+[D-BUS Service]
+Name=org.freedesktop.Notifications
+Exec=/usr/lib/xfce4/notifyd/xfce4-notifyd
+
+2. run notify daemon
+/usr/lib/xfce4/notifyd/xfce4-notifyd
+
+3. then run `notify-send "title" "msg"`
