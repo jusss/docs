@@ -1,0 +1,38 @@
+in FP
+we pass a variable to a function, you can't change the variable inside the function
+like
+python:
+v = 1
+
+def f(x):
+    x = 2
+    print(x)
+
+f(v) will output 2, but v is still 1
+
+unless you make v as a global variable,
+
+another way, in OOP, variable itself it is an object, you can change its attribute inside another function
+
+kotlin:
+var v = 1
+fun f() { v=2; println(v) }
+f() will output 2
+and v will be 2
+
+python:
+
+class V():
+    def __init__(self):
+        t=1
+
+def f(obj):
+    obj.t=2
+    
+v=V()
+f(v)
+v.t will be 2 
+
+so what you should care about is the parameter is a variable or an object
+
+FP could use closure to do that thing like an Object
