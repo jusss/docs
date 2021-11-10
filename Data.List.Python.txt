@@ -1,0 +1,113 @@
+二面代码题
+给进一个数组 找出三个下标不同的数，和为0。输出所有符合要求的元素组。
+示例：
+Input: nums = [-1,0,1,2,-1,-4] Output: [[-1,-1,2],[-1,0,1]]
+
+#blist = [[alist[x],alist[y],alist[z]] for x, y, z in range(len(alist)) if (alist[x] + alist[y] + alist[z] == 0) && (x!= y) && (y!=z)]
+#list(set(blist))
+#[blist[i] for i in range(len(blist)) if blist[i] not in blist[i+1::]]
+
+[[x,y,z] for i in range(len(alist) - 2) for x in [alist[i]] for y in alist[i+1::] for z in alist[i+2::] if (x+y+z == 0)]
+== [[-1, 0, 1], [-1, 2, -1], [-1, -1, 2], [0, 1, -1]]
+
+blist = [[-1, 0, 1], [-1, 2, -1], [-1, -1, 2], [0, 1, -1]]
+
+[ i.sort() for i in blist ]
+
+blist == [[-1, 0, 1], [-1, -1, 2], [-1, -1, 2], [-1, 0, 1]]
+
+[ blist[i] for i in range(len(blist)) if blist[i] not in blist[i+1::] ]
+== [[-1, -1, 2], [-1, 0, 1]]
+
+using list comprehension to express the question will get the anwser
+---------------------------------------------------
+remove duplicate elements in a list
+list(set(alist))
+alist=[1,1,3,5,6,3,9,2]
+[alist[i] for i in range(len(alist)) if alist[i] not in alist[i+1::]]
+[1, 5, 6, 3, 9, 2]
+
+----------------------------------------------
+get single element in a list
+
+alist=[1,1,3,5,6,3,9,2]
+[alist[i] for i in range(len(alist)) if alist[i] not in (alist[i+1::] + alist[:i:])]
+[5, 6, 9, 2]
+
+list slice [start:end:step] 
+[::-1] is reverse
+[:i:] is before i
+[i::] is after i
+
+alist.sort() will change alist itself, not return something
+
+elemIndices = lambda elem, alist: [i for i in range(len(alist)) if alist[i] == elem]
+elemIndices( 3, [1,3,32,3,4]) == [1, 3]
+
+get the single element in a list
+b=[1,3,32,3,4]
+[i for i in b if len(elemIndices(i,b)) == 1]   ==   [1, 32, 4]
+
+--------------------------------------------------
+def decorator(func):
+    def wrapper():
+        doSomething
+        func()
+        doSomething
+    return wrapper
+
+@decorator
+def afunc():
+    ...
+
+>> def f():
+...     x=0
+...     while True:
+...             x=x+1
+...             print(x)
+...             yield x
+... 
+>>> f2=f()
+next(f2) // 2
+
+try:
+   Business Logic here...
+except "Invalid level!":
+   Exception handling here...
+else:
+   Rest of the code here...
+
+check file exists
+file_exists = os.path.exists('readme.txt')
+
+write file
+with open('readme.txt', 'w') as f:
+    f.write('readme')
+
+list(filter(lambda x: x> 2, [1,2,3]))  ==   [3]
+
+list(range(3))  [0, 1, 2]
+
+alist=list(range(500))
+
+functools.reduce(lambda x,y: x+y, alist)
+124750
+
+list(map (lambda x: x+1, [1,2]))
+[2, 3]
+
+--------------------------------
+conversion in str and int
+
+str(10) == '10'
+int('10') == 10
+
+-----------------------
+list to string, "".join(list)
+str to list, list(str)
+--------------------------
+bytecode.decode() to str
+str.encode() to bytecode 
+----------------------------
+
+toolz.groupby(lambda x: x> 3, [1,2,3,5,6])   ==   {False: [1, 2, 3], True: [5, 6]}
