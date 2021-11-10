@@ -1,0 +1,56 @@
+activity 生命周期包含
+onCreate 初始化
+onStart 启动，activity可见没出现在前台
+onResume 后台回来
+onPause 跳到另一个和退出时执行, toast 失去focus
+onStop activity对象还在内存但没被销毁
+onDestroy  销毁释放资源
+onRestart 切后台切回来，后一个Activity返回上一个
+四种状态running, paused 弹toast dialog, stopped停止不可见但保留信息，dead终止
+
+
+四大组件 activity service content provider broadcast receiver
+activity用Intent通信，对象转成Json序列化在activity传输，在Manifest声明
+service 后台服务 started启动 然后bind绑定
+started可以后台运行与启动它的组件无关，bind组件销毁服务停止
+content provider数据共享,多个应用之间数据共享
+broadcast receiver广播接收器 来电 数据可以接收广播启动服务 notification manager
+广播分动态与静态注册 activity关闭动态失效，静态app不启动也能接收
+
+app存数据 shared preference key-value , external storage file, sqlite database
+
+activity栈，跳转，压下当前activity,返回，销毁当前
+
+eventbus, workmanager, 异步消息通知机制
+
+数据库sqllite mysql   greendao
+
+常见view recyclerview, listview, textview, buttonview, searchview, edittextview, imageview
+
+五大布局 线性布局 相对布局 绝对布局 表格布局 框架布局
+
+interface and abstract class different, interface no attribute, abstract clas has
+
+国内用极光推送, or socket自己实现
+
+restful request, post/get
+
+打包签名用keystore
+
+适配portrait landscape, layout and layout-land, 
+minidp xxx-dp 不同分辨率图片
+
+Handler加多线程，异步执行, kotlin coroutine, async/await
+
+fragement就是一个activity里可以有多个fragement 比如标签页，切换刷新数据不离开当前activity
+
+adapter, recyclerview adapter, 把item布局和recyclerview adapter绑定,
+在activity 创建recyclerview绑定adapter
+
+蓝牙，先获取profile proxy object,然后把回调对象绑定对象，蓝牙发生变化就可以监听
+
+
+时间轴相册，时间排序算法，recyclerview 嵌套recyclerview, 图片滚动viewflipper
+后台上传下载，UI IO，UI销毁不影响IO
+做过ASR NLP TTS OCR FaceRecognition 
+6.0 api 23, 10 api 30, pie 9 28,
