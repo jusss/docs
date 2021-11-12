@@ -1,3 +1,62 @@
+let alist = ["ab","ef","ij"]; blist = ["cd","gh","kl"] in [ (alist !! n) <> (blist !! n) | n <- [0..(length alist)-1] ]
+
+it is `zip`, but zip is using patter matching and recursive defined in haskell
+
+but in python, we can define it with list comprehension
+
+zip = lambda alist, blist: [ (alist !! n) <> (blist !! n) | n <- [0..(length alist)-1] ]
+
+fmap (+) alist blist, it's zipWith, since fmap only work on one list
+also there is liftM2 for one item in alist to match all items in blist
+----------------------------------------------
+remove duplicate elements in a list,
+if element is not show up in the rest, then it is single
+the list comprehension, express the question with list comprehension, and the anwser it is
+
+alist=[1,1,3,5,6,3,9,2]
+
+[alist[i] for i in range(len(alist)) if alist[i] not in alist[i+1::]]
+
+[ alist !! n | n <- [0..(length(alist) - 1)], (alist !! n) `notElem` (drop (n+1) alist) ]
+
+[x | (x:xs) <- tails alist, x `notElem` xs ]
+
+------------------------------------------------
+["ab","cd","ef"] ["gh","ij", "kl"] to get ["abgh", "cdij", "efkl" ]
+
+[ alist[i] + blist[i] for i in range(len(alist)) ]
+
+fmap (\x,y -> x+y) 
+
+
+--------------------------------
+[ f(x) for i in alist ]
+
+map( f, alist) = [ f(i) for i in alist ]
+map f alist = [ f i | i <- alist ]
+
+haskell does not have list slice like python alist[i::]
+but haskell has dropWhile takeWhile to do the same thing 
+
+for example, get the a digit string from a string's end, 
+"abc12" -> "12", "ab12c3" -> "3"
+[ alist[i::] for i in range(len(alist)) if alist[i::].isdigit() ]
+
+[ if (isDigit (drop n alist)) then (drop n alist) else [] | n <- [0.. (length alist)] ]
+
+[ drop n alist | n <- [0..(length alist)], all isDigit (drop n alist) ]
+
+
+[ a <> b | a <- alist, b <- blist ]
+[ x + y for x in alist for y in blist ]
+
+[ if ... then ... else ... | x <- alist, odd x ]
+[ ... for i in alist if odd(i) ]
+
+-----------------------------
+toolz.groupby(len,["a","bc"])
+{1: ['a'], 2: ['bc']}
+-------------------
 [ alist[i::] for i in range(len(alist)) if alist[i::].isdigit() ]
 "abc12d56" == [ "56" ]
 ---------------------
