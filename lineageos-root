@@ -1,0 +1,18 @@
+since android 10, lineageos 17.1 won't release su 
+but it can get root with adb
+
+enable 'rooted debugging' in developer options
+run `adb root` then `adb shell` u will get root privilege
+
+before 17.1, you can get su file via https://download.lineageos.org/extras
+and just flash it via recovery, then in adb shell run `su`
+
+adb root
+adb remount # to remount /system as read-write, not readonly
+nano /system/usr/keylayout/Generic.kl
+change 125 to WINDOW
+
+125 META_LEFT is window/super key in the physical keyboard
+
+https://blog.csdn.net/u012587637/article/details/115517908
+
