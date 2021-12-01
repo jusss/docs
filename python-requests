@@ -1,3 +1,17 @@
+login_url = "http://www.x.org/login/"
+data = {"user_name": "name",
+        "password": "password"
+        }
+session = requests.Session()
+# login
+login_response = session.post(url=login_url, data=data)
+login_text = login_response.content.decode()
+if "登录无效" in login_text:
+        raise Exception("login failed, invalid username or password")
+
+response = session.get("http://www.x.org/article")
+print(response.content.decode())
+-----------------------------------------------
 https://www.cnblogs.com/lilinwei340/p/6417689.html
 
 流式上传
