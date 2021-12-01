@@ -1,0 +1,3 @@
+in qq mail, you may use authorization code to login, not password
+in website settings, General -> Generate Authorization Code,
+then use that code as password in ~/.mpoprc
