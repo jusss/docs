@@ -1,5 +1,5 @@
 bind x y = if x/= None then y x else None 
-bind dict.get("a",None) \x -> you can use x or don't use x
+bind dict.get("a",None) \x -> you can use x or don't use x or x.method()
 this avoid if xxx: if xxx: if xxx:
 use object(x).bind(y).bind(z) implement infix expression
 avoid bind(bind(x,y),z)
@@ -16,7 +16,7 @@ class Maybe:
     def fromMaybe(self):
         return self.x
 
-maybe = Maybe(a_dict.get(key, None)) // (lambda v: use_v_or_not)
+maybe = Maybe(a_dict.get(key, None)) // (lambda v: use_v_or_not) // lambda v: v.method()
 maybe.fromMaybe()
 
 a < b     __lt__(a,b)
