@@ -1,3 +1,44 @@
+Java use null as failed IO computation, it's very good for Maybe 
+Maybe(x) // \x -> xxx null failed //
+just use lambda to wrap null, it no need to check if it's null every time
+in haskell you have to check value and return Nothing, in python return None
+
+bind is an advanced version fmap which can do if-else
+Nothing <$> f = Nothing
+Just a <$> f = Just (f a)
+
+but bind can do more, not just detect Nothing, it can detect a specific Just a and
+return Nothing
+
+class Maybe:
+    def __init__(self,a):
+        self.a = a
+    def fmap(self,ab):
+        if self.a is None:
+            return None
+        else:
+            return Maybe(ab(self.a))
+    def ap(self, mamb):
+        if self.a is None:
+            return None
+        else:
+            return mamb(self.a)
+    def bind(self, amb):
+        if self.a is None:
+            return None
+        else:
+            return amb(self.a)
+    def from_maybe(self):
+        return self.a
+
+    
+respone = request.post(...)
+Maybe(respone.json())
+    .fmap(lambda x: x.method())
+    .bind(lambda x: None if x == "" else Maybe(doSometing(x)))
+    .from_maybe()
+
+----------------------------
 bind x y = if x/= None then y x else None 
 bind dict.get("a",None) \x -> you can use x or don't use x or x.method()
 this avoid if xxx: if xxx: if xxx:
