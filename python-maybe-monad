@@ -36,6 +36,7 @@ respone = request.post(...)
 Maybe(respone.json())
     .fmap(lambda x: x.method())
     .bind(lambda x: None if x == "" else Maybe(doSometing(x)))
+    .bind(lambda x: Maybe(doSometing(x)).bind(lambda y: Maybe(x+y)))
     .from_maybe()
 
 ----------------------------
