@@ -1,0 +1,26 @@
+there're two ways to handle error,
+checking conditions before computation, or capture run-time error with try-catch
+haskell Either Exception
+python None Exception
+java null Exception
+
+you can use try-catch to handle run-time Exception,
+or check conditions before computation
+
+like 1/0, python would raise ZeroDivisionError,
+or you can check if it's zero divided to avoid error.
+
+language like C, only can do checking conditions to avoid error,
+and like python, it use most raise error to interrupt the computation,
+so you can use try-except to handle it.
+
+in haskell, you can use checking-conditions and return Either a b,
+to avoid failed computation, or use try-catch to capture run-time exception.
+
+and in python, you can use try-catch to turn raise error to None,
+so it will work in >>= computation chain
+
+about read timeout in socket, exception catch exception, there's value return in language like C
+
+https://gist.github.com/poscat0x04/afc28fc9dde8e6a4277e4a9d8dcab422
+https://github.com/chessai/unpacked-either
