@@ -1,0 +1,6 @@
+visit tmp.link and login, then click upload file with curl, get a curl code
+use that code to upload file to tmp.link
+and then get a curl download link after upload
+visit that download link via browser, choose download option with curl
+open a web page, paste that curl download code
+use that curl download code to download file
