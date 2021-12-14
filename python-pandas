@@ -1,0 +1,9 @@
+# color 
+from pandas import *
+
+df = DataFrame()
+df.insert(0,'Test',[1,2,3])
+
+# this is needed, otherwise, to_excel only do the original DataFrame
+df = df.style.apply(lambda x: ["background-color:green"], axis=1)
+df.to_excel("test.xlsx")
