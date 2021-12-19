@@ -1,0 +1,6 @@
+let assume gvim is installed on C:\Program Files (x86)\Vim
+there will be C:\Program Files (x86)\Vim\vim82 directory
+copy your plugin into that directory
+
+and config file will be %userprofile%\.vimrc
+

@@ -1,0 +1,18 @@
+degrade from type to function value
+
+. is function compose, f . g = \x -> f (g x)
+>>= :: (e->a) -> (a -> e -> b) -> e -> b
+let's assume e->a is a function g of get result from database by input e,
+and f is take that g's result and original input e, to do next thing,
+>>= is an advanced version of fmap, which can do if-else
+so we can do if g e is not what we want, in f, change e and recursive 
+until get the proper (g e)
+
+g >>= f = \e -> f (g e) e
+or f x y = [x,y]
+
+>=> :: (a->w->b) -> (b->w->c) -> a->w->c
+
+g >=> f = \x,y -> f (g x y) y
+
+

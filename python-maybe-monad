@@ -2,6 +2,7 @@ Java use null as failed IO computation, it's very good for Maybe
 Maybe(x) // \x -> xxx null failed //
 just use lambda to wrap null, it no need to check if it's null every time
 in haskell you have to check value and return Nothing, in python return None
+but python use raiseError a lot, so use try catch to capture and return None will be good
 
 bind is an advanced version fmap which can do if-else
 Nothing <$> f = Nothing

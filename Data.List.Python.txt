@@ -1,3 +1,25 @@
+liftM2 one in alist, match all in blist, 
+same as
+
+[ f(i,m) for i in alist for m in blist ]
+------------------------------
+intersect = lambda alist, blist: [ i for i in alist if i in blist ]
+------------------------------
+groupby == alist in python
+
+let a = 3, which can be [ for a in [3] ]
+
+alist.sort()
+[ [alist[i+1]] for i in range(len(alist)-1) if alist[i] == alist[i+1] ]
+
+[ [alist[i]] + [alist[i+1]] if alist[i] in alist[i+1::] else [alist[i]] for i in range(len(alist)) ]
+
+[ [alist[i]] + [alist[i+1]] if alist[i] in alist[i+1::] else [alist[i]] for i in range(len(alist)) ]
+
+
+
+
+-------------------------------
 let alist = ["ab","ef","ij"]; blist = ["cd","gh","kl"] in [ (alist !! n) <> (blist !! n) | n <- [0..(length alist)-1] ]
 
 it is `zip`, but zip is using patter matching and recursive defined in haskell

@@ -1,3 +1,200 @@
+36 7kyu Reverse words
+
+Complete the function that accepts a string parameter, and reverses each word in the string. All spaces in the string should be retained.
+
+Examples
+"This is an example!" ==> "sihT si na !elpmaxe"
+"double  spaces"      ==> "elbuod  secaps"
+
+def reverse_words(text):
+  return " ".join([ i[::-1] for i in text.split(" ") ])
+-----------------------------------
+35 6kyu Which are in?
+Given two arrays of strings a1 and a2 return a sorted array r in lexicographical order of the strings of a1 which are substrings of strings of a2.
+
+Example 1:
+a1 = ["arp", "live", "strong"]
+
+a2 = ["lively", "alive", "harp", "sharp", "armstrong"]
+
+returns ["arp", "live", "strong"]
+
+Example 2:
+a1 = ["tarp", "mice", "bull"]
+
+a2 = ["lively", "alive", "harp", "sharp", "armstrong"]
+
+returns []
+
+Notes:
+Arrays are written in "general" notation. See "Your Test Cases" for examples in your language.
+In Shell bash a1 and a2 are strings. The return is a string where words are separated by commas.
+Beware: r must be without duplicates.
+
+
+def in_array(array1, array2):
+    blist = [ i for i in array1 for n in array2 if i in n ]
+    clist = [ blist[n] for n in range(len(blist)) if blist[n] not in blist[n+1::] ]
+    clist.sort()
+    return clist
+------------------------------
+34 6kyu Persistent Bugger.
+Write a function, persistence, that takes in a positive parameter num and returns its multiplicative persistence, which is the number of times you must multiply the digits in num until you reach a single digit.
+
+For example:
+
+  persistence(39) # returns 3, because 3*9=27, 2*7=14, 1*4=4
+                 # and 4 has only one digit
+                  
+  persistence(999) # returns 4, because 9*9*9=729, 7*2*9=126,
+                  # 1*2*6=12, and finally 1*2=2
+
+  persistence(4) # returns 0, because 4 is already a one-digit number
+
+from functools import *
+def persistence(n):
+    # your code
+    def f(n,count):
+        if (n < 10):
+            return count
+        else:
+          return f( reduce(lambda x,y: x*y, [ int(i) for i in str(n) ]), count+1 )
+        
+    return f(n,0)
+---------------------------
+33 7kyu Odd or Even?
+Task:
+Given a list of integers, determine whether the sum of its elements is odd or even.
+
+Give your answer as a string matching "odd" or "even".
+
+If the input array is empty consider it as: [0] (array with a zero).
+
+Examples:
+Input: [0]
+Output: "even"
+
+Input: [0, 1, 4]
+Output: "odd"
+
+Input: [0, -1, -5]
+Output: "even"
+
+from functools import *
+def odd_or_even(arr):
+    sum = reduce(lambda x,y: x+y, arr)
+    if (sum % 2 == 0):
+        return "even"
+    else:
+        return "odd"
+-------------------------------------
+32 5kyu Extract the domain name from a URL
+
+domain_name("http://github.com/carbonfive/raygun") == "github" 
+domain_name("http://www.zombie-bites.com") == "zombie-bites"
+domain_name("https://www.cnet.com") == "cnet"
+
+def domain_name(url):
+    if "https://www." in url:
+        return url.split('.')[1]
+    
+    if "http://www." in url:
+        return url.split('.')[1]
+    
+    if "www." in url:
+        return url.split('.')[1]
+    
+    if "https://" in url:
+        return url.split('.')[0][8::]
+    
+    if "http://" in url:
+        return url.split('.')[0][7::]
+    
+    return url.split('.')[0]
+
+-------------------------------
+31 5kyu String incrementer
+https://www.codewars.com/kata/54a91a4883a7de5d7800009c
+Your job is to write a function which increments a string, to create a new string.
+
+If the string already ends with a number, the number should be incremented by 1.
+If the string does not end with a number. the number 1 should be appended to the new string.
+Examples:
+
+foo -> foo1
+
+foobar23 -> foobar24
+
+foo0042 -> foo0043
+
+foo9 -> foo10
+
+foo099 -> foo100
+
+Attention: If the number has leading zeros the amount of digits should be considered.
+
+def increment_string(strng):
+    containDigit = [ strng[i::] for i in range(len(strng)) if strng[i::].isdigit() ]
+    if containDigit == []:
+        return strng + "1"
+    else:
+        alphabet = strng[:-len(containDigit[0]):]
+        nonZero = int(containDigit[0]) + 1
+        if (len(str(nonZero)) >= len(containDigit[0])):
+            return alphabet + str(nonZero)
+        else:
+            return strng[:-len(str(nonZero)):] + str(nonZero)
+    
+------------------------------------------------
+30 6kyu Valid Braces
+https://www.codewars.com/kata/5277c8a221e209d3f6000b56/python
+
+Write a function that takes a string of braces, and determines if the order of the braces is valid. It should return true if the string is valid, and false if it's invalid.
+
+This Kata is similar to the Valid Parentheses Kata, but introduces new characters: brackets [], and curly braces {}. Thanks to @arnedag for the idea!
+
+All input strings will be nonempty, and will only consist of parentheses, brackets and curly braces: ()[]{}.
+
+What is considered Valid?
+A string of braces is considered valid if all braces are matched with the correct brace.
+
+Examples
+"(){}[]"   =>  True
+"([{}])"   =>  True
+"(}"       =>  False
+"[(])"     =>  False
+"[({})](]" =>  False
+
+def validBraces(string):
+    # find the first right one, check if the proper left before it
+    # if so, remove them in the list, then recursive do it again
+    # if get empty list in the last, then they all are correct
+    
+    adict = {"(": ")", "[": "]", "{": "}"}
+    match = lambda x,y : True if adict.get(x,"") == y else False
+    
+    def f(alist):
+        if alist == []:
+            return True
+        i=0
+        for n in range(len(alist)):
+            if alist[n] == ')' or alist[n] == '}' or alist[n] == ']':
+                i = n
+                break
+        if (i==0):
+            return False
+        else:
+            if not match(alist[i-1], alist[i]):
+                return False
+            else:
+                alist.pop(i)
+                alist.pop(i-1)
+                return f(alist)
+            
+    return f(list(string))
+
+
+----------------------------------------------------
 29 5kyu Sum of pairs
 https://www.codewars.com/kata/54d81488b981293527000c8f/train/python 
 
