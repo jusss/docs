@@ -1,0 +1,32 @@
+
+this case is good for Scheme's macro, but in python there's no macro, so use eval
+there's a list like [0..100], you need to run code like obj.f(0).f(1)...f(100)
+how to generate this code? use eval   
+
+color_column_name = ['DXP1', 'DXP3'...]
+color_column = {'DXP1': f1, 'DXP2': f2...}
+
+    # new_df = new_df.style.apply(color_column['DXP1'], subset=['DXP1'], axis=1)\
+    #                     .apply(color_column['DXP3'], subset=['DXP3'], axis=1)\
+    #                     .apply(color_column['DY5'], subset=['DY5'], axis=1)\
+    #     .apply(color_column['DY7'], subset=['DY7'], axis=1)\
+    #     .apply(color_column['DVX9'], subset=['DVX9'], axis=1)\
+    #     .apply(color_column['DVX11'], subset=['DVX11'], axis=1)\
+    #     .apply(color_column['DVY13'], subset=['DVY13'], axis=1)\
+    #     .apply(color_column['DVY15'], subset=['DVY15'], axis=1)\
+    #     .apply(color_column['DHeight17'], subset=['DHeight17'], axis=1)\
+    #     .apply(color_column['DHeight19'], subset=['DHeight19'], axis=1)\
+
+
+    concat_str = "new_df.style"
+    for i in color_column_name:
+        concat_str = concat_str + f".apply(color_column['{i}'], subset=['{i}'], axis=1)"
+
+    print(concat_str)
+    new_df = eval(concat_str) 
+
+or use reduce
+    new_df = reduce(lambda obj,x: obj.apply(color_column[x], subset=[x], axis=1), [new_df.style] + color_column_name)
+
+    reduce use return value as the first variable for next computation
+
