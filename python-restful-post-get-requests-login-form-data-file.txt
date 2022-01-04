@@ -7,6 +7,15 @@ session = requests.Session()
 res = session.post(login_url, data= data)
 print(res.text)
 
+there's a weird thing, the website header is multiple-form-data, not json
+and if you use data = "{'a':['b','c'], 'd':{'e':'f'}}", it will be an error,
+'cause python requests library can't handle nested data,
+but if you put that {'a'...} into a file, and use data = f.read()
+it will work
+or use json = "{...}", and set the post request header = {'Content-Type': 'application/json'}
+but I don't know if the website gonna support that request header
+since the website header is 'Content-Type': 'multipart/form-data; boundary=c7cbfdd911b4e720f1dd8f479c50bc7f'
+
 ----------------------------------------------------
 #REST #RESTFul #restful
 
