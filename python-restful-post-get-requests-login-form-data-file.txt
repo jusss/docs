@@ -1,0 +1,62 @@
+in website, submit a form, it is post it a form data
+use python requests to post form data, 'data' parameter is a string which contain a dict,
+
+login_url = 'http://xxx.org/login/'
+data = {'name': value, 'password': value }
+session = requests.Session()
+res = session.post(login_url, data= data)
+print(res.text)
+
+----------------------------------------------------
+#REST #RESTFul #restful
+
+https://requests.readthedocs.io/en/master/api/
+params – (optional) Dictionary, list of tuples or bytes to send in the query string for the Request.
+data – (optional) Dictionary, list of tuples, bytes, or file-like object to send in the body of the Request.
+json – (optional) A JSON serializable Python object to send in the body of the Request.
+headers – (optional) Dictionary of HTTP Headers to send with the Request.
+
+in python requests, `data' will upload a dict as
+"emp2Name=Jesse&emp2Op=insert&emp2Table=emp2&emp2Age=49"
+`json' will upload a dict as
+"{\"emp2Name\": \"Jesse\", \"emp2Op\": \"insert\", \"emp2Table\": \"emp2\", \"emp2Age\": 49}"
+
+#############################################################
+
+about REST Ful API,
+
+url, headers, params, data, json, auth, cookies, timeout, allowRedirects, stream, files
+
+    //1. every value in key-value should do URLEncoder.encode in java, but python has urllib.urlencode(dict) for a dict
+    //2. pass a key-value string like a=b&c=d, not a json {a=b;c=d}, declare this in header by "Content-Type", "application/x-www-form-urlencoded"
+    //3. params is in body in post, in header in get
+    //4. headers is look like accept: application/json content-type: application/json
+    //5. params is in body, so they're same, when headers application/x-www-form-urlencoded, params and body like parameter=value&also=another
+    //6. multipart/form-data is for files, application/json is for json like "{a=b;c=d}"
+    //7. check post or get first, check json or urlencoded second,
+    //8. if it's urlencoded, value should be urlencoded, if it's json, the dict or map should be to json
+    //9. headers maybe a json, and body maybe bytes from file
+
+# restful passing file
+self.headers = {'Ocp-Apim-Subscription-Key': '45af723cb74d4fb0b07bbedb68f73b80','Content-type': 'audio/ogg; codec=audio/pcm; samplerate=16000','Accept': 'application/json'}
+response = self.http_client.fetch('https://westus.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=zh-CN',method='POST',headers=self.headers,body=open(self.filename,'rb').read())
+
+# passing json
+post_data={"reqType":0,"perception":{"inputText":{"text":p},"inputImage":{"url": "imageUrl"},"selfInfo":{"location":{"city":"北京","province":"北京","street":"信息路"}}},"userInfo":{"apiKey":"79229c49d0014c68ab90b9282ebf7156","userId": "360371"}}
+                data_send = json.dumps(post_data).encode("utf-8")
+                response = self.http_client.fetch('http://openapi.tuling123.com/openapi/api/v2',method='POST',body=data_send)
+
+# passing urlencoded
+paramsDict = {'app_id':'2111117142',
+              'question':questionBytes,
+              'time_stamp':time_stamp,
+              'nonce_str':nonce_str,
+              'session':'10000'
+             }
+body = urllib.urlencode(paramsDict)
+response = http_client.fetch(url, method='POST', body=body,  validate_cert = False)
+
+//10. body are bytes, the different is that read bytes from file, or turn json to bytes or turn urlencoded to bytes
+
+
+
