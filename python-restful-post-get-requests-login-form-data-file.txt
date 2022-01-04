@@ -47,16 +47,16 @@ url, headers, params, data, json, auth, cookies, timeout, allowRedirects, stream
     //9. headers maybe a json, and body maybe bytes from file
 
 # restful passing file
-self.headers = {'Ocp-Apim-Subscription-Key': '45af723cb74d4fb0b07bbedb68f73b80','Content-type': 'audio/ogg; codec=audio/pcm; samplerate=16000','Accept': 'application/json'}
+self.headers = {'Ocp-Apim-Subscription-Key': '0','Content-type': 'audio/ogg; codec=audio/pcm; samplerate=16000','Accept': 'application/json'}
 response = self.http_client.fetch('https://westus.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=zh-CN',method='POST',headers=self.headers,body=open(self.filename,'rb').read())
 
 # passing json
-post_data={"reqType":0,"perception":{"inputText":{"text":p},"inputImage":{"url": "imageUrl"},"selfInfo":{"location":{"city":"北京","province":"北京","street":"信息路"}}},"userInfo":{"apiKey":"79229c49d0014c68ab90b9282ebf7156","userId": "360371"}}
+post_data={"reqType":0,"perception":{"inputText":{"text":p},"inputImage":{"url": "imageUrl"},"selfInfo":{"location":{"city":"北京","province":"北京","street":"信息路"}}},"userInfo":{"apiKey":"6","userId": "0"}}
                 data_send = json.dumps(post_data).encode("utf-8")
                 response = self.http_client.fetch('http://openapi.tuling123.com/openapi/api/v2',method='POST',body=data_send)
 
 # passing urlencoded
-paramsDict = {'app_id':'2111117142',
+paramsDict = {'app_id':'2',
               'question':questionBytes,
               'time_stamp':time_stamp,
               'nonce_str':nonce_str,
