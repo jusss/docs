@@ -1,3 +1,9 @@
+
+findElementInList = lambda element, alist: [y for x, y in zip(alist, list(range(len(alist)))) if x == element]
+
+print(findElementInList(3,[1,2,3,5,6,3])) == [2,5]
+
+
 liftM2 one in alist, match all in blist, 
 same as
 
