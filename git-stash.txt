@@ -1,0 +1,25 @@
+git stash -u # This will stash everything, including unstaged files
+git stash pop
+
+for special file
+git stash push -- file1.txt
+or git stash save -- file1.txt
+Git stash save is the deprecated version of Git stash push.
+
+git stash push -m "Change comment" -- file1.txt
+git stash list
+
+
+git stash save -- create_dataset/configs/sdk.yaml
+or  git stash save create_dataset/configs/sdk.yaml
+git stash list
+git stash apply "stash@{0}"
+or git stash pop
+
+# rollback file to unchanged version
+git checkout -- path/to/file
+
+# rollback
+git reset --hard commit-id
+
+or git stash -p
