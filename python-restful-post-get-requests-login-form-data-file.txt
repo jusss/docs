@@ -1,3 +1,11 @@
+submit text form post it with params 
+submit file form post it with files
+
+<form enctype="multipart/form-data" action="/paste" method="post"><input type="text" name="paste" multiple> <input type="submit" value="Submit"> </form>
+<form enctype="multipart/form-data" action="/text" method="post"><input type="file" name="text" multiple> <input type="submit" value="Submit"> </form>
+
+
+----------------------------------------
 in website, submit a form, it is post it a form data
 use python requests to post form data, 'data' parameter is a string which contain a dict,
 
