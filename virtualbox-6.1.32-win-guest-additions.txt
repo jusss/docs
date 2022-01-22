@@ -1,0 +1,19 @@
+https://download.virtualbox.org/virtualbox/6.1.32/VirtualBox-6.1.32-149290-Win.exe
+https://download.virtualbox.org/virtualbox/6.1.32/
+
+setting -> store -> IDE controler add VBoxGuestAdditions.iso
+
+uname -r # get kernel name
+apt install linux-headers-xxx # install kernel headers
+
+apt install build-essential
+
+mkdir /mnt/cdrom
+mount /dev/cdrom /mnt/cdrom
+cd /mnt/cdrom/
+./VBoxLinuxAdditions.run
+will generate module for current kernel, and generate the initrd.img
+
+systemctl reboot
+
+enable share clipboard, RightCtrl-f to fullscreen
