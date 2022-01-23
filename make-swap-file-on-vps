@@ -1,0 +1,19 @@
+#!/bin/bash
+umask 066; dd bs=1M count=4096 if=/dev/zero of=/myswap; mkswap /myswap;
+swapon /myswap
+
+
+<[exa]> `umask 066; truncate -s 4G /myswap; mkswap /myswap; swapon /myswap`
+<[exa]> the hard part ^
+<whatif> will-try  [02:20]
+<whatif> [exa]: swapon: /myswap: skipping - it appears to have holes.
+<whatif> free -h Swap:            0B          0B          0B  [02:22]
+<[exa]> oh noes
+<whatif> [exa]: someting wrong?
+<[exa]> try fixing it with something like `dd bs=1M count=4096 if=/dev/zero
+        of=/myswap`
+<[exa]> I didn't realize it's linux  [02:23]
+<whatif> [exa]: done, then what? swapon /myswap?  [02:25]
+<whatif> aha, mkswap /myswap; swapon /myswap worked  [02:26]
+<[exa]> great  [02:27]
+

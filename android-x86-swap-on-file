@@ -1,0 +1,37 @@
+or create an iso file on android storage,
+dd bs=1048576 count=512 if=/dev/zero of=/sdcard/swap.iso
+mknod /dev/block/loop8 b 7 8
+mkswap /sdcard/swap.iso
+losetup /dev/block/loop8 /sdcard/swap.iso
+mkswap /dev/block/loop8
+swapon /dev/block/loop8
+free -h
+
+it's weird, android swapon can work on /mnt/media_rw/xxx/swap.iso
+but cp that swap.iso to /sdcard/script/, swapon it will error invalid parameter
+the success one is exfat file system, fail on is fat32
+
+if there is 2GB disk space partition on android, and it's /dev/block/mmcblk1p5
+then 
+mkswap /dev/block/mmcblk1p5
+swapon /dev/block/mmcblk1p5
+sysctl -w vm.swappiness=50 
+
+-----------------------------
+on PC
+umask 066
+mount /dev/sdb1 /mnt
+sudo dd bs=1M count=2046 if=/dev/zero of=/mnt/swap.iso
+sudo mkswap /mnt/swap.iso
+sudo umount /mnt 
+
+on android-x86
+ls /mnt/media_rw/ # find out where usb-stick is mounted
+swapon /mnt/media_rw/xxx/swap.iso
+free -h
+
+cube i6 air, the card reader is very slow, and the emmc storage is slow too,
+usb 3.0 stick connected via otg, faster than card reader and emmc
+the usb stick no need to be ext4, exfat or vfat will ok, since swap on an iso file,
+not a partition
+
