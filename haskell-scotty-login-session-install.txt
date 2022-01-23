@@ -1,0 +1,28 @@
+git clone https://github.com/asg0451/scotty-login-session.git
+cd scotty-login-session
+cabal v2-build
+there're 3 steps need to change the lib, and follow it
+two are to add ghc feature to the two files
+the third is add MonadUnliftIO m to the type constraint of runSql' and runDB'
+and import Control.Monad.IO.Unlift
+
+vim scotty-login-session.cabal, in build-depends add 'unliftio-core'
+then cabal v2-build will be done
+
+cabal repl 
+import Web.Scotty.Login.Session will be ok
+
+cabal v2-install --lib
+
+ghc examples/Simple.hs -package scotty 
+
+ghc -package scotty -optl-static your-code.hs to binary and pass it to the vps, run it
+
+another way is cabal v2-install those needed file to somewhere,
+then run dpkg-deb --build BuildPackage to generate deb package to install it on vps
+
+and third way is using swapon file to extend the memory of vps, and compile it on vps
+
+#!/bin/bash
+umask 066; dd bs=1M count=4096 if=/dev/zero of=/myswap; mkswap /myswap;
+swapon /myswap
