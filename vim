@@ -1,3 +1,6 @@
+reference
+https://www.cnblogs.com/warrior/p/12760845.html
+----------------------------------
 "F5 run"
 nnoremap <F5> <esc>:w<enter>:!runghc %:p<enter>
 inoremap <F5> <esc>:w<enter>:!runghc %:p<enter>
