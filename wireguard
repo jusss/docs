@@ -1,3 +1,10 @@
+on Server
+Address use 10.0.0.1/24
+AllowedIPs use 10.0.0.2/32
+
+on Client
+Address use 10.0.0.2/32
+------------------------------------------------
 on debian, wireguard-tools wireguard-dkms,
 make sure linux-image-amd64 and linux-headers-$(uname -r) 
 are installed
