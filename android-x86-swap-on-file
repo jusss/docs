@@ -1,3 +1,18 @@
+usb stick, sandisk, usb 3.2 Gen 1, 256G, SanDisk Extreme PRO,
+come with exfat file system,
+
+the asus laptop left usb port 365MB/s write speed,
+the right usb port 47.8MB/s write speed,
+
+dd bs=1M count=12000 if=/dev/zero of=/mnt/swap12g.iso
+only take 35s
+
+it's weird, swap2g.iso with exfat, 
+on android swapon swap2g.iso, it shows invalid parameter
+but mkfs.vfat /dev/sdb1, make it vfat,
+swapon swap2g.iso is ok
+
+----------------------------------
 or create an iso file on android storage,
 dd bs=1048576 count=512 if=/dev/zero of=/sdcard/swap.iso
 mknod /dev/block/loop8 b 7 8
@@ -21,9 +36,9 @@ sysctl -w vm.swappiness=50
 on PC
 umask 066
 mount /dev/sdb1 /mnt
-sudo dd bs=1M count=2046 if=/dev/zero of=/mnt/swap.iso
-sudo mkswap /mnt/swap.iso
-sudo umount /mnt 
+dd bs=1M count=2046 if=/dev/zero of=/mnt/swap.iso
+mkswap /mnt/swap.iso
+umount /mnt 
 
 on android-x86
 ls /mnt/media_rw/ # find out where usb-stick is mounted
