@@ -1,0 +1,36 @@
+session and cookie
+    
+get "/test" $ do
+         agent <- header "User-Agent"
+         liftIO $ print agent
+         setSimpleCookie "this-is-cookie-name" "b" -- or setHeader "Cookie" "a=b"
+         text "hi"
+
+there's is request and response
+client with 'get' request, server give an response
+
+header "User-Agent" could let server get client's browser info from client's request
+setSimpleCookie "this-is-cookie-name" "b" would let server give client a response header, with Set-Cookie, then client will save this cookie and use it in header to do the next request
+
+so we can set SessionId=6 in the cookie, by server give a response with Set-Header
+
+with that SessionId in the cookie, client do the next request with the cookie
+server will recognize who the client is and let it pass
+
+and also server could use response header to send a delete cookie to client,
+then client browser would delete it
+
+
+`addSession conf' would send client browser a header session id
+Session {sessionSid = "23d2ed156291952634b1c644343eb5c431f97a5eb77168965269ec0cbe4d78e2b8f182de66a6c95ab346f0d7de6e612cf244065ede8c7fb8cf8ef7cf91c4e4fce958bee71f57707ed3ef443e1cdc865394273fe3e783e35b5ce6f8f11bd9ecfef54a1dead8a7478d63e579cf1218318dd1d9c31a2d5ea2ca5e40", sessionExpiration = 2022-01-30 09:34:18.209000774 UTC}
+
+
+setHeader "Set-Cookie" cookie
+
+server use setHeader "Set-Cookie" response to client browser,
+then client will save the cookie, which contain SessionId, use it for the rest request
+then server use Header "Cookie" to get the browser's cookie, and check the SessionId
+if it's expired, then sent Delete-Cookie as response header, browser take that then delete cookie
+
+in chromium F12, network could check the header info
+

@@ -1,4 +1,30 @@
 
+cabal unload all module in current scope,
+
+meet `hidden package', change the *.cabal file
+
+Library
+    exposed-modules: add-the-module-name
+    build-depends: add-the-package-name
+
+then cabal v2-build or cabal v2-install --lib
+
+ghc-pkg list, get all the packages installed
+expose or hidden, ghci care that,
+but cabal doesn't care that, cabal care trusted or distrusted
+
+mv /root/.ghc/x86_64-linux-8.8.4/environments/default /root/ghc-environment-defualt
+
+
+this file created by cabal v2-install, but used by ghc to check package expose/hidden
+rm /root/.ghc/x86_64-linux-8.8.4/environments/default
+ln -s ~/.cabal/store/ghc-8.10.1/package.db/ ~/.ghc/x86_64-linux-8.8.4/package.conf.d
+https://github.com/haskell/cabal/issues/6262
+
+
+
+------------------------------------------
+
 mkdir new_project
 cd new_project
 cabal v2-init # generate cabal config file
