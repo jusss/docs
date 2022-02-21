@@ -1,0 +1,11 @@
+test local harddisk
+sudo dd if=/dev/zero of=./test.iso bs=1M count=1024
+it will show writing speed per second
+
+test which port is usb 3.0, do the same
+
+emmc 20MB/s
+HDD 30MB/s
+usb 3 stick 300MB/s
+SSD 800MB/s
+memory card 10GB/s
