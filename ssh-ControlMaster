@@ -5,3 +5,7 @@ ControlMaster auto
 ControlPath ~/.ssh/master-%r@%h:%p
 
 # this will generate a socket file in ~/.ssh/master-user@remote:port
+
+then run "ssh -p 22 -N root@moon"
+now ssh again will be very fast
+and vim scp://root@moon:22/a.hs will be very fast
