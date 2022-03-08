@@ -1,0 +1,22 @@
+before you push you code to repo
+you may want to do `git pull` first
+but git pull may conflict, if the same file on repo were changed after you latest pull
+so get the conflict files
+
+then git diff those file, get those files how you changed, then git restore those file,
+then change them again
+
+for example scripts/a.py is conflicted
+git diff scripts/a.py > diff.txt
+git checkout -- scripts/a.py
+git pull
+then change scripts/a.py again
+vim diff.txt scripts/a.py
+:vsplit
+git add, commit, push
+
+no -or + are the same part
+only + is the add part
++ follow - is the changed part
+
+:%s/^M//g    remove ^M, input ^M by C-v C-m 

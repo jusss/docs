@@ -1,3 +1,5 @@
+check if a int list is ordered
+all (== True) $ fmap (\x -> (fst x) >= (snd x)) $ zip (tail [1..6]) [1..6]
 
 foldMap = fold . fmap 
 
