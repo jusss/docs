@@ -1,0 +1,37 @@
+hidden package issue
+git clone ...
+cabal v2-build
+cabal v2-install --lib
+ghci not found, cabal repl is ok, repl can load hs file to run
+cabal like virtualenv in python, ghci won't read cabal installed package, it doesn't change ~/.ghci file
+
+change cabal.project file, ghci only read ~/.ghci file, cabal repl read what cabal installed
+cabal.project is in top of the project, created by youself
+https://cabal.readthedocs.io/en/3.4/cabal-project.html
+https://cabal.readthedocs.io/en/3.6/cabal-commands.html
+https://cabal.readthedocs.io/en/3.4/cabal-commands.html#cabal-v2-run
+
+use
+1. cabal repl can load hs file to run, :load Main in cabal repl
+or 
+2. create cabal.project file in top of the project
+or
+3. cabal v2-run a.hs,
+and a.hs like
+#!/usr/bin/env cabal
+{- cabal:
+build-depends: base ^>= 4, shelly ^>= 1.9
+-}
+main :: IO()
+main = do
+...
+or
+https://cabal.readthedocs.io/en/3.4/cabal-commands.html#cabal-v2-install
+cabal v2-install --lib xlsx, make sure use the package name so you can use it directly in ghci
+cabal v2-install --lib lens
+now runghc a.hs is ok
+
+or
+cabal v1-install do the same what pip do, and cabal v2-install do the same what virtualenv do
+cabal v1-build
+cabal v1-install
