@@ -1,0 +1,25 @@
+in choregraphe, every class is a service, run by brooker,
+every service has init, start, stop, output, input method,
+assume those service run in coroutine with async/await,
+and use subscribed event to update info in different services.
+so a dag is combine those services
+like Promise in js, and >>= in Haskell
+
+
+write to-do in class file, instance those class and call then mothod to run those action chains
+
+dag could be implemented by asyncio, async/await then 
+
+python, generator yield, async/await
+ES6 Promise
+Java 7 Concurrent.Future
+kotlin coroutine
+haskell ContT
+scheme callcc, shift/reset
+
+github/docs/ALL-THE-ANSWERS-II
+github/docs/python-async
+code/python/python-asyncio.py
+
+there're coroutine and continuation, and continuation can implement coroutine, but coroutine cannot implement continuation
+and continuation can implement any control flow pattern
