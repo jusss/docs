@@ -1,0 +1,165 @@
+
+python async/await, generator/yield, use select/epoll to implement those
+python before 3.2 use generator/yield to implement coroutine, in 3.4
+with async/await
+and asyncio package is built-in
+
+use await coroutine_func() to chain coroutine_func,
+use task.add_done_callback(callback_func) to call non-coroutine-func
+
+1. create async function
+use
+async def coroutine_func():
+    await asyncio.sleep(1) # give the control to other func
+    await asyncio.gather(another_coroutine_func(),...)
+    result = await another_coroutine_func() # use await to chain async actions
+or
+@asyncio.coroutine
+def coroutine_func():
+    yield from xxx
+the @asyncio.coroutine is generator-based will be removed in 3.10,
+async def is native coroutine
+
+2. run async function
+
+in python 3.7+
+asyncio.run(coroutine_func())
+
+same as
+loop = asyncio.get_event_loop()
+loop.run_until_complete(coroutine_func()) # run from here, blocking
+loop.close()
+
+this same as runBlock{ } in kotlin, but in android, no blocking
+function, and python create loop to block the rest
+
+3. create task
+
+f = coroutine_func() # will not run immediately,
+put f in an event loop
+
+loop = asyncio.get_event_loop()
+loop.run_until_complete(f)
+
+or asyncio.run(f) # will run it
+
+or wrap it to a task object
+
+loop=asyncio.get_event_loop()
+task = loop.create_task(f) # or asyncio.ensure_future(f)
+task.add_done_callback(callback_func) # when this async is done, call back
+loop.run_until_complete(task) # run_until_complete need a future object
+
+def callback_func(t, future):
+   print('callback:',t, future.result())
+
+asyncio.gather(coroutine_func(), another_coroutine_func())
+will schedule those as a Task and parallelism to run
+
+4.  create queue, communicate in different async functions?
+q = asyncio.Queue()
+
+in async def func():
+ await q.put((key, value))
+ k, v = await q.get()
+ q.task_done()
+
+await q.join()
+
+5. async in generator
+@async.coroutine
+def f():
+  s = yield from another_async_func()
+
+await is used to native async func like 'async def f', and yield from
+is used to @async.coroutine def f
+like the other generator func
+def gen():
+ yield a,b,c
+g=gen()
+next(g) == (a,b,c)
+https://realpython.com/async-io-python/https://docs.python.org/3/library/concurrent.futures.html#concurrent.futures.Futurehttps://docs.python.org/3/library/asyncio-future.html?highlight=future#asyncio.Future
+
+--0000000000009c4b8405debd23a0
+Content-Type: text/html; charset="UTF-8"
+
+<pre style="word-wrap:break-word;white-space:pre-wrap">python async/await, generator/yield, use select/epoll to implement those
+python before 3.2 use generator/yield to implement coroutine, in 3.4 with async/await
+and asyncio package is built-in
+
+use await coroutine_func() to chain coroutine_func,
+use task.add_done_callback(callback_func) to call non-coroutine-func
+
+1. create async function
+use 
+async def coroutine_func():
+    await asyncio.sleep(1) # give the control to other func
+    await asyncio.gather(another_coroutine_func(),...)
+    result = await another_coroutine_func() # use await to chain async actions
+or 
+@asyncio.coroutine
+def coroutine_func():
+    yield from xxx
+the @asyncio.coroutine is generator-based will be removed in 3.10, async def is native coroutine
+
+2. run async function
+
+in python 3.7+
+asyncio.run(coroutine_func())
+
+same as 
+loop = asyncio.get_event_loop()
+loop.run_until_complete(coroutine_func()) # run from here, blocking
+loop.close()
+
+this same as runBlock{ } in kotlin, but in android, no blocking function, and python create loop to block the rest
+
+3. create task
+
+f = coroutine_func() # will not run immediately, 
+put f in an event loop 
+
+loop = asyncio.get_event_loop()
+loop.run_until_complete(f)
+
+or asyncio.run(f) # will run it
+
+or wrap it to a task object
+
+loop=asyncio.get_event_loop()
+task = loop.create_task(f) # or asyncio.ensure_future(f)
+task.add_done_callback(callback_func) # when this async is done, call back
+loop.run_until_complete(task) # run_until_complete need a future object
+
+def callback_func(t, future):
+   print(&#39;callback:&#39;,t, future.result())
+
+asyncio.gather(coroutine_func(), another_coroutine_func())
+will schedule those as a Task and parallelism to run
+
+4.  create queue, communicate in different async functions?
+q = asyncio.Queue()
+
+in async def func():
+ await q.put((key, value))
+ k, v = await q.get()
+ q.task_done()
+
+await q.join()
+
+5. async in generator
+@async.coroutine
+def f():
+  s = yield from another_async_func()
+
+await is used to native async func like &#39;async def f&#39;, and yield from is used to @async.coroutine def f
+like the other generator func
+def gen():
+ yield a,b,c
+g=gen()
+next(g) == (a,b,c)
+
+https://realpython.com/async-io-python/">https://realpython.com/async-io-python/
+https://docs.python.org/3/library/concurrent.futures.html#concurrent.futures.Future
+https://docs.python.org/3/library/asyncio-future.html?highlight=future#asyncio.Future
+
