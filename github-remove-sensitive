@@ -1,0 +1,22 @@
+
+https://rtyley.github.io/bfg-repo-cleaner/
+download bfg.jar from https://repo1.maven.org/maven2/com/madgag/bfg/1.14.0/bfg-1.14.0.jar
+
+#java -jar bfg.jar --strip-blobs-bigger-than 100M some-big-repo.git
+#cd some-big-repo.git
+#git reflog expire --expire=now --all && git gc --prune=now --aggressive
+#git push
+
+https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository
+
+1. remove it on local
+cd repo
+git rm sensitive-file
+git commit -m 'remove sensitive file'
+java -jar bfg.jar --delete-files sensitive-file
+git reflog expire --expire=now --all && git gc --prune=now --aggressive
+git push --force
+
+2. remove it on github
+file a ticket to remove commit history on github
+https://support.github.com/request?tags=docs-generic
