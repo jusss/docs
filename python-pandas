@@ -21,7 +21,7 @@ https://stackoverflow.com/questions/36213383/pandas-dataframe-how-to-apply-funct
 
 
 if __name__ == "__main__":
-        input_file = "C:\\Users\\le.liu\\ADAS_20211116-164204_184_0_postobs_v2.csv"
+        input_file = "a.csv"
 
         dataset = pd.read_csv(input_file, skiprows=2) # skip 2 lines
         df = pd.DataFrame(dataset, columns=['id','x']) # only take id and x column
