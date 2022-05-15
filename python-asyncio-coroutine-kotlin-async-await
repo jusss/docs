@@ -1,0 +1,151 @@
+
+import asyncio
+
+async def loop1():
+    n=1
+    while n<6:
+        print("loop1")
+        n=n+1
+        await asyncio.sleep(1)
+    return 1
+
+async def loop2():
+    n=1
+    while n<6:
+        print("loop2")
+        n=n+1
+        await asyncio.sleep(1)
+    return 2
+
+async def loop3():
+    n=1
+    while n<3:
+        print("loop3")
+        n=n+1
+        await asyncio.sleep(1)
+    return 3
+
+async def loop4():
+    n=1
+    while n<3:
+        print("loop4")
+        n=n+1
+        await asyncio.sleep(1)
+    return 4
+
+#async def main():
+    #L = await asyncio.gather(loop1(),loop2())
+    #print(L)
+    #r3 = await loop3()
+    #print(r3)
+
+async def main():
+    _loop1 = loop1()
+    # asyncio.create_task will run immediately, like kotlin's async {...}
+    # task1 and task2 will run parallelism, and task4 will run after task1 is done
+    task1=asyncio.create_task(_loop1)
+    task2=asyncio.create_task(loop2())
+
+    # await will block and wait the result
+    await task1
+    task4=asyncio.create_task(loop4())
+
+    await task2
+    task3=asyncio.create_task(loop3())
+
+    # you need await to block the result, otherwise it will end too soon
+    #await task3
+    # doSomething
+    #await task4
+    # same to
+    await asyncio.gather(task3, task4)
+
+
+asyncio.run(main())
+print("async is done")
+
+--------------------------------------------------------------
+import asyncio
+
+
+async def func(i: int) -> None:
+    for _ in range(i):
+        await asyncio.sleep(1)
+    print(f"Task {i} completed.")
+
+
+async def main() -> None:
+    coro1 = func(1)
+    coro2 = func(2)
+    task1 = asyncio.create_task(coro1)
+    task2 = asyncio.create_task(coro2)
+    await task1
+    coro3 = func(3)
+    await asyncio.gather(task2, coro3)
+
+
+asyncio.run(main())
+---------------------------------------------------------------------
+<whatif> in kotlin's coroutine, result =
+         CoroutineScope(NonCancellable).async(Dispatchers.IO) {
+         doSomeBlockingIO }, this will run immediately, and use result.await()
+         to get the result, I look at the asyncio, that await asyc_def_func()
+         is blocking, but how to let that async_def_func() run?  [23:07]
+
+<whatif> for examply I need two async function, and when they're all done,
+         then run something  [23:08]
+
+<whatif> and I need their result
+
+<jinsun> whatif:
+         https://docs.python.org/3/library/asyncio-task.html#asyncio.gather
+
+<whatif> jinsun: what about I need loop1 and loop2 run parallelism at first,
+         but when loop1 is done, to call loop3, how to do that?  [23:15]
+
+<jinsun> whatif: use create_task to create tasks for both loop1 and loop2,
+         then await task1, and then create task for loop3,
+         https://docs.python.org/3/library/asyncio-task.html#asyncio.create_task
+
+<whatif> jinsun: task1=loop.create_task(loop1);task2=loop.create_task(loop2);
+         await task1; task3=loop.create_task(loop3), then how I should start
+         it?  [23:23]
+<whatif> loop.run_until_complete(?)
+
+<jinsun> whatif: yes I think, but I'd use asyncio.create_task and asyncio.run
+         instead of manually creating a loop unless you really need some low
+         level loop functionality  [23:25]
+
+<jinsun> whatif: also to be clear, that "loop1" and "loop2" are actually
+         coroutines right? not event loops. calling coroutines loop is weird,
+         but having multiple event loops is weirder  [23:28]
+<whatif> jinsun: yes, loop1 is a loop within asyc def function  [23:29]
+<whatif> python's coroutine is weird, not like kotlin's  [23:30]
+
+<whatif> they have async and it will run at the background when call it, and
+         you use await to blocking to wait the result  [23:31]
+<whatif> that's very normal to use
+<whatif> python's await is blocking to wait the result, but how to run it at
+         background?  [23:33]
+<whatif> create and run immediately
+<jinsun> that's what create_task does, I gave a link to its docs above
+
+<jinsun> whatif: here an example if it was not clear what I was talking about,
+         https://bpa.st/47MA  [23:40]
+
+<whatif> jinsun: would "task2 = asyncio.create_task(coro2)" this run
+         immediately? before "await task1"?
+<jinsun> whatif: yes create_task schedules the coroutine to run in the event
+         loop immediately  [23:43]
+
+<agronholm> whatif: potentially at the next yield point  [23:46]
+
+<agronholm> so depends on what you mean by "immediately"
+
+<whatif> jinsun: then this "await asyncio.gather(task2, coro3)" won't bother
+         task2? since it's already running
+<whatif> it can be replaced by "await task2; await coro3"?
+<agronholm> yup  [23:49]
+<jinsun> whatif: yes it is the same thing, you just save a line and get all
+         results together in one list with gather
+<whatif> jinsun: thanks :)  [23:57]
