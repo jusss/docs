@@ -1,4 +1,14 @@
 
+replace a serial in a list by index range
+
+replace_by_index_range = lambda f, alist, index_range: [alist[i] if i not in index_range else f(i)  for i in range(len(alist))]
+
+zipWith = lambda f, alist, blist: [ f(alist[i], blist[i]) for i in range(len(alist if len(alist) < len(blist) else blist)) ]
+
+join = list(reduce(lambda x,y: x+y, alist))
+
+------------------------------------------------
+
 findElementInList = lambda element, alist: [y for x, y in zip(alist, list(range(len(alist)))) if x == element]
 
 print(findElementInList(3,[1,2,3,5,6,3])) == [2,5]
