@@ -1,3 +1,6 @@
+assume 'await asyncio.sleep(1) is just like a 'break' from current loop, and jump to other loop, then jump back
+if you want sleep in current loop to avoid run all loop at once, use time.sleep
+----------------------------------------
 
 import asyncio
 
@@ -6,6 +9,8 @@ async def loop1():
     while n<6:
         print("loop1")
         n=n+1
+        # if you dont want loop1 run at the same time with other loop, use time.sleep, asyncio.sleep just like a break won't block current loop
+        time.sleep(2)
         await asyncio.sleep(1)
     return 1
 
@@ -14,6 +19,7 @@ async def loop2():
     while n<6:
         print("loop2")
         n=n+1
+        time.sleep(2)
         await asyncio.sleep(1)
     return 2
 
@@ -22,6 +28,7 @@ async def loop3():
     while n<3:
         print("loop3")
         n=n+1
+        time.sleep(2)
         await asyncio.sleep(1)
     return 3
 
@@ -30,6 +37,7 @@ async def loop4():
     while n<3:
         print("loop4")
         n=n+1
+        time.sleep(2)
         await asyncio.sleep(1)
     return 4
 
