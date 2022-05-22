@@ -1,5 +1,9 @@
 assume 'await asyncio.sleep(1) is just like a 'break' from current loop, and jump to other loop, then jump back
 if you want sleep in current loop to avoid run all loop at once, use time.sleep
+
+1. asyncio.gather(loop1(), loop2()) will start loop1 and loop2 at the same time, 'n=1' and 'n=1' in loop1 and loop2 both will start
+2. and 'while' in loop1 will make loop2 won't run the rest,
+3. but 'await asyncio.sleep(1)' in 'while' will jump to loop2 to run the rest
 ----------------------------------------
 
 import asyncio
