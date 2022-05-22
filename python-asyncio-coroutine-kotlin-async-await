@@ -1,9 +1,48 @@
 assume 'await asyncio.sleep(1) is just like a 'break' from current loop, and jump to other loop, then jump back
 if you want sleep in current loop to avoid run all loop at once, use time.sleep
+time.sleep will block whole thread, and asyncio.sleep will wait in parallelism, only block current function, won't block other function
 
-1. asyncio.gather(loop1(), loop2()) will start loop1 and loop2 at the same time, 'n=1' and 'n=1' in loop1 and loop2 both will start
-2. and 'while' in loop1 will make loop2 won't run the rest,
-3. but 'await asyncio.sleep(1)' in 'while' will jump to loop2 to run the rest
+1. asyncio.gather(loop1(), loop2()) will start loop1, until 'await asyncio.sleep(1)' in loop1, will jump to run loop2
+2. and 'while' in loop1 will make loop2 won't run, but 'await asyncio.sleep(1)' in 'while' will jump to loop2 to run
+3. 'await asyncio.sleep(1)' in loop1 will jump to loop2 and the rest in loop1 will still wait for 1 sec, like waiting in parallelism
+
+-------------------------------------------------------------
+async def loop1():
+    print(datetime.datetime.now(), f"loop1 is created")
+    n=1
+    while n<6:
+        print(datetime.datetime.now(), f"loop1, {n}")
+        n=n+1
+        await asyncio.sleep(2)
+    return 1
+
+async def loop2():
+    print(datetime.datetime.now(), f"loop2 is created")
+    n=1
+    while n<6:
+        print(datetime.datetime.now(), f"loop2, {n}")
+        n=n+1
+        await asyncio.sleep(3)
+    return 2
+
+async def main():
+    await asyncio.gather(loop1(),loop2())
+
+asyncio.run(main())
+
+2022-05-22 10:54:00.929398 loop1 is created
+2022-05-22 10:54:00.929433 loop1, 1
+2022-05-22 10:54:00.929484 loop2 is created
+2022-05-22 10:54:00.929512 loop2, 1
+2022-05-22 10:54:02.931334 loop1, 2
+2022-05-22 10:54:03.931331 loop2, 2
+2022-05-22 10:54:04.933358 loop1, 3
+2022-05-22 10:54:06.934308 loop2, 3
+2022-05-22 10:54:06.934538 loop1, 4
+2022-05-22 10:54:08.937405 loop1, 5
+2022-05-22 10:54:09.936334 loop2, 4
+2022-05-22 10:54:12.937923 loop2, 5
+
 ----------------------------------------
 
 import asyncio
