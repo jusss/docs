@@ -1,0 +1,27 @@
+after installed android-x86, and destored DnX and other android partition,
+now it can restore the official android system that come with the factory
+this will destore windows 10 system, after restore android, you may want to restore windows
+
+
+1. first, in the windows 10, use os swith to android, so it can get into DnX mode,
+    but it will boot failed since the android system is deleted, don't worry, press
+    Power Volumn+ and Volumn- all three buttons together, it still can get into DnX mode
+
+2. download the i6sg rom from https://pan.baidu.com/s/1ntvLcNn, or search it on https://www.51cube.com/firmware/?search=i6
+
+3. I tried it in windows 10, and the intel tools doesn't work since fastboot can't recognize the device, so it won't flash the rom,
+    so in archlinux, cat that flash.sh from rom, then run
+    sudo fastboot flash fw_stage2 BYTC_IFWI_X64_R_MRDP1_7004_00_SecEnabled_EMMC.bin
+    sudo fastboot flash osloader efilinux-userdebug.efi
+    sudo fastboot boot droidboot.img
+    sudo fastboot oem wipe ESP
+    ./flash.sh
+    when it's done, it will be power off, then power it on will be ok.
+
+https://groups.google.com/g/android-x86/c/_7-giIRXZvE
+There is another Fastboot implementation though, which is much earlier in the boot process. It's called "DNX mode" and it's supposed to be used for recovery if even the bootloader and Fastboot partition were destroyed. As far as I know, it's directly built into the BIOS of the device, because it boots even before the BIOS menu shows up when pressing F2. On my device I can enter DNX mode by pressing Volume Up + Volume Down + Power when turning on the tablet. It then only shows 3 lines "Fastboot starting...".
+64bit android x86 can't shutdown the power because the acpi only support 32bit
+https://bugzilla.kernel.org/show_bug.cgi?id=70931
+Bay Trail-T tablet doesn't support ACPI poweroff, and has only
+32bit EFI runtime service to support shutdown, which can't be
+called from current 64bit linux kernel.
