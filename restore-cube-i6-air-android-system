@@ -25,3 +25,123 @@ https://bugzilla.kernel.org/show_bug.cgi?id=70931
 Bay Trail-T tablet doesn't support ACPI poweroff, and has only
 32bit EFI runtime service to support shutdown, which can't be
 called from current 64bit linux kernel.
+
+power volumn-, together, choose android icon, Volumn-, recovery, 
+
+power Volumn-, is os swith, switch android and windows
+
+adb root
+adb remount
+adb shell
+get root privilege in adb 
+
+[john@moon ~]$ adb shell
+shell@i6-SG:/ $ su
+/system/bin/sh: su: can't execute: Permission denied
+126|shell@i6-SG:/ $ ^D
+[john@moon ~]$ adb root
+restarting adbd as root
+[john@moon ~]$ adb remount
+remount succeeded
+[john@moon ~]$ adb shell
+root@i6-SG:/ # 
+root@i6-SG:/ # ls -l /system/bin/su                                            
+-r-sr--r-- root     root       191389 2022-05-31 00:25 su
+root@i6-SG:/ # chown
+Usage: chown <USER>[:GROUP] <FILE1> [FILE2] ...
+10|root@i6-SG:/ # chown root:shell /system/bin/su                              
+root@i6-SG:/ # ls -l /system/bin/su                                            
+-r-xr--r-- root     shell      191389 2022-05-31 00:25 su
+root@i6-SG:/ # chmod 4755 /system/bin/su                                       
+root@i6-SG:/ # ls -l /system/bin/su                                            
+-rwsr-xr-x root     shell      191389 2022-05-31 00:25 su
+root@i6-SG:/ # 
+
+adb reboot
+now you can 'adb shell' 'su'
+
+
+[john@moon ~]$ sudo adb devices
+List of devices attached
+Baytrail01552010	no permissions; see [http://developer.android.com/tools/device.html]
+[john@moon ~]$ adb kill-server
+[john@moon ~]$ sudo adb kill-server
+cannot connect to daemon at tcp:5037: Connection refused
+[john@moon ~]$ adb adb start-server
+adb: unknown command adb
+[john@moon ~]$ sudo adb start-server
+* daemon not running; starting now at tcp:5037
+* daemon started successfully
+[john@moon ~]$ adb devices
+List of devices attached
+Baytrail01552010	sideload
+
+[john@moon ~]$ adb sideload /tmp/update.zip 
+adb: sideload connection failed: closed
+adb: trying pre-KitKat sideload method...
+sending: '/tmp/update.zip'  100%    
+
+------------------------------------------------------------------------
+android 4.4.4, KitKat, with adb root enabled, android-x86 cpu
+root this devices successfully!
+
+[john@moon supersu]$ ls
+default.prop  x64     mips    armv7  arm       SuperSU-v2.82-201705271822.zip
+x86           mips64  common  arm64  META-INF
+[john@moon supersu]$ adb root
+restarting adbd as root
+[john@moon supersu]$ adb remount
+remount succeeded
+[john@moon supersu]$ adb disable-verity
+error: closed
+[john@moon supersu]$ adb shell setenforce 0
+[john@moon supersu]$ adb push x86/su /system/bin/su
+x86/su: 1 file pushed, 0 skipped. 115.4 MB/s (99916 bytes in 0.001s)
+[john@moon supersu]$ adb push x86/su /system/xbin/su
+x86/su: 1 file pushed, 0 skipped. 126.8 MB/s (99916 bytes in 0.001s)
+[john@moon supersu]$ adb shell chmod 06755 /system/bin/su
+[john@moon supersu]$ adb shell chmod 06755 /system/xbin/su
+[john@moon supersu]$ adb shell /system/bin/su --install
+[john@moon supersu]$ adb shell /system/bin/su --daemon&
+[1] 20628
+[john@moon supersu]$ adb install common/Superuser.apk 
+Performing Push Install
+common/Superuser.apk: 1 file pushed, 0 skipped. 6.8 MB/s (6201401 bytes in 0.866s)
+	pkg: /data/local/tmp/Superuser.apk
+Success
+[john@moon supersu]$ adb shell setenforce 0
+[john@moon supersu]$ adb disable-verity
+error: closed
+[john@moon supersu]$ adb disable-verify
+adb: unknown command disable-verify
+[john@moon supersu]$ 
+
+now open SuperSu app in the android, it ask you if update the su binary file, choose yes,
+then it ask update with ordinary way or twrp, choose ordinary way, then it tells update succeeded,
+ask if reboot, choose yes, after reboot, now open SuperSu app in android again, then open terminal app,
+run 'su', SuperSu will pop up the ask root permission dialog, choose yes, bingo, you have root privilege 
+
+ref
+https://forum.xda-developers.com/t/how-to-manually-update-su-and-supersu-file-through-adb-root-shell.3238991/
+https://github.com/spff/install-supersu-via-adb
+http://selvaline.blogspot.com/2015/09/how-to-install-supersu-on-android-via.html
+https://android.stackexchange.com/questions/224119/how-to-gain-root-on-bluestacks-android-emulator
+
+#1. Unzip SuperSU zip
+
+cd /mnt/sdcard
+mkdir supersu
+cd supersu
+unzip ../SuperSU-v2.82-201705271822.zip
+
+#2. Extract su command and run its post-install
+
+cp x64/su /system/xbin/su
+chmod a+rwx /system/xbin/su
+/system/xbin/su --install
+/system/xbin/su --daemon # When su --daemon is running SuperSU Android UI should detect the root when started
+
+#Continue with the next steps
+
+Then run the SuperUser.apk you got from the internet from the step where says run SuperUser.apk from MediaCenter.
+
