@@ -1,4 +1,87 @@
+after installed android-x86, and destored DnX and other android partition,
+now it can restore the official android system that come with the factory
+this will destore windows 10 system, after restore android, you may want to restore windows
 
+
+1. first, in the windows 10, use os swith to android, so it can get into DnX mode,
+    but it will boot failed since the android system is deleted, don't worry, press
+    Power Volumn+ and Volumn- all three buttons together, it still can get into DnX mode
+
+2. download the i6sg rom from https://pan.baidu.com/s/1ntvLcNn, or search it on https://www.51cube.com/firmware/?search=i6
+
+3. I tried it in windows 10, and the intel tools doesn't work since fastboot can't recognize the device, so it won't flash the rom,
+    so in archlinux, cat that flash.sh from rom, then run
+    sudo fastboot flash fw_stage2 BYTC_IFWI_X64_R_MRDP1_7004_00_SecEnabled_EMMC.bin
+    sudo fastboot flash osloader efilinux-userdebug.efi
+    sudo fastboot boot droidboot.img
+    sudo fastboot oem wipe ESP
+    ./flash.sh
+    when it's done, it will be power off, then power it on will be ok.
+
+https://groups.google.com/g/android-x86/c/_7-giIRXZvE
+There is another Fastboot implementation though, which is much earlier in the boot process. It's called "DNX mode" and it's supposed to be used for recovery if even the bootloader and Fastboot partition were destroyed. As far as I know, it's directly built into the BIOS of the device, because it boots even before the BIOS menu shows up when pressing F2. On my device I can enter DNX mode by pressing Volume Up + Volume Down + Power when turning on the tablet. It then only shows 3 lines "Fastboot starting...".
+64bit android x86 can't shutdown the power because the acpi only support 32bit
+https://bugzilla.kernel.org/show_bug.cgi?id=70931
+Bay Trail-T tablet doesn't support ACPI poweroff, and has only
+32bit EFI runtime service to support shutdown, which can't be
+called from current 64bit linux kernel.
+
+power volumn-, together, choose android icon, Volumn-, recovery, 
+
+power Volumn-, is os swith, switch android and windows
+
+adb root
+adb remount
+adb shell
+get root privilege in adb 
+
+[john@moon ~]$ adb shell
+shell@i6-SG:/ $ su
+/system/bin/sh: su: can't execute: Permission denied
+126|shell@i6-SG:/ $ ^D
+[john@moon ~]$ adb root
+restarting adbd as root
+[john@moon ~]$ adb remount
+remount succeeded
+[john@moon ~]$ adb shell
+root@i6-SG:/ # 
+root@i6-SG:/ # ls -l /system/bin/su                                            
+-r-sr--r-- root     root       191389 2022-05-31 00:25 su
+root@i6-SG:/ # chown
+Usage: chown <USER>[:GROUP] <FILE1> [FILE2] ...
+10|root@i6-SG:/ # chown root:shell /system/bin/su                              
+root@i6-SG:/ # ls -l /system/bin/su                                            
+-r-xr--r-- root     shell      191389 2022-05-31 00:25 su
+root@i6-SG:/ # chmod 4755 /system/bin/su                                       
+root@i6-SG:/ # ls -l /system/bin/su                                            
+-rwsr-xr-x root     shell      191389 2022-05-31 00:25 su
+root@i6-SG:/ # 
+
+adb reboot
+now you can 'adb shell' 'su'
+
+
+[john@moon ~]$ sudo adb devices
+List of devices attached
+Baytrail01552010	no permissions; see [http://developer.android.com/tools/device.html]
+[john@moon ~]$ adb kill-server
+[john@moon ~]$ sudo adb kill-server
+cannot connect to daemon at tcp:5037: Connection refused
+[john@moon ~]$ adb adb start-server
+adb: unknown command adb
+[john@moon ~]$ sudo adb start-server
+* daemon not running; starting now at tcp:5037
+* daemon started successfully
+[john@moon ~]$ adb devices
+List of devices attached
+Baytrail01552010	sideload
+
+[john@moon ~]$ adb sideload /tmp/update.zip 
+adb: sideload connection failed: closed
+adb: trying pre-KitKat sideload method...
+sending: '/tmp/update.zip'  100%    
+
+------------------------------------------------------------------------
 android 4.4.4, KitKat, with adb root enabled, android-x86 cpu
 root this devices successfully!
 
@@ -43,6 +126,7 @@ https://forum.xda-developers.com/t/how-to-manually-update-su-and-supersu-file-th
 https://github.com/spff/install-supersu-via-adb
 http://selvaline.blogspot.com/2015/09/how-to-install-supersu-on-android-via.html
 https://android.stackexchange.com/questions/224119/how-to-gain-root-on-bluestacks-android-emulator
+https://android.stackexchange.com/questions/127230/android-adb-has-root-access-but-no-su-binary
 
 #1. Unzip SuperSU zip
 
