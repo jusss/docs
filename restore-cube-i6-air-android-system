@@ -147,3 +147,103 @@ chmod a+rwx /system/xbin/su
 
 Then run the SuperUser.apk you got from the internet from the step where says run SuperUser.apk from MediaCenter.
 
+-----------------------------------------------------
+
+adb shell
+su
+mknod /dev/loop0 b 7 0 # loop 1 will be b 7 1, and loop8 will be b 7 8, not on /dev/block/loop8
+losetup -f # will show the free node to use when mount -o loop
+
+cat /proc/filesystems will show what file system it support
+
+
+
+adb install ru.meefik.linuxdeploy-1.apk
+open this app, make path to /storage/sdcard1/linux.img, install it
+it will create a linux.img which is mountable, since it may not install succeeded,
+so 'adb pull /storage/sdcard1/linux.img ./' to pc,
+then on pc 'sudo mount -o loop linux.img /mnt'
+sudo debootstrap --no-check-gpg --variant=buildd --arch=i386 --foreign bullseye /mnt/  http://mirrors.aliyun.com/debian
+sudo chroot /mnt/ /bin/bash
+/debootstrap/debootstrap --second-stage
+exit
+sudo umount /mnt
+
+android kitkat 4.4.4 with busybox mount only support ext2 file system on sdcard, exfat won't work,
+also mount ext2 img file on vfat sdcard, failed
+
+since that mount linux.img failed on android kitkat 4.4.4, so use sdcard partition instead of img file
+
+on pc, using sdcard reader and that sdcard connect to pc
+mkfs.ext2 /dev/sdb1
+mount /dev/sdb1 /mnt
+debootstrap --no-check-gpg --variant=buildd --arch=i386 --foreign bullseye /mnt/  http://mirrors.aliyun.com/debian
+chroot /mnt/ /bin/bash
+/debootstrap/debootstrap --second-stage
+export PATH=$PATH:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
+apt update
+apt install vim openssh-server inetutils-ping
+vi /etc/group
+
+inet:x:3003:
+net_rw:x:3004:
+
+exit
+umount /mnt
+
+on android
+adb shell
+su
+busybox mount -t ext2 /dev/block/mmcblk1p1 /mnt/media_rw/sdcard1/
+cd /mnt/media_rw/sdcard1
+chroot . /bin/bash
+export PATH=$PATH:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
+
+addgroup --gid 3003 android_inet
+addgroup --gid 3003 inet
+usermod -g inet _apt
+apt update
+# ref https://askubuntu.com/questions/910865/
+
+echo 'export PATH=$PATH:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin' > source.sh
+exit
+
+vi mount.sh
+
+busybox mount -o bind /dev ./dev
+busybox mount -t proc proc ./proc
+busybox mount -t sysfs sysfs ./sys
+busybox mount -t devpts devpts ./dev/pts
+
+vi umount.sh
+busybox umount ./dev/pts
+busybox umount ./sys
+busybox umount ./proc
+busybox umount ./dev
+
+busybox umount /dev/block/mmcblk1p1
+
+-----------------------------------
+adb shell
+su
+busybox mount /dev/block/mmcblk1p1 /mnt/media_rw/sdcard1
+cd /mnt/media_rw/sdcard1
+sh mount.sh
+chroot . /bin/bash
+source source.sh
+
+dpkg-reconfigure debconf
+
+apt install python3 python3-pip ghc cabal-install screen man 
+apt purge apt-utils # blocking systemd
+
+---------------------------------------
+
+or try linux deploy, click download icon at right top corner,
+installation type to partition, installation path to /dev/block/mmcblk1p1, user name to root
+then click start
+
+
+
+
+
