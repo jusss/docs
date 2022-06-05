@@ -251,7 +251,7 @@ apt purge apt-utils # blocking systemd
 
 ---------------------------------------
 [john@moon bash]$ cat mount-android.sh 
-# run 'sh mount-android.sh' in android terminal
+# run 'sh /sdcard/mount-android.sh' in android terminal
 # and write '#!/bin/bash;export PATH=/usr/bin:/bin:/usr/local/bin' to chroot's root/.bashrc, chroot will read it
 DP=/dev/block/mmcblk1p1
 MP=/mnt/media_rw/sdcard1
@@ -268,7 +268,7 @@ busybox mount -t tmpfs tmpfs $MP/dev/shm
 busybox chroot $MP /bin/su joe
 
 [john@moon bash]$ cat umount-android.sh 
-# run 'sh umount-android.sh' in android terminal
+# run 'sh /sdcard/umount-android.sh' in android terminal
 DP=/dev/block/mmcblk1p1
 MP=/mnt/media_rw/sdcard1
 busybox umount $MP/dev/shm
