@@ -231,6 +231,18 @@ cd /mnt/media_rw/sdcard1
 sh mount.sh
 chroot . /bin/bash
 source source.sh
+vi .bashrc
+#!/bin/bash
+export PATH=$PATH:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
+
+#chroot will read .bashrc
+
+useradd -m joe -s /bin/bash
+# write that export PATH to joe's .bashrc, if it's sh not bash, run 'chsh -s /bin/bash joe'
+# so u can run 'busybox chroot $MP /bin/su joe'
+# also you can run "busybox chroot $MP /bin/bash -c 'command1;command2'" once and exit chroot 
+# wite 'export PATH=/bin:/usr/bin:/usr/loca/sbin:/sbin:/usr/local/sbin:/usr/local/bin' in the first line of joe's .bashrc
+# and 'cd ~;' in the last line of joe's bashrc
 
 dpkg-reconfigure debconf
 
@@ -238,6 +250,36 @@ apt install python3 python3-pip ghc cabal-install screen man
 apt purge apt-utils # blocking systemd
 
 ---------------------------------------
+[john@moon bash]$ cat mount-android.sh 
+# run 'sh mount-android.sh' in android terminal
+# and write '#!/bin/bash;export PATH=/usr/bin:/bin:/usr/local/bin' to chroot's root/.bashrc, chroot will read it
+DP=/dev/block/mmcblk1p1
+MP=/mnt/media_rw/sdcard1
+busybox mount $DP $MP
+busybox mount -o bind /dev $MP/dev
+busybox mount -t proc proc $MP/proc
+busybox mount -t sysfs sysfs $MP/sys
+busybox mount -t devpts devpts $MP/dev/pts
+busybox mount -t tmpfs tmpfs $MP/tmp
+busybox mount -t tmpfs tmpfs $MP/dev/shm
+# busybox chroot $MP /bin/bash
+# use 'useradd -m joe -s /bin/bash' to create user joe, and write that export PATH to joe's .bashrc
+# also u can run "busybox chroot $MP /bin/bash -c 'command1;command2'" once and exit chroot
+busybox chroot $MP /bin/su joe
+
+[john@moon bash]$ cat umount-android.sh 
+# run 'sh umount-android.sh' in android terminal
+DP=/dev/block/mmcblk1p1
+MP=/mnt/media_rw/sdcard1
+busybox umount $MP/dev/shm
+busybox umount $MP/tmp
+busybox umount $MP/dev/pts
+busybox umount $MP/sys
+busybox umount $MP/proc
+busybox umount $MP/dev
+busybox umount $DP
+
+----------------------------------------
 
 or try linux deploy, click download icon at right top corner,
 installation type to partition, installation path to /dev/block/mmcblk1p1, user name to root
