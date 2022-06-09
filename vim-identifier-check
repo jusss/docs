@@ -1,0 +1,35 @@
+1.
+sudo pip3 install pylint
+
+2.
+mkdir -p ~/.vim/autoload ~/.vim/bundle && \
+curl -LSso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim
+
+3.
+vim .vimrc
+execute pathogen#infect()
+
+4.
+cd ~/.vim/bundle && \
+git clone --depth=1 https://github.com/vim-syntastic/syntastic.git
+or
+git clone https://github.com/dense-analysis/ale.git
+
+5.
+vim /tmp/a.py
+:w will prompt wrong syntax and unresolved identifier
+
+6.
+vim .vimrc
+let g:ale_linters ={
+      \   'haskell': ['hlint', 'hdevtools', 'hfmt'],
+      \}
+
+ref
+https://www.howtoing.com/vim-editor-plugins-for-software-developers-2-syntastic
+https://monicalent.com/blog/2017/11/19/haskell-in-vim/
+https://www.reddit.com/r/vim/comments/e588uc/vim_ale_haskell_could_not_find_module_issue/
+
+
+
+
