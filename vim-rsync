@@ -1,0 +1,25 @@
+git clone https://github.com/KenN7/vim-arsync.git
+or download vim-arsync-master.zip from website
+
+cp vim-arsync-master/autoload/arsync/ ~/.vim/autoload/ -r
+cp vim-arsync-master/plugin/vim-arsync.vim ~/.vim/plugin/
+
+for example the remote project is on user@remote:~/project/
+ssh user@remote # enable ssh key login
+tar -cvf project.tar project/
+on local
+scp user@remote:~/project.tar ~/remote/
+cd ~/remote/
+tar -xvf project.tar # will get ~/remote/project/
+vim ~/remote/project/.vim-arsync # this need to be in the root of project which need to rsync
+remote_host remote
+remote_user user
+remote_port port
+remote_path ~/project/
+local_path /home/user/remote/project/
+auto_sync_up 1
+remote_or_local remote
+sleep_before_sync 0
+
+then cd ~/remote/project and vim files, :w will rsync to remote
+and open a screen on local, one is vim those files and another connect to remote to run it
