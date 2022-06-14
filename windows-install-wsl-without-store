@@ -1,0 +1,7 @@
+https://docs.microsoft.com/en-us/windows/wsl/install-manual
+
+or
+
+https://docs.microsoft.com/en-us/windows/wsl/install
+
+just open powershell and run wsl --install -d debian

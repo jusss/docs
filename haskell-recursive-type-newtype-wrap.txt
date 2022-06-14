@@ -1,0 +1,67 @@
+<albet70>	what's the point to make a new type? like newtype StateRefT s m a = StateRefT (ReaderT (IORef s) m a), just use ReaderT (IORef s) m a isn't enough?
+<sshine>	albet70, 1) to make your abstraction opaque, 2) to avoid the type class instances of what it aliases to, and consequently, so you can give it new type class instances without having them propagate back to the type they alias.
+<sshine>	albet70, for example: https://hackage.haskell.org/package/base-4.16.0.0/docs/Data-Monoid.html#t:Product
+<sshine>	albet70, you could say 'instance Monoid Int where ...', but this isn't the only well-defined Monoid instance on Int. so you invent a wrapper for that particular instance.
+<sshine>	albet70, I guess in your case, it is mostly to make the abstraction opaque.
+<albet70>	"🟢 sshine :albet70, I guess in your case, it is mostly to make the abstraction opaque.", but abstraction opaque just make people not easy to read
+<sshine>	i.e. hide the implementation. not sure it's always preferrable. some people have that in an .Internal module so that you can refer to the ReaderT without the wrapper, but not make a commitment to that implementation in front of all who rely on the package.
+<sshine>	albet70, not just. also makes people not start to rely on the implementation in ways you don't want.
+<albet70>	sshine, newtype CoroutineT r m a = CoroutineT {runCoroutineT' :: ContT r (StateT [CoroutineT r m ()] m) a} this type is too difficult to understand
+<albet70>	just ContT r (StateT [ContT r m ()] m) a isn't enough?
+<geekosaur>	that's not because it's a newtype, it's because Cont is your favorite nightmare come to life
+<albet70>	I don't know how the people make this non-readable type
+<albet70>	and it's a recursive type?
+<albet70>	haskell support recursive type?
+<geekosaur>	sure. I mean, list is a recursive type
+<vaibhavsagar[m]>	yes
+<geekosaur>	Trees are recursive types
+<albet70>	"geekosaur :sure. I mean, list is a recursive type", what's the function type when the function returns itself?
+<geekosaur>	data List a = Nil | Cons a (List a) -- with base case, even
+<vaibhavsagar[m]>	for lists, an example is `tail`, which has the type signature `[a] -> [a]`
+<geekosaur>	the base case for the `CoroutineT` type is an empty list of recursive `CoroutineT`s
+<absentia>	a tree of coroutine transformers?
+<absentia>	welcome to hell
+<geekosaur>	hencemy initial comment about nightmares
+<albet70>	"geekosaur :the base case for the `CoroutineT` type is an empty list of recursive `CoroutineT`s", it doesn't say the m is []
+<geekosaur>	it doesn't have to, it says it's a list. lists can be empty
+<absentia>	albet70: `m` is a type-level variable, `[]` is a term-level constructor
+<albet70>	oh, the whole CoroutineT is []
+<geekosaur>	it didn't say it's a NonEmpty
+<albet70>	so recursive type with a base case can be expressed in haskell, right?
+<absentia>	absolutely
+<geekosaur>	yes. as can recursive types with no base case (this is often used for streams)
+<albet70>	function return itself doesn't have a base case, can't it?
+<geekosaur>	I don't understand the question, sorry
+<albet70>	if a function return itself, could it be expressed?
+<ski>	"the base case for the `CoroutineT` type is an empty list of recursive `CoroutineT`s" -- no, the list doesn't occur covariantly/positively
+<ski>	albet70 : with a recursive type, sure
+<albet70>	"🟢 ski :albet70 : with a recursive type, sure", in js, f = _ => f, what's its type?
+<ski>	albet70 : `result where result = a -> result'
+<albet70>	f _ = f
+<ski>	you can try this, in `ocaml -rectypes', it allows cyclic types (equi-recursive types)
+<ski>	newtype Munch a = MkMunch (a -> Munch a)
+<ski>	munch :: a -> Munch a
+<ski>	munch _ = MkMunch munch
+<albet70>	fixed point...
+<ski>	"a tree of coroutine transformers?" -- no. a coroutine action is a function that accepts a list of coroutine actions, and produces a new such list, together with a result value
+<albet70>	then what value has this type?
+<ski>	which type ?
+<albet70>	"ski : newtype Munch a = MkMunch (a -> Munch a)", this
+<ski>	e.g. `MkMunch munch' has type `Munch a'
+<ski>	you could say `fix (MkMunch . const)', if you prefer
+<ski>	of course, `Munch a' is a pretty useless type ..
+<ski>	(i guess you could define `Munch a -> [a] -> b')
+<ski>	(or s/[a]/Stream a/)
+<albet70>	ski what do u think what's the benefit to make a new type to wrap? like newtype StateRefT s m a = StateRefT (ReaderT (IORef s) m a), just use ReaderT (IORef s) m a isn't enough?
+<ski>	for base case for `CoroutineT r m a', you'll be provided already with a list of coroutines. so, you could simply return those, or ignore them (returning an empty list). but it's not just "empty list" is *the* base case, since you're always provided with such a list. you could reverse the list, e.g. ..
+<ski>	albet70 : i think sshine already answered that
+<albet70>	yes...
+<ski>	(i was about to answer at the time, but sshine already covered it well)
+<sshine>	> let f x = f in f 0
+<lambdabot>	error:
+<lambdabot>	• Occurs check: cannot construct the infinite type: t1 ~ p0 -> t1
+<lambdabot>	• In the expression: let f x = f in f 0
+<sshine>	albet70, so that's something you can't do.
+<sshine>	albet70, this function would have the type 'a -> (a -> (a -> ...))'
+<sshine>	albet70, but as long as it recurses on its values, that's fine :)
+<ski>	<ski> albet70 : `result where result = a -> result'

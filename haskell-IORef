@@ -1,0 +1,106 @@
+put State in scottyT
+State s IO a, s doesn't persist between requests
+so use IORef,
+
+<whatif> kuribas: that better question is how to save inner value within a
+         function out of it?
+<kuribas> whatif: modifyIORef
+
+<whatif> runghc test.hs, it tells me that utf8-string is hidden package, I run
+         `ghc-pkg export utf8-string', still the same, why?  [16:40]
+<whatif> those expose/hidden package is really anonying
+<whatif> no cabal in current path, just a test file
+<kuribas> going to be downvoted to hell for this, but just having fun:
+          https://www.reddit.com/r/programming/comments/sh9uif/software_development_languages_haskell/
+                                                                        [16:52]
+<lortabac> kuribas: :)  [16:57]
+<whatif>
+         https://hackage.haskell.org/package/scotty-0.9.0/docs/Web-Scotty-Trans.html#v:scottyT
+                                                                        [17:02]
+<yushyin> kuribas: sure i can give you my downvote ;)
+<whatif> what is this (m Response -> IO Response)  [17:03]
+<kuribas> yushyin: do what you want :)
+<whatif> or how to construct (m Response -> IO Response)?
+<yushyin> tl;dr but if you want some by all means  [17:04]
+<whatif> @hoogle Response
+<lambdabot> Network.HTTP.Client data Response body
+<lambdabot> Network.HTTP.Client.Internal data Response body
+<lambdabot> Network.HTTP.Client.Internal Response :: Status -> HttpVersion ->
+            ResponseHeaders -> body -> CookieJar -> ResponseClose -> Response
+            body
+<kuribas> whatif: by "running" your monad.  [17:05]
+<whatif> kuribas: what does that mean?...
+<kuribas> whatif: If you have a ReaderT, you can use runReaderT...
+<whatif> kuribas: StateT
+<whatif> evalStateT
+<kuribas> whatif: yes.  But that could give problems with concurrency.  [17:07]
+<whatif> scottyT 3000 $ flip evalStateT "msg" $ get "/" $ test "hello"
+<kuribas> whatif: put an IORef in a ReaderT
+<kuribas> ReaderT MyState (IO a)  [17:08]
+<whatif> Couldn't match expected type `StateT [Char] ((->) (m Response)) (IO
+         Response)' with actual type `ScottyT e1 m1 ()'
+<kuribas> type MyState = IORef AppState
+<kuribas> whatif: does your state need to persist?  [17:09]
+<whatif> kuribas: put and get with StateT could not do the same like IORef?
+                                                                        [17:10]
+<kuribas> I don't think the pure state will persist between requests.
+<whatif> kuribas: yes
+<kuribas> So you'll need a IORef, or MVar, TVar, ...  [17:11]
+<whatif> kuribas: because requests are?
+<kuribas> requests are in IO.
+<whatif> kuribas: StateT could work on IO?  [17:12]
+<whatif> couldn't?
+<kuribas> no, StateT encapsulates IO.  [17:13]
+<kuribas> Not the other way around.
+<kuribas> and a Wai Application is basically "Request -> IO Response"  [17:14]
+<kuribas> whatif: you could keep your StateT and wrap it in a ReaderT with
+          IORef.
+<kuribas> whatif: but that's probably not easier that simply using an IORef.
+<kuribas> whatif: note that a toplevel "ReaderT IO a" is a common pattern for
+          a toplevel application monad.
+<whatif> kuribas: what I'm confused is why not use StateT s IO a
+<kuribas> because the "s" doesn't persist.
+<kuribas> between requests.
+<whatif> kuribas: why "s" dones't persist between requests?  [17:21]
+<whatif> just because of IO?
+<kuribas> In other words, the s is "readonly", so you can use ReaderT isntead.
+<kuribas> yes.
+<kuribas> whatif: look at the Application type above, and tell me how you
+          could persist state.
+<ephemient> you provide s to every evalStateT
+<kuribas> ephemient: yes, so you get a ReaderT disguised as a StateT.  [17:22]
+<ephemient> in theory you could runStateT, pull it out, stuff it in an IORef,
+            read it back the next request and put it into state again, but…
+<ephemient> why would you do that instead of just using IORef?
+<whatif> just using IORef would be easier than StateT or ReaderT?  [17:23]
+<whatif> could we have global variable in Haskell?
+<whatif> that would be so easy with global variable to do this
+<kuribas> whatif: not without unsafePerformIO.
+<whatif> kuribas: but IORef is safe?  [17:24]
+<kuribas> Putting an IORef in a ReaderT isn't hard.
+<ephemient> in the ReaderT IO pattern, you'd put references to your "global"
+            variables in the "reader" environment
+<kuribas> You can write a helper to extract or update this state from your app
+          monad.
+<kuribas> whatif: also, "ReaderT AppState IO a " is the idiomatic way to do
+          this.
+<whatif> ephemient: what if I have two threads want to share the same
+         variable?
+<ephemient> they're not *global* global, just hoisted outside to outside of
+            the app loop
+<ephemient> they are shared this way
+<kuribas> whatif: this is also better than global state, because you could for
+          example run two servers with different state.  [17:27]
+<whatif> kuribas: that better question is how to save inner value within a
+         function out of it?  [17:28]
+<kuribas> whatif: modifyIORef
+<whatif> g x = do {o <- get; let {n=o+1}; put n; return (n+x);}  [17:34]
+<whatif> runState (traverse g [1,1,1]) 0 == ([2,3,4],3)
+<whatif> this s persist?  [17:35]
+<kuribas> no?  [17:36]
+<kuribas> whatif: the question doesn't make sense without context.  [17:37]
+<ephemient> if you have main = do varRef <- newIORef ...; let env = Env {
+            varRef = varRef }; loop $ evalStateT foo env or whatever. then foo
+            gets the same varRef across all invocations of foo from the same
+            main. foo can gets varRef >>= liftM modifyIORef' (+ 1) or whatever
+            it wants with that  [17:44]

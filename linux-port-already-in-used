@@ -1,0 +1,2 @@
+sudo ss -lp "sport = :domain"
+and also use 0.0.0.0 for local listen on server, not server's real ip

@@ -1,0 +1,15 @@
+there're prefix infix suffix expression
+
+f(x) is prefix
+a + b is infix
+
+put () on operator like + make it as prefix
+
+(+) 1 2
+1 + 2
+
+f >>= g
+(>>=) f g
+
+f <$> g
+(<$>) f g

@@ -1,0 +1,9 @@
+# create group and set gid
+addgroup --gid 3003 android_inet
+addgroup --gid 3003 inet
+# add user to group
+usermod -g inet _apt
+#create user
+useradd -m joe -s /bin/bash
+
+another way is gpasswd, groupadd

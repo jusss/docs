@@ -1,0 +1,5 @@
+:tabnew new-file
+nnoremap <C-n> :tabnext<CR>
+inoremap <C-n> :tabnext<CR>
+nnoremap <C-p> :tabprevious<CR>
+inoremap <C-p> :tabprevious<CR>

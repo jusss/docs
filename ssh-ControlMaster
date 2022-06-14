@@ -9,3 +9,6 @@ ControlPath ~/.ssh/master-%r@%h:%p
 then run "ssh -p 22 -N root@moon"
 now ssh again will be very fast
 and vim scp://root@moon:22/a.hs will be very fast
+
+if there're file exist, disable multiple, just delete .ssh/ssh-socket-file
+may set ControlPersist 2h will good
