@@ -1,3 +1,13 @@
+if u want to just rollback one file,
+git log # get previous commit id that file with, and copy current commit id for jump back
+git checkout previous-commit-id # jump back there, copy that file out of git project
+git checkout branch-name # like master whatever your branch
+
+or
+git checkout that-top-commit-id # you can get with git reflog
+git checkout branch-name # like master whatever
+
+----------------------------
 files changed, but no add and commit
 git checkout -- .      
 or 
