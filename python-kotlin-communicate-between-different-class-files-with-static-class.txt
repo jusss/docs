@@ -1,0 +1,5 @@
+class A is a.py
+class B is b.py
+class C is c.py
+
+if class C is static class, so class A and class B can pass values to each other
