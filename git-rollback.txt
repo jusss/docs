@@ -7,6 +7,8 @@ or
 git checkout that-top-commit-id # you can get with git reflog
 git checkout branch-name # like master whatever
 
+if it shows 'HEAD detached from id' that because you git checkout commit-id, 
+git checkout master will solve it
 ----------------------------
 files changed, but no add and commit
 git checkout -- .      
