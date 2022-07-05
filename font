@@ -1,3 +1,22 @@
+download CascadiaCode from github release
+https://objects.githubusercontent.com/github-production-release-asset-2e65be/196284711/a4002c5c-d3c5-48f4-9378-683fea7c09a7?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20220705%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20220705T021236Z&X-Amz-Expires=300&X-Amz-Signature=b1ab64adf32d66c934082034181ff4d94a53fde6bfd2124f8d5d1a49720cf8a0&X-Amz-SignedHeaders=host&actor_id=0&key_id=0&repo_id=196284711&response-content-disposition=attachment%3B%20filename%3DCascadiaCode-2106.17.zip&response-content-type=application%2Foctet-stream
+
+cp ttf/CascadiaCode.ttf ttf/CascadiaMono.ttf ~/.fonts/
+cp woff2/CascadiaCode.woff2 woff2/CascadiaMono.woff2 ~/.fonts/
+cp otf/static/CascadiaCode-Regular.otf otf/static/CascadiaMono-Regular.otf ~/.fonts/
+
+cd ~/.fonts
+mkfontscale
+mkfontdir
+fc-cache -fv ~/.fonts
+fc-list |grep Cas
+
+terminal color use white on black
+font choose Cascadia Mono SemiLight 16
+xfce could use
+vim .config/xfce4/terminal/terminalrc
+FontName=Cascadia Code 15
+-------------------------------------------------
 on windows 10, run emacs 26.3 in windows terminal preview
 it's kind of like run emacs in terminal, so the terminal font settings
 decide what emacs uses, font ligature works
@@ -23,7 +42,7 @@ they make -> as one symbol, and three = can be one long =
 
 # install font on linux
 
-kdir ~/.fonts
+mkdir ~/.fonts
 cp simsun.ttf ~/.fonts
 cd ~/.fonts
 mkfontscale
