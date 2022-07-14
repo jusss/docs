@@ -1,0 +1,12 @@
+1. browser itselft provide extract gzip package function, but without compress gzip package function
+2. so the server can provide Content-Encoding: gzip, Transfer-Encoding: chunked to download, but the client can't use that to upload, unless use js in the website
+
+
+upload file with chunked data, the server need to provide a post interface which received the chunked data,
+and in the html, js implement slice the big file and post chunked data to that web interface, Transfer-Encoding: chunked,
+Content-Length is the data size
+also you can use python requests to post chunked data directly to that web interface
+
+browser doesn't provide post chunked data, js provide it
+but browser support download chunked data to one file
+search Transfer-Encoding on mdn
