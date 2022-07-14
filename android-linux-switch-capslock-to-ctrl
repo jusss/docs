@@ -1,0 +1,22 @@
+on android, vim /system/usr/keylayout/Generic.kl
+key 58 CTRL_LEFT
+
+on linux, 
+su
+dumpkeys > key.map
+vim key.map
+keycode 58 = Control
+loadkeys key.map
+then re-login, it will work
+
+for tty
+write it in .bashrc
+vim ~/.bashrc
+sudo loadkeys $HOME/key.map
+
+for Xorg
+vim .xinitrc, put this at the first, 'cause fvwm will stuck at the end
+setxkbmap -layout us -option ctrl:nocaps
+
+to revert
+loadkeys -d
