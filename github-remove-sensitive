@@ -20,3 +20,11 @@ git push --force
 2. remove it on github
 file a ticket to remove commit history on github
 https://support.github.com/request?tags=docs-generic
+
+https://support.github.com/request
+choose account or bill issue, then file a report 
+
+asking them to remove cached views and references to the sensitive data in pull requests on GitHub. Please provide the name of the repository and/or a link to the commit you need removed.
+
+https://support.github.com/contact?flow=file_attachment_removal&subject=Remove%20file&tags=rr-remove-data
+
