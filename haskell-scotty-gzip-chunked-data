@@ -1,3 +1,18 @@
+
+you can set custom header, just keep client and server use the same header
+upload file, its name could be in header's "Content-Disposition", and its value is a string
+server read that header and get its value could get the upload file name 
+even the token's name, server could response give client a custom key-value to auth
+
+browser html doesn't provide upload with gzip, js provide that, and server provide that interface
+browser html does provide download with gzip
+
+browser html doesn't provide upload with chunked data, js provide that, and server provide that interface
+browser html does provide download with chunked data
+
+scotty use bodyReader from request to receive chunked data from client uploading
+use stream from response to send chunked data to client downloading
+
 1. browser itselft provide extract gzip package function, but without compress gzip package function
 2. so the server can provide Content-Encoding: gzip, Transfer-Encoding: chunked to download, but the client can't use that to upload, unless use js in the website
 
@@ -10,3 +25,30 @@ also you can use python requests to post chunked data directly to that web inter
 browser doesn't provide post chunked data, js provide it
 but browser support download chunked data to one file
 search Transfer-Encoding on mdn
+
+-- what you want post to server, then receive what you post under that web route in scotty
+-- like you want post json to route "/data", then 
+-- post "/data" $ do
+--      r <- jsonData
+-- on that jsonData position, you can construct a 'ActionM a' value to take the data
+-- you can get that route's request by using "request", or header by "header"
+--
+-- post "/data" $ do
+--      r <- request # get the request
+--      r <- header # get the header 
+--      r <- body # get the body
+--
+-- bodyReader Get an IO action that reads body chunks, 
+-- browser or html don't provide the chuck function, js provide chuck function
+-- js chuck the large file then post chunked data to that web route
+-- and web take that chunked data, could using bodyReader?
+--
+--
+-- like you want to post file, then in html using 'form-data' to let browser upload file
+-- then in scotty, 
+-- post "/file" $ do
+--  r <- files # to get the file 
+--
+--  there's only request, header and body, jsonData and files using body too
+--
+-- https://github.com/scotty-web/scotty/blob/master/examples/bodyecho.hs
