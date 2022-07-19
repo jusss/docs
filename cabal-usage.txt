@@ -177,17 +177,43 @@ this is aeson depend on vector-0.13.0.0, but vector-algorithms depend on vector 
 this conflict in scotty-login-session
 vim scotty-login-session.cabal
 
+right: 
+build-depends:  , aeson <= 2.0
+
+wrong:
 build-depends: , vector >= 0.6 && <= 0.13
                      , vector-algorithms >= 0.6
                      , primitive >= 0.7.1.0 && <0.8
 
-cabal v2-install --lib scotty-login-session --allow-newer
+then cabal v2-build will be good
+cabal v2-install --lib 
+---------------------------------------------
+
+or just git clone and after cabal v2-install --lib in scotty-login-session,
+mkdir web
+cp -r scotty-login-session web
+mkdir web/upload-files
+cd web/upload-files
+cabal init
+vim upload-files.cabal
+build-depends: ,scotty-login-session
+
+vim ~/web/cabal.project
+packages: */*.cabal
+cd ~/web/
+cabal run upload-files
+
+--------------------------------------------------------------------------------------------
+also there is 
+cabal v2-install --lib scotty-login-session --allow-older
+
+since a lots of depends on older vector version, only aeson depends on newer, so rollback aeson
 
 https://cabal.readthedocs.io/en/3.4/setup-commands.html#cmdoption-runhaskell-Setup.hs-configure-allow-newer
 
 If you want to install a package A that depends on B >= 1.0 && < 2.0, but you have the version 2.0 of B installed, you can compile A against B 2.0 by using cabal install --allow-newer=B A. This works for the whole package index: if A also depends on C that in turn depends on B < 2.0, C’s dependency on B will be also relaxed.
 
-cabal install --allow-newer=vector vector-algorithms
+cabal install --allow-older=vector aeson
 
 
 cp LICENSE web/upload-files/
