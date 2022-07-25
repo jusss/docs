@@ -1,3 +1,42 @@
 1. no bluetooth 5.0, it doesn't connect to 4.0
 2. no red, too soft, no black
 3. no too hight
+
+--- ikbc s200
+ikbc s200 has a bluetooth 5.0, and it has a poor connection to other bluetooth 5.0 devices, can't connect to 4.0 devices
+
+--- ikbc w210
+ikbc w210 has a bluetooth 5.0, only has a good connection to 5.0, it can't connect to bluetooth 4.0 devices
+
+
+--- keychron k3
+keychron k3 has a bluetooth 5.1, good connections to 4.0 devices
+
+keychron k3, function keys not working on archlinux,
+'cause linux think it's hid_apple, even it switch on Win/Android, not Mac/iOS on keyboard
+
+solution
+
+sudo vim /etc/modprobe.d/hid_apple.conf
+options hid_apple fnmode=2
+
+sudo rmmod hid_apple
+sudo modprobe hid_apple
+
+now press F5, check if its behavior like F5, it not then
+press fn + X + L and hold for 4 seconds, then press F5
+or try fn + K + C for 4 seconds, it will work
+
+https://www.reddit.com/r/Keychron/comments/lgotvh/keychron_k3_ubuntu_fn_keys/
+https://github.com/Kurgol/keychron/blob/master/k2.md#f-keys-on-ubuntu
+
+0 = disabled : Disable the 'fn' key. Pressing 'fn'+'F8' will behave like you only press 'F8'
+
+1 = fkeyslast : Function keys are used as last key. Pressing 'F8' key will act as a special key. Pressing 'fn'+'F8' will behave like a F8.
+
+2 = fkeysfirst : Function keys are used as first key. Pressing 'F8' key will behave like a F8. Pressing 'fn'+'F8' will act as special key (play/pause).
+
+
+
+
+
