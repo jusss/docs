@@ -12,6 +12,10 @@ ikbc w210 has a bluetooth 5.0, only has a good connection to 5.0, it can't conne
 --- keychron k3
 keychron k3 has a bluetooth 5.1, good connections to 4.0 devices
 
+it use fn + 1/2/3 to switch different bluetooth devices, not fn + f1,
+
+fn + S + O hold for 4 seconds, will disable auto sleep mode
+
 keychron k3, function keys not working on archlinux,
 'cause linux think it's hid_apple, even it switch on Win/Android, not Mac/iOS on keyboard
 
