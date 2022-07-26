@@ -1,3 +1,46 @@
+
+reverse_ l = let
+    _reverse (x:xs) y = _reverse xs (x:y)
+    _reverse [] y = y
+    in _reverse l []
+
+
+{- main = print $ _reverse [1..6] [] -}
+main = print $ reverse_ [1..6]
+
+--------------------------------
+there're two list, alist ["a","b","c"] and blist ["awe", "bword", "ces", "de"]
+print that blist's element which contain alist's element
+
+in python it would be 
+
+for a in alist:
+    for b in blist:
+        if a in b:
+            print(b)
+
+[ b for a in alist for b in blist if a in b ]
+
+in haskell with list comprehension
+[ e | i <- lista, e <- listb, elem i e ]
+
+try fmap . fmap 
+
+import Data.List
+
+alist = ["a","b","c"]
+blist = ["awe","bword","fc","wf","lp"]
+
+getSeq :: String -> String -> Maybe String
+getSeq x y = if x `isSubsequenceOf` y
+                then Just y
+                else Nothing
+
+{- main = print $ fmap (\a -> fmap (\b -> getSeq a b) blist) alist -}
+{- [Just "awe",Just "bword",Just "fc"] -}
+main = print $ foldl1 (<>) $ fmap (filter (/= Nothing)) $ fmap (\a -> fmap (\b -> getSeq a b) blist) alist
+
+----------------------------------------
 check if a int list is ordered
 all (== True) $ fmap (\x -> (fst x) >= (snd x)) $ zip (tail [1..6]) [1..6]
 
