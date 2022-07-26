@@ -10,6 +10,11 @@ ikbc w210 has a bluetooth 5.0, only has a good connection to 5.0, it can't conne
 
 
 --- keychron k3
+
+after disconnect when power off, power on, hold fn + 2 for 4 seconds,
+then run blueman-applet; blueman-manager to connect
+
+
 keychron k3 has a bluetooth 5.1, good connections to 4.0 devices
 
 it use fn + 1/2/3 to switch different bluetooth devices, not fn + f1,
