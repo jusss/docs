@@ -1,4 +1,19 @@
 
+check if all elements are equal in a list
+
+allEqual :: (Eq a) => [a] -> Bool
+allEqual xs = all (\a -> a == True) $ fmap (\(x,y) -> x == y) $ zip <*> tail $ xs
+\a -> a == True == \a -> a
+allEqual xs = all (\a -> a) $ fmap (\(x,y) -> x == y) $ zip <*> tail $ xs
+\a -> a == id
+allEqual xs = all id $ fmap (\(x,y) -> x == y) $ zip <*> tail $ xs
+all id == and
+allEqual xs = and $ fmap (\(x,y) -> x == y) $ zip <*> tail $ xs
+fmap (uncurry something) $ zip == zipWith something
+allEqual xs = and $ zipWith (==) <*> tail $ xs
+allEqual = and $ zipWith (==) <*> tail
+
+----------------------------
 reverse_ l = let
     _reverse (x:xs) y = _reverse xs (x:y)
     _reverse [] y = y

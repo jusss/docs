@@ -1,3 +1,15 @@
+check if all elements are equal in a list
+allEqual :: (Eq a) => [a] -> Bool
+allEqual xs = and $ zipWith (==) <*> tail $ xs
+
+ap_func = lambda g, f: lambda x: g(x, f(x))
+ap = ap_func
+tail = lambda xs: xs[1:]
+zipWith = lambda f, alist, blist: [ f(alist[i], blist[i]) for i in range(len(alist if len(alist) < len(blist) else blist)) ]
+eq = lambda x, y: x == y
+all_equal = lambda xs: all(ap(partial(zipWith, eq), tail)(xs))
+
+---------------------------------
 there're two list, alist ["a","b","c"] and blist ["awe", "bword", "ces", "de"]
 print that blist's element which contain alist's element
 
