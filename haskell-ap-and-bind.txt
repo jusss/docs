@@ -1,0 +1,8 @@
+zip <*> tail == \x -> zip x (tail x)
+<*> a b c = a c (b c)
+
+m ~ (->) r
+>>= :: (r -> a) -> (a -> r -> b) -> r -> b
+>>= a b c = b (a c) c
+
+Cont f >>= g = \ar -> f (\a -> g a ar)
