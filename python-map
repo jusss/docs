@@ -1,0 +1,26 @@
+python's map is fmap, traverse, liftM2 in haskell
+but in py3k, map return iterable object, not list
+
+import operator
+map(operator.add, xs, ys) # this is liftM2
+
+python's map on something, it the return value is None, it could do early exit, like traverse
+"NoneType is not callable"
+filter(None, ...) is pretty useful
+map() already accepts multiple iterables.Before zip() was added, you used `map(None, ...)`
+they removed map() accepting None in Python 3.(Precisely because zip() exists.)
+
+use itertools.islice do slice on an iterable object, that no need map's return value to converse to list by list(map(...))
+
+def zip_with(f, *iterables): return itertools.starmap(f, zip(*iterables))
+
+then of course zip() is just zip_with(tuple, ...), just like in haskell
+
+map(lambda x: x if y, alist) is wrong, it needs else
+x if y else z
+
+or use list comprehesion,
+
+[ x for (x,y) in tuple_list if y]
+
+[y for x, y in data if x == "a"]
