@@ -72,6 +72,9 @@ build-depends:  , aeson <= 2.0
 then cabal v2-run upload-files
 or cabal run upload-files
 or cd web/upload-files/; cabal run
+
+if upload-files.cabal, main-is web5.hs, you want pass a parameter to web5.hs
+then cabal v2-run upload-files parameter
 ---------------------------------------------
 
 mkdir upload-files
