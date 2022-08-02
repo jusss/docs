@@ -67,6 +67,29 @@ getSeq x y = if x `isSubsequenceOf` y
 {- [Just "awe",Just "bword",Just "fc"] -}
 main = print $ foldl1 (<>) $ fmap (filter (/= Nothing)) $ fmap (\a -> fmap (\b -> getSeq a b) blist) alist
 
+main = print $ filter (/= Nothing) $ liftA2 getSeq alist blist
+
+fmap ((`fmap` blist) . getSeq) alist
+
+fmap g . fmap f = fmap (g . f)
+
+liftM2 == liftA2
+liftA2 take one of alist and all of blist, until alist is over 
+liftA2 getSeq alist blist = join (fmap (\a -> fmap (\b -> getSeq a b) blist) alist)
+
+liftA2 (+) [1..3] [2..6] == [3,4,5,6,7,4,5,6,7,8,5,6,7,8,9]
+
+liftA2 @((->)_) :: (a -> b -> c) -> (_ -> a) -> (_ -> b) -> _ -> c
+liftA2 f g h = \x -> f (g x) (h x)
+
+liftA2 f alist blist = join (fmap (\a -> fmap (\b -> f a b) blist) alist)
+
+https://homepages.inf.ed.ac.uk/wadler/topics/parametricity.html#free
+@free reverse :: [a] -> [a]
+$map f . reverse = reverse . $map f
+
+
+
 ----------------------------------------
 
 replace a serial in a list by index range
