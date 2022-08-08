@@ -84,6 +84,10 @@ liftA2 f g h = \x -> f (g x) (h x)
 
 liftA2 f alist blist = join (fmap (\a -> fmap (\b -> f a b) blist) alist)
 
+liftA2 f xs ys = [f x y | x <- xs, y <- ys]
+
+liftA2 = lambda f, xs, ys: [ f(x,y) for x in xs for y in ys ]
+
 https://homepages.inf.ed.ac.uk/wadler/topics/parametricity.html#free
 @free reverse :: [a] -> [a]
 $map f . reverse = reverse . $map f
