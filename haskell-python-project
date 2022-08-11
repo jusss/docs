@@ -1,0 +1,18 @@
+python code formatter
+https://github.com/psf/black
+
+
+haskell logic programming
+http://minikanren.org/
+
+generate haskell code from a type
+https://github.com/augustss/djinn
+
+lambdabot free theorem
+https://github.com/lambdabot/lambdabot/tree/master/lambdabot-haskell-plugins/src/Lambdabot/Plugin/Haskell/Free
+https://homepages.inf.ed.ac.uk/wadler/topics/parametricity.html#free
+
+@free reverse :: [a] -> [a]
+$map f . reverse = reverse . $map f
+
+
