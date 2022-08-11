@@ -1,4 +1,9 @@
 
+intersect = foldl1 (\xs ys -> [x | x<- xs, elem x ys])
+intersect [[1,2,3], [4,3,5], [3,7,8,9,12]] == [3]
+
+-------------------------------
+
 check if all elements are equal in a list
 
 allEqual :: (Eq a) => [a] -> Bool
