@@ -95,14 +95,49 @@ k2 = cont.pure(3).bind(lambda a: pure(a+1).bind(lambda b: pure(b+a)))
 k.runCont(identity)
 
 
+def pure(x):
+    return Cont(lambda k: k(x))
+
+id = lambda x: x
+
+class Cont:
+    def __init__(self, g):
+        self.g = g
+
+    def bind(self, f):
+        return Cont(lambda k: self.g(lambda x: f(x).runCont(k)))
+
+    def runCont(self, f):
+        return self.g(f)
+
+# k3 = pure(3)
+# print(k3.runCont(id))
+
+# k5 = k3.bind(lambda a: pure(a+2))
+# print(k5.runCont(id))
+
+# (Cont inC) >>= fn = Cont $ \out -> inC (\a -> (runCont (fn a)) out)
+
+
+k7 = k3.bind(lambda a: Cont(lambda x: x("a") + x("b")).bind(lambda b: pure(str(a)+b)))
+print(k7.runCont(id))
 
 
 
 
 
+# Cont r a = (a->r)->r
+# cont :: (a->r)->r -> Cont r a
+# return :: a -> Cont r a
 
 
+k = (return $ \x -> x+3) <*> (return 3); runCont k id == 6
 
+return 3 == cont $ \x -> x 3?
+
+k = (cont $ \x -> x+3) <*> (cont $ \x -> x 3) is wrong
+\x -> x+3 :: a->a
+cont a->a /= Cont r a
 
 
 
