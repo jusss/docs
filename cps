@@ -107,6 +107,11 @@ class Cont:
     def bind(self, f):
         return Cont(lambda k: self.g(lambda x: f(x).runCont(k)))
 
+    # __irshift__() is x >>= y, first to call x.__irshift__(y), not defined, then x.__rshift__(y), then y.__rrshift__(x)
+    # https://blog.finxter.com/python-__irshift__-magic-method/
+    def __rshift__(self, f):
+        return Cont(lambda k: self.g(lambda x: f(x).runCont(k)))
+
     def runCont(self, f):
         return self.g(f)
 
@@ -123,6 +128,11 @@ k7 = k3.bind(lambda a: Cont(lambda x: x("a") + x("b")).bind(lambda b: pure(str(a
 print(k7.runCont(id))
 
 
+k7 = k3 >> (lambda a: 
+        Cont(lambda x: x("a") + x("b")) >> (lambda b: 
+            pure(str(a)+b)))
+
+print(k7.runCont(id))
 
 
 
@@ -150,4 +160,4 @@ m >>= (\x -> k x >>= h) = (m >>= k) >>= h
 
 ref
 https://jsdw.me/posts/haskell-cont-monad/
-
+# http://www.valuedlessons.com/2008/01/monads-in-python-with-nice-syntax.html
