@@ -1,0 +1,16 @@
+(setq package-archives '(("gnu" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
+                         ("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")))
+
+(require 'package)
+(package-initialize)
+
+(setq org-odt-preferred-output-format "docx")
+C-c C-e o o
+
+M-x package-refresh-contents
+M-x package-install RET ox-pandoc RET
+
+apt install pandoc
+use cabal install --exe pandoc would take an hour for the deps to build
+
+M-x org-pandoc-export-to-docx
