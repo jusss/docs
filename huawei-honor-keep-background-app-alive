@@ -1,0 +1,3 @@
+1. settings -> battery -> Close apps on screen lock -> un-choose app to keep it won't be closed
+2. settings -> apps -> settings -> special access -> ignore battery optimization -> all apps -> choose allowed app
+3. settings -> apps -> choose app -> app permissions -> set individual permissions -> app auto-launch

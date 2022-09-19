@@ -1,0 +1,9 @@
+DO NOT MOUNT ANYTHING, JUST CHROOT TO INSTALL
+
+after mount dev, proc, and sys into chroot env,
+apt install pack-name will call systemd if it's relatived
+that would cause installing failed
+
+so do not mount anything, just `sudo chroot ./i386 /bin/bash'
+then 'apt install emacs'
+
