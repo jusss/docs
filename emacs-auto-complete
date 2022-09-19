@@ -1,0 +1,23 @@
+add major mode into ac-modes, use auto-complete to complete any word
+
+
+(require 'auto-complete)
+(add-to-list 'ac-modes 'javascript-mode)
+(add-to-list 'ac-modes 'elm-mode)
+(add-to-list 'ac-modes 'html-mode)
+(add-to-list 'ac-modes 'css-mode)
+(add-to-list 'ac-modes 'python-mode)
+(add-to-list 'ac-modes 'racket-mode)
+(add-to-list 'ac-modes 'scheme-mode)
+(add-to-list 'ac-modes 'js-mode)
+(add-to-list 'ac-modes 'mhtml-mode)
+(add-to-list 'ac-modes 'haskell-mode)
+(add-to-list 'ac-modes 'web-mode)
+; just add the major-mode to the list, ac will work
+(add-to-list 'ac-modes 'text-mode)
+(add-to-list 'ac-modes 'org-mode)
+; for all major-mode, like Object in Java
+(add-to-list 'ac-modes 'fundamental-mode)
+(ac-config-default)
+;;; auto-complete perfer upper case, but I want lower case, so ignore case
+(setq ac-ignore-case nil)
