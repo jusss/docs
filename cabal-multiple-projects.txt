@@ -1,3 +1,16 @@
+if install package with `cabal v1-install pack-name'
+use `ghc-pkg unregister pack-name' to remove
+
+install with ` cabal v2-install --lib pack-name'
+vim ~/.ghc/x86_64-linux/environments/default
+delete that pack-name
+
+if you want to install some executable binary like pandoc
+cabal install --exe pandoc
+and wait about an hour for all the deps to build
+use apt or pacman to use pandoc is faster
+
+-------------------------------------
 merge multiple cabal project into your project, cabal.project
 
 mkdir -p ~/web/upload-files
