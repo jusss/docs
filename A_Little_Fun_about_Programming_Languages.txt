@@ -1,0 +1,16 @@
+1. map, filter, and reduce
+2. Cont and CPS
+3. Coroutine, Green Thread, Continuation, and delimited Continuation, Promise async/await, yield
+4. type tetris
+5. fmap, ap, bind
+6. lambda cube
+7. fixed-point, TCO, and infinite type, anonymouse tail call
+8. SKI 
+9. global scope, dynamic scope and lexial scope
+10. ad-hoc polymorphism and function overloading
+11. ADT, Sum, Product
+12. eta expand, beta reduce
+13. higher order function, higher kinded type, and KEEP 87, decorator
+14. value, type, kind, slot
+15. curry, unary, binary, Hurry-Coward Corresponse, Pierece law, 
+16. editor, vim and emacs
