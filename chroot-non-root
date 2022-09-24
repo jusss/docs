@@ -1,0 +1,23 @@
+Chroot with non root
+
+debootstrap --arch i386 --foreign sid ./i386
+http://mirrors.aliyun.com/debian
+
+chroot ./i386 /usr/bin
+
+/debootstrap/debootstrap --second-stage
+
+exit
+chmod 0755 ./i386 -R
+unshare -mr /usr/sbin/chroot ./i386 /bin/bash
+
+
+https://github.com/nix-community/nix-user-chroot
+Check if your kernel supports user namespaces for unprivileged users
+$ unshare --user --pid echo YES
+
+https://askubuntu.com/questions/488470/how-to-enter-a-chroot-without-using-sudo
+
+https://lwn.net/Articles/689856/
+
+https://www.reddit.com/r/netsec/comments/3vkprb/chroot_as_nonroot_user/

@@ -1,0 +1,29 @@
+install hadoop on debian
+sudo apt update
+sudo apt install snapd
+sudo snap install core
+sudo snap install hadoop --beta
+
+https://snapcraft.io/install/hadoop/debian
+
+it will be /snap/bin/hadoop, and it's link to
+/usr/bin/snap
+
+/usr/bin/snap run hdfs
+/usr/bin/snap run hadoop
+
+vim hdfs.sh
+#!/bin/bash
+/usr/bin/snap run hadoop.hdfs "$@"
+
+sudo ln -s /snap/bin/hadoop /usr/bin/hadoop
+sudo ln -s /home/user/hdfs.sh /usr/bin/hdfs
+
+if you download hadoop-2.7.2.tar.gz from hadoop official website,
+cp those directory to /
+
+export JAVA_HOME=/snap/hadoop/11/usr/lib/jvm/java-1.8.0-openjdk-amd64
+export HADOOP_PREFIX=/home/joe/hadoop-2.7.2
+
+now you can use hdfs or hadoop command directly
+
