@@ -1,0 +1,12 @@
+https://ohgm.co.uk/how-to-view-linkedin-profiles-anonymously/
+
+    Find out the person’s profile URL using Google. Copy it.
+    Open Google’s mobile friendly test and paste in the URL.
+    Open the Source Code tab and copy the code.
+    Paste the code into an online HTML viewer like JSBin.
+    You can once again view their LinkedIn profile anonymously and without an account.
+
+https://search.google.com/test/mobile-friendly
+https://jsbin.com/?html,output
+
+

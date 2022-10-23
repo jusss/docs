@@ -1,0 +1,12 @@
+scrot -s '%Y-%m-%d_$wx$h.png' -e 'mv $f ~/Pictures/'
+
+then use gimp Pictures/a.png to edit
+
+scrot -s -e 'gimp $f'
+
+-s will select the window
+-e will use gimp to open the screenshot
+
+or bind a special key in fvwm2 to run it
+
+
