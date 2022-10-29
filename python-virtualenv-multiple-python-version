@@ -1,0 +1,30 @@
+there're two ways to install multiple python versions on one machine
+1. using pyenv, but pyenv installing need to download from github,
+which it may failed
+2. using virtualenv, and download python source code from python.org,
+after compile the code and install
+the binary into the system, using virtualenv to create an environment
+with that specific python version
+
+mkdir another-python
+cd another-python/
+wget https://www.python.org/ftp/python/3.8.14/Python-3.8.14.tgz
+tar -xvzf Python-3.8.14.tgz
+cd Python-3.8.14/
+/configure --prefix=/home/user/another-python/
+make -j8
+make install
+#The scripts pip3 and pip3.8 are installed in '/home/user/another-python/bin'
+export PATH=$PATH:/home/user/another-python/bin
+python3.8 # will run 3.8, and the default python still using 3.9
+
+cd
+pip3 install virtualenv
+virtualenv virtual-env -p ~/another-python/bin/python3.8
+source virtual-env/bin/activate
+#now the default python should be python3.8
+
+exit and open a new terminal
+export PATH=$PATH:/home/user/another-python/bin
+pip3.8 install opencv-python
+source virtual-env/bin/activate

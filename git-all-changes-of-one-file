@@ -1,0 +1,2 @@
+git check one file's all changes
+git log --follow -p -- file

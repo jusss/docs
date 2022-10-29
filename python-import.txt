@@ -1,0 +1,6 @@
+about same package's name under different path
+1. using export PATH=path1/path2
+2. using sys.path.append(path) in file
+3. using absolute path to import x.y.z
+
+
