@@ -1,0 +1,21 @@
+iPad Air 2022
+M1 chip, iPad Air 5th
+
+iSH contain an alpine linux environment, which based on x86
+
+iSH can't input white space via otg keyboard,
+disable "full keyboard access" can be solved
+
+copy download video from "On My iPad" -> "Downloads" to "iSH" in Files app
+
+clip download mp4 with ffmpeg on iSH
+# apk add ffmpeg
+# ffmpeg -ss start-time -t during-time -i input-file.mp4 -vcodec copy -acodec copy output.mp4
+
+concat videos to one
+vim list.txt
+file c1.mp4
+file c2.mp4
+
+ffmpeg -f concat -i list.txt -c copy concat.mp4
+
