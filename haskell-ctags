@@ -1,0 +1,6 @@
+cabal v2-install hasktags
+export PATH = $PATH:/root/.cabal/bin/
+hasktags -c -o .vim/haskell-tags -R /root/web
+vim ~/.vimrc
+set tags=~/.vim/python-tags
+
