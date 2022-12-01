@@ -1,0 +1,14 @@
+(setq socks-server (list "My socks server" "127.0.0.1" 7070 5))
+(setq socks-override-functions 1)
+(setq socks-noproxy '("localhost"))
+(require 'socks)
+(setq telega-proxies
+      (list
+       '(:server "127.0.0.1" :port 7070 :enable t
+                 :type (:@type "proxyTypeSocks5"
+                               :username "" :password ""))
+              ))
+
+"https://github.com/zevlg/telega.el"
+
+M-x telega RET

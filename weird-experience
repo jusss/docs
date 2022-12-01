@@ -1,0 +1,5 @@
+there're one same code on two different machines for web server
+one has big font, another has small font, it's really weird.
+until you put mouse point on that zoom sign, at you find out
+the big font one was zoom in, and the browser remember it
+so every time you visit it, it is zoom in by default
