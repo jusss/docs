@@ -4,3 +4,6 @@ hasktags -c -o .vim/haskell-tags -R /root/web
 vim ~/.vimrc
 set tags=~/.vim/python-tags
 
+or use ctags, need to compile from github universal-ctags
+ctags -R --languages=Haskell /root/web
+
