@@ -19,3 +19,18 @@ file c2.mp4
 
 ffmpeg -f concat -i list.txt -c copy concat.mp4
 
+apk add py3-pip
+
+there's also a-shell app which contain native executive file on M1
+
+remap caps lock to control when use hardware keyboard
+Settings -> General -> Keyboards -> Hardware Keyboard -> Modifier Keys ->
+remap Caps Lock Key to Control
+
+remap Option to Command, Command to Option, then use Window Tab to app switcher
+iSH External Keyboard Option -> Meta for emacs, so it can use Alt-v to backward
+
+since there's no stunnel on iOS, then you can have ssh over wireguard
+
+alphabet character can't do key repeat, apple's design, wtf
+vim, gg, unless use number to jump like 2j, 6w, /name, etc, emacs C-n is ok, there's also blink shell solved that
