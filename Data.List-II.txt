@@ -1,3 +1,7 @@
+since fmap :: (a->b) -> [a] -> [b] can't do replace character to string in list
+concatMap :: Foldable t => (a -> [b]) -> t a -> [b]
+concatMap (\x -> if x == '\r' then "\\r" else [x]) "a\r\nb" == "a\\r\nb"
+-------------------------
 scanl1 (<>) $ fmap (("/:" <>) . ("l" <>) . show) [1..9]
 ["/:l1","/:l1/:l2","/:l1/:l2/:l3","/:l1/:l2/:l3/:l4","/:l1/:l2/:l3/:l4/:l5","/:l1/:l2/:l3/:l4/:l5/:l6","/:l1/:l2/:l3/:l4/:l5/:l6/:l7","/:l1/:l2/:l3/:l4/:l5/:l6/:l7/:l8","/:l1/:l2/:l3/:l4/:l5/:l6/:l7/:l8/:l9"]
 -----------------------------
