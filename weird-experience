@@ -3,3 +3,8 @@ one has big font, another has small font, it's really weird.
 until you put mouse point on that zoom sign, at you find out
 the big font one was zoom in, and the browser remember it
 so every time you visit it, it is zoom in by default
+
+using iframe to show raw html code by with plain text url Content-Type text/plain
+
+tomsmeding, I found a way to put raw html code inside textarea with js, reading html text file with Hasekll and put it into textarea with js is a wrong way, lots of escape characters, the right way is using js to fetch the content of that text file as plain text and put it into textarea
+
