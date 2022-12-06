@@ -1,3 +1,21 @@
+since Data.List doesn't have splitOn, so implement it yourself, turn to Data.Text is absurd
+
+findElementInList element alist = fmap fst $ filter ((== element) . snd) $ zip [0..(length alist)] alist
+
+findElementInList '/' "/ab/c/d" == [0,3,5]
+
+slice alist (start, end) = drop start $ take end alist
+
+getIndexList subList sourceList = fmap fst $ filter (isPrefixOf subList . snd) $ zip [0..] $ tails sourceList
+
+splitOn subList sourceList = case getIndexList subList sourceList of
+    [] -> [sourceList]
+    indexList -> fmap (slice sourceList) $  [(0, head indexList)] <> (zip starts (tail indexList)) <> [(last starts, length sourceList)] where
+        starts = fmap (+ (length subList)) indexList
+
+splitOn "/a/b" "this is a test /ab/c/a/b /c /a/b absurd" == ["this is a test /ab/c"," /c "," absurd"]
+
+-----------------------------
 since fmap :: (a->b) -> [a] -> [b] can't do replace character to string in list
 concatMap :: Foldable t => (a -> [b]) -> t a -> [b]
 concatMap (\x -> if x == '\r' then "\\r" else [x]) "a\r\nb" == "a\\r\nb"
