@@ -1,0 +1,22 @@
+there three things, 
+1. error before 'evaluate' like 1/0, print + print, type check failure
+2. pure exception, raised by 'error' as your intention or abort like (read "a") :: Int, 
+3. IO exception like readFile, run-time exception
+
+about pure exception, `undefined`, `error "foo"`, missing patterns - these are examples of pure (and thus imprecise) exceptions
+(error "thing") + 2 is a pure exception, also putStr "foo" >> putStr (error "no!")
+those are raised by your intention, and some others like parse failure (read "a") :: Int
+
+use `catch' to capture IO Exception, https://hackage.haskell.org/package/base-4.17.0.0/docs/GHC-IO.html#v:catch
+`try' is a `catch' wrapper, https://hackage.haskell.org/package/base-4.17.0.0/docs/src/Control.Exception.Base.html#try
+
+ExceptT for detecting error before 'evaluate'
+
+in Web.Scotty, rescue using catchError, which ends up calling `catch`
+
+ref
+https://wiki.haskell.org/Handling_errors_in_Haskell
+https://www.microsoft.com/en-us/research/wp-content/uploads/1999/05/except.pdf
+https://hackage.haskell.org/package/transformers-0.5.6.2/docs/Control-Monad-Trans-Except.html
+https://hackage.haskell.org/package/scotty-0.12.1/docs/Web-Scotty.html#v:rescue
+https://hackage.haskell.org/package/mtl-2.3.1/docs/Control-Monad-Error-Class.html#v:catchError
