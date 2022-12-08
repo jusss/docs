@@ -1,0 +1,6 @@
+1. visit https://desktop.telegram.org download telegram for linux x64
+    https://updates.tdesktop.com/tlinux/tsetup.4.4.1.tar.xz
+
+2. tar xvJf tsetup.4.4.1.tar.xz; cd Telegram
+    ./Telegram
+    it will pop up a qrcode, using other devices to scan it for login
