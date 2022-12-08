@@ -14,6 +14,20 @@ ExceptT for detecting error before 'evaluate'
 
 in Web.Scotty, rescue using catchError, which ends up calling `catch`
 
+
+catch examples
+ do
+   let f = rootPath <> "/" <> pathName <> "/paste.txt" 
+   strOrException <- catch (readFile f) 
+                       (\e -> do  
+                               let err = show (e :: IOException) 
+                               hPutStr stderr ("Warning: Couldn't open " ++ f ++ ": " ++ err) 
+                               return "") 
+   strOrException <- catch (readFile $ rootPath <> "/" <> pathName <> "/paste.txt") (\e -> return $ show (e :: IOException)) 
+   print strOrException 
+
+if do notation isn't IO a, and since catch :: IO a ... then use catchError
+
 ref
 https://wiki.haskell.org/Handling_errors_in_Haskell
 https://www.microsoft.com/en-us/research/wp-content/uploads/1999/05/except.pdf
