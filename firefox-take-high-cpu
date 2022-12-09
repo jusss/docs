@@ -1,0 +1,6 @@
+https://bugzilla.mozilla.org/show_bug.cgi?id=1718719
+
+without update to the latest version, workaround is
+about:config
+set security.tls.enable_0rtt_data to false
+
