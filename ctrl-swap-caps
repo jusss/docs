@@ -9,3 +9,36 @@ sudo loadkeys ./key.map
 
 http://blog.csdn.net/csfreebird/article/details/51069348
 https://www.emacswiki.org/emacs/MovingTheCtrlKey#toc5
+
+
+on android, vim /system/usr/keylayout/Generic.kl
+key 58 CTRL_LEFT
+
+on linux, 
+su
+dumpkeys > key.map
+vim key.map
+keycode 58 = Control
+loadkeys key.map
+then re-login, it will work
+
+for tty
+write it in .bashrc
+vim ~/.bashrc
+sudo loadkeys $HOME/key.map
+to revert
+loadkeys -d
+
+for Xorg
+vim .xinitrc, put this at the first, 'cause fvwm will stuck at the end
+setxkbmap -layout us -option ctrl:nocaps
+xmodmap won't use ~/.Xmodmap on archlinux 
+
+sudo localectl set-x11-keymap "" "" "" ctrl:swapcaps
+to reverse
+sudo localectl set-x11-keymap "" "" "" ctrl:ctrl
+sudo localectl set-x11-keymap "" "" "" capslock:capslock
+killall Xorg and exit, then login again
+localectl will create /etc/X11/xorg.conf.d/00-keyboard.conf
+or just sudo rm /etc/X11/xorg.conf.d/00-keyboard.conf
+https://wiki.archlinux.org/title/Xorg/Keyboard_configuration#Using_localectl

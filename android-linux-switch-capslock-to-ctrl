@@ -13,10 +13,21 @@ for tty
 write it in .bashrc
 vim ~/.bashrc
 sudo loadkeys $HOME/key.map
+to revert
+loadkeys -d
 
 for Xorg
 vim .xinitrc, put this at the first, 'cause fvwm will stuck at the end
 setxkbmap -layout us -option ctrl:nocaps
+xmodmap won't use ~/.Xmodmap on archlinux 
 
-to revert
-loadkeys -d
+sudo localectl set-x11-keymap "" "" "" ctrl:swapcaps
+to reverse
+sudo localectl set-x11-keymap "" "" "" ctrl:ctrl
+sudo localectl set-x11-keymap "" "" "" capslock:capslock
+killall Xorg and exit, then login again
+localectl will create /etc/X11/xorg.conf.d/00-keyboard.conf
+or just sudo rm /etc/X11/xorg.conf.d/00-keyboard.conf
+https://wiki.archlinux.org/title/Xorg/Keyboard_configuration#Using_localectl
+
+

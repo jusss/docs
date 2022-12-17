@@ -8,3 +8,73 @@ using iframe to show raw html code by with plain text url Content-Type text/plai
 
 tomsmeding, I found a way to put raw html code inside textarea with js, reading html text file with Hasekll and put it into textarea with js is a wrong way, lots of escape characters, the right way is using js to fetch the content of that text file as plain text and put it into textarea
 
+
+since get and post both can pass message to the server,
+but get only can pass the certain message which is known,
+like get `?fileMode=write' to the server and server can get param in get route
+post can pass some unknown message to server, you can set it whatever you want
+so unknown message use post, certain message use get
+
+use 'case ... of ...' or MultiWayIf to replace a bunch of 'if-then-else'
+case ... of is an equivalent to MultiWayIf,
+in other languages like Java or C, it called 'switch ... case ...'
+
+for example
+
+      if (fileMode == "write") then getEditTextFile urlPath
+      else if contentType == "html" then runContT (getFileOrDirectory urlPath getTextFile) generateTextHtml
+      else if contentType == "plain" then do
+          addHeader "Content-Type" "text/plain; charset=utf-8"
+          file (rootPath <> urlPath)
+      else text "wrong contentType" 
+
+equal to 
+
+      case fileMode of
+          "write" -> getEditTextFile urlPath
+          "delete" -> (liftIO $ removeFile $ rootPath <> urlPath) >> (redirect $ DTL.pack $ backUrlPath urlPath)
+          x -> case contentType of
+                  "html" -> runContT (getFileOrDirectory urlPath getTextFile) generateTextHtml
+                  "plain" -> (addHeader "Content-Type" "text/plain; charset=utf-8") >> file (rootPath <> urlPath)
+                  _ -> text "wrong contentType"
+
+in Haskell indent, `)` should be after `(`
+
+f (...
+ )
+
+f (...
+    )
+are ok, but next isn't
+
+f (...
+)
+
+
+use 'fetch' and 'innerText' can replace 'iframe src' to show plain text
+  let h4 = "<iframe src=\"" <> urlPathWithReadParam <> "\"  width=\"100%\" height=\"100%\"   ></iframe>"
+
+  let h4 = "<div id=\"content\"></div>"
+  let h5 = "<script> fetch(\"" <> urlPathWithReadParam <> "\").then((r)=>{r.text().then((d)=>{document.getElementById('content').innerText = d })});</script>"
+ 
+
+android connect to iPad as hid bluetooth keyboard, it keeps continuous re-connecting, it may be the time issue,
+make sure the android has the correct time, and open the app with landscape mode
+
+linux Xorg, capslock turn to ctrl, and not by setxbdmap, xmodmap or loadkeys
+even I use xev to get CapsLock, it's still show Control_L
+it's really weird, until I press C-r swap to search which command I used,
+then localectl set-x11-keymap "" "" "" ctrl:swapcaps shows up
+wola, this may be the reason,
+sudo localectl set-x11-keymap "" "" "" ctrl:ctrl
+sudo localectl set-x11-keymap "" "" "" capslock:capslock
+killall Xorg and exit, then login again
+#localectl --no-convert set-x11-keymap key.map
+localectl will create /etc/X11/xorg.conf.d/00-keyboard.conf
+or just sudo rm /etc/X11/xorg.conf.d/00-keyboard.conf
+https://wiki.archlinux.org/title/Xorg/Keyboard_configuration#Using_localectl
+
+
+if you don't enable wifi to connect to some network,
+the bluetooth doesn't work, that's really weird
+even bluetooth on the wifi chips, this is no natual
