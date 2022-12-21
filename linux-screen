@@ -1,0 +1,7 @@
+https://stackoverflow.com/questions/12345675/
+
+ls /usr/share/terminfo/x
+
+export TERM=xterm-xfree86
+
+TERMINFO='/usr/share/terminfo/' screen
