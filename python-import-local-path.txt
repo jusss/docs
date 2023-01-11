@@ -1,0 +1,16 @@
+1. a.py and b.py at the same path
+inside a.py
+ import b
+
+2. a.py and test/b.py, a.py and test at the same path
+touch test/__init__.py
+inside a.py
+       import test.b
+
+3. b.py at /test, not the same path with a.py
+inside a.py
+       import sys
+       sys.path.append("/test")
+       import b
+
+https://zhuanlan.zhihu.com/p/451438246
