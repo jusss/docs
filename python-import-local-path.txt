@@ -14,3 +14,24 @@ inside a.py
        import b
 
 https://zhuanlan.zhihu.com/p/451438246
+
+weird issue
+
+test/utils/config_parser.py
+test/utils/__init__.py
+test/pipeline/wonder.py
+test/pipeline/__init__.py
+
+in test/test.py
+from pipeline.wonder import *
+from utils.config_parser import *
+
+tells utils is not a package
+
+but 
+from utils.config_parser import function_a
+from pipeline.wonder import function_b
+is ok
+
+maybe import two local packages make namespaces conflict
+
