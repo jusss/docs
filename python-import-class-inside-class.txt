@@ -1,0 +1,6 @@
+class A:
+    from package import ClassB
+    def __init__(self):
+        self.x = self.ClassB()
+
+
