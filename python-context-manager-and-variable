@@ -1,0 +1,195 @@
+context manager like a decorator with try-finally, a higher-order-function with try-finally
+
+Context variables are an alternative to global variables can share the same context in multi-thread and coroutine,
+it's natively supported in asyncio
+
+what's the purpose of a context manager in python?
+context managers are there to aid with resources, the context is basically the resource
+
+with open(path, "w") as f:
+     data = 3/0
+     f.write(data)
+
+this resource will be closed even 3/0 will raised ZeroDivisionError
+
+Almose everything done with a context manager CAN BE DONE WITH try: ... finally: ...
+context manager need to implemented __enter__ and __exit__
+__enter__ will run when context start, __exit__ will run when exit
+
+from contextlib import contextmanager
+@contextmanager
+def tag(name):
+    print(name)
+    yield
+    print("/" + name)
+
+with tag("hi"):
+     print("foo")
+
+hi
+foo
+/hi
+
+https://stackoverflow.com/questions/36559580/
+
+
+To write a with statement, you need to use the following general syntax:
+
+with expression as target_var:
+    do_something(target_var)
+    
+The context manager object results from evaluating the expression after with.
+In other words, expression must return an object that implements the context management protocol.
+This protocol consists of two special methods:
+
+.__enter__() is called by the with statement to enter the runtime context.
+.__exit__() is called when the execution leaves the with code block.
+
+The as specifier is optional. If you provide a target_var with as,
+then the return value of calling .__enter__() on the context manager object is bound to that variable.
+
+1. Call expression to obtain a context manager.
+2. Store the context manager’s .__enter__() and .__exit__() methods for later use.
+3. Call .__enter__() on the context manager and bind its return value to target_var if provided.
+4. Execute the with code block.
+5. Call .__exit__() on the context manager when the with code block finishes.
+
+expression must return an object implement __enter__ and __exit__
+with expression:
+     code
+expression run first, then expression return an object, then object.__enter__ run, then code, then object.__exit__
+
+You can provide the same functionality by implementing both the .__enter__() and the .__exit__() special methods
+in your class-based context managers. You can also create custom function-based context managers
+using the contextlib.contextmanager decorator from the standard library and an appropriately coded generator function.
+
+>>> class HelloContextManager:
+...     def __enter__(self):
+...         print("Entering the context...")
+...         return "Hello, World!"
+...     def __exit__(self, exc_type, exc_value, exc_tb):
+...         print("Leaving the context...")
+...         print(exc_type, exc_value, exc_tb, sep="\n")
+...
+
+>>> with HelloContextManager() as hello:
+...     print(hello)
+...
+Entering the context...
+Hello, World!
+Leaving the context...
+None
+None
+None
+
+# timing.py
+
+from time import perf_counter
+
+class Timer:
+    def __enter__(self):
+        self.start = perf_counter()
+        self.end = 0.0
+        return lambda: self.end - self.start
+
+    def __exit__(self, *args):
+        self.end = perf_counter()
+
+
+Creating Function-Based Context Managers
+Python’s generator functions and the contextlib.contextmanager decorator
+provide an alternative and convenient way to implement the context management protocol
+
+>>> from contextlib import contextmanager
+
+>>> @contextmanager
+... def hello_context_manager():
+...     print("Entering the context...")
+...     yield "Hello, World!"
+...     print("Leaving the context...")
+...
+
+>>> with hello_context_manager() as hello:
+...     print(hello)
+...
+Entering the context...
+Hello, World!
+Leaving the context...
+
+
+before yield "Hello, World!" like __enter__, after like __exit__,
+
+very like, 1. before yield code, 2. try "with" code, 3. finally after yield code
+
+https://realpython.com/python-with-statement/
+
+-----------------------------------------------------------------------------------------
+
+context variables are convenient when you need to pass a variable along the chain of calls
+so that they share the same context, in the case when this cannot be done through a global
+variable in case of concurrency. context variables can be used as an alternative to global
+variables both in multi-threaded code and in asynchronous with coroutines
+
+
+Below is your example showing the corruption of a global variable compared to context vars:
+import asyncio
+import contextvars
+
+# declare context var
+current_request_id_ctx = contextvars.ContextVar('')
+current_request_id_global = ''
+
+
+async def some_inner_coroutine():
+    global current_request_id_global
+
+    # simulate some async work
+    await asyncio.sleep(0.1)
+
+    # get value
+    print('Processed inner coroutine of request: {}'.format(current_request_id_ctx.get()))
+    if current_request_id_global != current_request_id_ctx.get():
+        print(f"ERROR! global var={current_request_id_global}")
+
+
+async def some_outer_coroutine(req_id):
+    global current_request_id_global
+
+    # set value
+    current_request_id_ctx.set(req_id)
+    current_request_id_global = req_id
+
+    await some_inner_coroutine()
+
+    # get value
+    print('Processed outer coroutine of request: {}\n'.format(current_request_id_ctx.get()))
+
+
+async def main():
+    tasks = []
+    for req_id in range(1, 10000):
+        tasks.append(asyncio.create_task(some_outer_coroutine(req_id)))
+
+    await asyncio.gather(*tasks)
+
+
+if __name__ == '__main__':
+    asyncio.run(main())
+
+Output:
+
+...
+Processed inner coroutine of request: 458
+ERROR! global var=9999
+Processed outer coroutine of request: 458
+
+Processed inner coroutine of request: 459
+ERROR! global var=9999
+Processed outer coroutine of request: 459
+
+
+https://stackoverflow.com/questions/63105799/
+
+
+.get() and .set(_) to change the value
+
