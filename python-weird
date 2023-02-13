@@ -1,0 +1,32 @@
+v={"a":1,"c":[1,2,3]}; 
+fs=[]; 
+for i in range(len(v["c"])): 
+    fs.append(v); 
+    v["a"]=v["c"][i];     
+
+fs is [{"a":3,"c":[1,2,3]},{"a":3,"c":[1,2,3]},{"a":3,"c":[1,2,3]}]
+
+becuase use fs.append(v), v is an object!
+
+
+solution:
+
+from copy import deepcopy
+v={"a":1, "c":[1,2,3]}
+fs = []
+for i in range(len(v["c"])):
+    v1 = deepcopy(v)
+    v1["a"] = v["c"][i]
+    fs.append(v1)
+
+print(fs)
+
+
+
+also there you can turn dict to tuple in list, so apply map
+
+tuple list to dict
+dict([("a",1),("c",[1,2,3])]) == {"a":1,"c":[1,2,3]}
+
+dict to tuple list
+list = [(k, v) for k, v in dict.items()]
