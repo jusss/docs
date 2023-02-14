@@ -3,7 +3,7 @@
 
 2. cd project
    find . |ctags -R -o ~/.vim/python-tags -
-    or ctags -R -o ~/.vim/python-tags ~/project
+    or ctags -R -o ~/.vim/python-tags ~/project1 ~/project2
 
 3. vim ~/.vimrc
     set tags=~/.vim/python-tags
@@ -12,5 +12,5 @@ put cursor on a word, C-] will jump to its definition, C-t will jump back,
 C-w C-] will open definition in a horizontal split
 https://weicode.wordpress.com/2018/05/01/configuring-ctags-for-python-and-vim
 
-there is also
 https://github.com/universal-ctags/ctags
+ctags can trace multiple path, ./bin/ctags -R -o ~/.vim/python-tags ~/.local/lib/python3.8/site-packages/ ~/code/python/
