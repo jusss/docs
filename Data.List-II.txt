@@ -1,3 +1,14 @@
+quickSort :: (Ord a) => [a] -> [a]
+quickSort [] = []
+quickSort (x:xs) =
+    let smallerSorted = quickSort [a | a <- xs, a <= x]
+        biggerSorted = quickSort [a | a <- xs, a > x]
+    in smallerSorted <> [x] <> biggerSorted
+
+main = print $ quickSort [1,3,2,4,1]
+
+p = s[2..] where s (x: xs) = s [i <- xs, mod i x /= 0]
+
 since Data.List doesn't have splitOn, so implement it yourself, turn to Data.Text is absurd
 
 findElementInList element alist = fmap fst $ filter ((== element) . snd) $ zip [0..(length alist)] alist
