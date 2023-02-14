@@ -1,0 +1,6 @@
+tabby is cross-platform terminal, it's good for windows if you don't have windows terminal
+
+https://github.com/Eugeny/tabby/releases/latest
+
+
+
