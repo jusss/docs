@@ -27,4 +27,5 @@ f(g(p,client), client) would be
 
 bind_func(g(p), f, client) since g is binary here, g(p) would be unary
 
-
+1. this env can contain some context and passing in the rest computation like for parser
+2. this env is not global variable, but all function need it, if it need to be changed that's State, Reader is read only
