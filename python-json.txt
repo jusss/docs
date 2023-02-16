@@ -1,0 +1,29 @@
+import json
+r = {"cpu": 4,
+     "image": (
+               "addr"
+              ),
+     "seq": True
+}
+
+des = json.dumps(r)
+print(des)
+# {"cpu": 4, "image": "addr", "seq": true}
+
+ser = json.loads(des)
+print(ser)
+# {'cpu': 4, 'image': 'addr', 'seq': True}
+
+dumps turn python dict to json string
+loads turn json string to python dict
+
+if in a.py
+f = E(r = {"cpu": 4,
+    	    "image": (
+               "addr"
+              ),
+	    "seq": True
+           })
+
+then a.json would be {"cpu": 4, "image": "addr", "seq": true},
+in a.py, _r = json.loads(open("a.json")), f = E(r = _r)
