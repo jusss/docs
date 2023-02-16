@@ -2,7 +2,8 @@ lets assume client.create_task(p) will return a task id,
 and we need client.query(task_id) to get its status
 
 but client.create_task is constructed within function g, 
-why? because there're some context need to attach before create, and query would be called by other functions, so create and query are split
+why? because there're some context need to attach before create, and query would be called by other functions,
+it may be created once, but query a lot for task's status, so create and query are split
 and client.query is constructed within function f
 
 f(g(p,client), client)
