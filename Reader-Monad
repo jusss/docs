@@ -1,0 +1,30 @@
+lets assume client.create_task(p) will return a task id,
+and we need client.query(task_id) to get its status
+
+but client.create_task is constructed within function g, 
+why? because there're some context need to attach before create, and query would be called by other functions, so create and query are split
+and client.query is constructed within function f
+
+f(g(p,client), client)
+
+bind_func = curry(lambda g, f, x: f(g(x),x))
+
+that g(p) is g in bind_func
+
+and this is what Reader do
+
+another example there's a dict environment contain some key value, and f, g both need it as input
+and f need g's output
+
+so f(g(env), env) == g >>= f == \env -> (g >>= f) env == \env -> f (g env) env
+
+this environment context env is passing in the >>= chain, and it always as the second parameter to rest functions
+
+g is an unary function, f and the rest would be binary function, and the binary function's second parameter is the env, the whole chains's input env
+
+
+f(g(p,client), client) would be
+
+bind_func(g(p), f, client) since g is binary here, g(p) would be unary
+
+
