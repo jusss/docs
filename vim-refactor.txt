@@ -1,1 +1,3 @@
-find ./ -type f -exec sed -i -e 's/a/b/g' {} \; 
+find ./ -type f -exec sed -i -e 's/\<a\>/b/g' {} \; 
+\<a\> start and end only with a
+use `grep 'a' . -R` to check
