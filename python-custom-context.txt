@@ -1,0 +1,25 @@
+https://towardsdatascience.com/how-to-build-custom-context-managers-in-python-31727ffe96e1
+
+
+python allow comma in the last of a list
+
+multiple decorator
+
+
+
+
+asterisk before a list in the function call
+a=[1,2,3]; f(*a) is different to f(a)? 
+I don't understand why an asterisk before a list in the caller? 
+I know *args in the definition it will take several arguments as a list pass to the function, 
+but what's the purpose using it when calling?
+`f(*a)` is the same as `f(1, 2, 3)`. With `f(a)`, you're passing the list as an argument.
+`f(*a)` and `f(a)` are equivalent to `f(1, 2, 3)` and `f([1, 2, 3])` there (note the lack of [] in the first one)
+one calls the function with three arguments "unpacked" from the list, and the other calls the function with one arg (a list with 3 elements in it)
+
+why python allow comma in the last of a list? [1,2] is equivalent to [1,2,]?
+Yes, they're equivalent. The latter form is useful if you have a list that spans several lines with one element per line. 
+`git diff` for example will only show the modified elements then, not an extra diff for the comma.
+
+
+
