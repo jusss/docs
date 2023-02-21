@@ -1,0 +1,17 @@
+*alist will expand alist
+
+a=[1,2]
+f(*a) == f(1,2)
+
+a={"a":3, "b":2}
+f(**a) == f(a=3, b=2)
+
+apply = lambda f, *args, **kwargs: id(f)(*args, **kwargs)
+
+apply(operator.add, 3, 2)
+
+python does not support curry, so optional parameter is hard to use
+even there is toolz.functoolz.curry or functools.partial
+
+without curry, optional parameter is hard, *args or **kwargs is a workaround
+but function composition is hard too
