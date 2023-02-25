@@ -1,3 +1,7 @@
+set splitright
+set splitbelow
+show new window on the right side
+---------------
 reference
 https://www.cnblogs.com/warrior/p/12760845.html
 ----------------------------------
