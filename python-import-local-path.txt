@@ -1,3 +1,16 @@
+python import function from relative path file
+
+f/a/b.py
+f/c/d.py
+
+if you want use b's function inside d.py
+
+d.py
+import sys, os
+
+sys.path.append(f"{os.path.dirname(os.path.dirname(__file__))}/a")
+from b import function
+-----------------------------------
 1. a.py and b.py at the same path
 inside a.py
  import b
