@@ -1,3 +1,14 @@
+http://x.org/get?key1=value1&key2=value2
+this is form data, 
+pass a dict as form data, use 'params'
+pass a dict as a json, use 'data'
+
+_dict = {key1: value1, key2: value2}
+r=session.post(url=url, params = _dict)
+print(r.url) you can get the wrapped url after concat
+
+
+------------------------
 login_url = "http://www.x.org/login/"
 data = {"user_name": "name",
         "password": "password"
