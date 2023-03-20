@@ -3,7 +3,7 @@
 
 2. cd project
    find . |ctags -R -o ~/.vim/python-tags -
-    or ctags -R -o ~/.vim/python-tags ~/project1 ~/project2
+    or ctags --languages=python -R -o ~/.vim/python-tags ~/project1 ~/project2
 
 3. vim ~/.vimrc
     set tags=~/.vim/python-tags
