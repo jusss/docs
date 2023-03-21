@@ -1,3 +1,6 @@
+C-v in vim
+C-x space in emacs
+--------------
 set splitright
 set splitbelow
 show new window on the right side
