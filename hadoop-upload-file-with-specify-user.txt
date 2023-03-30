@@ -1,0 +1,12 @@
+https://stackoverflow.com/questions/11371134/how-to-specify-username-when-putting-files-on-hdfs-from-a-remote-machine
+
+import os 
+os.environ["HADOOP_USER_NAME"] = "joe"
+
+or
+os.system("env HADOOP_USER_NAME=joe hadoop dfs -put -f local_file remote_path")
+
+By default authentication and authorization is turned off in Hadoop. 
+The user identity that Hadoop uses for permissions in HDFS is determined by 
+running the whoami command on the client system. Similarly, 
+the group names are derived from the output of running groups.
