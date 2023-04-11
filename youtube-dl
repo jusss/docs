@@ -1,19 +1,16 @@
-on iOS
+lately twiiter redirect some contents to do age verify, cause youtube-dl failed to download video
+https://github.com/yt-dlp/yt-dlp/issues/6763
+https://github.com/yt-dlp/yt-dlp/issues/6199
+https://github.com/yt-dlp/yt-dlp/issues/5716
+1. pip3 install yt-dlp
+2. use your local chromium to login twitter, get the cookies,
+    tar -cvf chromium.cookies.tar .config/chromium/Default
+    pass that to remote, and tar -xvf chromium.cookies.tar on remote
+3. yt-dlp -F "https://twitter.com/_Saraurora_/status/1614746772974501896" --cookies-from-browser "chrome:~/.config/chromium/Default::twitter"
 
-tap shortcuts app -> < Shortcuts -> Share Sheet -> +
-Accepts will get app shared with msg, Shortcut Input will be that msg
-Web -> Get Contents of URL can do post/get
-and the next action can get the response "Contents of URL" of the post 
+if you're using firefox then tar -cvf .mozilla/firefox/yqnxjsy3.default-release, and 
+yt-dlp -F "https://twitter.com/_Saraurora_/status/1614746772974501896" --cookies-from-browser "firefox:yqnxjsy3.default-release::twitter"
 
-so iOS post url, server get the url and download video then use video url as response to iOS
-and iOS get contents of contents of url then save contents of url to recents
-
-get contents of from "Web"
-save contents of url to recents from "app" -> "photos"
-
-
-
-on server
 
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ScopedTypeVariables #-}
