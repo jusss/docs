@@ -1,0 +1,133 @@
+TSPL
+(letrec ([f (lambda (x) (cons 'a x))]
+         [g (lambda (x) (cons 'b (f x)))]
+         [h (lambda (x) (g (cons 'c x)))])
+  (cons 'd (h '()))) <graphic> (d b a c)
+
+
+(letrec ([f (lambda (x k) (k (cons 'a x)))]
+         [g (lambda (x k)
+              (f x (lambda (v) (k (cons 'b v)))))]
+         [h (lambda (x k) (g (cons 'c x) k))])
+  (h '() (lambda (v) (cons 'd v))))
+
+
+in (f x $ \v ->...) v is the f's result, because f = \x, k -> k (cons 'a x)
+k will take f's result, and in the calling f x $ \v ->...
+\v is k, so v is f's result, in a calling, using a lambda to capture an result is interesting, and if lambda as parameter, so lambda itself can be changed in recursive calling, amazing!
+
+https://scheme.com/tspl4/further.html
+
+(define product_
+  (lambda (ls k)
+    (let ([break k])
+      (letrec ((f (lambda (ls k)
+        (cond
+          [(null? ls) (k 1)]
+          [(= (car ls) 0) (break 0)]
+          [else (f (cdr ls)
+                   (lambda (x)
+                     (k (* (car ls) x))))]))))
+    (f ls k)))))
+
+CPS can allow more than one result to its continuation
+(define car&cdr
+  (lambda (p k)
+    (k (car p) (cdr p))))
+
+(car&cdr '(a b c)
+  (lambda (x y)
+    (list y x)))
+
+
+(define integer-divide
+  (lambda (x y success failure)
+    (if (= y 0)
+        (failure "divide by zero")
+        (let ([q (quotient x y)])
+          (success q (- x (* q y)))))))
+
+(integer-divide 10 3 list (lambda (x) x)) 
+(integer-divide 10 0 list (lambda (x) x))
+
+(define product
+  (lambda (ls)
+    (call/cc
+      (lambda (break)
+        (letrec ((f (lambda (ls)
+          (cond
+            [(null? ls) 1]
+            [(= (car ls) 0) (break 0)]
+            [else (* (car ls) (f (cdr ls)))]))))
+          (f ls))))))
+
+callCC transform to CPS
+
+(define product
+  (lambda (ls k)
+    (let ([break k])
+      (letrec ((f (lambda (ls k)
+        (cond
+          [(null? ls) (k 1)]
+          [(= (car ls) 0) (break 0)]
+          [else (f (cdr ls)
+                   (lambda (x)
+                     (k (* (car ls) x))))]))))
+        (f ls k)))))
+        
+(product_ '(1 2 0) (lambda (x) x))
+
+transform to python
+
+def product(ls, k):
+    _break = k
+    def f(ls, k):
+        if not ls:
+            return k(1)
+        elif ls[0] == 0:
+            return _break(0)
+        else:
+            return f(ls[1:], lambda x: k(ls[0] * x))
+
+    return f(ls, k)
+
+print(product([1,2,0], lambda x: x))
+
+
+mapK p [] k = k []
+mapK p (x: xs) k = p x $ \v -> mapK p xs $ \ns -> k (v : ns)
+
+map p [] = []
+map p (x: xs) = (p x) : (map p xs)
+
+(define mapK
+  (lambda (p ls k)
+    (if (null? ls)
+        (k '())
+        (p (car ls) (lambda (v) (mapK p (cdr ls) (lambda (ns) (k (cons v ns)))))))))
+
+(define rec
+  (lambda (ls k)
+    (mapK (lambda (x c)
+            (if (= 0 x) (k "zero found")
+                (c (/ 1 x))))
+          ls
+          k)))
+(rec '(1 2 3) (lambda (x) x))
+
+
+1. in definition p x f, when calling f is \v, v always will be p's result, and f will take result in definition of p
+2. function mapK take function p and continuation k, when calling p with \v, v is p's result and calling mapK with \ns, ns is mapK's result
+3. the inner p x in map, turn into outer p x in mapK, it needs using v as its result and give v to its old behavior
+
+(define factorial
+  (lambda (x)
+    (if (= x 0)
+        (call/cc (lambda (k) (set! retry k) 1))
+        (* x (factorial (- x 1))))))
+
+(define factorial
+       (lambda (x k)
+                      (if (= x 0)
+                          (k 1)
+                   (factorial (- x 1) (lambda (v) (k (* v x)))))))
