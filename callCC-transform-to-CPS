@@ -131,3 +131,70 @@ map p (x: xs) = (p x) : (map p xs)
                       (if (= x 0)
                           (k 1)
                    (factorial (- x 1) (lambda (v) (k (* v x)))))))
+
+
+(define product 
+  (lambda (ls)
+    (call/cc
+      (lambda (break) (letrec ((f (lambda (ls)
+        (cond ((null? ls) 1)
+                     ((= (car ls) 0) (break 0))
+                      (else (* (car ls) (f (cdr ls))))))))
+         (f ls))))))
+
+def product(ls, k):
+  _break = k
+  def f(ls, k):
+    if not ls:
+      return k(1)
+    elif ls[0] == 0:
+      return _break(0)
+    else:
+      return f(ls[1:], lambda x: k(ls[0] * x))
+  return f(ls, k)
+product([1,2,3], lambda x: x))
+
+https://stackoverflow.com/questions/50958042/continuation-passing-style-and-concurrency
+
+https://tmp.barzilay.org/cont.txt
+
+https://www.cs.purdue.edu/homes/suresh/590s-Fall2002/lectures/lecture-4.html#:~:text=Continuation%20passing%20style%20makes%20the,they%20return%20to%20their%20caller.
+
+
+in scheme they use call/cc to capture the rest computation, and call/cc can transform to CPS, how CPS would capture the rest computation?
+
+ski :every call in CPS is a tail call
+dolio :Yeah, in CPS, every computation is called with the rest of the computation as an argument.
+dolio :And the last thing it does is call the rest of the computation.
+
+f x k, call k in the last in f definition 
+in calling f x \v -> ... v is the f's result \v is the rest computation of f
+k 1 like f's rest computation as 1
+set k k in call/cc \k -> set k k then k k
+like \v -> ... is v in \v -> ...
+k call k
+f k in definition 
+but f f in calling 
+
+f x (\v -> ...) when f is with CPS and v is the result of f, \v -> is the rest computation of f
+
+
+I suddenly think that Java in android programming uses a lot of CPS, you can pass an object or a lambda which that can take some results, abstract class
+geekosaur :CPS is fairly common in modern UI programming, although it's not often called that
+
+
+
+so if f x (\v -> ...) is curried, then (f x)(\v -> ...)
+very like js's  promise
+(f x)(\f' -> ...)(\f'' -> ...)
+f' is f's k
+f'' is k of f'
+
+since we have mapK which like traverse or mapM
+what would bindK be like?
+
+if f is an unary function, then it would be f x k
+if f is a binary function, it would be f g x k
+and g would be another CPS computation 
+g would have g :: a -> (a-> b) -> b
+CPSed
