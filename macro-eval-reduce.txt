@@ -3,19 +3,19 @@ this case is good for Scheme's macro, but in python there's no macro, so use eva
 there's a list like [0..100], you need to run code like obj.f(0).f(1)...f(100)
 how to generate this code? use eval   
 
-color_column_name = ['DXP1', 'DXP3'...]
-color_column = {'DXP1': f1, 'DXP2': f2...}
+color_column_name = ['X1', 'X3'...]
+color_column = {'X1': f1, 'X2': f2...}
 
-    # new_df = new_df.style.apply(color_column['DXP1'], subset=['DXP1'], axis=1)\
-    #                     .apply(color_column['DXP3'], subset=['DXP3'], axis=1)\
-    #                     .apply(color_column['DY5'], subset=['DY5'], axis=1)\
-    #     .apply(color_column['DY7'], subset=['DY7'], axis=1)\
-    #     .apply(color_column['DVX9'], subset=['DVX9'], axis=1)\
-    #     .apply(color_column['DVX11'], subset=['DVX11'], axis=1)\
-    #     .apply(color_column['DVY13'], subset=['DVY13'], axis=1)\
-    #     .apply(color_column['DVY15'], subset=['DVY15'], axis=1)\
-    #     .apply(color_column['DHeight17'], subset=['DHeight17'], axis=1)\
-    #     .apply(color_column['DHeight19'], subset=['DHeight19'], axis=1)\
+    # new_df = new_df.style.apply(color_column['X1'], subset=['X1'], axis=1)\
+    #                     .apply(color_column['X3'], subset=['X3'], axis=1)\
+    #                     .apply(color_column['Y5'], subset=['Y5'], axis=1)\
+    #     .apply(color_column['Y7'], subset=['Y7'], axis=1)\
+    #     .apply(color_column['VX9'], subset=['VX9'], axis=1)\
+    #     .apply(color_column['VX11'], subset=['VX11'], axis=1)\
+    #     .apply(color_column['VY13'], subset=['VY13'], axis=1)\
+    #     .apply(color_column['VY15'], subset=['VY15'], axis=1)\
+    #     .apply(color_column['H17'], subset=['H17'], axis=1)\
+    #     .apply(color_column['H19'], subset=['H19'], axis=1)\
 
 
     concat_str = "new_df.style"
