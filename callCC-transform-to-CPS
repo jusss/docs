@@ -198,3 +198,58 @@ if f is a binary function, it would be f g x k
 and g would be another CPS computation 
 g would have g :: a -> (a-> b) -> b
 CPSed
+
+bind :: m a -> (a -> m b) -> m b
+bind [] p = []
+bind (x: xs) p = (p x): (bind xs p)
+bindK [] p k = k []
+bindK (x: xs) p k = p x $ \v -> bindK xs p $ \ns -> k (v: ns)
+
+1. k's lambda can get f's result
+2. k can be changed on f's calling
+
+(define id (lambda (x) x))
+(define retry #f)
+(define factorial
+    (lambda (x)
+    (letrec ((f lambda (x k)
+                (if (= x 0)
+                    (begin (set! retry k) (k 1))
+                    (f (- x 1) (lambda (v) (k (* v x)))))))
+                    (f x id))))
+(factorial 3)
+(retry 1)
+
+k as goto, need recursion to do that, so if it does not have tco, then do not use it as goto
+
+#k as break
+def product(ls, k):
+    _break = k
+    def f(ls, k):
+        if not ls:
+            return k(1)
+        elif ls[0] == 0:
+            return _break(0)
+        else:
+            return f(ls[1:], lambda x: k(ls[0] * x))
+
+   return f(ls, k)
+
+print(product([1,2,3], lambda x: x))
+
+identity = lambda x: x
+
+# k as goto
+retry = 0
+def factorial(x):
+    def f(x, k):
+        if x == 0:
+            global retry
+            retry = k
+            return k(1)
+        else:
+            return f(x-1, lambda v: k(v * x))
+    return f(x, identity)
+
+print(factorial(3))
+print(retry(1))

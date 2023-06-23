@@ -1,0 +1,27 @@
+python decorators are just higher-order functions
+
+1. lets say there's function p and 
+from toolz.functoolz import curry
+@_decorator
+def p(x, y):
+    ...
+
+t = \k -> g k
+
+2. calling with 
+t $ p x y
+
+3. transform
+apply = curry $ \f *args **kwargs -> t $ _decorator(f)(*args, **kwargs)
+
+4. calling with transform
+apply(p,x,y)
+
+5. optional parameters for t
+ot = curry $ \m n k -> g m n k
+
+optional_apply = \m n -> curry $ \f *args **kwargs -> ot m n $ _decorator(f)(*args, **kwargs)
+
+6. calling
+apply = optional_apply(m, n)
+apply(p,x,y)
