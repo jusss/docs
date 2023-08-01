@@ -1,0 +1,30 @@
+in chroot env
+
+apt install shellinabox
+
+openssl req -nodes -newkey rsa:2048 -keyout example.key -out example.csr -subj "/C=GB/ST=L
+ondon/L=London/O=Acme Widgets/OU=IT Department/CN=192.168.0.1"
+openssl x509 -req -days 365 -in example.csr -signkey example.key -out example.crt
+cp example.key server.key
+cp example.crt server.crt
+
+cat server.crt server.key > certificate.pem
+shellinaboxd -p port
+
+then visit ip with cert https://192.168.0.1:4200
+
+make sure that visit ip is that same ip in the cert
+
+--------------------
+you can also point the cert path, for example cp certificate.pem to ssl
+shellinaboxd -c ssl
+
+--cert will find certificate on $PWD which is . by default
+-t will not enable ssl
+-s :LOGIN or :SSH
+-u user
+-p port 4200 is default
+
+if you just want run it on local then
+shellinaboxd -t -s :LOGIN -u root
+visit https://localhost:4200
