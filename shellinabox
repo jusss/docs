@@ -15,6 +15,21 @@ then visit ip with cert https://192.168.0.1:4200
 
 make sure that visit ip is that same ip in the cert
 
+---------------------------------------
+if you want to use ssh instead of login
+
+/etc/init.d/ssh start # start sshd in debian chroot env
+cat /etc/ssh/sshd_config # get the ssh port for example 22
+
+shellinaboxd -p 4200 -s /:SSH:1.0.2.2:22
+
+then visit https://localhost:4200 will re-direct to 1.0.2.2:22
+you may set on localhost and visit localhost will re-direct to 1.0.2.2
+you can use it in a chroot env then re-direct to host ssh port, 
+so you can visit host
+
+use SSH instead of LOGIN can solved session timeout issue
+otherwise you may need to set timeout in pam for LOGIN
 --------------------
 you can also point the cert path, for example cp certificate.pem to ssl
 shellinaboxd -c ssl
