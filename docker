@@ -1,5 +1,17 @@
+1. make a docker with a linux distribution
+mkdir docker
+cd docker
+vim Dockerfile
+FROM docker.org/project:version
+CMD ["/bin/bash"]
 
+2. git clone code into a docker
+docker build -t $project:$version . # if you code can found by docker
+docker run -dt --memory 8G --memory-swap 9G $project /bin/bash
+docker ps # get the id
+docker exec -it $ID /bin/bash
 
+--------------------------
 
   docker run -it --cap-add SYS_ADMIN --security-opt=seccomp:unconfined -v /sys/fs/cgroup:/sys/fs/cgroup:ro -d -p 8080:8080 --name django_server django /sbin/init
   docker exec -it ea8492d21b8d /bin/bash                                                                                                                                                  
