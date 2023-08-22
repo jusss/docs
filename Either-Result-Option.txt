@@ -1,0 +1,5 @@
+ADT contain Sum type and Product Type
+Either a b = Left a | Right b is a Sum type
+Either a b = a | b is a Union type
+Either a b NEED to come with function overloading (Java, C#) or pattern matching (Haskell)
+like python it needs reflection, isLeft or isRight by type() or isinstance()
