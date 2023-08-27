@@ -1,0 +1,36 @@
+1. using pattern matching in do notation to extract value from wrapped structure
+
+data MultiPart = MultiPart [BodyPart]
+
+there's no record to extract [BodyPart]
+
+so define a function
+
+getMultiPart :: MultiPart -> [BodyPart]
+getMultiPart (MultiPart x) = x
+
+and you can avoid that in do notation
+
+do
+let MultiPart msg = (parseMultipartBody bm _all) :: MultiPart
+
+so that msg will be [BodyPart]
+
+2. using pattern matching to avoid extract value
+
+data BodyPart = BodyPart headers bytestring
+
+headers contain file name, and bytestring is the data
+you don't need to extract headers and bytestring out of BodyPart by
+getHeaders (BodyPart headers bytestring) = headers
+
+you can just 
+
+readFromBodyPartWriteFile :: String -> BodyPart -> IO ()
+readFromBodyPartWriteFile path (BodyPart headers bytestring) = do
+...
+
+to use pattern matching to extract headers and bytestring
+
+pattern matching can extract b from A b
+

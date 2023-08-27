@@ -1,0 +1,6 @@
+in do notation
+opts@Options{..} <- m x
+equal to
+let opts@Options{..} = x
+and x must be Options .. otherwise MonadFail will raise
+opts is x
