@@ -1,0 +1,18 @@
+function with static types is very like class’s method in a way
+data constructor is very like class constructor
+
+data Person = Person { name :: String, age :: Int, gender :: String }
+class Person (name: String, age: Int, gender: String) { … }
+
+that constructor is class name
+
+getUserName :: Person -> String
+getUserName (Person name age gender) = name
+
+it’s very like class’s method
+class Person (name: String, age: Int, gender: String) {
+ function getUserName(self){
+    return self.name
+  }
+}
+
