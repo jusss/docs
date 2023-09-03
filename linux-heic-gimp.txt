@@ -1,0 +1,2 @@
+gimp can open heic picture file, gpicview and feh can't
+but gimp would take a large GB cache in ~/.cache/
