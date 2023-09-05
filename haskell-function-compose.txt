@@ -1,0 +1,25 @@
+
+compose  like
+input   f          g   output
+•        ------ ------  •
+g (f x)
+
+wrapped like f is inside g
+g x
+monad compose like
+x  Maybe  IO
+.  --      --
+
+monad compose would be like
+reader_bind( maybe_bind(x, f), g )
+monad compose would change the monad context 
+
+function do compose, monad do not
+g take f's output as input, that's compose
+monad do not, since monad compose would 
+like chain different monads, that can not
+monad can be wrapped by another monad
+
+compose is (g . f) x
+wrapped is ContT r m a
+
