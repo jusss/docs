@@ -1,0 +1,26 @@
+zram is different with swap
+lineageos 18.1 enable zram by default
+usb preferences -> File Transfer
+adb root
+adb shell
+
+ls /dev/block/zram0 # check if zram is supported by kernel
+
+disable
+swapoff /dev/block/zram0
+
+reset
+echo 1 > /sys/block/zram0/reset
+
+resize
+create a 2G zram
+echo $((2046*1024*1024)) > /sys/block/zram0/disksize
+
+mkswap /dev/block/zram0
+swapon /dev/block/zram0
+free -h
+
+stackoverflow.com/questions/24467604/
+
+sysctl -w vm.swappiness=60
+
