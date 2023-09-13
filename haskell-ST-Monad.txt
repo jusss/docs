@@ -1,0 +1,6 @@
+type IO = ST RealWorld
+
+Newtype wrappers aside, yes. We could unify them and have `type IO = ST RealWorld`, `type IORef = STRef RealWorld`. Oh wow, now that I look, we actually have: `newtype IORef a = IORef (STRef RealWorld a)`.
+
+ST allows you to something along the lines of `run :: ST ... a -> a` in a safe manner, where IO does not.
+
