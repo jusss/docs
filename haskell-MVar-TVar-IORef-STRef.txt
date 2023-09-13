@@ -1,0 +1,102 @@
+MVar, Mutable Variable
+TVar, Transaction Variable from STM
+IORef,
+STRef, State Thread 
+
+type IO = ST ReadWorld
+
+import GHC.MVar
+main = do
+    m <- newEmptyMVar
+    putMVar m 2
+    v <- takeMVar m
+    print v
+    putMVar m v
+    _v <- takeMVar m
+    print _v
+
+takeMVar m will get IO a, after takeMVar m is empty, takeMVar empty will block until its filled up
+putMVar m a :: IO () put a into MVar a, and m must be empty, otherwise it will block until m is empty
+
+newEmptyMVar :: IO (MVar a) create a new empty MVar a
+newMVar :: a -> IO (MVar a) create a new MVar with the given value
+
+    |
+   / \
+  |
+      |
+  |
+      |
+  |
+      |
+
+import GHC.MVar
+import Control.Concurrent
+import Control.Monad
+import Control.Concurrent.Async
+
+f1 m = do
+    v <- takeMVar m
+    if v < 60 then do
+        print 1
+        putMVar m $ v+1
+        f1 m
+    else do
+        putMVar m $ v+1
+        return ()
+
+f2 m = do
+    v <- takeMVar m
+    if v < 60 then do
+        print 2
+        putMVar m $ v+1
+        f2 m
+    else do
+        putMVar m $ v+1
+        return ()
+
+main = do
+    m <- newMVar 0
+    a1 <- async $ f1 m
+    a2 <- async $ f2 m
+    r1 <- wait a1
+    r2 <- wait a2
+    return ()
+
+after takeMVar, always putMVar
+or use readMVar, which putMVar after takeMVar
+
+main = do
+    a <- newEmptyMVar
+    forkIO $ forever $ takeMVar a >>= print
+    forever $ putMVar a =<< getLine
+
+blog.jakuba.net/2014-07-20-mutable-state-in-haskell/
+
+data IORef a where
+    newIORef :: a -> IO (IORef a)
+    readIORef :: IORef a -> IO a
+    writeIORef :: IORef a -> a -> IO ()
+    modifyIORef :: IORef a -> (a -> a) -> IO ()
+
+main = do
+    ref <- newIORef (0:: Int)
+    modifyIORef ref (+1)
+    readIORef ref >>= print
+
+a can not escape from IO monad, but can escape from State Thread Monad with runST
+
+STRef s a where
+    newSTRef :: a -> ST s (STRef s a)
+    readSTRef :: STRef s a -> ST s a
+    writeSTRef :: STRef s a -> a -> ST s ()
+    modifySTRef :: STRef s a -> (a -> a) -> ST s ()
+
+
+data TVar a
+newTVar    :: a -> STM (TVar a)
+readTVar   :: TVar a -> STM a
+writeTVar  :: TVar a -> a -> STM ()
+modifyTVar :: TVar a -> (a -> a) -> STM ()
+newTVarIO   :: a -> IO (TVar a)
+readTVarIO  :: TVar a -> IO a
