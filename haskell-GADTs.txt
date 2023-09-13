@@ -1,0 +1,16 @@
+data Expr a = I Int
+            | B Bool
+
+data Expr a where
+    I   :: Int  -> Expr Int
+    B   :: Bool -> Expr Bool
+
+data Maybe a = Just a | Nothing
+
+data Maybe a where
+ Just :: a -> Maybe a
+ Nothing :: Maybe a
+
+the first ADT give a feel like Maybe is an interface and Just and Nothing are class who inherit Maybe
+ 
+and the second GADTs like Maybe is a class and Just is a class method 
