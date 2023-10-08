@@ -1,0 +1,11 @@
+git clone https://github.com/vim/vim.git && cd vim && mkdir /home/john/vim9
+# other path than default, make distclean if re-do
+./configure --prefix=/home/john/vim9
+make -j8
+# make DESTDIR=/home/john/vim9/ install
+make install
+# export PATH=$PATH:/home/john/vim9/bin
+# if there's default vim, you can use alias to use the new one
+echo "alias vim=/home/john/vim9/bin/vim" >> ~/.bashrc
+
+
