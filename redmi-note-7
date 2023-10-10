@@ -1,3 +1,13 @@
+flash Pixel Experience 13 since lineageos discontinuted redmi note 7,
+download 13 plus edition, it's better than 13, https://get.pixelexperience.org/lavender
+https://dl.pixelexperience.org/9GOknL28EQmjDQhQccoysxLztTSx58TYBKdaqpFIfWWaflr4X6oh5M79DkOtrEUkwEZdi4T3skHoJsy8efLFR0SfHCS8bUF0xkryywmtOVo=/PixelExperience_Plus_lavender-13.0-20230925-0907-OFFICIAL.zip
+no need for recovery img, since TWRP recovery is already installed,
+
+hold Volumn up and power button to get into recovery mode, no need for wipe data, just refactory will be good,
+put this zip package into usb-stick and connect it to the phone, install it from usb-stick, wipe cache and dalvik then reboot system
+
+use redmi2 as wifi spot, connect it and login, done
+---------------------------------------------
 after clear cache and dalvik inside TWRP recovery, then update lineageos 17.1 to 18.1,
 inside google play arm v7 from MindTheGapps, not arm64 version,
 install mobile legends bang bang, it won't have lag anymore
