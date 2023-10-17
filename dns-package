@@ -1,0 +1,10 @@
+dns query package structure
+query and reply have same structure
+
+from top to bottom, 3 sections:
+
+header: takes 12Bytes, first 2B is ID
+question: QNAME takes 1B for length, then content, repeat, end with 0x00, QTYPE 1B, QCLASS 1B
+answer: NAME same as QNAME, TYPE 1B, CLASS 1B, TTL 1B, RDLENGTH 1B length for RDATA, RDATA
+
+https://mislove.org/teaching/cs4700/spring11/handouts/project1-primer.pdf
