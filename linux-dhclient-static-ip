@@ -1,0 +1,12 @@
+/etc/dhcp/dhclient.conf
+remove 'domain-name-servers' in request 
+or
+below request, add
+supersede domain-name-servers 127.0.0.1; 
+
+or
+
+chattr +i /etc/resolv.conf # prevent from being overwritten
+
+
+with -i undo it
