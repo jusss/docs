@@ -1,0 +1,8 @@
+import Data.Functor.Compose
+foldr (:) [] (Compose [Nothing, Just 3]) == [3]
+
+very like natural transformation
+also see `maybe` in Data.Maybe
+
+Functor do compose, Monad do not
+
