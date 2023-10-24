@@ -1,0 +1,46 @@
+Maybe and Either's effect is only run on the Right way,
+short circuiting the Left way
+ExceptT a IO b's effect is only run IO on Right way
+
+do
+a <- Nothing
+doSometing a
+
+this will do nothing on a, since a is Nothing, and whole do notation computation is Nothing
+
+ExceptT's do notation, v <- x; when f :: a -> IO ();
+if x :: ExceptT (return $ Right 2), f v will run IO,
+whole v's bloodline will run
+if x :: ExceptT (return $ Left 2), f v won't run IO,
+whole v's bloodline will not run
+
+what's the difference between ExceptT a IO b and IO (Either a b)?
+1. inside ExceptT you can run IO with liftIO, in IO (Either a b) you wait Either is done to run IO
+2. different do notation, in ExceptT do notation a <- get b, a is directly value, in IO (Either a b) a is Either a b
+3. different effect, ExceptT a IO b only run IO on Right way (ExceptT (return $ Right x)) , IO (Either a b) run IO on Left or Right way
+
+runExceptT $ do-notation, this do-notation is about ExceptT, 
+return can construct IO a
+data ExceptT a m b = ExceptT {runExceptT :: m (Either a b)}
+ExceptT is also a constructor, ExceptT (return $ Right 2 :: IO (Either String Int)) :: ExceptT String IO Int
+
+you can construct ExceptT in IO's do notaion anywhere you want, and use runExceptT to extract it to IO (Either a b) for Main
+in the outer, then use case-of to detect that whole ExceptT's result is left or right
+
+r :: Either String () <- runExceptT $ do
+        -- return construct IO a
+        a <- ExceptT (return $ Right 3 :: IO (Either String Int))
+        -- Left "a" won't run
+        -- a <- ExceptT (return $ Left "a" :: IO (Either String Int))
+        -- run IO inside Either, not need to wait Either's result to run IO
+        liftIO $ print a
+case r of 
+    Left x ->
+    Right y ->
+
+liftIO can lift IO action inside ExceptT a IO b
+
+Left a or Nothing `short-circuit` do-notaion computation, not whole >>= computation chain
+ContT `short-circuit` whole >>= computation chain
+
+
