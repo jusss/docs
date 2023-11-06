@@ -1,0 +1,22 @@
+1. show more message
+set cmdheight=2
+then when press key, the binding function will show on mini buffer
+
+2. interactive
+let g:ot = 0
+function! SimpleComplete()
+    execute 'echo '.g:ot
+endfunction
+then when this function is called, will echo message on mini buffer
+
+3. purge plugin installed by tarball
+ Download supertab.vmb to any directory.
+ Open the file in vim ($ vim supertab.vmb).
+ Source the file (:so %).
+
+ uninstall supertab
+ rm .vim/plugin/supertab.vim
+ sudo rm /usr/share/vim/vimfiles/plugin/supertab.vim
+ 
+ sudo find / -iname "supertab*"
+

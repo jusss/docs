@@ -5,4 +5,8 @@ install details
 2. Open the file in vim ($ vim supertab.vmb).
 3. Source the file (:so %).
 
+uninstall supertab
+1. rm .vim/plugin/supertab.vim
+2. sudo rm /usr/share/vim/vimfiles/plugin/supertab.vim
 
+sudo find / -iname "supertab*"
