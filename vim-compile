@@ -10,3 +10,7 @@ make install
 # export PATH=$PATH:/home/john/vim9/bin
 # if there's default vim, you can use alias to use the new one
 echo "alias vim=/home/john/vim9/bin/vim" >> ~/.bashrc
+or 
+apt install vim-nox
+echo "alias vim='vim-nox'" >> ~/.bashrc
+source .bashrc
