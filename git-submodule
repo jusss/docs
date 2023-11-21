@@ -1,0 +1,29 @@
+git clone --recursive git@domain:repo.git
+git checkout branch
+git submodule update --init
+git submodule update --remote
+or git submodule init; git submodule update
+git checkout -b branch
+git fetch
+git branch --set-upstream-to=origin/branch branch
+
+git clone --recursive https://x.git
+git checkout branch
+git submodule update --init
+git pull origin master
+
+# reset http login user password
+git config --unset credential.helper
+
+# store password
+git config credential.helper store
+
+let assume there're 10 files changed, but you want upload 5 files
+git stash -p
+git add *
+arc lint
+arc diff
+arc land
+git stash pop
+
+
