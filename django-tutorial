@@ -1,0 +1,270 @@
+pip3 install django
+
+1. create project (root)
+    django-admin startproject mysite (mkdir mysite; cd mysite; cabal init)
+    python manage.py runserver (cabal run mysite)
+
+2. create application (route)
+    python manage.py startapp myblog
+    vim myblog/views.py -> response
+    vim myblog/urls.py -> route
+    myblog/models.py -> database table class
+
+    A project can contain multiple apps, An app can be in multiple projects. project and app are every likely.
+    x:3000 is the project mysite, and x:3000/myblog is the application myblog
+
+3. config
+    vim mysite/urls.py -> add /myblog route
+    settings.py -> databse file path, application, others, templates path
+    urls.py -> route
+    admin.py -> user
+    models.py -> databse class
+    views.py -> response
+    migrations/ -> databse
+    apps.py -> application name
+    templates/base.html -> response
+    templates/myblog/titles.html -> response
+
+    settings.py
+        DEBUG True when develop
+        ALLOWED_HOSTS: domain name
+        INSTALLED_APPS: [...] add your custom app 'myblog' so it can be visited
+        DATABASES: SQLite/PostgreSQL
+        LANGUAGE_CODE: 'zh-hans'
+        TIME_ZONE: Asia/Shanghai
+        TEMPLATES: DIRS: [os.path.join(BASE_DIR, 'templates'),], APP_DIRS: False templates path -> /templates/
+        STATIC_URL: '/static/' static path for css, js
+        LOGIN_REDIRECT_URL: '/' redirect after login
+4. create sql
+    after add database-class myblog/models.py
+    python3 manage.py makemigrations # will create database data in file
+    python3 manage.py migrate # migrate data into database
+5. create users
+    python3 manage.py createsuperuser # route /admin
+    /myblog/admin.py import database class so you can add blog on /admin
+    visit /admin with root user, add regular user in the front page
+    python3 manage.py shell # debug for database class
+    python3 manage.py startapp account # create login app for regular users to login
+    add 'account INSTALLED_APPS in /mysite/settings.py
+    add ur in urlpatterns in /mysite/urls.py
+    vim /account/urls.py add /account/login/ for sub-route visit
+    add /account/forms.py for form class
+    add /account/views.py for response
+    add /templates/account/login.html for login page
+
+examples:
+    create a sub-route /myblog
+    i. python3 manage.py startapp myblog
+    ii. vim mysite/settings, INSTALLED_APPS add 'myblog'
+    iii. vim myblog/views.py
+        from django.http import HttpResponse
+        def index(request):
+            return HttpResponse("Hello world')
+    iv. vim myblog/urls.py
+        from django.urls import path
+        from . import views
+        urlpatterns = [ path ('', views.index, name='index'),]
+    v. vim mysite/urls.py
+        from django.urls import path, include
+        urlpatterns = [
+            path('admin/', admin.site.urls),
+            path('myblog', include('myblog.urls')),
+        ]
+    vi. visit http: //127.0.0.1:8000/myblog/
+
+    create user and post a blog
+    i. vim myblog/models.py
+        from django.db import models
+        class Post (models.Model):
+            title = models.CharField(max_length=200)
+            content = models.TextField()
+            def __str__(self):
+                return self.title
+    ii. python3 manage.py makemigrations
+        python3 manage.py migrate
+    iii. python3 manage.py createsuperuser
+    iv. vim myblog/admin.py
+        from .models import Post
+        admin.site.register(Post)
+    v. visit http://127.0.0.1:8000/admin/ and add some contents on myblog
+    vi. vim myblog/views.py
+        from .models import Post
+        def index(request) :
+            context = { 'new_list': Post.objects.all()}
+            return render(request,'myblog/index.html', context = context)
+    vii. mkdir -p myblog/templates/myblog; vim myblog/templates/myblog/index.html
+        {% if blog_list %}
+        <ul>
+        {% for elem in blog_List %}
+        <li>
+        <h3>{{elem.title}}</h3>
+        <p>{{ elem.content }}</p>
+        </li>
+        {% endfor %}
+        </ul>
+        {% else %}
+        <p> no message yet </p>
+        {% endif %}
+    viii. visit http://127.0.0.1:8000/myblog/
+
+there're two ways to do templates
+APP Level, render myblog/index.html in myblow/views.py is /myblog/templates/myblog/index.html
+Project level, templates in root path, /templates/myblog/index.html
+vim mysite/settings.py
+    in TEMPLATES
+    'DIRS': [os.path.join(BASE_DIR, 'templates')],
+    'APP_DIRS': False,
+
+python3 manage.py startapp account
+
+joe@debian:~/mysite$ vim mysite/settings.py
+joe@debian:~/mysite$ vim mysite/urls.py
+joe@debian:~/mysite$ vim account/urls.py
+joe@debian:~/mysite$ vim account/forms.py
+joe@debian:~/mysite$ vim account/views.py
+vim account/templates/account/login.html
+joe@debian:~/mysite$ vim account/forms.py
+joe@debian:~/mysite$ vim account/views.py
+joe@debian:~/mysites cp account/templates/account/login.html account/templates/account/register.html
+joe@debian:~/mysite$ vim account/templates/account/register.html
+joe@debian:~/mysite$ vim account/urls.py
+joe@debian:~/mysite$ python3 manage.py runserver
+
+django-admin shell
+python3 manage.py shell
+
+create model in myblog/models.py
+class Post(models.Model):
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    def __str__(self):
+        return self.title
+
+create model form in myblog/forms.py
+class PostForm(forms.ModelForm):
+    class Meta:
+        model = Post
+        fields = "__all__"
+
+in myblow/views. py
+def index(request):
+    return render(request,'myblog/index.html', { 'blog_List: Post.objects.all()})
+
+def add(request):
+    if request.method == "POST":
+        form = PostForm(request.POST)
+        if form.is_valid():
+            form.save()
+        else:
+            return HttpResponse('failed')
+        return redirect("/myblog")
+    if request.method == "GET":
+        form = PostForm()
+        return render(request,'myblog/add.html', { 'blog_list': Post.objects.all(), "form": form})
+
+1. check login or not
+@login_required(login_url = "/account/login/")
+get query string in views
+in views, request.GET.get('key',") get /a/c/?key=value
+
+2. sql table use userId for difference, pass special used data in views
+>>> from myblog.models import Post
+>>> Post.objects.all()
+<QuerySet [<Post: this is á test!>, <Post: adf>, <Post: hi>, <Post: its ok>, <Post:adf>]>
+>>> Post. objects.get(id=4)
+>>> Post. objects.filter(id=4)
+
+alter new item in models
+vim myblog/models.py
+class Post(models.Model):
+    title = models. CharField(max_length=200)
+    content = models.TextFieldO)
+    user_id = models.BigIntegerField(default=0)
+
+myblog/forms.py
+class PostForm(forms.ModelForm):
+    class Meta:
+        model = Post
+        # fields = "__all__"
+        exclude = ['user_id']
+
+myblog/views.py
+@login_required(login_url = "/account/login/")
+def index(request):
+    current_user = request.user
+    # return render (request: mublog/index.html', { 'blog_List': Post.objects.all(), 'user': current_user})
+    return render(request, {"blog_List': Post.objects.filter(user_id=current_user.id), 'user': current_user})
+
+@login_required(login_ur = "/account/login/")
+def add(request):
+    if request.method == "POST":
+        form = PostForm(request.POST)
+        if form.is_valid():
+            obj = form. save(commit=False)
+            obj.user_id = request,user, id
+            obj. save()
+    else:
+        return HttpResponse('failed')
+    return redirect("/myblog")
+
+python3 manage.py makemigrations myblog
+python3 manage.py migrate myblog
+
+referencing with User model
+myblog/models.py
+class Post(models.Model):
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    user_id = models.BigIntegerField()
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
+
+    def __str__(self):
+        return self.title
+
+myblog/forms.py
+class PostForm(forms.ModelForm):
+    class Meta:
+        model = Post
+        # fields = "__all__"
+        exclude = ['user_id', 'author']
+
+myblog/views.py
+@login_required(login_url = "/account/login/")
+def index(request) :
+    current_user = request.user
+    # return render(request, 'myblog/index.html', {'blog_list': Post.objects.all(), 'user': current_user})
+    return render(request, 'myblog/index.html', {'blog_list': Post.objects.filter(author=current_user), 'user': current_user})
+
+@login_required(login_url="/account/login/")
+def add(request) :
+    if request.method == "POST":
+        form = PostForm(request.POST)
+        if form.is_valid():
+            obj = form.save(commit=False)
+            obj.user_id = request.user.id
+            obj.author = request.user
+            obj.save()
+    else:
+        return HttpResponse('failed')
+    return redirect("/myblog")
+
+    if request.method == "GET":
+        form = PostForm()
+        return render(request, 'myblog/add.html',{'blog_List': Post.objects.all(), "form": form, 'user': request.user})
+
+new model or model changed, need run migrate
+clear the database
+1. don't delete _init__.py in the migrations folder
+2. rm your_app/migrations/*
+3. rm db.sqlite3
+4. python3 manage.py makemigrations
+5. python3 manage.py migrate
+
+python3 manage.py makemigrations myblog
+It is impossible to add a non-nullable field 'author' to post without specifying a default.
+
+author = models.CharField(default="")
+or
+author = models.CharField(null=True)
+or
+author = models.CharField(null=True, blank=True)
