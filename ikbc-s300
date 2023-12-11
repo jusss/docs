@@ -4,3 +4,9 @@ there're three bluetooth devices can be connected, Fn + PrtSc connect the first 
 Fn + ScrLk connect the second one, and Fn + Pause connect the last one
 turn the switch to show green, it's 2.4G wireless keyboard
 turn the switch to show blue, it's bluetooth keyboard
+
+on linux via bluetooth
+blueman-applet &
+blueman-manager click search item on left top corner
+right on ikbc option in blueman-manager, click connect,
+then hold Fn + ScrLk for 3 seconds on s300, it will be connected
