@@ -1,0 +1,56 @@
+type alias
+
+type Str = String
+
+
+
+
+data alias
+
+data P = P String Int
+
+pattern P1 = P "a" 3
+
+f :: P -> Bool
+f P1 = True
+f _ = False
+
+
+
+newtype TYPE = TYPE { fromTYPE :: Word16 }
+pattern A :: TYPE
+pattern A = TYPE 1
+pattern CNAME :: TYPE
+pattern CNAME = TYPE 5
+
+
+f :: TYPE -> Word16
+f (TYPE 1) = fromTYPE (TYPE 1)
+f A = fromTYPE A
+
+where you use A , actually it's TYPE 1, still C's macro to me
+
+
+data Type = App String [Type]
+App "Int" [] :: TYPE
+
+pattern Int = App "Int"   []
+
+isInt :: Type -> Bool
+isInt Int = True
+isInt _   = False
+
+data Identifier = MkIdentifier
+  { unIdentifier :: Text
+  , folded       :: Text
+  }
+
+instance Eq Identifier where
+ (==) = (==) `on` folded
+
+pattern Identifier :: Text -> Identifier
+pattern Identifier s <- MkIdentifier s _ where
+  Identifier s = MkIdentifier s (Text.toCaseFold s)
+
+where `Identifier s` will replace by `MkIdentifier s (Text.toCaseFold s)`
+
