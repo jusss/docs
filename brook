@@ -1,3 +1,14 @@
+brook 20230606
+
+wget 'https://objects.githubusercontent.com/github-production-release-asset-2e65be/85371712/5a597028-8d04-4039-b9e8-1ada37d5f50b?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20231215%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20231215T070600Z&X-Amz-Expires=300&X-Amz-Signature=5aa7123bc40d1f036abcb8a5788226bd6aaad904abedfb5052db973b3f2eb6bc&X-Amz-SignedHeaders=host&actor_id=6339363&key_id=0&repo_id=85371712&response-content-disposition=attachment%3B%20filename%3Dbrook_linux_amd64&response-content-type=application%2Foctet-stream'
+
+on server 
+./brook-66 server -l :port -p password
+
+on client
+brook-66 client -s server-ip:port -p password --socks5="127.0.0.1:7070"
+
+---------------------------------------------
 make sure the server and the client have the same version! it's important!
 ---------------------------------------
 
