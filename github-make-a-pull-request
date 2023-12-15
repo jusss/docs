@@ -1,0 +1,20 @@
+make a fork on the github web page, and create a 'patch' branch
+git clone https://github.com/jusss/scotty-tls.git
+cd scotty-tls
+git checkout patch
+
+after changes
+
+git add *
+git commit -m ''
+git remote set-url origin git@github.com:jusss/scotty-tls.git
+git push origin patch
+
+visit your github repo, switch to 'patch' branch,
+then click make pull requests on your repo website,
+click make a new requests, choose the original repo and branch, then 
+choose your repo and 'patch' branch
+then submit
+
+it will generate like this
+https://github.com/scotty-web/scotty-tls/pull/10
