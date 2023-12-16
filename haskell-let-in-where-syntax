@@ -1,0 +1,9 @@
+f = do
+    ...
+    let altered_response = encode $ alterIdentifier q cacheResponse where
+        alterIdentifier m r = r { header = (header r) {identifier = identifier $ header m} }
+    ...
+
+do { let v = f x where f = ... } is ok
+
+do { let v = let f = ... in f x } is ok 
