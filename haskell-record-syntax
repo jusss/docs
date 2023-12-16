@@ -1,0 +1,22 @@
+(Foo {a b c}) {a = x} will update a's value
+
+data Foo = Foo { a :: Foo, b :: Int, c :: String } | Bar | Des deriving Show
+
+nf = Foo (Foo Bar 3 "hi") 9 "ok"
+is the same
+nf = Foo { a = (Foo Bar 3 "hi"), b = 9, c = "ok }
+
+if you want to update b to 0
+
+nf { b = 0 }
+
+if you want to update the inner Bar to Des
+
+nf { a = (a nf) { a = Des } }
+
+you can define a function to update it like
+
+f :: Int -> Foo -> Foo
+f n foo = foo { b = n }
+
+or use lens
