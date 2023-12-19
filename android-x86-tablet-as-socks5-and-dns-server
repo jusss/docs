@@ -1,0 +1,31 @@
+make debian bulleye chroot environment on sdcard, and install cabal ghc
+chroot this environment, then
+git clone https://github.com/jusss/code
+
+for dns server, cabal run mdns
+
+for socks5 server, it needs ssh over kcptun
+download kcptun from https://objects.githubusercontent.com/github-production-release-asset-2e65be/52595226/8249c100-7a52-11ea-9acb-276a46260fa4?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20231219%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20231219T074227Z&X-Amz-Expires=300&X-Amz-Signature=e7afa91d3218d84ab9424446fbe0707c0deb60e6fea5c242d10723a5719d30a7&X-Amz-SignedHeaders=host&actor_id=6339363&key_id=0&repo_id=52595226&response-content-disposition=attachment%3B%20filename%3Dkcptun-linux-386-20200409.tar.gz&response-content-type=application%2Foctet-stream
+this is a x.tar.gz package
+
+install tmux by apt install tmux
+
+ssh.sh
+count=1
+while:
+do
+    echo $count >> ./re-run-times
+    date >> ./re-run-times
+    ssh -D 192.168.0.x:7070 -C -q -N -p KCP-Port user@127.0.0.1 -i user_key
+    sleep 3
+    count=$((count+1))
+done
+
+kcp.sh
+/client_linux_386 -r "ServerIP:Port" -l ":KCP-Port" -mode fast3 -nocomp -sockbuf 16777217 -dscp 46 -scavengettl 1
+
+even the android tablet go to sleep, those proxy and dns services still work in the chroot environment
+
+on iOS/Android/PC, settings -> wifi -> manually set dns server to this tablet ip for dns service
+
+since iOS doesn't provide socks5, you need potatso or kitsunebi app for socks5 proxy
