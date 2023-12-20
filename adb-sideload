@@ -1,0 +1,15 @@
+in development enable adb and debug as root
+connect as File Transfer
+
+adb -d reboot sideload
+this will get into recovery with sideload
+
+adb -d sideload Downloads/lineage-17.1-20210518-nightly-lavender-signed.zip
+if it will get adb: sideload connection failed: insufficient permissions for device
+
+then
+adb kill-server
+sudo adb start-server
+detech the device and plug it again
+adb -d sideload Downloads/lineage-17.1-20210518-nightly-lavender-signed.zip
+
