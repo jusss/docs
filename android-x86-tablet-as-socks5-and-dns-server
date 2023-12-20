@@ -29,3 +29,28 @@ even the android tablet go to sleep, those proxy and dns services still work in 
 on iOS/Android/PC, settings -> wifi -> manually set dns server to this tablet ip for dns service
 
 since iOS doesn't provide socks5, you need potatso or kitsunebi app for socks5 proxy
+
+enable ssh on debian bullseye
+apt install openssh-server
+
+/etc/init.d/ssh start
+vim /etc/ssh/sshd_config
+
+Port 22
+PermitRootLogin yes
+PubkeyAuthentication yes
+PasswordAuthentication yes
+ChallengeResponseAuthentication yes
+UsePAM yes
+AllowAgentForwarding yes
+AllowTcpForwarding yes
+X11Forwarding yes
+TCPKeepAlive yes
+ClientAliveInterval 0
+ClientAliveCountMax 3
+Subsystem	sftp	/usr/lib/ssh/sftp-server
+
+/etc/init.d/ssh restart
+
+ssh root@localhost
+
