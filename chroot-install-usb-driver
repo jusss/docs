@@ -1,0 +1,2 @@
+apt install kmod usbutils iproute2 net-tools 
+apt install usb-modeswitch usb-modeswitch-data
