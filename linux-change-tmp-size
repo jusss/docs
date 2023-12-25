@@ -1,0 +1,2 @@
+mount -o remount,size=6G /tmp/
+df -h /tmp
