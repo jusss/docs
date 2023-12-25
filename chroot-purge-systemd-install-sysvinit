@@ -1,0 +1,6 @@
+in debian chroot, systemd is not running, so it can be removed
+
+apt purge systemd
+apt install sysvinit-core
+
+/etc/init.d/ssh start can be /usr/sbin/sshd -D &
