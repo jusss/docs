@@ -1,3 +1,5 @@
+on iPad OS, safari or chrome use desktop ua to visit, not mobile way
+----------------------
 in chroot env
 
 apt install shellinabox
