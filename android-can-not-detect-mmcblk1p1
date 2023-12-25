@@ -1,0 +1,37 @@
+there's no /dev/block/mmcblk1p1 only /dev/block/mmcblk1
+
+fdisk /dev/block/mmcblk1
+
+the number of cylinders for this disk is set to 32000
+there is nothing wrong with that, but this is larger than 1024
+and could in certain setups cause problems with 
+1) software that runs at boot time
+2) booting and partitioning software from other OSs
+
+try fsck.ext2 -t root /dev/block/mmcblk1
+
+fdisk -l /dev/block/mmcblk1
+
+first cylinder to 1 when fdisk /dev/block/mmcblk1, or under 2048
+
+
+or mkfs and fdisk on android, use busybox
+
+on Android
+fdisk /dev/block/mmcblk1
+d
+1
+o
+n
+p
+w
+
+mkfs.ext2 /dev/block/mmcblk1p1
+
+busybox mount -t ext2 /dev/block/mmcblk1p1 /mnt/media_rw/sdcard1
+
+busybox umount /mnt/media_rw/sdcard1
+
+
+
+
