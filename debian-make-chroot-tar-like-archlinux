@@ -1,0 +1,56 @@
+you can make chroot environment like debootstrap, but that need network
+sometimes you need make a lot, so use tar
+
+after you debootstrap one environment like bookworm,
+
+sudo mount /dev/sdb1 /mnt
+
+sudo debootstrap --no-check-gpg --variant=buildd --arch=i386 --foreign bookworm /mnt/  http://mirrors.aliyun.com/debian
+
+then 
+cd bookworm
+chroot . /bin/bash
+/debootstrap/debootstrap --second-stage
+apt update
+apt install vim screen tmux openssh-server inetutils-ping
+echo 'export PATH=$PATH:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin' > source.sh
+vi /etc/group
+
+inet:x:3003:
+net_rw:x:3004:
+
+exit
+tar -cvzf /mnt/bookworm.tar.gz .
+cd /mnt
+tar -xvzf bookworm.tar.gz
+chroot /mnt /bin/bash
+usermod -g inet _apt
+apt purge systemd
+apt install sysvinit-core
+
+if you want make archlinux then
+download archlinuxarm-armv7h-latest.tar.gz from archlinuxarm.org
+
+root@moon:~# cat /mount-i386.sh
+# run 'sh /sdcard/mount-android.sh' in android terminal
+# and write '#!/bin/bash;export PATH=/usr/bin:/bin:/usr/local/bin' to chroot's root/.bashrc, chroot will read it
+#DP=/dev/block/mmcblk1p1
+MP=/mnt
+#busybox mount $DP $MP
+sudo mount -o bind /dev $MP/dev
+sudo mount -t proc proc $MP/proc
+sudo mount -t sysfs sysfs $MP/sys
+sudo mount -t devpts devpts $MP/dev/pts
+sudo mount -t tmpfs tmpfs $MP/tmp
+sudo mount -t tmpfs tmpfs $MP/dev/shm
+# for share Xorg
+xauth extract - $DISPLAY | sudo tee $MP/root/.Xauthority
+# busybox chroot $MP /bin/bash
+# use 'useradd -m joe -s /bin/bash' to create user joe, and write that export PATH to joe's .bashrc
+# also u can run "busybox chroot $MP /bin/bash -c 'command1;command2'" once and exit chroot
+#sudo chroot $MP /bin/su joe
+sudo chroot $MP /bin/bash
+
+bash /mnt/mount-i386.sh
+apt update
+apt install vim 
