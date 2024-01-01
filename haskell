@@ -1,3 +1,33 @@
+Int -> Word32
+
+fromIntegral (v:: Int)
+
+(fromIntegral <$> (v .: (fromString "local_port") :: Parser Int) :: Parser PortNumber)
+
+----------------------------
+is there a function that just print Either value? if it's Left then print the exception, Right then do nothing?
+either error id (v:: Either String ())
+if you want use 'either error id ' in IO action, it needs "return either error id x" or "either error id <$> ..."
+like either (error . show) id <$> runExceptT do
+
+----------------------------
+do { v <- doSomthing; f v } is there a way to write like do { f v <- doSomething }?
+do { _ <- f <$> doSomething }
+
+----------------------------
+avoid lots of liftIO,
+1. mtl instead of transformers
+2. all IO in one function, liftIO one function
+3. all IO in one do notaion, liftIO one do notation
+
+----------------------------
+
+use where in main's IO do notation
+-- liftIO $ f config where
+    -- f Config{..} = do
+        -- print Config{..}
+        -- the 'where' section terminates the declaration of 'main', 'where' can only attach to declarations, not expressions
+-------------------------
 unsafePerformIO, IORef
 ---------------------------
 higher ranked type, Rank-N types,
