@@ -1,3 +1,22 @@
+kcptun don't use compress with -nocomp, ssh use compress with -C
+on server
+./server_linux_amd64 -t "127.0.0.1:0" -l ":0" -mode fast3 -nocomp -sockbuf 16777217 -dscp 46 -crypt xor -key "password"
+
+on client
+./client_linux_386 -r "2.0.2.2:0" -l ":0" -mode fast3 -nocomp -sockbuf 16777217 -dscp 46 -scavengettl 1 -crypt xor -key "password"
+
+cat kcptun/l.sh
+count=1
+while :
+do
+	echo $count >> ./re-run-times
+	date >> ./re-run-times
+    ssh -D 192.168.0.6:0 -C -q -N -p 0 user@127.0.0.1 -i ./user
+	sleep 3
+	count=$((count+1))
+done
+
+---------------------------
 download client_linux_arm7 and run it inside termux on android,
 then `adb shell` run `ssh xxx` over that kcp tunnel,
 ssh comes with android in lineage os 18.1
