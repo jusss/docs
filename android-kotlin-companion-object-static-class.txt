@@ -1,0 +1,16 @@
+companion object as static class for store value
+
+IntentData.kt
+class IntentData {
+    companion object {
+        lateinit var bthid: BluetoothHidDevice
+        lateinit var btAdapter: BluetoothAdapter
+    }
+}
+
+
+  IntentData.bthid = bthid
+  IntentData.btAdapter = btAdapter
+
+bthid = IntentData.bthid
+btAdapter = IntentData.btAdapter

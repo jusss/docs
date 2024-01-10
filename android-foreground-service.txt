@@ -1,0 +1,77 @@
+if you need return value from service, use bind service
+
+//                    https://www.geeksforgeeks.org/foreground-service-in-android/
+//   https://dhexx.cn/news/show-4555137.html?action=onClick
+
+
+1. AndroidManifest.xml
+<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+<application ...
+<service android:name=".MyService"
+            android:enabled="true"/>
+</application>
+
+2. MyService.kt
+class MyService: Service() {
+    override fun onBind(p0: Intent?): IBinder? {
+        return null
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channelId = "newChannelId"
+            val channelName = "channelName"
+            val channel =
+                NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_LOW)
+            val manager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            manager.createNotificationChannel(channel)
+            val notification: Notification =
+                NotificationCompat.Builder(this, channelId).setAutoCancel(true)
+                    .setCategory(Notification.CATEGORY_SERVICE).setOngoing(true)
+                    .setPriority(NotificationManager.IMPORTANCE_LOW).build()
+            startForeground(1, notification)
+        }
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        START YOUR CODE HERE!
+     
+        val name=intent?.getStringExtra("name")
+        Toast.makeText(
+            applicationContext, "Service has started running in the background",
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+   override fun onDestroy() {
+
+        STOP YOUR CODE HERE!
+   }
+
+}
+
+3. MainActivity.kt
+findViewById<Button>(R.id.startRec).setOnClickListener{
+            uiScope.launch {
+                withContext(Dispatchers.Main) {
+                    val showTextView = findViewById<TextView>(R.id.text1)
+                    
+                    
+
+
+                   // START SERVICE
+                    val intent=Intent(applicationContext,MyService::class.java)
+                    intent.putExtra("name","Geek for Geeks")
+                    startForegroundService(intent)
+//                    startService(intent)
+
+                    // STOP SERVICE
+                    val intent=Intent(applicationContext,MyService::class.java)
+                    intent.putExtra("name","Geek for Geeks")
+                    stopService(intent)
+
+                }
+            }
+        }

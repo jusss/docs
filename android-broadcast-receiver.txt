@@ -1,0 +1,42 @@
+1. broadcast send
+                        val intent = Intent()
+                        intent.action = "com.example.bluetoothconnect.service"
+                        intent.putExtra("d","d")
+                        sendBroadcast(intent)
+
+2. broadcast class, put callback into, in Activity so it can visit activity variable with inner class
+
+class OTGRealKeyboardActivity : AppCompatActivity() {
+    val buttons = ArrayList<Button>()
+    var lastButton : Button? = null
+    lateinit var ll: LinearLayout
+
+    inner class ServiceConnectedReceiver: BroadcastReceiver(){
+        override fun onReceive(p0: Context?, p1: Intent?) {
+            if (p1?.action.equals("com.example.bluetoothconnect.service")){
+
+//                val result = p1?.getSerializableExtra("d") as IntentData
+
+                bthid = IntentData.bthid
+                btAdapter = IntentData.btAdapter
+
+                btAdapter.bondedDevices.map { btd ->
+                    buttons.add(Button(p0))
+                    buttons.get(buttons.size - 1).setText(btd.name)
+                    buttons.get(buttons.size - 1).setAllCaps(false)
+                    buttons.get(buttons.size - 1).setFocusable(false)
+
+                    buttons.get(buttons.size - 1).setOnClickListener {
+//                buttons.map { btn -> btn.setBackgroundColor(Color.LTGRAY) }
+//                buttons.map { btn -> btn.setTextColor(Color.BLACK) }
+                        val btn = it as Button
+
+3. broadcast register in onCreate or onResume
+override fun onCreate(savedInstanceState: Bundle?) {
+val filter = IntentFilter("com.example.bluetoothconnect.service")
+        this.registerReceiver(ServiceConnectedReceiver(), filter)
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(ServiceConnectedReceiver())
+    }

@@ -1,0 +1,146 @@
+sent broadcast in bind service, once service value is produced, get it in activity
+//                    https://www.geeksforgeeks.org/foreground-service-in-android/
+//   https://dhexx.cn/news/show-4555137.html?action=onClick
+
+
+1. AndroidManifest.xml
+<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+<application ...
+<service android:name=".MyService"
+            android:enabled="true"/>
+</application>
+
+2. make static class aka companion object for store service value, in case the value is not produced and the variable in activity is been using
+IntentData.kt
+class IntentData {
+    companion object {
+        lateinit var bthid: BluetoothHidDevice
+        lateinit var btAdapter: BluetoothAdapter
+    }
+}
+
+ 
+3. MyService.kt, in function, pass service value into companion object then send broadcast, so broadcast receiver can read service value from companion object
+class BluetoothConnectService: Service() {
+
+    // Binder given to clients.
+    private val binder = LocalBinder()
+  
+    fun connect(TARGET_DEVICE_NAME: String)  {  // ACTUAL CODE
+  
+        lateinit var bthid: BluetoothHidDevice
+        val btAdapter = BluetoothAdapter.getDefaultAdapter()
+       
+
+                        IntentData.bthid = bthid
+                        IntentData.btAdapter = btAdapter
+
+                        val intent = Intent()
+                        intent.action = "com.example.bluetoothconnect.service"
+                        intent.putExtra("d","d")
+                        sendBroadcast(intent)  // broadcast send, signal for service value is produced and can get it from IntentData, since some object like BluetoothHidDevice can not be serilized for intent to pass
+    }
+
+
+    inner class LocalBinder : Binder() {
+        // Return this instance of LocalService so clients can call public methods.
+        fun getService(): BluetoothConnectService = this@BluetoothConnectService
+    }
+
+    override fun onBind(p0: Intent?): IBinder? {
+        return binder
+    }
+
+//    in bind service, onCreate and onStartCommand will not run, only startForegroundService will call them
+    override fun onCreate() {
+        super.onCreate()
+       
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        return START_STICKY
+    }
+
+    override fun stopService(name: Intent?): Boolean {
+        Log.d("Stopping","Stopping Service")
+
+        return super.stopService(name)
+    }
+
+    override fun onDestroy() {
+
+        Toast.makeText(
+            applicationContext, "Service execution completed",
+            Toast.LENGTH_SHORT
+        ).show()
+        Log.d("Stopped","Service Stopped")
+        super.onDestroy()
+    }
+
+}
+
+4. in Activity, create ServiceConnection instance and bind it in onStart(), 
+class OTGRealKeyboardActivity : AppCompatActivity() {
+
+    /** Defines callbacks for service binding, passed to bindService().  */
+    private val connection = object : ServiceConnection {
+
+        override fun onServiceConnected(className: ComponentName, service: IBinder) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance.
+            val binder = service as BluetoothConnectService.LocalBinder
+            mService = binder.getService()
+            mBound = true
+            println("*** onServiceConnected ")
+            mService.connect(TARGET_DEVICE_NAME)   // ACTUAL CODE
+//            bthid = x
+//            btAdapter = y
+        }
+
+        override fun onServiceDisconnected(arg0: ComponentName) {
+            mBound = false
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        // Bind to LocalService.
+        Intent(this, BluetoothConnectService::class.java).also { intent ->
+            bindService(intent, connection, Context.BIND_AUTO_CREATE)
+        }
+    }
+
+5. in Activity,register broadcast in onCreate so once service value is produced, get it from companion object and update UI in broadcast class with the value, use listener event with that value in activity so UI can work without that value
+ broadcast class, put callback into, in Activity so it can visit activity variable with inner class
+
+class OTGRealKeyboardActivity : AppCompatActivity() {
+    val buttons = ArrayList<Button>()
+    var lastButton : Button? = null
+    lateinit var ll: LinearLayout
+
+    inner class ServiceConnectedReceiver: BroadcastReceiver(){
+        override fun onReceive(p0: Context?, p1: Intent?) {
+            if (p1?.action.equals("com.example.bluetoothconnect.service")){
+                bthid = IntentData.bthid
+                btAdapter = IntentData.btAdapter
+
+                btAdapter.bondedDevices.map { btd ->
+                    buttons.add(Button(p0))
+                    buttons.get(buttons.size - 1).setText(btd.name)
+                    buttons.get(buttons.size - 1).setAllCaps(false)
+                    buttons.get(buttons.size - 1).setFocusable(false)
+
+                    buttons.get(buttons.size - 1).setOnClickListener {
+                        val btn = it as Button
+
+6. broadcast register in onCreate or onResume
+override fun onCreate(savedInstanceState: Bundle?) {
+val filter = IntentFilter("com.example.bluetoothconnect.service")
+        this.registerReceiver(ServiceConnectedReceiver(), filter)
+
+      override fun onDestroy() {
+        super.onDestroy()
+        unbindService(connection)
+        mBound = false
+        unregisterReceiver(ServiceConnectedReceiver())
+    }
