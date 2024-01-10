@@ -1,6 +1,6 @@
 if you need return value from service, use bind service
 
-//                    https://www.geeksforgeeks.org/foreground-service-in-android/
+//   https://www.geeksforgeeks.org/foreground-service-in-android/
 //   https://dhexx.cn/news/show-4555137.html?action=onClick
 
 

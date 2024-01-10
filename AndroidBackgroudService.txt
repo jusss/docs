@@ -1,3 +1,18 @@
+
+//   https://www.geeksforgeeks.org/foreground-service-in-android/
+//   https://dhexx.cn/news/show-4555137.html?action=onClick
+since android 8.0, you can not use startService,
+background must start foreground service first
+
+startService to startForegroundService
+
+if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {String channelId="newChannelId";String channelName="channelName";NotificationChannel channel = new NotificationChannel(channelId, channelName,NotificationManager.IMPORTANCE_LOW);NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);manager.createNotificationChannel(channel);Notification notification = new NotificationCompat.Builder(this, channelId).setAutoCancel(true).setCategory(Notification.CATEGORY_SERVICE).setOngoing(true).setPriority(NotificationManager.IMPORTANCE_LOW).build();startForeground(1, notification);
+}
+
+<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+
+
 https://stackoverflow.com/questions/34573109/how-to-make-an-android-app-to-always-run-in-background
 
 1. create YourService.class file near MainActivity.kt
