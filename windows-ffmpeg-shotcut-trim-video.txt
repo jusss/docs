@@ -1,0 +1,22 @@
+ffmpeg -ss 00:00:06 -t 00:06:00 -i original.mkv -vcodec copy -acodec copy clip.mkv
+use vcodec copy, acodec copy, the clips may get the original timestamp
+
+use Shortcut editor from shotcut.org
+1. open original.mkv 
+2. trim the video like on iOS by move the left cursor bar as start and 
+the right cursor bar as end
+3. click timeline on the menubar, then hold the video to left corner
+4. move the bar from left to right can zoom the timeline
+5. trim the video under timeline
+6. click export on the menubar, choose hevc as default, timeline as source,
+click the config and detect the hardware encoder, choose hevc_qsv, toggle the
+hardware encoder, click advance, resolution 1920x1080, color range full JPEG, export the file
+
+
+tldr.inbrowser.app
+
+https://tldr.inbrowser.app/pages/common/ffmpeg
+take a thumbnail from a video
+ffmpeg -ss mm:ss -i a.mp4 -frames 1 -s 128x128 -f image2 thumbnail.png
+
+
