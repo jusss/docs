@@ -249,6 +249,20 @@ dpkg-reconfigure debconf
 apt install python3 python3-pip ghc cabal-install screen man 
 apt purge apt-utils # blocking systemd
 
+
+if there is some warnings like W: Download is performed unsandboxed as root as file '/var/cache...' couldn't be accessed by user '_apt'
+-pkgAcquire::Run (13: Permission denied)
+
+chmod 755 / will solve it, cause by / is 700
+
+in debian chroot, systemd is not running, so it can be removed
+
+apt purge systemd
+apt install sysvinit-core
+
+/etc/init.d/ssh start can be /usr/sbin/sshd -D &
+
+
 ---------------------------------------
 [john@moon bash]$ cat mount-android.sh 
 # run 'sh /sdcard/mount-android.sh' in android terminal

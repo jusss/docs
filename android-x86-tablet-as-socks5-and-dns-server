@@ -1,3 +1,7 @@
+lan socks5 over ssh and kcptun
+dns by mdns
+ssh by openssh-server and /etc/init.d/ssh start
+
 make debian bulleye chroot environment on sdcard, and install cabal ghc
 chroot this environment, then
 git clone https://github.com/jusss/code
@@ -53,4 +57,8 @@ Subsystem	sftp	/usr/lib/ssh/sftp-server
 /etc/init.d/ssh restart
 
 ssh root@localhost
+
+use screen over ssh, use tmux on tablet
+
+
 
