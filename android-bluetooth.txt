@@ -1,0 +1,16 @@
+
+Bluetooth = Classic Bluetooth (BluetoothDevice) | Bluetooth Low Energy (BluetoothGatt)
+
+Paring = LMP | Secure Simple Paring
+
+
+createInsecureRfcommSocketToServiceRecord() API force Android use SSP "Just Works" association mode
+
+https://stackoverflow.com/questions/5401445/android-bluetooth-pairing
+https://learn.sparkfun.com/tutorials/bluetooth-basics/how-bluetooth-works
+https://www.ellisys.com/technology/een_bt07.pdf
+https://forums.anandtech.com/threads/whats-the-protocol-for-pairing-two-bluetooth-devices-without-screens.2523333/
+https://security.stackexchange.com/questions/168614/is-a-no-pairing-no-password-bluetooth-rfcomm-connection-secure
+https://security.stackexchange.com/questions/206333/just-works-bluetooth-low-energy-security
+http://www.taodudu.cc/news/show-4740594.html?action=onClick
+https://cloud.tencent.com/developer/article/2229487
