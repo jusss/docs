@@ -1,0 +1,25 @@
+1. how to add database
+Data -> Database -> +Database -> mysql
+the most available database are configurated by default
+
+2. how to add dataset
+Data -> Datasets -> +Dataset -> pod, table, add
+there're physical and virtual dataset, a physical dataset is a mapping of one tab of database
+sql lab -> sql editor -> do some statements -> run selection -> create chart -> save to a new virtual dataset
+a virtual dataset can read data from multiple tabs, is a set of sql statments
+
+3. how to create a chart based on a tab
+click a dataset -> view all charts -> evolution
+mertrics is y-axis
+x-axis is x-axis
+
+4. make filters on the left bar
+filter data on dash board based on keys, there's filter type value, column choose keyword, tag can select multiple values and dynamiclly search
+inverse selection will do the exclue, oppsite
+scoping work on all or part tabs
+
+5. how to show charts on dash board
+search charts tab name on the right bar, and click on it when move it to the left
+
+6. how to add tab page
+edit tab -> layout elements -> move tabs to where you need it
