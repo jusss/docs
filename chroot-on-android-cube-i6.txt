@@ -1,0 +1,60 @@
+archlinuxarm repo archlinuxarm.org/about/mirrors
+http://mirrors.ustc.edu.cn/archlinuxarm/
+you can download the image file from that repo,
+like va.us.mirror.archlinuxarm.org/os/ArchLinuxARM-armv7-latest.tar.gz
+
+1. android install xsdl, connectbot, busybox
+2. download ArchLinuxARM-armv7-latest.tar.gz
+3. dd make a iso file and mount it then extract that gz file into it
+
+dd if=-/dev/zero of=archl.img bs=512K count=4096
+mkfs -t ext4 arch.img & sudo su
+mount -o loop arch.img /mnt (or use mknod and losetup)
+cp ArchLinuxARM-armv7-latest.tar.gz ./ 
+tar -xvzf ArchLinuxARM-armv7-latest.tar.gz 
+rm ArchLinuxARM-armv7-latest.tar.gz
+umount /mnt
+
+4. copy this arch.img to android, android mount this iso file then chroot
+jmtp ~/tmp (or mount)
+rsync -avP arch.img ~/tmp/
+cd ~/tmp
+mkdir linux
+fusermount -u ~/tmp/
+
+now, android mount arch.img then mount /dev something into it, chroot it
+you can use adb to do that on laptop or connectbot on android 
+
+busybox need root privilege, CM13 android 6.0,
+Settings -> About Phone -> click 7 times to enable Developer options -> root access
+adb root then install busybox
+
+open connectbot choose local, press Enter get into
+su
+cd /sdcard
+(redmi internal storage can use fuse)
+mount Android 6.0 storeage is not like android 4.4.4
+it seems 6.0 can not mount img file, but you can format sdcard to ext4
+then extract ArchLinuxARM-armv7-latest.tar.gz into that sdcard
+mount this sdcard into Android, use connectbot login local, run `su`
+then chroot, 
+cd /mnt/media-rw/sdcard1
+mount -o bind /dev ./dev
+mount -t proc /proc ./proc
+mount -t sysfs /sys ./sys
+mount -t devpts /dev/pts ./dev/pts
+chroot ./ /bin/bbash
+rm /etc/resolv.conf (it's a softlink)
+vi /etc/resolv.conf
+nameserver 8.8.8.8
+vi /etc/group
+inet:x:3003:root
+net_raw:x:3004:root
+su root
+vi /etc/pacman.d/mirrorlist
+Server=http://mirrors.ustc.edu.cn/archlinux
+pacman -Syu
+pacman -S xterm
+open xsdl app on android
+xterm -display :0&
+there's xterm on xsdl now

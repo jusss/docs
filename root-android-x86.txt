@@ -1,0 +1,52 @@
+adjust partition, delete partition first, change /etc/fstab uuid and name
+
+x86 tablet root 4.3, it can adb root; adb shell directly.
+it even doesn't need udev config, it can copy su to it for root directly
+1. enable developer mode by click 7 times on build version
+2. adb root (cube i6 air support adb root)
+3. adb remount (make /system writable)
+4. adb shell (now you can copy su to the system)
+
+android 4.3 can do that, but not for 4.4
+
+/system/etc/install-recovery.sh (auto run when system init)
+you can write `sh /system/etc/init.d/some-service` into it for auto run when it reboot
+
+daemonsu and su are the same binary file
+
+99SupersuDaemon is a init script, it call /system/xbin/daemonsu
+
+cube i6 air's android is x86 not x64
+
+android-x86 cube i6 air root!
+1. download update-supersu-v2.37.zip and extract it
+find ABI variable's value in META-INF/com/google/android/update-binary
+you can know cube i6 air is x86 neither x64 or arm
+2. adb root; adb remount; adb shell; run that ABI variable statement, you can get CPU's name and download 
+the proper su file, find the su file on that above file path
+cp su /system/xbin/su
+cp su /system/xbin/daemon
+mkdir /system/bin/.ext
+cp su /system/bin/.ext/.su
+cp supolicy /system/xbin/
+cp libsupol.so /system/lib
+cp superuser.apk /system/app/ this apk can get from google play for root permission manage
+3. #/system/xbin/daemon --auto-daemon & (enable daemon for su request)
+4. open Connectbot app and login local, run `su` will become root
+5. android 4.3+, when system boot up, it will run /system/etc/install-recovery.sh
+so create a file like 
+#!/system/bin/sh
+/system/xbin/daemonsu --auto-daemon &
+it will run when system boot up
+
+if you can't install supersu.apk from that extract file successfully, install it from google play
+do not update the su binary file from google play, now you can use su for root permission, supersu can authorize root permission for other app
+
+by the way, cube i6 air's sdcard mount on /mnt/media-rw/
+
+cube i6 air android do not need to change /etc/udev/rules.d/x.rules for adb shell,
+and it can adb root, redmi 2 can't do that, redmi 2 need change that rules
+
+
+
+

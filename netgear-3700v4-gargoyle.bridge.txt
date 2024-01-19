@@ -1,0 +1,22 @@
+192.168.1.2/basic.sh
+
+login Gargoyle 
+Connection -> Basic 
+
+toggle wirless Bridge/Repeater
+Wireless Bridge/Repeater
+Bridge IP: 192.168.1.2
+AP/Gateway IP: 192.168.1.1
+Subnet Mask: 255.255.255.0
+Wan Ethernet Port: Disable
+DNS Servers: Use Gateway As DNS Server
+Connect Via WDS
+Repeater: Repeater Enabled
+Operation Mode: B+G+N
+Channel Width 20MHz
+Transmit Power: Max 22
+SSID to join: wifi
+SSID to Broadcast wifi
+Wireless Channel: 11
+Encryption: WPA2 PSK
+Password: ******

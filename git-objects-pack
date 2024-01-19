@@ -1,0 +1,46 @@
+.git/objects/pack take huge size
+https://stackoverflow.com/questions/11050265/remove-large-pack-file-created-by-git
+
+ 3700v4-gargoyle.bridge.png
+ Emacs-on-Android.jpg      
+ bootia32.efi              
+ chroot-on-android-1.jpg   
+ chroot-on-android-2.jpg   
+ chroot-on-android-3.jpg   
+ ex.ref.m.pdf              
+ root-android-x86-I.jpg    
+ root-android-x86-II.jpg   
+
+git filter-branch --force --index-filter 'git rm -r --cached --ignore-unmatch 3700v4-gargoyle.bridge.png Emacs-on-Android.jpg bootia32.efi chroot-on-android-1.jpg chroot-on-android-2.jpg chroot-on-android-3.jpg ex.ref.m.pdf root-android-x86-I.jpg root-android-x86-II.jpg' --prune-empty --tag-name-filter cat -- --all
+
+WARNING: Ref 'refs/heads/bla2' is unchanged
+WARNING: Ref 'refs/remotes/docs/bla2' is unchanged
+WARNING: Ref 'refs/remotes/origin/master' is unchanged
+WARNING: Ref 'refs/remotes/origin/bla2' is unchanged
+WARNING: Ref 'refs/remotes/origin/master' is unchanged
+
+git update-ref -d refs/original/refs/remotes/origin/bla2
+git for-each-ref --format='delete %(refname)' refs/original | git update-ref --stdin
+git reflog expire --expire=now --all
+git gc --aggressive --prune=now
+git push docs bla2 --force
+ncdu
+
+or
+
+java -jar ~/Downloads/bfg-1.14.0.jar --delete-files 3700v4-gargoyle.bridge.png Emacs-on-Android.jpg bootia32.efi chroot-on-android-1.jpg chroot-on-android-2.jpg chroot-on-android-3.jpg ex.ref.m.pdf root-android-x86-I.jpg root-android-x86-II.jpg
+
+git reflog expire --expire=now --all && git gc --prune=now --aggressive
+
+git push docs bla2 --force
+
+remove it on github
+
+file a ticket to remove commit history on github
+https://support.github.com/request?tags=docs-generic
+
+https://support.github.com/request
+choose account or bill issue, then file a report
+asking them to remove cached views and references to the sensitive data in pull requests on GitHub. Please provide the name of the repository and/or a link to the commit you need removed.
+
+https://support.github.com/contact?flow=file_attachment_removal&subject=Remove%20file&tags=rr-remove-data

@@ -1,0 +1,2727 @@
+
+lineage-17.1-20201107-nightly-wt88047-signed.zip enabled "allow clients to use VPNs"
+in hotspot tethering, so this phone can be a route for other devices,
+and they don't need VPN to visit google
+
+if you want to make PC use android's VPN, but don't use mobile data
+1, disable mobile data then connect phone to router with wifi
+2, connect phone to PC with usb cable
+3, enable usb-tethering and allow clients to use VPNs
+
+or you can use mobile data, and by usb-tethering or hostspot to share VPN to other devices
+
+if you want share with hostspot, you must use mobile data
+if you want share with usb-tethering, you can use mobile data or wifi
+if you want share vpn over wifi, you must use usb-tethering
+
+---------------------------------------
+GuixSD vs NixOS
+guix vs nix
+--------------------------------------------
+ 
+
+there're three ways to handle remote disconnected without an exit signal,
+the normal way is recv length 0 or empty string,
+but we can use recv/send timeout exceptions
+or ping/pong from ICMP protocal to detect that
+------------------------------------------
+
+#clear ByteArray
+
+```
+var aob = ByteArray(1024)
+while (true) {
+  try{
+  size = client.inputStream.read(aob)
+  }catch(e:Exception){
+     client.close()
+     client = re_connect_network()
+   }
+  recvMsg = String(aob.sliceArray(0 until size), Charsets.UTF_8)
+  if recvMsg.contains(“something”) doSomthing
+  ...
+}
+```
+that’s how I handle it, but when the connection is disconnected without an exit signal, so this try-catch will work and make a new connection, but the last received recvMsg will still go through those next if-else, so that’s I wonder if there’s a way can clear aob the ByteArray?
+also I find a way to solve this, just set size to 0, so sliceArray will not work, this can avoid those next if-else
+
+It probably makes more sense to just throw away the old array and allocate a new one in the `catch` block: `aob = ByteArray(1024)`. It's likely that the overhead of the exception is far higher than the cost of re-allocating an array, and also zeroing an existing array in code might actually be slower.
+
+//////////////////////////////////
+
+kotlin's sealed class is like `data` in haskell
+and `when` can do something like pattern matching
+
+// sealed class Tree<T> {
+//  class Leaf<T>(val value: T): Tree<T>()
+//  class Node<T>(val left: Tree<T>, val right: Tree<T>): Tree<T>()
+// }
+
+sealed class Tree<T>
+data class Node<T>(val left: Tree<T>, val right: Tree<T>): Tree<T>()
+data class Leaf<T>(val value: T): Tree<T>()
+
+fun <T,R> Tree<T>.map(transform: (T) -> R): Tree<R> {
+    return when (this) {
+        is Node -> Node(
+            left = left.map(transform),
+            right = right.map(transform)
+        )
+        is Leaf -> Leaf(transform(value))
+    }
+}
+
+fun main(){
+    val tree = Node(Leaf(1), Node(Leaf(2), Leaf(3)))
+    val mapped = tree.map { it * it }
+    println(mapped)
+}
+
+##########################
+map a binary tree
+
+data Tree a = Leaf a | Node (Tree a) (Tree a)
+            deriving (Show)
+
+maptree :: (a->b) -> Tree a -> Tree b
+maptree f (Leaf a) = Leaf (f a)
+maptree f (Node xl xr) = Node (maptree f xl) (maptree f xr)
+
+Prelude> maptree (+1) (Node (Leaf 2) (Node (Leaf 5) (Leaf 9)))
+Node (Leaf 3) (Node (Leaf 6) (Leaf 10))
+
+########################################################
+
+#modern language's features
+kotlin doesn't have list comprehension, decorator, generator, coroutine library is not yet avaiable in stdlib
+no Promise/Future, not even typeclass, continuation, macro, patter matching, metaclass, those more fancy things
+it's AD 9102, kotlin/java don't support like a=[3,5] or b={"a":3} this form, but kotlin do have a project called
+KEEP and it's unstable now
+
+########################################################
+
+you can not use function call directly in a class, you must put it in a method
+class T2{
+    fun gg(){}
+    gg() is not ok, "Expecting member declaration"
+}
+
+but you can make that function call as a right value
+
+class T2{
+    fun gg(){}
+    val t = gg()
+}
+
+also you can use lambda do that
+class T2{
+    val z2 = {
+        x:ArrayList<String> ->
+        for (i in 0..100){
+            x.add("/home/$i.ogg")
+        }
+        x
+    }(arrayListOf())
+}
+
+about class initial, python's __init__(self), java's class constructor, 
+kotlin's attributes are initialized as default,
+if class's parameter are different, use secondary constructor 
+if you like, see primary constructor and secondary constructor in kotlin
+
+///////////////////////////////////////////////
+
+Collections: List(order), Set(unique), Map(unique)
+read-only and mutable
+
+val num = mutableListOf("one","two")  //listOf is read-only
+num.add("3")
+num[0]
+
+val num2 = mutableListOf<String>()
+num2.add("what")
+
+val bob = Person("Bob",33)
+val people = listOf<Person>(Person("Adam",20), bob, bob)
+
+val dict = mutableMapOf<String, String>() //mapOf is read-only
+dict["1"] = "1"
+
+val dict = mapOf("key1" to "value1", "key2" to "value2")
+
+val dict = mutableMapOf("key1" to "value1", "key2" to "value2")
+dict.put("key3", "value3")
+dict["key1"]
+
+
+lists are different to arrays,
+an array's size is defined upon initialization and is never changed
+a list doesn't have a predefined size
+
+in kotlin, the default implementation of List is ArrayList which 
+you can think of as a resizable array
+
+ArrayList is a better choice than List
+
+val x:ArrayList<String> = arrayListOf()
+x.add("whatever")
+
+////////////////////////////////////////////
+
+fun <T> Iterable<Iterable<T>>.flattern(): List<T>
+
+it's not a recursion in type definition or call
+it's just an interable of iterable of T which gets flattened into a list of T
+like
+[[1,2],[3]] -> flatten -> [1,2,3]
+
+not like that MapTree type definition in haskell
+
+data Tree a = Leaf a | Node (Tree a) (Tree a)
+    deriving (Show)
+
+"it is indeed a recursive generic type but you're not going to be able to do anything
+particularly Haskell-ey with them"
+
+//////////////////////////////////////////
+abstract & concrete
+
+if you want use a type's methods, then make the type concret
+
+fun <A> t(e:A){
+    e.length //will be not resolved, even you will pass a string to e
+} //this is OK in js or python, but not OK in kotlin
+
+fun t2(e:String){
+    e.lenght //will be resolved, 'cause e has String type, and String type has lenght method
+}
+
+abstract type and concret type
+it's like to be evalated or not to be evalated
+
+if you want e has methods of String, then make e as String
+don't set e as T, and pass String to e, that won't work in static language like kotlin
+but it works in dynamic languages like python
+
+def f(x){
+    x + "1"
+    or x +1 
+} both ok, 'cause x can be String or Int
+
+but fun <T> f(x:T) {
+    x + "1"
+    or x+1
+} will not ok, 'cause + "1" x need to be String, +1 x need to be Int
+
+sealed class Either<A,B>
+data class Left<A,B>(val v:A):Either<A,B>()
+data class Right<A,B>(val v:B):Either<A,B>()
+
+fun  test(e: Either<Int,String>):Any{
+    when (e){
+         is Left<Int,String> -> return e.v
+         is Right<Int,String> -> return e.v
+    }
+}
+
+fun <A,B> test2(e:Either<A,B>):Any{
+    when (e){
+        is Left<A,B> -> e.v //return e.v then test2 return A, and return e.v on Right will return B, and Any is not ok here, 'cause A and B are not concret
+        is Right<A,B> -> e.v //so don't use return, will return Unit
+    }
+}
+
+fun main(){
+    val t = Left<Int,String>(3)
+    println(t.v)
+    val t2 = test(Left<Int,String>(3))
+    println(t2)
+}
+
+fun <A> t(e:A){
+    //e.length
+}
+fun t2(e:String){
+    e.length
+}
+
+
+###############################################
+
+So tell me...
+what makes Queen any different
+from all the other wannabe rock stars I meet?
+
+I'll tell you what it is.
+We're four misfits who don't belong together,
+playing to the other misfits.
+The outcasts right at the back of the room...
+who are pretty sure they don't belong either.
+We belong to them.
+
+Bohemian Rhapsody 2018 - Queen
+
+##################################################
+
+1. All things that are made abstract exist only to be made concrete again.
+2. the only purpose of a function is to be applied to an argument
+3. Maybe a is abstract, but Maybe Int is a concrete type
+4. create and describe with abstract, but apply with concrete
+5. like parameter and type, you create a function with variable and type variable
+but you must call it with concrete value and concrete type
+##########################################
+
+1. types are used to describe values, types are sets of values in math, modes in CS
+2. think class as type constructor, and instance as value constructor,
+    List<T> is like Maybe a, List is not a type, List<T> is a type, if there's no type
+    variable then type constructor is the type like Int
+    value = List<Int>(x:Int)
+    value is the value constructor, value.x is the value, like Just a
+    Either<A,B> is like Either a b
+    and A,B or a b are used to describe values's type
+    Either<A,B>(x:A, y:B) is like Either a b = Left a | Right b
+
+###########################
+
+1. the type is the class, the value is the instance
+   class C<T> (x:T){...}
+    C is like type constructor and T is type variable, 
+    the instance of C<T> is the value constructor, 
+    the instance may have x as value, or not,
+    the instance means it may use T type 
+
+2. C<out T>   and somewhere C<T>
+
+3. C2<T2>: C<Int>
+
+
+
+###########################3
+sealed class E
+data class L(val v: String) : E()
+data class R(val v: Int): E()
+
+
+fun poly(expr: E):E  = when(expr) {
+    is L -> L(expr.v)
+    is R -> R(expr.v + 1)
+}
+fun poly2(expr: E):Any?  = when(expr) {
+    is L -> expr.v
+    is R -> expr.v + 1
+}
+fun main(){
+    val t = poly(L("aha"))
+    println(poly(poly(R(3))))
+    println(poly2(R(9)))
+    println(L("a").v)
+}
+
+why this t.v is not resolved?
+
+'cause poly return a value of type E and the sealed class E itself does not define
+the property v.
+
+####################################
+
+parametric polymorphism, is like type variables in Hasekll or generics in Java,
+different types with the same behavior
+
+Ad-hoc polymorphism, method overload, is like typeclass in Hasekll or interface in Java,
+different types with different behaviors, different behaviors return diffrents result types
+I'd like to call it result polymorphism
+
+
+#####################################
+
+1. overload function (two functions, same name, different parameter's types)
+2. interface typeclass
+3. Object Any
+4. Either out in Int String type inheritance, sealed class
+
+##############################################
+
+type variables for parameter polymorphism, different types with same behavior, the behavior don't depend on the type
+typeclass for behavior polymorphism, different types with different behaviors, the behavior depend on the type
+
+
+polymorphic in python haskell and kotlin
+
+def f(x):
+    if isinstance(x, int):
+        return x+1
+     if isinstance(x, str):
+        return x[::-1]
+
+in haskell, we have pattern matching to do that
+
+f :: Either Int String -> Either Int String
+
+f (Left x) = Left (x+1)
+
+f (Right x) = Right (reverse x)
+
+in kotlin, use overload method, functions have same names but different parameters
+
+fun getValue(id: Int): Any { ... } 
+
+fun process(value: Int) { ... } 
+fun process(value: String) { ... }
+val value = getValue(valueId)
+ when (value) { 
+is Int -> process(value)
+is String -> process(value)
+else -> ... }
+
+https://stackoverflow.com/questions/56680581/how-to-create-a-type-that-may-contain-int-or-string?noredirect=1#comment99929450_56680581
+
+
+<__monty__> jusss: Most common way to have function implementation depend on
+            the type of the value they're applied to is through
+            typeclasses. `class X a where f :: a -> a; instance X Int where f
+            = (+1); instance X String where f = reverse` then you can do both
+            `f 4` and `f "abc"`.                                        [16:25]
+
+
+
+
+#################################################
+
+how to create a type that contain Int or String?
+use Either Int String,  so Left 3 has Either Int String, Right "3" has Either Int String
+we can pass it, and it may contain Int or String
+
+<jusss>  data T = Either Int String;   f :: T -> T;   f x = x;   f (Left 3)
+        got an error , why?                                             [13:36]
+<jle`> defines a new data type T        
+<jle`> with a single data constructor, 'Either'
+<jusss> jle`: oh, my fault, I should use Either on the right side
+<jusss> without a value constructor
+<jle`> fwiw this is a pretty confusing data type constructor, because 'Either'
+       is commonly used as a type name from Prelude
+<jusss> jle`: I should just use f :: Either Int String -> Either Int String
+<jle`> if that's what you want :)                                       [13:39]
+<jle`> that'd be a very different type, yeah
+<jle`> but the only person who really knows what you want is you, yourself. so
+       search inside your heart :)
+<jusss> jle`: I want the either type, 'cause I'm not sure which type the
+        paramter is
+<jusss>  ff :: (Either Int String) -> (Either Int String);  ff x = x;   ff
+        (Left 3);  ff (Right "3")
+
+and we still can get 3 from (Left 3) by
+f (Left x) = x
+
+it's about polymorphic, for example,
+f(x) if x is String, then make reverse x and return it,
+if x is Int, then plus one and return it
+
+
+f :: Either Int String -> Either Int String
+f (Left x) = Left (x+1)
+f (Right x) = Right (reverse x)
+
+g :: Either a a -> a
+g (Left x) = x
+g (Right x) = x
+
+the right way:
+
+<__monty__> jusss: Most common way to have function implementation depend on
+            the type of the value they're applied to is through
+            typeclasses. `class X a where f :: a -> a; instance X Int where f
+            = (+1); instance X String where f = reverse` then you can do both
+            `f 4` and `f "abc"`.                                        [16:25]
+
+
+join = concat -- []
+join f = \x -> f x x -- (e ->)
+join f = \s -> let (f', s') = f s in f' s' -- State
+join (Just (Just a)) = Just a; join _ = Nothing -- Maybe
+join (Identity (Identity a)) = Identity a -- Identity
+join (Right (Right a)) = Right a; join (Right (Left e)) = Left e; 
+                                  join (Left e) = Left e -- Either
+join ((a, m), m') = (a, m' `mappend` m) -- Writer
+join f = \k -> f (\f' -> f' k) -- Cont
+
+https://stackoverflow.com/questions/11234632/monads-with-join-instead-of-bind
+##########################################
+
+do notation, reader monad, share state, create new variable and store value and pass
+but only in this bind chain expression
+
+Just 3 >>= (\x -> Just "!" >>= (\y -> Just (show x ++ y)))
+same with the next one, 'cause of ???
+Just 3 >>= \x -> Just "!" >>= \y -> Just (show x ++ y)
+
+ah, a nested use of >>=! in the outermost lambda. we feed Just "!" to
+the lambda \y -> Just (show x ++ y). inside this lambda, the y becomes "!"
+x is still 3 because we got it from the outer lambda.
+
+foo :: Maybe String
+foo = do
+  x <- Just 3
+  y <- Just "!"
+  return (show x ++ y)
+
+see, x and y is passing in the bind chain, and the return values is bound to them
+
+foo = 
+    Just 5 >>= \x ->
+    Just 4 >>= \y ->
+    return $ x + y
+
+foo = do
+    x <- Just 5
+    y <- Just 4
+    return $ x + y
+
+<nil> lambda abstractions, if thought of as an operator, have the lowest
+      precedence. they just extend as far as possible to the right  [22:53]
+
+<jusss> why                  Just 3 >>= (\x -> Just "!" >>= (\y -> Just (show x ++ y)))
+<jusss> equal to             Just 3 >>= \x -> Just "!" >>= \y -> Just (show x ++ y)
+and it's not equal to        Just 3 >>= (\x -> Just "!") >>= (\y -> Just (show x ++ y))
+<jusss> nil and it equals to Just 3 >>= (\x -> (Just "!" >>= (\y -> Just (show x ++ y)))) ?
+it equals                 to Just 3 >>= (\x -> Just "!" >>= (\y -> Just (show x ++ y)))
+<nil> yes, there's no ambiguity there  [23:04]
+<nil> (hm, there is, actually.)
+<nil> but yes.  [23:05]
+
+<jusss> nil Just 3 >>= \x -> ... >>= \y -> ... >>= \z -> ... equal to Just 3
+        >>= (\x -> ... \z -> ..) ?
+<jusss> Just 3 >>= (\x -> (... >>= \y -> (... >>= \z -> ...))) ?  [23:12]
+
+<[exa]> jusss: open lambda goes all the way to the end of block, so \a ->
+        ... \b -> ... parentheses as (\a -> ... (\b -> ...))  [23:16]
+<[exa]> jusss: the other way, ... (\a -> ...) (\b -> ...) is a bit
+        confusing. You can read '\a ->' as abstracting 'a' from now on
+<jusss> [exa]: Just 3 >>= (\x -> Just "!" >>= (\y -> Just (show x ++ y)))
+        equal to Just 3 >>= \x -> Just "!" >>= \y -> Just (show x ++ y) ?
+<[exa]> jusss: yeah that should work  [23:20]
+
+about compose, it's not only about (.) 
+I think it should about every function
+((+) <$> (2*) <*> (2^))   is also function compose
+
+
+
+construct a chain to avoid global variables, passing a value around to instead of store
+use do-notation to construct that chain
+
+
+<jusss> c_wraith: actually I was wondering how about share state stuff 
+<jusss> and they said something about reader monad   [23:52]
+<jusss> I read them from some articles
+<jusss> I wonder the magic, avoid to create global variable to store a value
+        or state whatever  [23:53]
+<c_wraith> There's no magic involved
+<c_wraith> It's replacing a global variable with just passing a value around
+<[exa]> jusss: let's go the scheme way, let's say you have (lambda (a) (+ (* 2
+        a) (^ 2 a)))  [23:54]
+<[exa]> this way: (\a -> (+) ((*) 2 a) ((^) 2 a))
+<[exa]> now, because single-parameter functions are functors (and also
+        applicatives and monads), you can eliminate a bit of manual parameter
+        forwarding and write this:  [23:55]
+<jusss> c_wraith: but hey, global variable can store values and you can visit
+        it any time, but passing a value around ? you only passing it in a
+        chain, you store values in a chain, the outer function still can't get
+        the value unless they join the chain  [23:56]
+<[exa]> jusss: ((+) <$> (2*) <*> (2^))
+<[exa]> % ((+) <$> (2*) <*> (2^)) 5
+<yahb> [exa]: 42
+<c_wraith> jusss: yes, that's a good thing.  It means you need to be
+           *explicit* about what has access to what
+<[exa]> jusss: and the functor/applicative/monad framework for singleparameter
+        function just nicely silently passes the argument around  [23:57]
+<[exa]> jusss: aaand, if you dig a bit in how that's achieved, you'll
+        eventually find that the rule '(f <*> g) x = f x (g x)' (together with
+        its monadic counterpart) exactly allows all this to happen  [23:59]
+<jusss> c_wraith: [exa] and I think to construct that chain will be difficult
+                                                                        [00:00]
+<c_wraith> jusss: constructing the chain automatically is what types like
+           State get you.  [00:01]
+<jusss> c_wraith: [exa] I don't know if you use python or js or scheme,
+        re-assign is really easy to do something
+<[exa]> jusss: reassign is also an easy way to make your language intractable
+        to static analysis
+<jusss> [exa]: but reassign can make you to store values, and you can visit
+        those values any time, but in a chain? you can't visit it from outside
+        and any time, you can only visit it if you put the visitor in the
+        chain  [00:04]
+<cocreature> you can use actual mutable state in Haskell which is important
+             for concurrency
+<c_wraith> But that's rare to actually need.
+<jusss> I don't know to construct that chain how long it will take, maybe it's
+        a long time
+<[exa]> jusss: have you seen the do-notation?  [00:06]
+<c_wraith> For the programmer or the computer?
+<jusss> [exa]: yep
+<jusss> c_wraith: for the programmer 
+<cocreature> c_wraith: well I’d say concurrency is quite common in Haskell
+             and then mutable state in the form of MVars/TVars/… is quite
+             common
+<[exa]> jusss: it looks just like python, even with assignments and
+        everything, right?
+<cocreature> but yeah it’s definitely less common than in other languages
+                                                                        [00:07]
+<cocreature> that is not a good idea
+<jusss> [exa]: I haven't tried it, maybe I should, construct a chain is the
+        right way to avoid global variable?   [00:08]
+<[exa]> jusss: 'do' basically constructs the chain for you
+<jusss> [exa]: but other languages don't have do notation... unless we
+        implement it in others  [00:09]
+<c_wraith> jusss: other languages *really wish* they had do notation.  Have
+           you noticed how many times it gets reinvented?
+<c_wraith> async/await, null coalescing operators, etc  [00:10]
+<[exa]> jusss: taken to extreme, 'do' notation is just about having a
+        polymorphic, overloadable code-block construct
+<c_wraith> all special cases of do notation
+<[exa]> jusss: in C, all commands in blocks separated by semicolons can be
+        though as do-blocks of IO operations
+<[exa]> jusss: similarly in python, js, etc.  [00:11]
+<[exa]> jusss: you might notice a similarity with Scheme's (begin), although
+        'do' does a bit more work in carrying some extra information between
+        the "commands"
+<jusss> c_wraith: [exa] but the books always use 'let' to explain do-notation
+<[exa]> which books?
+<jusss> [exa]: ghci> let x = 3; y = "!" in show x ++ y   from
+        http://learnyouahaskell.com/a-fistful-of-monads
+<[exa]> jusss: there's no "do" yet, they're just showing what happens if you
+        run the monadic computation manually without having the extra Maybe
+        around (for handling failures)
+<[exa]> jusss: the magic comes 2 samples lower, right next to the owl picture
+<jusss> [exa]: ok, maybe I should keep do-notation in mind and use it to
+        construct the chain then write it on the paper with bind form
+<jusss> [exa]: I haven't implement do-notation in other languages yet, but I
+        implemented bind  [00:26]
+<[exa]> jusss: do notation is just syntactic sugar for bind, nothing more
+
+
+####################################################
+
+in dynamic type languages, class is the type?
+Int is a class and a type?
+and what function object's class is ?
+
+<jusss> Int is a type also a class ?
+<jusss> I saw a kotlin code like `fun Bird(birth: DataTime) = ...`  DataTime
+        is a class I think, but they use a class as a type, I don't know
+        this's ok?  [11:57]
+<jusss> bookworm: so I wonder python's class and type
+<energizer> jusss: in python 'type' and 'class' mean the same thing  [12:08]
+<jusss> think about function, function is an object, right? so what's the
+        class of functions?
+<energizer> types.FunctionType
+<jusss> Int is a type, and Int is a class
+<energizer> jusss: there is no distinction between type and class in python
+<energizer> they were different in python 2.1 i think?
+<bookworm> yes
+<bookworm> 2.2 was the unification
+<jusss> energizer the value has the type, the instance is the value, the class
+        is the type, in python , right?
+<energizer> jusss: the instance is the value, yes. but in python, type and
+            class are exactly the same. there is no difference at all. those
+            words may be used differently in other languages, but not python
+<jusss> energizer I see
+<[Tritium]> jusss, energizer: Unless you have to work with python 0.9 through
+            2.1 (....such systems exist)            
+
+"在动态类型语言里，class就是type? Int是个class, 同时又是个type?"
+"动静态类型的区别只是在于运行之前能不能确定类型，给type和class的区别没毛关系，在class based的语言里，type是class接口的抽象，没有class的语言照样有类型，class不能用于推断或检查，所以它们是不同的东西"
+
+"type是class接口的抽象，这句话怎么理解？一个class可以有多个type? 我是因为看到kotlin的代码里用class来做type才产生的疑问，
+func Bird(birth: DateTime) = ..."
+
+"C++里也是这么做的，这一点都不罕见，你看到的跟编译器看到的东西是不一样的"
+
+"所以我就把class当type用也是可以的吗?"
+
+"对于一般使用者来说应该可以忽略它们的区别"
+
+
+#######################################
+
+lisp: lambda calculus, AST, CPS
+haskell: category theory, ADT, Monad
+############################################
+
+what is the monad, monad is related with three patterns
+return, bind, and fmap
+and make it follow the identity law and associativity law
+
+construct something to match that patterns
+
+then something is (m a), and monad is in it!
+
+like construct list and function to match that patterns
+
+so list type, [] a, [] is the monad
+function type, e->a, (e->) is the monad
+
+we construct something to monad, not something come with monad!
+
+##################################
+
+<ski>   data Tree a = Nil
+<ski>               | Node a (Tree a) (Tree a)
+<ski> now, define a function                                            [10:33]
+<ski>   addToTree :: Num a => Tree a -> a -> Tree a
+<ski> that adds its second argument to all the elements of the tree, giving
+      back the corresponding new tree
+
+Tree a could be Nil, Node a Nil Nil, Node a Nil (Node a Nil Nil),
+Node a (Node a Nil Nil) Nil, etc... infinity?
+
+data Tree a = Nil | Node a (Tree a) (Tree a) deriving Functor
+
+instance Functor Tree where
+fmap :: (a->b) -> (Tree a -> Tree b)
+fmap _ Nil = Nil
+fmap f (Node a left right) = Node (f a) (fmap f left) (fmap f right)
+
+addToTree :: Num a => Tree a -> a -> Tree a
+addToTree as a = fmap (+ a) as
+
+mapTree :: (a->b) -> (Tree a -> Tree b)
+mapTree _ Nil =Nil
+mapTree f (Node a left right) = Node (f a) (mapTree f left) (mapTree f right)
+
+##################################################
+
+x=0, f() re-assign it, g() re-assign it, t() re-assign it
+the FP way: m x >>= f >>= g >>= t
+passing the values between functions, not re-assign them, 
+but the hard part is to connect those functions
+#############################################
+
+rule I. the return type in the type signature, it must be appeared befor the last one, otherwise it will be undefined, Eg :: a->b->c->a is ok, and Eg :: a->b->c is not ok, 'cause c is undefined.
+
+rule II. in the data declaration, the variable in the right part of '=', it must be appeared in the left part of '=',  data T a = V a is ok, and data T = V a is not,
+
+
+there're a set of function definition and type signature in the typeclass,
+those function definitions describe the relationship among them, like how Function A change to
+Function B, but not really Function A's definition.
+in the instance definition, define the functions which type signatures defined in the typeclass's definition,
+multiple instance with the one typeclass, and define the same function, it will make the function can take multiple type.
+
+like isEqual True True = True
+     isEqual Red Red = True
+in two instances.
+
+data Bool = True | False
+data Color = Red | Green | Blue
+
+class BasicEq a where
+      isEqual :: a -> a -> Bool
+      isEqual x y = not (isNotEqual x y)
+
+      isNotEqual :: a -> a -> Bool
+      isNotEqual x y = not (isEqual x y)
+
+instance BasicEq Bool where
+         isEqual True True = True
+         isEqual False False = True
+         isEqual _ _ = False
+
+instance BasicEq Color where
+         isEqual Red Red = True
+         isEqual Green Green = True
+         isEqual Blue Blue = True
+         isEqual _ _ = False
+
+t :: (BasicEq a)=> a -> a -> Bool
+t x y = isEqual x y
+
+λ> isEqual Red Red
+True
+λ> isEqual True True
+True
+λ> t Red Red
+True
+λ> t True True
+True
+
+typeclass is used to make the one function take multiple type signatures,
+and use the typeclass constraint in other type signature, it makes the type concret and you can use the function defined in the typeclass.
+like (BasicEq a) => a, so a can only be Bool or Color, and you can use isEqual apply on a.
+
+
+https://rwh.readthedocs.io/en/latest/chp/6.html
+
+{-# language MultiParamTypeClasses, FunctionalDependencies #-}
+{-# language FlexibleInstances #-}
+module X where
+
+data T a = V a
+
+class MyT a b | a -> b where
+    value :: a -> b
+
+instance MyT (T a) a where
+    value (V a) = a
+
+λ> value (V 3)
+3
+
+
+
+###################################################################w
+
+Typeclass
+use a type as a typeclass's instance and use it in the function of typeclass
+like pass a type into typeclass's function
+
+data Bool = True | False
+class BasicEq a where
+      isEqual :: a -> a -> Bool
+      
+
+a is instance of BasicEq, and BasicEq is a typeclass
+
+instance BasicEq Bool where
+         isEqual True True = True
+         isEqual False False = True
+         isEqual _ _ =False
+
+use type Bool as a instance of typeclass BasicEq
+so use the function's signature in typeclass as the signature of function in instance
+
+######################################################################################
+
+
+已知函数A和函数B的类型，就能通过类型推导得出(B A)的类型，通过换元法的代入和消除，haskell的类型推导就像在做中学的数学题，通过函数的类型签名还可以写出函数的定义，#神奇
+
+通过函数的类型签名然后再用eta expand构造出在其它语言里的表达方式
+map . map
+= \f -> map (map f)
+=\f -> map (\xs->map f xs)
+=\f xss -> map (\xs->map f xs) xss
+=(\f xss (map (\xs (map f xs) xss)))
+=(lambda (f xss) (map (lambda (xs) (map f xs)) xss))
+
+(map . map) (+1) [[1,2,5], [7,8]]会得到[[2,3,6], [8,9]] 绑定刚才那个scheme的lambda表达式为g (g (lambda (x) (+ x 1)) ‘((1 2 5) (7 8)))得到((2 3 6) (8 9)) #eta-expand和类型推导真是神奇！
+
+通过已知的两个函数类型可以推导出组合之后的函数类型，然后根据这个函数类型还可以推出函数的定义，
+甚至可以根据已知的两个函数类型,在组合之后进行eta-expand变成符合那两个类型的form, 就可以变成在其它语言里的表达方式 #mark
+
+function's type is not same with the function's return value type!
+
+id :: a->a
+function id's type is a->a
+and function's return value type is a
+
+##################################################################################
+
+<jusss> how to express map . map in other languages? like python or scheme
+<Solonarv> or ugly, ugly lambdas, e.g. python: map(lambda xs: map(f, xs), xss)
+<ski> jusss : i was about to say `(compose map map)', but that doesn't do what
+      you wanted, try `(lambda (f lis) (map (lambda (lis) (map f lis)) lis))'
+      instead ?
+<ski> jusss : if you `(define ((curried-map) f) lis) (map f lis))', then you
+      can say `(compose curried-map curried-map)' (adjust in the obvious way
+      if you want to work on more than one list)
+<ski> (the definition of `curried-map' may also need to be adjusted, if your
+      Scheme doesn't support "curried" `define's)
+<jusss> can I through the type signature to get the function's definition?
+<Solonarv> jusss: sometimes
+<ski> jusss : "through" ?
+<Solonarv> roughly speaking, the more general the type signature is the more
+           you can deduce about the implementation
+<Solonarv> for the type of (map . map) there are many possible implementations
+                                                                        [23:21]
+<jusss> ski: const::a->b->a, id::a->a, so const id::b->a->a
+<jusss> f:: const id,   f x y = y
+<Solonarv> roughly speaking, the type of map.map is enough to figure out that
+           elements in the result must come from the function argument being
+           applied to elements in the input list
+<ski> @djinn b -> a -> a
+<lambdabot> f _ a = a
+<ski> jusss : like that ^ ?  [23:23]
+<Solonarv> but the type doesn't say anything about how the elements are
+           arranged - they could be duplicated, or reshuffled in some
+           arbitrary way, or stuff like that
+<jusss> ski: yeah
+<jusss> Solonarv: ski, how you think about map .map to express in other
+        languages? I mean the transformation, is there a rule or something?
+                                                                        [23:29]
+<ski> what do you mean with "the transformation" or "rule" ?  [23:30]
+<jusss> map . map == (map (lambda (lis) (map f lis)) lis)
+<jusss> the procedure do that transform
+<jusss> sorry for my Bad English
+<Solonarv> basically just inline the definition of (.) and eta-expand
+           everything until there are no partial applications left
+<ski> jusss : `map' in Scheme is more like a `tupledMap' satisfying `tupledMap
+      (f,xs) = map f xs' in Haskell
+<ski> (well, `map' in Scheme also has the functionality of `zipWith',&c. ..)
+<ski> (so there's some slight impedance mismatch you need to account for)
+<jusss> Solonarv: that eta-expand apply on type signature or function's
+        definition?  [23:40]
+<Solonarv> definition
+<Solonarv> so we go like this:  [23:43]
+<Solonarv>             map . map
+<Solonarv> = \f     -> map (map f)               -- 1. definition of (.)
+<Solonarv> = \f     -> map (\xs -> map f xs)     -- 2. eta expand the inner
+           'map' call
+<Solonarv> = \f xss -> map (\xs -> map f xs) xss -- 3. eta expand outer 'map'
+           call
+<jusss> Solonarv: eta-expand is wonderful!
+<ski> jusss : yea, it might be a good idea to practice it until it becomes
+      second nature :)
+<jusss> ski: through map's type signature we can know it takes two parameter,
+        and through eta-expand, we can consturct (map . map) = \f -> map (map
+        f) to a form that map with two parameter, and then we can get the
+        expression in other language who support lambda, wonderful!
+<ski> jusss : yep :)        
+
+#######################################################
+
+
+fmap :: (a->b) -> f a -> f b
+when Functor is List, then fmap is map
+fmap :: (a->b) -> List a -> List b
+map :: (a->b) -> [a] -> [b]
+
+when Functor is (->) e, then fmap is (.)
+fmap :: (a->b) -> ((->) e a) -> ((->) e b)
+
+and (->) e a == e->a
+fmap :: (a->b) -> (e->a) -> (e->b)
+(.) :: (a->b) -> (e->a) -> (e->b)
+and Functor is (->) e
+
+
+if 
+(.) :: (a->b) -> (e->a) -> (e->b)
+map :: (a->b) -> [a] -> [b]
+
+so map . map :: ?
+
+rule I. -> and . is infix expression, so ((->) e a) == (e->a) and map . map == (.) map map
+rule II. -> is right associate
+rule III. f g a == (f g) a
+rule IIII. take function A's parameter type and return type as function B's parameter types in B's type signature, get function B's type signature with function A's type
+rule V. (B A) A will take the first parameter position in B, so remove the type of the first parameter in B, it will get (B A)'s type
+
+map . map == (.) map map
+map1 :: (x1->y1) -> ([x1] -> [y1])
+map2 :: (x2->y2) -> ([x2] -> [y2])
+
+let (x1->y1) as a, and ([x1] -> [y1]) as b in (.)
+so (.) :: ((x1->y1) -> ([x1]->[y1])) -> (e->(x1->y1)) -> (e->([x1]->[y1]))
+and (.) map1, that map1 take the first parameter's position,
+so (.) map1 :: (e->(x1->y1)) -> (e->([x1]->[y1]))
+
+let (x2->y2) as e and ([x2]->[y2]) as (x1->y1) in (.) map1
+so [x2] as x1, and [y2] as y1
+so (.) map1 :: ((x2->y2) -> ([x2]->[y2]))  ->  ((x2->y2) -> ([[x2]] -> [[y2]]))
+and (.) map1 map2, that map2 take the first parameter's position.
+so (.) map1 map2 :: ((x2->y2) -> ([[x2]]->[[y2]]))
+
+(.) map map :: (x2->y2) -> ([[x2]]->[[y2]])
+map . map :: (x2->y2) -> [[x2]] -> [[y2]]
+
+
+####################################################
+
+const :: a->b->a
+id :: a -> a
+
+id :: x -> x
+const :: (x->x) -> b -> (x->x)
+const id :: b->(x->x)
+const id :: b->a->a
+
+f = const id
+f :: b-> a -> a
+f x y = y
+
+
+####################################################################
+
+
+Promise Monad!
+
+class Maybe:
+    def __init__(self, unwrapped_value):
+        self.value = unwrapped_value
+
+    def map(self, f):
+        return Maybe(f(self.value)) if self.value else Maybe(None)
+
+    def join(self):
+        return self.value
+
+add3 = lambda x: x+3
+minus2 = lambda x: x-2
+print(Maybe(5).map(add3).map(minus2).map(str).map(lambda x: x+"2k").join())
+
+what if
+
+class Promise:
+    def __init__(self,_value):
+        self.value = _value
+
+    def then(self,func):
+        try:
+            return Promise(func(self.value))
+        except Exception as e:
+            return e
+
+    def join(self):
+        return self.value
+
+n = Promise(5).then(lambda x: x+2).then(lambda x: x+3).join()
+print(n)
+
+Promise is a Monad!
+
+and join:: m (m a) -> m a will equal join:: m a -> a
+and id a -> a
+and lambda x: x
+and Promise.then(lambda x: x)
+                
+
+#################################################################
+
+use SVG or Canvas in html to replace pictures!
+
+from abc import ABCMeta, abstractmethod
+class Functor(metaclass=ABCMeta):
+      @abcstractmethod
+      def fmap(self, func):
+          pass
+class TT(Functor):
+      pass
+
+TT()  TypeError: Can't instantiate abstract class TT with abstract methods fmap
+
+class TT(Functor):
+      def fmap(self, f):
+          return 1
+
+@abstractmethod force sub-class to implement some methods!
+this is for the typeclass in Haskell,like
+class X where
+      cc: XXXXX->XXX
+
+
+
+
+def f(x) -> 123:
+    return x
+
+this -> in function definition is 'function annotations',it returns a int type value, not implemented.
+
+you can use python's class to implement other things that are in other languages, like Functor in haskell
+
+
+python type hints
+https://sikasjc.github.io/2018/07/14/type-hint-in-python/
+t: Tuple[int, float] = 0, 1.2
+l: List[int] = [1, 2, 3]
+
+
+from typing import Callable, TypeVar
+from abc import ABCMeta, abstractmethod
+a=TypeVar('a')
+b=TypeVar('b')
+
+class Functor(metaclass=ABCMeta):
+    @abstractmethod
+    def fmap(self, func):
+        pass
+
+class Maybe(Functor, metaclass=ABCMeta):
+    @abstractmethod
+    def fmap(self, f: Callable[[a],b]) -> "Maybe":
+        pass
+
+class Just(Maybe):
+    def __init__(self,value):
+        self._value=value
+    def fmap(self, f: Callable[[a],b]) -> "Just":
+        return Just(f(self._value))
+    def __str__(self):
+        return f"Just {self._value}"
+    def __repr__(self):
+        return self.__str__()
+
+class Nothing(Maybe):
+    def fmap(self, f: Callable[[a],b]) -> "Nothing":
+        return Nothing()
+    def __str__(self):
+        return "Nothing"
+    def __repr__(self):
+        return "Nothing"
+
+def fmap(func, f):
+    return f.fmap(func)
+
+print(fmap(lambda x: x+1, Nothing()))
+print(fmap(lambda x: x+1, Just(123)))
+
+"""
+this is something sort of typeclass in python
+
+
+
+@nasyx
+as a Maybe, you need class Maybe(Monad, Monoid, Applicative, Functor): pass
+so you need to implement Monad, Applicative, Monoid, Functor's metaclass first,
+
+"""
+
+
+
+
+############################################################################
+
+
+#wrapper #monad #functor 
+list class closure tuple set, they all can wrap value
+
+一个是通过类这种方式，传unwrappped value进去实例化成对象，用对象来wrap value
+然后在对象里面用method来操作里面的unwrapped value,并且每次操作完之后用值再次
+实例化一个对象并返回，Maybe(unwrapped value).map(f).map(f)
+另一种是用List来wrap value, 然后 Array.prototype.function= {}, 这种给原型添加
+方法，并且这个方法返回的也是一个list, 这样就可以 [].function().function()
+
+c(b(a(x)))   to    f(x).map(a).map(b).map(c)
+
+class Maybe:
+    def __init__(self, unwrapped_value):
+        self.value = unwrapped_value
+
+    def map(self, f):
+        return Maybe(f(self.value)) if self.value else Maybe(None)
+
+    def join(self):
+        return self.value
+
+add3 = lambda x: x+3
+minus2 = lambda x: x-2
+print(Maybe(5).map(add3).map(minus2).map(str).map(lambda x: x+"2k").join())
+
+"""
+join::m (m a) -> m a
+join Just (Just a) = Just a
+
+this is match pattern in haskell, you can do 1+1=3 
+but in python, you need do visitor pattern with class for that,
+it's complicated and not just one class
+
+this match pattern is too easy for do DSL
+
+"""
+
+
+javascript, half Orient Object, half Functional Programming,
+OO is based on Prototype not Class, I wonder if there's a language based on Orient Closure
+
+Orient Object: Prototype, Class
+Orient Closure
+
+use closure can do curry,  capture the parameter into a closure
+f(x,y) = x+y
+f(x) = return g(y) { x + y }
+
+https://www.zhihu.com/question/19635359
+
+list and object can be wrapper!
+
+class Num{
+       constructor (value) {
+          this.value = value ;
+       }      
+       add5 () {
+           return  new Num( this.value + 5)
+       }
+       double () {
+           return  new Num( this.value * 2)
+       }
+    }
+var num = new Num(2);
+num.add5 ().double ()
+
+
+class Num{
+       constructor (value) {
+          this.value = value ;
+       }      
+       map (fn) {
+         return new Num(fn(this.value))
+       }
+    }
+var num = new Num(2);
+num.map(add5).map(double)
+
+class Functor{
+       constructor (value) {
+          this.value = value ;
+       }      
+       map (fn) {
+         return Functor.of(fn(this.value))
+       }
+    }
+Functor.of = function (val) {
+     return new Functor(val);
+}
+
+Functor.of(5).map(add5).map(double)
+
+https://www.zhihu.com/question/19635359/answer/420267395
+
+class Maybe{
+       constructor (value) {
+          this.value = value ;
+       }      
+       map (fn) {
+          return this.value ? Maybe.of(fn(this.value)) : Maybe.of(null);
+       }
+    }
+Maybe.of = function (val) {
+     return new Maybe(val);
+}
+
+var a = Maybe.of(null).map(function (s) {
+  return s.toUpperCase();
+});
+
+
+https://www.zhihu.com/question/19635359/answer/420267395
+
+一个是通过类这种方式，传unwrappped value进去实例化成对象，用对象来wrap value
+然后在对象里面用method来操作里面的unwrapped value,并且每次操作完之后用值再次
+实例化一个对象并返回，Maybe(unwrapped value).map(f).map(f)
+另一种是用List来wrap value, 然后 Array.prototype.function= {}, 这种给原型添加
+方法，并且这个方法返回的也是一个list, 这样就可以 [].function().function()
+
+
+######################################################################
+
+
+adit.io/posts/2013-04-17-functors,_applicatives,_and_monads_in_pictures.html
+
+2 -> (+3) 2 -> 5
+
+Functor: apply a function to a wrapped value and get a wrapped value
+fmap    (+3)   (Just 2) -> Just 5
+fmap ::(a->b)-> f    a  ->  f   b
+
+<$> is the infix version of fmap
+
+(+3) <$> Just 2  is same to fmap (+3) Just 2
+
+Applicatives: apply a wrapped function to a wrapped value and get a wrapped value
+Just (+3)  <*>  Just 2  == Just 5
+
+[(*2), (+3)] <*> [1,2,3]   ==    [2,4,6,4,5,6]
+
+(*) <$> Just 5 <*> Just 3 == Just 15
+liftA2 (*) (Just 5) (Just 3)  ==  Just 15        liftA2 does the same thing
+
+Monad: apply a function to a wrapped value, but that function take unwrapped value and return a wrapped value, the function is >>=  and it's pronounced bind.
+
+half x = if even x
+         then Just (x `div` 2)
+         else Nothing
+
+Just 3 >>= half     == Nothing        use >>= to shove the wrapped value to the function
+
+>>= :: m a -> (a-> m b) -> m b
+      Just 3     half      Nothing
+      Just 6     half     Just 3
+
+Just 6 >>= half     == Just 3
+
+λ> Just 20 >>= half >>= half >>= half
+Just 5
+λ> Just 20 >>= half >>= half >>= half
+Nothing
+
+IO Monad
+getLine >>= readFile >>= putStrLn
+
+λ> getLine >>= readFile >>= putStrLn
+test.hs
+module X where
+half x = if even x
+         then Just (x `div` 2)
+         else Nothing
+              
+
+λ> 
+
+
+
+#########################################################################
+
+https://bartoszmilewski.com/2011/01/09/monads-for-the-curious-programmer-part-1/
+http://learnyouahaskell.com/functors-applicative-functors-and-monoids
+
+a type is just a set of values. For instance, the type Char is a set {‘a’, ‘b’, ‘c’, … }.
+types are objects and functions are morphisms. Indeed, a function maps one type into another
+
+A functor, F, is a map from one category to another: it maps objects into objects and morphisms into morphisms.
+
+type constructors are instances of Functor, like [], Maybe, Either a and a Tree type that we made on our own
+
+
+
+<lyxia> jusss: https://en.wikibooks.org/wiki/Haskell/The_Functor_class  [23:16]
+<dmwit> jusss: You might like: Typeclassopedia, You Could Have Invented Monads
+        (And Maybe You Already Have)
+
+<lambdabot> http://www.haskell.org/haskellwiki/Typeclassopedia
+http://blog.sigfpe.com/2006/08/you-could-have-invented-monads-and.html
+<lambdabot> http://www.haskell.org/haskellwiki/All_About_Monads
+<jusss> dmwit: type constructor is functor, and now I even don't know what is
+        functor
+<dmwit> Functors are parameterized types that offer a way to modify all the
+        contained values of the parameter type.  [23:37]
+<dmwit> :t fmap
+<lambdabot> Functor f => (a -> b) -> f a -> f b
+<dmwit> They make a few promises: if you pass it a function that doesn't
+        change anything, then the whole transformation doesn't change
+        anything.
+
+<dmwit> (Formally, `fmap id = id`.)
+<dmwit> The second promise is that if you do two transformations in a row,
+        that's the same as doing one big transformation that combines the two
+        steps.
+<dmwit> (Formally, `fmap f . fmap g = fmap (f . g)`.)
+<dmwit> In terms of "what they are", that is all there is to it.  [23:38]
+<dmwit> But to get a feeling for them, you'll need to play with a couple
+        instances.
+
+<dmwit> The resources I linked do that, and it is why I linked them, so
+        definitely take a look.
+<jusss> I know function composition
+
+<jusss> but those type things, did fmap have a function definition?  [23:39]
+
+<dmwit> fmap has many function definitions; a different one for each Functor.
+<dmwit> Check here:
+        https://hackage.haskell.org/package/base-4.12.0.0/docs/Prelude.html#t:Functor
+                                                                        [23:40]
+<dmwit> You can click the "Source" links in the list of instances to see
+        implementations of fmap for a bunch of different types.
+
+<jusss> a list is a container for values, I can understand, but functions? no
+                                                                        [23:42]
+<dmwit> Would you like me to convince you that a function is a container? =)
+<jusss> is it?
+
+<jusss> http://learnyouahaskell.com/functors-applicative-functors-and-monoids
+                                                                        [23:43]
+<roland> is there a name for the operator „$“?
+<dmwit> roland: Not really. "function application" if you need to refer to it,
+        or "applied to" if you are reading it alound as part of a code snippet
+<jusss> those articles always use wrappers to descripe that functor monad
+        things, but what are that wrappers  [23:44]
+<dmwit> jusss: Well, if you define what you mean by container, then we can
+        answer for sure whether functions are containers. But I have a pretty
+        good track record of giving people a "container-like" way of intuiting
+        functions' Functor instance.
+<roland> ok thx  [23:45]
+<dmwit> This last question "what are that wrappers?" I find too vague to
+        meaningfully answer.
+
+<rfold> I prefer to think of "fmap" not as mapping a to b using given
+        function, but as mapping functions (a -> b) into functions (f a -> f
+        b).  [23:46]
+
+<rfold> This completely does away with the confusion surrounding the container
+        metaphore when considering things that "aren't really containers".
+<jusss> dmwit: a list is a container, I can get the value from it and the
+        value won't change before and after
+
+<dmwit> Which value?  [23:48]
+<dmwit> Surely you admit there may be more than one.
+<jusss> dmwit: those values in the list
+<dmwit> Okay. So, rephrasing slightly: a list is a container, I can get the
+        value at a particular index and the value won't change before and
+        after.
+<dmwit> You are okay with this modification?  [23:49]
+<jusss> yeah
+
+<dmwit> A function is a container, I can get the value at a particular input
+        and the value won't change before and after.
+<dmwit> (This isn't my preferred usual route to giving this intuition, but you
+        sound like you prefer an argument to an exposition, so let's go! =)
+
+<jusss> I don't think so
+<dmwit> Which part don't you believe?  [23:50]
+<jusss> how you can get the value at a particular input?
+<dmwit> Apply the function to the input.
+<dmwit> Compare:
+
+<dmwit> > "abcde" !! 2
+<lambdabot>  'c'
+<dmwit> > chr $ 98  [23:51]
+<lambdabot>  'b'
+<dmwit> So we call the indexing operator ($) instead of (!!), but that's not
+        *so* different.
+<jusss> ok
+<jusss> get the value at a particular input, ok,  [23:52]
+<jusss> and your input is a list
+<dmwit> Nope.
+
+<dmwit> My input is a number.
+<dmwit> Just like with lists, the index is a number.
+<dmwit> (Picking `chr` as my function of interest for now, to give something
+        concrete to talk about.)
+<jusss> ok  [23:53]
+
+<dmwit> Now if I wanted to muck about with all the letters in a list, making
+        them uppercase or something, I could use map to do it.  [23:54]
+<dmwit> > map toUpper "abcde"
+<lambdabot>  "ABCDE"
+<dmwit> I can do something similar with functions.
+
+<jusss> like?
+<dmwit> I can take a function that returns characters, and create a new
+        function that does almost the same thing except it returns upper-case
+        versions if the original returned a lower-case one.
+<dmwit> But instead of map, we use (.) for that transformation.
+<dmwit> > (.) toUpper chr $ 98  [23:55]
+<lambdabot>  'B'
+<dmwit> This is something like "mucking about with all the letters in the
+        function chr", see?
+
+<dmwit> Imagine we have a bunch of boxes with characters in them.  [23:56]
+
+<dmwit> Maybe some of the boxes have the same character, maybe not. No
+        promises.
+<dmwit> And now I'm going to label each box somehow; say, with a number.
+
+<dmwit> The interface to this collection of boxes is that if you give me a
+        label, I'll give you the character inside the box with that label.
+<dmwit> This is a bit like a container that contains characters, right?
+<jusss> ok
+
+<dmwit> But this is exactly what functions (of type `Int -> Char`) are: they
+        are a bunch of `Char`s in boxes, each labeled with an `Int`.
+
+<dmwit> If you give me an `Int`, I can look up the `Char` in the box with that
+        label.
+
+<jusss> "a type is just a set of values."
+<dmwit> And you can easily imagine taking that big collection of boxes,
+        together with a transformation on their contents, and making up a new
+        collection of boxes where each labeled box in the new collection
+        corresponds to applying the given transformation to the contents of
+        the labeled box in the old container.  [23:59]
+[Mon Apr  8 2019]
+<dmwit> We name that operation (.): you give it a transformation on contained
+        values, and a container (function), and it produces a new container
+        (function) with all the same labels and the transformation applied to
+        each labeled value.  [00:00]
+<dmwit> :t (.)
+<lambdabot> (b -> c) -> (a -> b) -> a -> c
+<dmwit> (An aside: "a type is just a set of values" is an okay first
+        approximation to the truth, but it turns out set theory isn't enough
+        for the rich universe of types that Haskell offers.)
+<dmwit> (...but I'm happy to run with the "a type is a set of values"
+        intuition for now. It takes you a pretty good long way.)  [00:05]
+<monochrom> Actually you will need that richness for function types for every
+            non-total language.
+<srnty> What should I read to get started with Haskell?
+<dmwit> monochrom: Really? If it's merely bottoms you're thinking of, sets are
+        enough to capture bottoms -- just add an extra element. It's
+        polymorphism that kills the set theory approach.
+<monochrom> Oh, that.  [00:06]
+<monochrom> I thought you were going for "set plus partial order".
+<jusss> dmwit: I can catch up with your "If you give me an `Int`, I can look
+        up the `Char` in the box with that label." but I don't know what those
+        boxes are related with functor? sorry I'm not every smart 
+<dmwit> ?wiki tutorial
+<lambdabot> https://wiki.haskell.org/tutorial
+<dmwit> ?wiki tutorials  [00:07]
+<lambdabot> https://wiki.haskell.org/tutorials
+<dmwit> srnty: ^
+<srnty> thank you
+<dmwit> jusss: Mmm, the boxes analogy is to give you a way of conceptualizing
+        functions that feels "container"-like.
+<dmwit> jusss: It's easy to imagine applying some function to the value inside
+        each box, right?  [00:08]
+<dmwit> That is the fundamental operation of Functor: it gives you a way to
+        apply a function to each contained value.
+<jusss> dmwit: ok
+<dmwit> (*If* you want to understand functors as containers. I don't, really;
+        it was you that brought that analogy up.)  [00:09]
+* rfold wonders if Functor would be easier to explain if it was a newtype
+  rather than a class
+<jusss> they all have they own version story about those functor monad stuff
+        on the internet  [00:10]
+<jusss> their
+<dmwit> newtype Functor f = Functor (forall a b. (a -> b) -> f a -> f b) -- ?
+        doesn't seem easier to explain to me
+<dmwit> It's all the same concepts, plus now you have to understand/explain
+        `forall` in more detail.  [00:11]
+<dmwit> And maybe also have to explain some other tangential oddities (like
+        why is this a newtype instead of a simple type alias).  [00:12]
+<jusss> so the functor is the box or a function?
+<jusss> or neither?
+<dmwit> A functor is a parameterized data type plus the fmap operation.
+<dmwit> So, e.g., `[]` and `map` make a functor.
+<dmwit> But it would be wrong to say "`"abcde"` is a functor".
+<jusss> aha  [00:13]
+<jusss> list and function are not functor, but they make functor?
+<dmwit> Yes. Although most people are sloppy about the distinction, and just
+        say "lists are functors" as a shorthand.  [00:14]
+<dmwit> (Because it's so obvious what the operation must be.)
+<dmwit> On functions, people are sloppy in a different way, actually, that MJD
+        brought to my attention. =)  [00:15]
+<dmwit> But anyway the careful phrasing is something like this: for any type
+        X, (->) X and (.) is a functor.
+<jusss> fmap (+1) is a functor?  [00:17]
+
+###############################################################
+
+module Test where
+data Struct val =
+                Empty
+                | NonEmpty StructType val
+data StructType =
+                Exec1
+                | Exec2
+apply::Struct a -> String
+apply (Empty) = "empty"
+apply (NonEmpty exec struct) = "exec1 or exec2"                
+
+                               
+--apply Empty
+--apply (NonEmpty Exec1 undefined)
+--apply (NonEmpty Exec1 "aha")
+--apply (NonEmpty Exec2 3)
+--apply (NonEmpty Exec2 (\x -> 3 +x))
+--apply (NonEmpty Exec2 ())
+                
+apply2::(Show a)=> Struct a -> String
+apply2 (NonEmpty exec struct) = "exec1 or exec2"
+
+--apply2 (NonEmpty Exec1 "a")                                
+                                
+apply3::(Show a)=> Struct a -> String
+apply3 (NonEmpty exec _) = "exec1 or exec2"
+
+
+<jusss> data Struct val = Empty | NonEmpty StrucType val;   data SturctType =
+        Exec1 | Exec2;   apply::Struct a-> String;    apply (NonEmpty exec
+        struct) ="exec1 or exec2"
+<jusss> how I can use an expression to call it?  [13:35]
+<jusss> apply NonEmpty ? ?   will get "exec1 or exec2"/
+<jusss> apply NonEmpty Exec1 ?
+ <slack1256> jusss: Can you use a paste service for that code?  [13:43]
+<slack1256> jusss: apply (NonEmpty Exec1 undefined) should work  [13:44]
+<jusss> slack1256 https://paste.ubuntu.com/p/RS7FtkHfFG/
+<slack1256> jusss: I don't understand what you want to do
+<jusss> slack1256 just an example from stackoverflow help me understand Value
+        Constructor
+<dmwit> jusss: Here are two examples of calls: `apply Empty` or `apply
+        (NonEmpty Exec1 ())`  [14:09]
+<dmwit> Just for fun, here's a third that may look a bit weirder to initiates
+        of other languages: `apply (NonEmpty Exec2 (\x -> 3 + x))`  [14:10]
+<jusss> dmwit: the question is how to handle that undefined type variable when
+        it is called
+<jusss> https://paste.ubuntu.com/p/s84KjsTtjH/
+<dmwit> The caller of `apply` may choose any specific type they like to
+        substitute for `a`.  [14:11]
+<jusss> dmwit: wait a second, but function don't have a type I think,   [14:12]
+<dmwit> In my three examples above, I left it unspecified (`Empty`), chose the
+        unit type `()` (`NonEmpty Exec1 ()`), and chose a function type
+        `Integer -> Integer` (`\x -> 3 + x`).
+<jusss> dmwit: normal function has a type?
+<dmwit> Certainly.
+<dmwit> :t \x -> 3 + x  [14:13]
+<lambdabot> Num a => a -> a
+<dmwit> :t \name -> "Hello, " ++ name ++ "!"
+<lambdabot> [Char] -> [Char]
+<jusss> dmwit: so normal function can be used in pattern match?
+<jusss> dmwit: value constructor is totally same with normal functions?
+<dmwit> There are no interesting patterns which match functions.  [14:14]
+<ggole> Variable patterns!
+<dmwit> Yes, data constructors may be applied to functions.
+<dmwit> ggole: Right. Variables and underscore. I consider these not
+        interesting, because they can be used for *any* type.
+<dmwit> There are no patterns which match functions but do not match every
+        type.  [14:15]
+<dmwit> (Hm. Maybe some view patterns, hey? Anyway that's an advanced topic
+        for another time...)
+<c_wraith> yeah, view patterns could, but that's a totally different thing,
+           really  [14:16]
+<ggole> Hmm, isn't there a pattern ascription extension?  [14:17]
+<ggole> It might be better to think of functions not having any constructors
+        with which to destructure function values, rather than talking about
+        types.
+<dmwit> You're right. I hereby steal that much better phrasing as my new
+        definition of "interesting".  [14:20]
+<jusss> this is really make me confused! so functions do have types? and they
+        have types but can not be used in patter match?  [14:21]
+<jusss> value constructor and normal function are same thing or not?  [14:22]
+<jusss> can I call value constructor as function?
+<slack1256> jusss: yep in the sense that they have types, but they are not of
+            the same "kind"
+<jusss> (Num a => a -> a) is one function's type? right?  [14:24]
+<slack1256> % :t Just
+<yahb> slack1256: a -> Maybe a
+<c_wraith> jusss: functions don't actually have constructors.  But that's not
+           conceptually any different from any other type that has
+           constructors, but keeps them hidden someplace you can't import.
+<slack1256> Just is a value constructor for Maybe and also a function that
+            returns a Maybe  [14:25]                              
+
+##################################################################
+f n = f' n (0,1)
+  where
+    f' 0 (x, _) = x
+    f' n (x, y) = f' (n-1) (y, x+y)
+
+递归时f' n (x, y) = f' (n-1) (y, x+y)不算重赋值，是重调用，可以理解为替换当前栈帧
+-------------------------------------------------------------------
+Type Constructor and Value Constructor
+
+data T a = V a   
+w = V 3 则 w :: T Int
+x::T String 则 V "whatever"的type是x, (T String)是一个type,而(V "whatever")是一个value
+
+data A = B
+A是Type Constructor, B是Value Constructor
+
+data T a = V a 就定义了T和V
+
+Elm里的Type相当于Haskell的data
+而在haskell里type相当于elm的Type alias
+type X = Int  X就可以代表Int
+
+newtype相当于一个优化的data
+
+newtype = 只允许有一个值的data
+
+newtype X = X Int 定义了一个新的X类型和对应的俩构造器
+
+data X = X Int 表示X这个值构造器接受一个Int返回一个X
+X::Int -> X
+haskell GADT
+
+data X = Int 是没有这种写法的，只有 type X = Int 定义类型构造器的别名
+
+data Y = Y
+x = Y 这样是可以的
+
+值构造器不是类型
+
+Int是个类型构造器
+data Int = 0|1|2|...|4294967295
+
+Value Constructor可以当作一类特殊的函数，可以在模式匹配里用,match pattern,
+但普通函数不能在模式匹配里用， 值构造器可以作为函数使用，也可以模式匹配
+所以Haskell有类型构造器 值构造器 和函数,  其它语言里的Constructor一般是指Value Constructor
+data E = X | Y
+:type X
+X :: E
+:type Y
+Y :: E
+:type 1
+1 :: Num p => p
+:type 1 :: Int
+1 :: Int :: Int
+所以:1也是值构造器还是多态的
+
+类型构造器和值构造器都可以没有参数
+data Bool = True | False   Bool是个无参数的类型构造器, True和False是无参数的值构造器
+data Maybe a = Nothing | Just a    Maybe是类型构造器，a是在等号左边是类型变量,a在等号右边是值变量，Just是值构造器
+
+Haskell除了值，类型之外还有Kind
+Int是Int::*
+Maybe是*->*
+Kind就是Type的Type,  Idris可以无限层级堆叠类型
+Haskell最高只有两阶类型，所以没法表达所有集合的集合, 是data和typeclass之别，好像没问题，Elm 0.19还没有typeclass
+https://diogocastro.com/blog/2018/10/17/haskells-kind-system-a-primer/
+C++好像也是两阶的
+Kind就是描述类型构造器的类型的,
+先用Type描述数字，data Nat这样用Nat Succ这样去描述数字
+https://hackage.haskell.org/package/data-nat
+data-nat: data Nat = Zero | Succ Nat
+
+data T a = V a
+x :: T Int 怎么把V 3里的3通过操作x提取出来？
+得把x写成函数
+x :: T Int -> Int
+x (V boom) = boom
+或者
+x biu = case biu of
+        (V boom) -> boom
+
+Elm没有data,只有Type和Type alias, Elm的Type和Haskell的data功能一样, Elm的Type alias和Haskell的type功能一样或者newtype?
+Haskell开LambdaCase之后可以这样写
+:set -XLambdaCase
+y = \case (V boom) -> boom
+:type x
+x :: T a -> a
+:type y
+y :: T a -> a
+
+Module X where 这个where就是定义了一个块状区域，类似c系语言里的大括号把后面缩进的内容都包含进去了
+
+t = map f  这个是curring柯里化也是pointfree写法
+括号里有逗号就是tuple,没有逗号就是优先求值
+x :: (Int, String, Int) -> Int 和 y :: Int->String->Int-> Int 后者是柯里化的
+
+haskell没有一元tuple 但是有0元tuple,0元tuple就是()
+
+module X where 就是指这个文件的名字是X.hs或X.elm, where类似C的大括号,这个文件可以作为模块给其它文件使用
+也可以 module Main where, module Test where, module Whatever where, module就是把这个文件声明成了模块给其它文件使用
+而在python里一个文件默认就是模块，test.py可以在同目录的其它python文件里直接import test去掉文件名后缀.py导入，但是为了防止在导入
+test.py时求值里面的函数，所以一般就在test.py里把求值的函数都写在if __name__ == '__main__':里，这样在其它文件导入test.py时，
+因为主文件的__name__才等于__main__,导入时test.py里的__name__不等于__main__这样test.py里的求值函数就不会求值，
+因为python的执行顺序是从top到bottom,所以python的程序入口点entry point就是第一行，
+而C的程序入口点是main(),  Elm和Haskell的程序入口点是main = 
+
+#######################################
+
+module X where
+main = print $ f 33
+f :: Integer -> Integer
+f x = x + x
+
+main = program's entry point, like int main() in C
+
+python's if __name__ == '__main__' is not the entry point, because python run from the top to bottom by sequence,
+this if __name__=='__main__' is used for preventing evaulate when import,
+but haskell doesn't run by that sequence, so you need give the entry point,
+
+_name_ means current module's name, one file is one module,
+if you import file a in file b, and run file b then the __name__ point
+to file b, and a will be evaluated when it's imported, but if you put
+that function call code in if __name__ == '__main__' in a, when a is imported
+in b, a will not be evalated,
+
+this if __name__=='__main__' only work for preventing the module you import to
+be evaluted,
+python's entry point is the first line
+https://www.zhihu.com/question/49136398
+
+
+
+##################################3
+
+#natural scroll like Mac OSX 
+
+$xinput set-prop 'Elan Touchpad' "libinput Natural Scrolling Enabled" 1
+
+reference: https://www.topbug.net/blog/2017/02/23/enable-natural-scrolling-for-trackpads-using-libinput/
+
+#touchpad    1/2/3 fingers tap meaning left/middle/right 
+
+[john@moon ~]$ cat /etc/X11/xorg.conf.d/30-touchpad.conf 
+Section "InputClass"
+	Identifier "Elan Touchpad"
+	Driver "libinput"
+	MatchIsTouchpad "on"
+	Option "Tapping" "on"
+	Option "TappingButtonMap" "lmr"
+EndSection
+
+
+
+###########################################
+
+write classes, every classes has onStart onStop onStopped three methods,
+connect their instances with obj1.onStart( obj2.onStopped)
+
+class Example:
+      def __init__(self):
+      	  pass
+     def onStart(self):
+     	 print('test')
+	 self.onStopped()
+    def onStop(self):
+    	pass	
+    def onStopped(self):
+    	return None
+
+
+
+
+
+#################################################
+
+https://segmentfault.com/a/1190000007546512
+什么模式？把promise与yield结合，使得可以在执行完成后恢复generator的流程。
+我们需要控制generator的iterator，它将接受到yield返回的那个promise，同时通过next(...)恢复generator运行，并把他们传递下去，我增加了一个runGenerator(...)方法来做这件事。
+ep=function* g() { doSomething; yield new Promise(function(r,e){setTimeout(function(){next(ep)}, 3000)} }}
+
+##############################################################
+
+while-loop-yield
+
+while (cond) { doSomeRepeatThing; yield whatever};
+this will not block the thread, and you can change 'cond' in the outside of  'while' statement to
+control the execution,
+
+http://www.ruanyifeng.com/blog/2014/10/event-loop.html
+"简言之就是JS只有一个主线程，主线程执行完执行栈的任务后去检查异步的任务队列，如果异步事件触发，则将其加到主线程的执行栈。"
+写while-loop要让它能回到主线程，它才能轮询其它事件，
+js自动把async/await用这种while-loop-yield方式加到了默认的event-loop里
+
+yield promise + setTimeout,  自动执行generator
+
+promise + yield 可以实现 async/await, 重点是用的promise的resolve判断是否整个promise链结束，要不要yield
+
+function* g() { while (condition) {console.log(3); yield 3}}
+
+#################################################
+
+<jusss> sinclair_:  I solved it!  const delay = ms => new Promise(resolve =>
+	setTimeout(resolve, ms));  var a=3;  async function loop() {
+	while(a==3) { await delay(1000); console.log(3) } };  loop();   a=2;
+	the whole point is making the while-loop return to the
+	WHERE-I-DONT-KNOW, and then change the condition!
+<jusss> sinclair_: WHERE-I-DONT-KNOW, is there a name for it?    [02:07]
+<ljharb> jusss: the caller
+
+while-loop is a blocking statement! it will block event-loop, so onclick event will be blocked too,
+use yield or await in that while-loop to make it return to the caller, so it won't be blocking any more,
+it's asynchronous now! the asynchronouse's whole point is that it can return to the caller and it can run some
+functions or statements that is after it
+
+
+<jusss> sinclair_: a new question come to me, yield is different with
+	async/await,  async/await can auto return to the insider of the async
+	function and run functions that are after it, but yield, I have to
+	call next() on it, how to do that with yield?  [02:30]
+
+<jusss> sinclair_: graingert const delay = ms => new Promise(resolve =>
+	setTimeout(resolve, ms));  var a=3;  async function loop()
+	{while(a==3) { await delay(1000); console.log(3) } };  loop();     the
+	loop will print 3 and return to caller, and it still print 3 in the
+	background right?
+<graingert> jusss: no
+<sinclair_> jusss: const result = await loop()
+<sinclair_> jusss: use typescript, things will be clearer
+<sillyslux_> but then you need return in your loop() functino  [02:35]
+<sinclair_> jusss: like, its not obvious that 'ALL' async functions return a
+	    Promise, so use TypeScript and it will tell you that
+<sillyslux_> now it'll just be undefined
+<jusss> graingert: sinclair_ but I saw that number are increasing on the
+	console
+<graingert> Yes but not in the background
+<sinclair_> jusss: numbers go up and down all the time tho
+<sillyslux_> how is it not obvious?!
+
+<graingert> JS has wait for all the caller's code to finish before going back
+	    to other tasks
+	    
+<sillyslux_> you don't need ts to tell you *that
+
+
+<sinclair_> jusss: so, that is going to cause JS to block, but you can make it
+	    not block by moving outside of the event loop
+<sinclair_> const delay = ms = new Promise(resolve => setTimeout(resolve, ms))
+<sinclair_> async function loop() { while(true) { await delay(1000) } }
+<sinclair_> jusss: the 'delay' in this scenario is moving the event loop out
+	    to that setTimeout
+<sinclair_> jusss: JS won't die in this scenario
+<sinclair_> jusss: it will loop and loop, but you need to move execution out
+	    of the event loop  [00:59]
+
+<sinclair_> jusss: so, in this example, i used 'delay', but it could be any
+	    asynchronous op that moves out of the JS event loop
+<jusss> sinclair_: const delay = ms => new Promise(resolve =>
+	setTimeout(resolve, ms)) ?  [01:00]
+<sinclair_> jusss: yes, ms means 'millisecond' its just a promise thing
+<sinclair_> jusss: so, i put a while(true) here, you just need something to
+	    stop it from looping, so make a ...  [01:04]
+<sinclair_> let running = true
+<sinclair_> then you need something to stop it from running
+
+<jusss> yield a-Promise-object would be better  [01:09]
+<sinclair_> jusss: that will suspend execution at the 'yield'
+<sinclair_> jusss: JS supports that
+<jusss> sinclair_: yeah, co-routine is popular in most languages now
+<sinclair_> async function generatorAsync*() {  while(true) { yield
+	    Promise.resolve(1) } }
+
+<sinclair_> const x = generatorAsync()
+<sinclair_> x.next().then(console.log)
+<sinclair_> x.next().then(console.log)
+<sinclair_> x.next().then(console.log)
+<sinclair_> or to be exact
+<sinclair_> x.next().then(result => console.log(result.value))
+<sinclair_> or...
+<sinclair_> console.log((await x.next()).value)  [01:11]
+<sinclair_> or whatever
+<sinclair_> jusss: the point is, you can suspend execution with yield (as you
+	    would expect) in JS
+<sinclair_> jusss: so you can handle things that way.. you can even cause the
+	    'yielding' function to return early on some condition.
+
+<jusss> sinclair_: a new question come to me, yield is different with
+	async/await,  async/await can auto return to the insider of the async
+	function and run functions that are after it, but yield, I have to
+	call next() on it, how to do that with yield?  [02:30]
+<graingert> jusss: co
+<sillyslux_> there is no "too slow" only "premature optimization"
+<jusss> graingert: what is co
+<sinclair_> graingert: why bring up random stuff?
+<graingert> jusss: https://www.npmjs.com/package/co
+
+<sinclair_> jusss: forget about co
+<graingert> jusss: you didn't really describe what you wanted very clearly
+								        [02:31]
+<graingert> jusss: maybe show an example from another language
+<sinclair_> graingert: you should have mentioned leftPad to complete the cycle
+	    of random
+<sinclair_> graingert: complete the cycle bro
+<graingert> jusss: what do you mean by "auto return"  [02:32]
+
+<sinclair_> jusss: graingert has a point, i have nfi what you're actually
+	    trying to do
+
+<sillyslux_> you mean nhi  [02:33]
+<graingert> !xy @ jusss
+<ecmabot> jusss: The XY problem: You want to do X, but don't know how. You
+	  think you can solve it using Y, but don't know how to do that
+	  either. You ask about Y, which is a strange thing to want to
+	  do. Just ask about X. See also: http://xyproblem.info/
+<sillyslux_> nih
+
+<sinclair_> jusss: someone linked the XY problem earlier
+<graingert> And you get another one
+<sillyslux_> that was me
+<graingert> xy is transitive btw
+<sinclair_> jusss: i usually scoff at someone bringing up the XY problem, but
+	    its possibly apt in this scenario
+
+								        [02:34]
+<jusss> sinclair_: graingert const delay = ms => new Promise(resolve =>
+	setTimeout(resolve, ms));  var a=3;  async function loop()
+	{while(a==3) { await delay(1000); console.log(3) } };  loop();     the
+	loop will print 3 and return to caller, and it still print 3 in the
+	background right?
+
+<graingert> jusss: no
+<sinclair_> jusss: const result = await loop()
+
+<sinclair_> jusss: use typescript, things will be clearer
+<sillyslux_> but then you need return in your loop() functino  [02:35]
+
+<sinclair_> jusss: like, its not obvious that 'ALL' async functions return a
+	    Promise, so use TypeScript and it will tell you that
+<sillyslux_> now it'll just be undefined
+<jusss> graingert: sinclair_ but I saw that number are increasing on the
+	console
+<graingert> Yes but not in the background
+<sinclair_> jusss: numbers go up and down all the time tho
+<sillyslux_> how is it not obvious?!
+
+<graingert> JS has wait for all the caller's code to finish before going back
+	    to other tasks
+<sillyslux_> you don't need ts to tell you *that
+
+http://es6.ruanyifeng.com/#docs/async
+async 函数的实现原理，就是将 Generator 函数和自动执行器，包装在一个函数里。
+so I think there's still an event-loop, all those Promise, async/await functions will run after all the caller's code to finish
+and they're asynchronous, they won't block the thread, and thread can receive something from event, affect on those things.
+
+I think JS still have an event-loop like asyncio in python, they all put it on the last, after all the normal functions
+
+我猜JS是有个默认的event loop,因为它是基于事件机制的，还要监测键盘等事件，所以把函数写成异步非阻塞的
+Promise Async/Await就是非阻塞的，跟python不同的是，你不需要手动创建event-loop, JS自己建好了,然后自动把Promise Async/Await插入进event-loop
+JS在单线程里不停的轮询那些事件并执行, 前面那个问题，console.log在async里不是在后台打印3，是在前台，但它打印3会
+回归the caller,然后能执行其它的co-routine，JS默认把这些Promise Async/Await放到最后执行，和其它语言把event-loop放到代码的最后一样
+
+############################################################
+
+#variable
+DO NOT USE GLOBAL VARIABLES, USE CLOSURE OR OBJECT TO CONTAIN VARIABLES
+
+#loop
+while in while, control condition outside of 'while' statement
+
+switch_all=Ture
+switch_one=Ture
+while switch_all:
+      do-something
+      while switch_one:
+      	    do-something
+      while switch_two:
+          do-something
+
+this while statement is a blocking stuff, put it into another thread or the last of the code,
+change switch_all and switch_one to False will affect that 'while' execution, and it can keep current state, better than function
+
+put those 'while' statement into an alternative thread or an coroutine object(return with yield), and the control condition is
+charged by outside of 'while' statement, then you can call it with change the condition in the outsider of 'while' statement
+
+
+#synchronous
+in other languages, functions are blocking each other as default, they want to be asynchronous,
+but in javascript, most functions are non-blocking, if function a run before function b, a may be not yet done when b is done,
+so if you want it to be synchronous, then callback b in a, or make a Promise
+
+
+##############################################################################################
+
+
+在top-level用var定义变量，变量是global variable, 在top-level的function里用var定义变量，就是local variable
+
+think how long time it will check the condition once?
+def sleep(n):
+    startTime=getTime()
+    while (getTime() - startTime < n):
+    	  pass
+
+########################################
+
+Asynchronous & Promise/Future
+Asynchronouse就是不等待阻塞函数就直接返回，但是会给阻塞函数一个callback函数，
+Promise就是一旦阻塞函数运行结束，就会改变Promise对象的状态，然后执行callback
+而且js里Promise是非阻塞的，
+就是把一个阻塞函数塞到Promise对象里，然后给那个Promise对象添加大量的callback以.then()那种方式，而不是函数调用那种方式.
+一旦这个Promise对象里的阻塞函数运行结束就会更改里面的状态，会执行后面那一坨.then()构建的函数callback链
+
+js的Promise就是把一个阻塞函数塞到Promise对象里，然后后面加上一坨的函数调用链,检测Promise对象里状态的变化去执行
+
+把 Promise/Future想象成一条链子，链子上有n个函数，最开始的函数可能是阻塞的，也可能是非阻塞的
+
+把namespace想象成一个cave, 变量和函数就是cave里面挂着的果子
+                                                                                                       .then() .addCallback()                                 y(g(f(x)))                                            
+Promise/Future就是构建了一个函数执行链，但是这个链子是不阻塞的，不影响其它函数的运行，如果是函数回调那种方式是会阻塞的
+
+python的Future对象呢，最主要的就是addCallback,也是和Promise一样，根据检测对象里面状态的变化，然后执行后面一坨的函数链
+aldebaran的qi.Future用的是多线程实现的这个Future对象,它用的是Promise.setValue更改状态,asyncio用.result(),js用resolve()
+而python3的concurrent.futures也是多线程，而asyncio的里面的future对象呢，也一样，也是个函数执行链，但是asyncio是在一个
+线程里玩Asynchronous, 就是用在阻塞函数前通过yield返回，把函数里面的阻塞函数放到一个列表里，用select()/epoll()轮询这个列表
+里的阻塞函数，一旦这个阻塞函数执行了，就把这个阻塞函数后面的那一坨函数执行链运行了，所以这个阻塞函数也是被搞成了Future对象.
+await等待的是个Future对象，Future对象里面有一坨的函数执行链，用yield generator那一套制作了那一坨函数执行链, 不是和async/await
+很一样，因为generator虽然有send()等方法，但是没有Future.addCallback()那一坨，addCallback添加的是完整的函数，而generator那套
+添加的是部分的函数执行块, 所以用generator那套实现的Asynchronous和asyncio那坨async/await实现的并不一样
+
+
+
+#################################
+
+co-routine base on generator
+
+
+def y():
+    while True:
+        yield None
+
+def g1():
+    yield from [1,3,5,7,9]
+
+def g2():
+    yield from [2,4,6,8,10]
+
+task=[g1(), g2()]
+
+while 1:
+    try:
+        print(next(task[0]))
+        print(next(task[1]))
+    except:
+        print('end')
+        break
+
+while 1:
+      for i in task:
+      	  try:
+	        print(next(i))
+	except:
+		print('end')
+		break
+
+python requests, requests.post(url,data=a-dict-for-html-form,files=binary-data,headers=a-dict)
+requests.get use params=a-dict and url to conflate as one url, and requests.post use data=a-dict to do that
+they both to generate one whole url
+tornado.httpclient don't have that 'params' or 'data' options, you have turn that to body form for tornado
+import urllib
+post_data = { 'data': 'test data' } #A dictionary of your post data
+body = urllib.urlencode(post_data) #Make it into a post request, if it's python3 , use urllib.parse.urlencode(a-dict)
+tornado's httpclient.fetch(url,headers=a-dict,body=file)
+tornado.httpclient.HTTPClient, Applications that are running an IOLoop must use AsyncHTTPClient instead.
+https://stackoverflow.com/questions/10367981/how-to-use-post-method-in-tornado
+#TencentAI
+
+import hashlib, time, random, string, requests
+from urllib.parse import quote
+import tornado.httpclient
+import urllib, json
+
+def curlmd5(src):
+    m = hashlib.md5(src.encode('UTF-8'))
+    # 将得到的MD5值所有字符转换成大写
+    return m.hexdigest().upper()
+ 
+def get_params(questionBytes):
+    #请求时间戳（秒级），用于防止请求重放（保证签名5分钟有效）  
+    time_stamp=str(int(time.time()))
+    # 请求随机字符串，用于保证签名不可预测  
+    nonce_str = ''.join(random.sample(string.ascii_letters + string.digits, 10))
+    app_key=''
+    paramsDict = {'app_id':'',
+              'question':questionBytes,
+              'time_stamp':time_stamp,
+              'nonce_str':nonce_str,
+              'session':'10000'
+             }
+    sign_before = ''
+    #要对key排序再拼接
+    for key in sorted(paramsDict):
+        # 键值拼接过程value部分需要URL编码，URL编码算法用大写字母，例如%E8。quote默认大写。
+        sign_before += '{}={}&'.format(key,quote(paramsDict[key], safe=''))
+    # 将应用密钥以app_key为键名，拼接到字符串sign_before末尾
+    sign_before += 'app_key={}'.format(app_key)
+    # 对字符串sign_before进行MD5运算，得到接口请求签名  
+    paramsDict['sign'] = curlmd5(sign_before)
+    return paramsDict
+  
+def get_content(question):
+    url = "https://api.ai.qq.com/fcgi-bin/nlp/nlp_textchat"
+    sendDataDict = get_params(question.encode('utf-8'))
+    print(sendDataDict)
+    #body = urllib.urlencode(sendDataDict) is for python2
+    body = urllib.parse.urlencode(sendDataDict)
+    #r = requests.post(url,data=sendDataDict)
+    #return r.json()["data"]["answer"]
+    response = http_client.fetch(url, method='POST', body=body)
+    return json.loads(response.body)["data"]["answer"]
+
+"""
+ {'app_id': '', 'question': b'\xe4\xbd\xa0\xe4\xb8\xad\xe5\x8d\x88\xe5\x90\x83\xe5\xbe\x97\xe4\xbb\x80\xe4\xb9\x88', 'time_stamp': '1546698439', 'nonce_str': 'mGhukeJUC4', 'session': '10000', 'sign': ''}
+对字典的key排序，并以key=value&这在方式拼接，得到一个字符串'key=value&key=value&'，最后追加'app_key=app-key'
+把这个新的字符串进行md5运算，追加到字典的sign里
+注意的是字典里question的值是bytes, 还有字符串拼接时value要用URL编码， 添加随机字符串在nonce 和当前时间戳
+https://ai.qq.com/doc/auth.shtml
+签名有效期5分钟，需要请求接口时刻实时计算签名信息
+"""
+if __name__=='__main__':
+    http_client = tornado.httpclient.HTTPClient()
+    print(get_content("北京时间"))
+
+
+##################################################################
+class as function, they both are first-class object, they can pass and return like argument
+1, operate that 'self'
+2, a variable in class but not in method, it's class-variable, I think it's kind of like closure can be handle
+3, @staticmethod decorator, remove the self in function, and you can use Class.Method() to call
+4, make a class or object pass to another class when it instance
+5. @classmethod, the first argument represent class itself and no mather what name it is, and it still can instance
+
+@classmethod
+def get_data(cls,string_data):
+    ...
+    return cls(whatever)
+c=AClass.get_data("string")
+c will be a instance of this AClass
+it can change the type of parameters of class when it initial instance
+https://stackoverflow.com/questions/136097/what-is-the-difference-between-staticmethod-and-classmethod
+
+class L:
+...     def __init__(self):
+...             self.a=0
+...     def c(self):
+...             self.a=self.a+1
+...             return self.a
+... 
+
+
+class A:
+...     def f(self):
+...             print('h')
+... 
+>>> class B:
+...     def __init__(self,ao):
+...             self.ao=ao
+...     def p(self):
+...             self.ao.f()
+... 
+>>> c=A()
+>>> d=B(c)
+>>> d.p()
+h
+
+
+
+##########################################################
+
+<head>
+<title>Tornado WebSockets</title>
+ <meta charset="utf-8" />
+ </head>
+     
+  <body>
+    <div id="fromPepper">
+        <h1 style="font-size:70px; color:green;"> Pepper </h1>
+      
+    </div>
+</body>
+
+ 
+ <script type="text/javascript">
+     change = function (state) {
+         k=document.getElementById('fromPepper');
+	 k.innerHTML=state;
+//        k.innerHTML=k.innerHTML+'<br>'+state;
+    };
+ 
+ 
+    var ws = new WebSocket("ws://127.0.0.1:22222/ws");
+    ws.onopen = function() {
+               ws.send("Hello, world");
+            };
+    ws.onmessage = function (evt) {
+               change(evt.data);
+            };
+      
+ 
+</script>
+
+####################################################################
+
+#!/usr/bin/env python3
+import tornado.websocket
+import tornado.ioloop
+import datetime, time
+from tornado.options import define, options, parse_command_line
+from concurrent.futures import ThreadPoolExecutor
+e=ThreadPoolExecutor()
+x=(i for i in range(0,100000))
+wsl=[]
+cl=[]
+def createClosure(f):
+    a=0
+    def realFunc():
+        nonlocal a
+        a=a+1
+        f.write_message(str(a))
+    return realFunc
+
+def runClosure():
+    for i in cl:
+        i()
+
+def test():
+    for i in wsl:
+       i.write_message(str(next(x)))
+
+def t2():
+    if cl:
+        return
+    else:
+        for i in cl:
+            i.write_message(str(next(x)))
+        
+class IndexHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.render("websocket.html")
+class EchoWebSocket(tornado.websocket.WebSocketHandler):
+    def open(self):
+        self.websocket_ping_interval=30
+        wsl.append(self)
+        cl.append(createClosure(self))
+    def on_message(self, msg):
+        for i in wsl:
+            self.write_message(u"you said: "+msg)
+
+    def on_close(self):
+        print("closed")
+    def check_origin(self, origin):
+        return True
+
+#e=ThreadPoolExecutor()
+def t():
+    time.sleep(20)
+    x[0]='wonderful'
+
+def s():
+    app=tornado.web.Application([(r'/',IndexHandler),(r'/ws', EchoWebSocket)])
+    define("port", default=22222, type=int)
+    app.listen(options.port,'0.0.0.0')
+
+    tornado.ioloop.PeriodicCallback(runClosure,1800).start()
+    tornado.ioloop.IOLoop.instance().start()
+    #http://xiaorui.cc/2016/01/20/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90tornado-periodiccallback-crontab%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1%E5%AE%9E%E7%8E%B0/
+    #mainLoop.run_in_executor(e,test)
+    #mainLoop.add_callback(t2)
+
+s()
+
+###################################################################
+import asyncio
+@asyncio.coroutine
+def p():
+    print('hello')
+    yield from asyncio.sleep(0.5)
+    print('world')
+@asyncio.coroutine
+def p2():
+    print('john')
+    yield from asyncio.sleep(0.5)
+    print('it is')
+
+def p3(f):
+    print(f.result())
+    
+loop=asyncio.new_event_loop()
+asyncio.set_event_loop(loop)
+
+task = [asyncio.ensure_future(p()), asyncio.ensure_future(p2())]
+task[1].add_done_callback(p3)
+#task = [p(), p2()]
+loop.run_until_complete(asyncio.wait(task))
+
+#asyncio.run(p())
+#asyncio.run(p2())
+
+#async def define a function, call that function and it return a coroutine object
+#asyncio.ensure_future on that coroutine object and return a future object
+#asyncio.get_event_loop() return a loop, loop.run_until_complete work on
+# that future object, 
+#task object is sub-class of future object
+#loop.run_until_complete will auto turn coroutine object to task object
+#loop.create_task(coroutine-object) to task object, same to asyncio.ensure_future(coroutine-object)
+#print that future object to know its state
+#future object has add_done_callback(callback-function) and that callback-function defined with future as parameter
+#
+#RuntimeError: There is no current event loop in thread 'MainThread'.
+#every thread only has one event-loop, if you use asyncio.get_event_loop it will auto create one event loop
+#and set it as default event-loop in current thread, if you call it in other threads so it will be error
+#you need create it and set it by hand, loop=asyncio.new_event_loop(); asyncio.set_event_loop(loop)
+#then you can use  get_event_loop in other threads
+#loop.call_soon_threadsafe(task)
+
+################################################
+there's a library called futures in python 2
+there's a library called __future__ in python2.7
+https://docs.python.org/2/library/__future__.html
+https://zhuanlan.zhihu.com/p/32756176
+
+from __future__ import absolute_import
+in the old way, python import your own library from current directory
+not the $PATH, with this, it will import from $PATH, and 
+you can use `from previous-directory import you-own-lib`
+
+from __future__ import division
+3/10 0.3
+
+from __future__ import print_function
+use print like in python3, it must need braces and it's a function
+
+from __future__ import unicode_literals
+turn str to unicode
+
+in python2, type('hi')  you got class 'str'
+but from __future__ import unicode_literals type('hi') got type 'unicode'
+
+---------------------------------------------
+fold from https://repl.it/repls/LowPracticalAbstractions
+<jusss> eiGHttt: 你的fold里的f从来没变过。。。
+const foldl = (f, acc, xs) => {
+  if (!xs.length) {
+    return acc;
+  }
+
+  const [y, ...ys] = xs;
+
+  return foldl(f, f(acc, y), ys);
+};
+
+const add = (x, y) => x + y;
+console.log(foldl(add, 0, [1, 2, 3]));
+
+fold from https://paste.ubuntu.com/p/XTzzDZ95N3/
+<jusss> LdBeth: 你的fold不是尾递归。。。
+function foldr (f,z,l) {
+    if (l.length == 0) {
+        return z;
+    }
+    else {
+        var a,b;
+        [a,...b] = l;
+        return f(a,foldr(f,z,b));
+    }
+}
+
+<eiGHttt> jusss: https://repl.it/repls/LowPracticalAbstractions	        [15:58]
+<LdBeth> jusss: https://paste.ubuntu.com/p/XTzzDZ95N3/
+<jusss> eiGHttt: LdBeth 你们竟然同时写出，好默契		        [16:29]
+<jusss> 还都是js
+
+<jusss> LdBeth: eiGHttt 我的f(g,alist)里g一直在变，g=g(i)每次执行一次,就把g(i)
+	的值重赋值给了g
+
+<jusss> eiGHttt: 无所谓，就是你们这个fold并没有改变函数，我的那个f却是一直在改
+	变函数							        [17:00]
+
+<jusss> LdBeth: 你上午推荐的是 haskell programming from first principles?
+###########################################################
+
+def z(x):
+    def t(y):
+        if y=="end":
+            return x[-1]
+        else:
+            x.append(x[-1]+y)
+            return t
+
+    return t
+
+ee=z([0])
+
+
+def f(g,alist):
+    if not alist:
+        return ee("end")
+    else:
+        return f(g(alist[0]), alist[1:])
+        
+    
+f(ee,[1,2,3])
+
+#############################################
+def f(g,alst):
+    for i in alst:
+        g=g(i)
+
+    return g
+
+def f(g,alst):
+    if not alst:
+        return sum
+    else:
+        return f(g(alst[0]), alst[1:])
+
+sum=0
+    
+def add(y):
+    def add1(x):
+        global sum
+        if x=="end":
+            return sum
+        else:
+            sum=sum+x
+            return add1
+    return add1(y)
+
+f(add,[1,2,3,5,6,7,"end"])
+### <jusss> LdBeth: 简单点就是 for i in alst: g=g(i)		        [10:48]        
+
+##########################################################################
+if you don't want use *args in python, or ... in javascript, &rest in lisp
+then just pass a list to do that, that would be great!
+
+f = lambda x: lambda y: x(y)      x is a function, y is a list
+add1 = lambda x: x[0] + 1
+add = lambda x: x[0] + x[1]
+addn = lambda x: reduce(lambda x,y: x+y, x)
+reduce? not map, a common function get all the elements out of the list
+
+X = f(add1)    X([3])
+Y = f(add)     Y([3,4])
+Z = f(addn)    Z([3,4,5,6])
+
+Don't use a variable as parameter, always use a list as parameter!
+And always use a curry function
+
+
+###############################################################
+
+#counter
+counter = (lambda x: lambda: [x.append(x[-1]+1),x][-1][-1])([0])
+"""
+counter()
+counter()
+"""
+
+
+#ture-false outputer
+#consider to add timestamp for control the output times in one minute
+f = (lambda x: lambda: [x.append(False) if x[-1] else x.append(True), x[-1]][-1])([False])
+f2 = (lambda x: lambda: [x.append(False) if x[-1] else x.append(True), x][-1][-1])([False])
+f3 = (lambda x: lambda: [x[-1], x.append(False) if x[-1] else x.append(True)][0])([True])
+f4 = (lambda x: lambda y: (lambda z: lambda: [z[-1], z.append(False) if z[-1] else z.append(True)][0])([x<y]))(3)(4)
+"""
+f4()
+f4()
+"""
+
+
+#timer-for-while
+lf = (lambda x: lambda: [x.append(x[-1]+1),x][-1][-1])([0])
+lf1 = lambda x: (lambda y: lambda: [y.append(False) if y[-1]<0 else y.append(y[-1]-1), y][-1][-1])([x])
+lf2 = lambda x: (lambda y: lambda z=[True]: [z.append(False) if y[-1]<1 else y.append(y[-1]-1), z][-1][-1])([x])
+
+"""
+ three_times=lf2(3)
+  while three_times():
+     print(1)
+"""
+#False-1 will get -1 in python3, False<0 will get False
+
+#util-er
+
+#return-er like promise in js, list.append() will return a new list, class.method() will return new class
+
+
+--------------------------------
+lf = (lambda x: lambda: [x.append(x[-1]+1),x][-1][-1])([0])
+纯函数式语言是没有赋值语句的，他们会用不停的返回一个新值来取代重新赋值
+用一个一直在增长的列表来替代闭包里的变量重赋值(返回最后一个列表的值)
+用generator可以写fibonacci sequence,但是可以用闭包来代替(返回个函数f)
+把这个f传到一个递归函数或while循环里，是不是有点意思
+如果传到递归函数里，递归函数还要返回一个thunk后的函数，再外加个while
+蹦床求值，还是放到迭代的while里省事
+-------------------------------------
+def mysum(n,m):
+    if n<0:
+        return m
+    else:
+        return lambda: mysum(n-1,m+n)
+def t(f):
+    while callable(f):
+        f=f()
+    return f
+
+t(mysum(1000,0))
+
+def count(x):
+    def f():
+        x.append(x[-1]+1)
+        return x[-1]
+    return f
+c=count([0])
+c()
+
+lc = lambda x: lambda: [x.append(x[-1]+1),x][-1][-1]
+ld = lc([0])
+ld()
+
+def fib():
+    m=0
+    n=1
+    def f():
+        nonlocal m
+        nonlocal n
+        m,n=n,m+n
+        return n
+    return f
+
+t=fib()
+
+while ld() < 100:
+    t()
+
+t()
+
+----------------------------------------
+python __future__ library,
+Django，Django REST framework的接口都是返回unicode类型的字符串。
+为了统一，我个人建议使用from __future__ import unicode_literals，
+将模块中显式出现的所有字符串转为unicode类型
+-------------------------------------------------
+展开let在js python
+f = (x => y => y+x)(1)
+f = (let ((x 1)) (lambda (y) (+ y x)))
+这样写能避免显式的赋值，而且还能限制变量x的作用域，可以在不支持let的语言里这样玩
+比如ES6之前的js没有let,只有var,或者默认global variable,就可以这样玩
+----------------------------------------------
+用yield和trampoline也可以避免递归时stack overflow
+<Yhg1s> jusss: not somethign worth using. The usual thing is to raise an
+	exception and catch it in the first call. It's more efficient in all
+	possible measurements to just not use deep recursion, and instead
+	write iteratively.
+<ikanobori> jusss: No.
+<ikanobori> Weird exception flow left out you can write most things it...
+-------------------------
+人为构造一个“蹦床”机制就可以对python的尾递归进行优化，这个写法是老黄历了。
+Guido 还写了一篇博客解释，大意就 TCO 破坏了 stack traces：  最后还说道 Python 的简单让他很自豪[笑cry]。
+
+尾递归的时候用异常跳出来执行，顺便通过异常把参数带出来。
+https://weibo.com/2009248211/GuKlxkcM3?type=comment
+
+--------------------------------------
+python gevent asyncio twisted tonator future 
+--------------------------------------------------------
+最近被co-routine, generator, promise/future这堆概念所困扰，
+据说还和 continuation, monad, lazy eval这堆概念有关
+call-by-name, call-by-value, 应用序求值，正则序求值，
+lambda expression, thunk function, callback, closure,
+lexical scope, dynamic scope, f-expression,
+delay-deferred-eval, asyncio, yield, decorator,
+Continuation-Passing-Style, Y-combinator,
+curring, 柯里化，trampoline,
+high-order function, list comprehension
+
+<jusss> onlylove: co-routine, promise/future, generator, yield之类的感觉都来自
+	于continuation, 而decorator什么的来自于macro?  [21:36]
+
+python: twisted, tornado, django, flask, urllib, requests, curl, aiohttp
+-------------------------------------------
+python 3.6+ 有f-string 类似于ruby　bash的变量在字符串中展开
+python 2.7可以用''.format来玩
+
+-----------------------------------------------
+python 的threading.Thread并没有能结束线程的方法，
+自己实现
+    def recv_from_server():
+        while True:
+            if name['exit_signal']:
+                return "end"
+
+
+    def recv_from_keyboard(event=None):
+        msg=my_msg.get()
+        my_msg.set("")
+        if msg.startswith("/quit"):
+            name['exit_signal'] = True
+            name['sock'].send(('QUIT' + "\r\n").encode('utf-8'))
+
+    rt=Thread(target=whatever['recv_from_server'])
+这样在两个线程绑定的两个函数里，用一个线程发出个信号让另一个线程结束
+-----------------------------------
+l=[0,1,2]
+for i in range(0,3):
+  l[i] = lambda a: a+i
+结果l[0] = l[1] = l[2] = lambda a: a+2
+词法闭包，调用时去函数定义时的那个环境里去取值，i在那个环境里最终会变为2
+这个lambda a: a+i 没有立即求值i,　l[0]得到也是labda a a: a+i,
+当l[0](5)时才会求值这个lambda,而此时这个lambda所在的那个环境里i的值为2
+解决方法: l[i] = lambda a,b=i: a+b
+或　l[i] = (lambda b: lambda a: a+b)(i)
+  
+------------------------------------------
+python 实现 socket.readline
+recv_msg=sock.recv(102400)
+if recv_msg.endswith('\r\n'):
+   readline_str = recv_msg
+else:
+   recv_msg + recv_msg
+
+def readline(a_str):
+   if a_str.endswith('\r\n'):
+      return a_str
+   else:
+      readline(a_str + sock.recv(102400))
+
+f=lambda x: x if x.endswith('\r\n') else f(x + sock.recv(1024))
+
+y=lambda: sock.recv(1024)
+
+def readline(a_str,f):
+   if a_str.endswith('\r\n'):
+      return a_str
+   else:
+      readline(a_str + f(),f)
+
+readline(y(),y)
+
+f=lambda a_str,procedure: a_str if a_str.endswith('\r\n') else f(a_str + procedure(), procedure)
+f(y(),y)
+   
+-------------------------------------------------
+a=[0,1,2]
+for i in range(0,3):
+  a[i] = lambda a: a+i
+
+a[0] == a[1] == a[2] == lambda a: a+2
+因为i在lambda里没有被求值, 最后i的值是2,当a[1](3)求值时，i是以2求值的
+
+可以用　a[i] = lambda a,b=i: a+b
+或　a[i] = (lambda b: lambda a: a+b)(i)
+
+感觉python里的lambda就用来做lazy eval了,比如在GUI编程里　f= lambda : whatever(x) 这样的好处就是
+f()就会执行whatever(x)，而且不用在f()里面设置参数
+
+------------------------------------------------------------
+求出数字列表里不重复且最大的值
+1.先求出不重复的元素, 用map来依次遍历每个元素和整个列表的元素比较，元素相同返回1,不同返回0,最后求和这个列表，
+如果有重复的元素，则会大于等于2,如果大于等于2,则返回(),否则把元素返回到新列表
+2.求出最大值
+(define alist (list 1 2 3 3 4 5 7 9 5 9))
+> (map (lambda (x)
+       (if (> (apply + (map (lambda (y)
+			       (if (eq? x y) 1 0))
+			     alist))
+	      1) '() x))
+     alist)
+'(1 2 () () 4 () 7 () () ())
+
+
+(define (map f alist)
+	(if (eq? alist '())
+	    '()
+	    (cons (f (car alist)) (map f (cdr alist)))))
+
+
+(define remove-empty-list
+  (lambda (alist)
+    (if (eq? alist '())
+    '()
+    (if (eq? (car alist) '())
+        (remove-empty-list (cdr alist))
+        (cons (car alist) (remove-empty-list (cdr alist)))))))
+ 
+(define remove-same-element
+  (lambda (alist)
+        (remove-empty-list
+        (map (lambda (x)
+               (if (> (apply + (map (lambda (y)
+                                             (if (eq? x y) 1 0))
+                         alist))
+                        1) '() x))
+                 alist))))
+ 
+(define get-max-value
+  (lambda (alist max)
+    ;max is (car alist) at the first time
+    (if (eq? alist '())
+    max
+    (if (> (car alist) max)
+        (get-max-value (cdr alist) (car alist))
+        (get-max-value (cdr alist) max)))))
+ 
+(define alist '(1 2 3 3 5 9 7 7))
+> (get-max-value (remove-same-element alist) (car alist))
+9
+
+> (require srfi/1)
+> (reduce (lambda (x y) (if (> x y) x y)) 0 '(1 2 3))
+
+-------------------------------------------------------------------------------------
+#lang racket
+(require srfi/1)
+
+(define alist (list 1 2 3 3 4 5 7 9 5 9))
+
+
+;(define (f alist)
+;(cond ((eq? '() (car alist)) (f (cdr alist)))
+;      ((eq? (cdr alist)) '())
+;      (else (cons (car alist) (f (cdr alist))))))
+;
+
+;(f (map (lambda (x)
+;       (if (> (apply + (map (lambda (y)
+;			       (if (eq? x y) 1 0))
+;			     alist))
+;	      1) '() x))
+;     alist))
+;
+(reduce (lambda (a b) (if (> a b) a b)) (car alist)
+ (filter (lambda (x) (not (eq? x '())))
+      (map (lambda (x)
+       (if (> (apply + (map (lambda (y)
+			       (if (eq? x y) 1 0))
+			     alist))
+	      1) '() x))
+     alist)))
+
+
+------------------------------------------------------------------------------

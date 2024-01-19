@@ -1,0 +1,100 @@
+
+CoroutineScope.launch {
+ withContext(Dispatchers.IO) {...}
+ withContext(Dispatchers.Main) {..}
+}
+the next withContext will wait for the previous withContext, IO and Main are in different thread 
+
+CoroutineScope.lanuch {
+val a1 = async(Dispatchers.IO) { ... }
+val a2 = async(Dispatchers.IO) {...}
+}
+a2 won't wait for a1, they're parallel
+
+so we can do do 1000 web request at the same time
+deferredList :: [Deferred<T>]
+result :: [T]
+["apiRequestOne", "apiRequestTwo",...].map {
+  deferredList.add( CoroutineScope.async(Dispatchers.IO) { doSomething with it; return@async IOResult} )
+} 
+CoroutineScope.lanch(Dispatchers.IO){
+deferredList.map { result.add(it.await()) }
+}  // async default use Dispatchers.Main, so declare Dispatchers.IO here, lanuch won't return value, so here use launcher
+----------------------------------------------------------
+1.  create companion object to store global variable
+class PictureAddrCache {
+    companion object {
+        lateinit var asyncPictureResult: Deferred<ArrayList<NaP<String,ArrayList<String>>>>
+}}
+
+2. create async IO class
+class AsyncInit {
+    fun run() {
+            PictureAddrCache.asyncPictureResult = CoroutineScope(NonCancellable).async(Dispatchers.IO) {
+            doSomeIO
+            return@async IOResult
+            }
+    }
+}
+
+3. run it at very first activity
+AsyncInit().run()
+
+4. wait the IO Result in another activity
+   CoroutineScope(NonCancellable).launch {
+                    withContext(Dispatchers.IO){
+                        val _r1 = PictureAddrCache.asyncPictureResult.await()
+                        println("---------- resutl $_r1 ---------------------")     
+                    }
+                    withContext(Dispatchers.Main){
+                       updateUI
+                    }
+                }
+
+//---------------------------------------------------------
+// think about Service or WorkManager?
+// Coroutine relate to Job, one to one, 
+// Coroutine has launch (no result) and async (result)
+// CoroutineScope(Dispatchers.Main).launch { ... }
+// coroutineScope {
+//            val deferredFirst = async { get("first") }
+//            val deferredSecond = async { get("second") }
+//            deferredFirst.await()
+//            deferredSecond.await()
+
+
+
+
+
+ViewModelScope, ViewModel is canceled once, Coroutine cancel too
+   viewModelScope.launch {
+            val articleList = withContext(Dispatchers.IO) {
+                articleDao.getAll()
+            }
+           adapter.clear()
+           adapter.addAllData(articleList)
+        }
+
+
+LifecycleScope, once you leave current Activity, cancel it
+lifecycleScope.launch { ... }
+
+https://zhuanlan.zhihu.com/p/297543508
+
+coroutineScope : CoroutineScope
+
+lifecycleScope.launch {...} return a Job object, Job can connect with other Jobs, Job has isActivity, isCompleted, isCancelled
+more details search SupervisorJob
+
+CoroutineScope(NonCancellable).lauch {} or .async{} return a Job, this Job won't be cancelled automatelly
+CoroutineScope.async{} would return a Deferred object, you can use await on that object to get result
+
+Scope would return Job, you can use Job connect other Jobs, or check Job status, or cancel Job
+when Job is done, there're is null, is CancellationException, Otherwise three status
+inside coroutine, function join would run its Job, stuck others jobs until its job is done
+
+
+Work Manager or Event Bus?
+https://developer.android.com/courses
+
+

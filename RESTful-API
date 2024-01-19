@@ -1,0 +1,62 @@
+
+#1, data's parameter is bytes, but in which form json or urlencoded, it depends config in the header
+
+ header = {
+        'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
+    }
+
+def getBody(filepath):
+    binfile = open(filepath, 'rb')
+    data = {'audio': base64.b64encode(binfile.read())}
+    return data
+
+r = requests.post(URL, headers=getHeader(aue, engineType), data=getBody(r"7.ogg"))
+
+set urlencodeed in header, so requests will turn the dict {'audio': 'x'} to "audio=x".encode("utf-8") as data's parameter
+
+if it's json in header, it will turn the dict to json as data's parameter
+
+#2, httpurlconnection use httpconn.setRequesProperty(k,v) to config header
+
+val addr = "http://api.xfyun.cn/v1/service/v1/iat"
+val url = URL(addr)
+val httpconn = url.openConnection()  as HttpURLConnection
+httpconn.requestMethod = "POST"
+httpconn.doOutput = true
+httpconn.setRequestProperty(k,v)  //config header 
+
+
+about REST Ful API,
+
+url, headers, params, data, json, auth, cookies, timeout, allowRedirects, stream, files
+
+    //1. every value in key-value should do URLEncoder.encode in java, but python has urllib.urlencode(dict) for a dict
+    //2. pass a key-value string like a=b&c=d, not a json {a=b;c=d}, declare this in header by "Content-Type", "application/x-www-form-urlencoded"
+    //3. params is in body in post, in header in get
+    //4. headers is look like accept: application/json content-type: application/json
+    //5. params is in body, so they're same, when headers application/x-www-form-urlencoded, params and body like parameter=value&also=another
+    //6. multipart/form-data is for files, application/json is for json like "{a=b;c=d}"
+    //7. check post or get first, check json or urlencoded second,
+    //8. if it's urlencoded, value should be urlencoded, if it's json, the dict or map should be to json
+    //9. headers maybe a json, and body maybe bytes from file
+
+# restful passing file
+self.headers = {'Ocp-Apim-Subscription-Key': '','Content-type': 'audio/ogg; codec=audio/pcm; samplerate=16000','Accept': 'application/json'}
+response = self.http_client.fetch('https://westus.stt.speech.microsoft.com/speech/recognition/conversation/cognitiveservices/v1?language=zh-CN',method='POST',headers=self.headers,body=open(self.filename,'rb').read())
+
+# passing json
+post_data={"reqType":0,"perception":{"inputText":{"text":p},"inputImage":{"url": "imageUrl"},"selfInfo":{"location":{"city":"北京","province":"北京","street":"信息路"}}},"userInfo":{"apiKey":"","userId": ""}}
+                data_send = json.dumps(post_data).encode("utf-8")
+                response = self.http_client.fetch('http://openapi.tuling123.com/openapi/api/v2',method='POST',body=data_send)
+
+# passing urlencoded
+paramsDict = {'app_id':'',
+              'question':questionBytes,
+              'time_stamp':time_stamp,
+              'nonce_str':nonce_str,
+              'session':'10000'
+             }
+body = urllib.urlencode(paramsDict)
+response = http_client.fetch(url, method='POST', body=body,  validate_cert = False)
+
+//10. body are bytes, the different is that read bytes from file, or turn json to bytes or turn urlencoded to bytes

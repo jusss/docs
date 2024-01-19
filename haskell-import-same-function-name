@@ -1,0 +1,7 @@
+import Network.DNS.Decode (decode)
+import Data.Aeson hiding (decode)
+import qualified Data.Aeson (decode)
+
+this will import everything from Data.Aeson except decode,
+Data.Aeson.decode to use Data.Aeson's decode
+and decode will be Network.DNS.Decode.decode

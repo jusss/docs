@@ -1,0 +1,19 @@
+Android version 6.0.1 CM13-aicp
+archlinuxarm 2016.01.16
+mount sdcard on /mnt/media-rw/22
+sdcard file system is ext4, there're archlinuxarm's image file
+chroot it, run fvwm then emacs
+
+1. xsdl, Xorg server on android
+XServer-XSDL-1.11.37.apk (it comes with screen keyboard after this version)
+can not input or stuck on xsdl, because aosp keyboard have some issues, replace it with hacker's keyboard v1.3
+and cancel Ctrl Alt Esc screen button on xsdl setting
+
+android keyboard and input are two things
+aosp keyboard can replace with hacker's keyboard, it has control keys like ctrl esc and meta etc
+cancel gyroscope in simitation on xsdl setting, use filter juser for styles and fing hover
+
+2. busybox for su
+3. connectbot for terminal, or termux
+4. hacker's keyboard, OTG connect keyboard choose hackers's keyboard layout
+
