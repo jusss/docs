@@ -1,3 +1,9 @@
+git log --format="%H" ALL-THE-ANSWERS-II
+store all the sensitive file's commit id, then 
+do bfg stuff, in case github may want those commit id for block requests
+commit id is everything
+https://github.com/jusss/docs/commit/COMMIT-ID
+---------------------------------
 
 https://rtyley.github.io/bfg-repo-cleaner/
 download bfg.jar from https://repo1.maven.org/maven2/com/madgag/bfg/1.14.0/bfg-1.14.0.jar
