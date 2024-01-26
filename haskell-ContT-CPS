@@ -1,3 +1,17 @@
+CPSed functions always return a Cont r a until the end
+
+what is a callback, it will call then back
+but CPS never return, so it's a tail call not tail callback
+1. functions use a tail call as its last parameter
+2. taill call will call at the end of the function, and the tail call do not come back, the tail call's result is functions's result
+
+in CPS style, functions end with a tail call to an extra parameter instead of returning a value
+
+f p1 p2 \k -> \p3 -> \kk -> \p4 -> \p5 -> \kkk
+
+it will end until no continuation as the last parameter
+
+---------------------------------------
 withFile :: FilePath -> IOMode -> (Handle -> IO r) -> IO r
 
 why withFile need Handle -> IO r, because that withFile can do close file after whatever Handle -> IO r done.
