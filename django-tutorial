@@ -3,6 +3,8 @@ pip3 install django
 1. create project (root)
     django-admin startproject mysite (mkdir mysite; cd mysite; cabal init)
     python manage.py runserver (cabal run mysite)
+    python manage.py runserver 0.0.0.0:3000
+    
 
 2. create application (route)
     python manage.py startapp myblog
@@ -27,7 +29,7 @@ pip3 install django
 
     settings.py
         DEBUG True when develop
-        ALLOWED_HOSTS: domain name
+        ALLOWED_HOSTS: ['*']
         INSTALLED_APPS: [...] add your custom app 'myblog' so it can be visited
         DATABASES: SQLite/PostgreSQL
         LANGUAGE_CODE: 'zh-hans'
@@ -59,7 +61,7 @@ examples:
     iii. vim myblog/views.py
         from django.http import HttpResponse
         def index(request):
-            return HttpResponse("Hello world')
+            return HttpResponse("Hello world")
     iv. vim myblog/urls.py
         from django.urls import path
         from . import views
@@ -254,7 +256,7 @@ def add(request) :
 
 new model or model changed, need run migrate
 clear the database
-1. don't delete _init__.py in the migrations folder
+1. don't delete __init__.py in the migrations folder
 2. rm your_app/migrations/*
 3. rm db.sqlite3
 4. python3 manage.py makemigrations
@@ -268,3 +270,9 @@ or
 author = models.CharField(null=True)
 or
 author = models.CharField(null=True, blank=True)
+
+
+# Get all user name
+python3 manage.py shell
+from django.contrib.auth.models import User
+[user.username for user in User.objects.all()]
