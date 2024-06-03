@@ -1,0 +1,8 @@
+1. disable zram
+sudo adb root
+adb shell
+swapoff /dev/block/zram0
+
+2. change battery performance
+settings -> battery -> battery saver and performance -> quick
+
