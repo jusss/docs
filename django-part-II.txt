@@ -1,4 +1,0 @@
-django is mvc
-view is template.py
-controller is views.py
-
