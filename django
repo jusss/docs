@@ -1,3 +1,7 @@
+django is mvc
+view is template.py
+controller is views.py
+---------------
 remove csrf line in settings.py MIDDLEWARE = [...]
 so you can post with urlencode django when django use post-form 
 r = requests.post('http://robot.huadin.net', data=params, headers=headers)

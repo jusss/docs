@@ -1,0 +1,45 @@
+virtualenv env
+source env/bin/active
+pip3 install django redis mysqlclient
+
+
+------------------------ MySql --------------------------
+
+# Install MySql
+
+apt install mysql-server mysql-client
+it will ask u to set root password
+
+after install, login mysql and create database for django
+mysql -u root -p 
+CREATE DATABASE mysite CHARACTER SET utf8;
+# create test user and password
+CREATE USER 'test'@'localhost' IDENTIFIED BY 'Secret_1234';
+# give all privilege to test user
+GRANT ALL PRIVILEGES ON `mysite` . * TO 'test'@'localhost';
+FLUSH PRIVILEGES;
+exit;
+
+config mysql, if mysql and django are not on the same machine
+vim /etc/mysql/mysql.config.d/mysqld.cnf
+# band-address = localhost
+
+systemctl restart mysql
+
+config in django's settings.py
+DATABASE = {
+    'default':{
+        'ENGINE': 'django.db.backends.mysql', # database engine
+        'NAME': 'mysite', # database name
+        'USER': 'test', # user name for mysql, or 'root'
+        'PASSWORD': 'Secret_1234', # password
+        'HOST': 'localhost', # mysql server ip, or '192.168.1.x'
+        'PORT': '3306', # server port
+        }
+}
+
+# create necessary tables
+python manage.py makemigrations
+python manage.py migrate
+
+------------------------ MySql --------------------------
