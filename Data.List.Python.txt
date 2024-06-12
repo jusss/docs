@@ -1,3 +1,62 @@
+itertools.combination(L,2) any two combination
+permutations(L,3) 
+repeat(10,3)
+sliding_window
+partition
+subslices
+transpose
+chunked
+
+
+----------------------------------------
+https://www.codewars.com/users/John%20Wonders
+
+
+most times or max unique
+
+b = [1,1,1,2,3,5,2,3,6,5]
+
+# max unique
+c=[b[i] for i in range(len(b)-1) if (b[i] not in b[:i]) and (b[i] not in b[i+1:])]
+print(max(c))
+
+# most times
+d={}
+for i,n in zip(range(len(b)),b):
+    if n not in d.keys():
+        d[n]=[i]
+    else:
+        d[n].append(i)
+
+print(d)
+
+r = [(k, len(v)) for k,v in d.items() if len(v) == max(map(len, d.values()))]
+print(r)
+
+# normal 
+b.sort()
+print(b)
+z = [[b[0]]]
+for i in range(len(b)-1):
+    if b[i] == b[i+1]:
+        z[-1].append(b[i])
+    else:
+        z.append([b[i+1]])
+
+print(z)
+
+# most times
+print([z[i] for i, n in zip(range(len(z)), map(len, z)) if n == max(map(len,z))])
+
+print([(k, len(list(g))) for k,g in itertools.groupby(b)])
+
+# max unique
+print(max([i for i in filter(lambda x: len(x) == 1, z)]))
+
+print([k for k, g in itertools.groupby(b) if len(list(g)) == 1][-1])
+
+
+-------------------------------
 
 from functools import reduce
 intersect = lambda xxs: list(reduce(lambda xs, ys: [x for x in xs if x in ys], xxs))
