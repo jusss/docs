@@ -1,0 +1,19 @@
+agent直接调用别人的LLM或dify创建自己的workflow,
+dify需要知识库和工具，
+
+image generator, 16G RAM + 4G VRAM
+voice generator, 8G VRAM
+text generator, 8G RAM + 4G VRAM
+
+3060
+4090 32G RAM 
+
+
+prompt 
+you're a math bot, when user say {{x}},
+you answer x+1.
+
+variable:
+{{x}}
+
+dify + moonshot
