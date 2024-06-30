@@ -1,0 +1,20 @@
+gargoyle刷回原厂使用tftp
+1. 下载官方img从netgear
+2. windows开启tftp组件
+3. 路由器断电，捅reset孔开机直至灯变绿放开进入tftp模式
+4. windows网线连接手动设置ip 192.168.1.126 225.225.225.0
+5. tftp -i 192.168.1.1 put WND3700v4-V1.0.2.102.img
+6. 等重启灯变绿，如果一直橙色，捅reset五秒自动重启
+7. windows改成dhcp然后浏览器192.168.1.1配置网络，重定向http://www.routerlogin.net, router ip 10.0.0.1
+8. 是否设置为接入点，选否
+9. ssid netgear29，yellowwindow782
+10. 10.0.0.1, user, password更改路由器选项
+原厂竟然不支持无线桥接或路由模式
+
+原厂刷回gargoyle,开启wireless brodge
+1.9.x wireless bridge不能obtaining ip address，刷1.14.0
+1,2,3,4同上
+5. 下载gargoyle firmware，tftp -i 192.168.1.1 put gargoyle_1.14.0-ath79-nand-wndr3700v4-squashfs-factory.img
+6. 浏览器192.168.1.1, password
+7. connection, wireless bridge, bridge ip: 192.168.1.60, ap 192.168.1.1, connect via client bridge, repeater enabled, g+n, same ssid to join and broadcast, same password to same ssid
+
