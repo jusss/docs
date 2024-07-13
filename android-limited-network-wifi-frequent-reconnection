@@ -4,3 +4,29 @@ then disable airplane mode, and it will stay
 connected to the wifi
 reason: it seems to prevent auto-connecting to trusted networks if it can't see
 any internet on the network
+
+
+the real reason is when wifi is on, it will visit https://www.google.com/generate_204 to determinate
+if the network has internet
+
+but google.com is not available in some area
+so change it
+
+adb shell settings put global captive_portal_https_url https://www.google.cn/generate_204
+adb shell settings put global captive_portal_http_url http://www.google.cn/generate_204
+adb shell settings put global captive_portal_fallback_url http://g.cn/generate_204
+adb shell settings put global captive_portal_other_fallback_urls http://www.qualcomm.cn/generate_204
+
+you may only need this
+adb shell settings put global captive_portal_https_url https://www.qualcomm.cn/generate_204
+
+or
+adb shell
+settings put global captive_portal_http_url http://connect.rom.miui.com/generate_204
+settings put global captive_portal_https_url https://connect.rom.miui.com/generate_204
+
+or use
+adb shell
+su
+settings get gloabl captive_portal_server
+settings put global captive_portal_server "connectivitycheck.gstatic.com"
