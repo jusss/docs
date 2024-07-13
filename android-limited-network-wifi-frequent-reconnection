@@ -1,0 +1,6 @@
+solution: enable airplane mode then enable wifi,
+open browser to visit a website
+then disable airplane mode, and it will stay 
+connected to the wifi
+reason: it seems to prevent auto-connecting to trusted networks if it can't see
+any internet on the network
