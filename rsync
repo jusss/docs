@@ -1,3 +1,11 @@
+--update will only copy new files and modified time is newer than the source file
+--ignore-existing will skip same files
+
+cd where you want to copy, then use *
+
+rsync -RrvP --update * /path/
+
+--------------------------------
 sudo rsync -RrvP IMG/ /mnt/ # this is like cp -r IMG/ /mnt/
 
 mkstemp function not implemented
