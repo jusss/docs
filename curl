@@ -1,3 +1,10 @@
+login then dowload with cookie
+curl -k -X POST "https://x/login?from=/others" -F 'username=' -F 'password=' -c cookie.txt
+
+curl -k -b cookie.txt https://x/others/copy.tar --output copy.tar
+
+
+---------------------------------------
 cmd | curl -F c=@- https://ptpb.pw/
 
 see: http://ptpb.pw/
