@@ -1,3 +1,48 @@
+docker copy image from one machine to another
+
+docker image ls
+docker save -o copy.watchtower.tar containrrr/watchtower
+docker save -o copy.shadowbox.tar quay.io/outline/shadowbox
+
+then copy to another machine
+docker load -i copy.shadowbox.tar
+docker image ls
+
+wget https://raw.githubusercontent.com/Jigsaw-Code/outline-server/master/src/server_manager/install_scripts/install_server.sh
+mkdir /sys/fs/cgroup/systemd
+mount -t cgroup -o none,name=systemd cgroup /sys/fs/cgroup/systemd
+docker run -itd containrrr/watchtower --cleanup --label-enable --tlsverify
+docker run -itd quay.io/outline/shadowbox:stable
+bash install_server.sh
+this will output a dict like {"apiUrl":..., "sha256":} and it will be stored in /opt/outline/access.txt
+
+add key
+on local
+download Outline-Manager.AppImage not Outline-Client.AppImage from github
+install shadowsocks-qt5
+then run it on client, click "get started"
+copy the dict message from server into it,
+click "add key" then click the key and share it, pull down the share page you'll find
+the ss key address, and copy it to others
+
+Issue
+1. root@Mars:~# docker run -itd containrrr/watchtower                                     
+docker: Error response from daemon: cgroups: cgroup mountpoint does not exist: unknown.
+
+solved:
+mkdir /sys/fs/cgroup/systemd
+mount -t cgroup -o none,name=systemd cgroup /sys/fs/cgroup/systemd
+docker run -itd containrrr/watchtower --cleanup --label-enable --tlsverify
+
+2. docker run -itd outline/shadowbox:latest --cleanup --label-enable --tlsverify
+Unable to find image 'quay.io/outline/shadowbox:latest' locally
+docker: Error response from daemon: manifest for quay.io/outline/shadowbox:latest not found: manifest unknown: manifest unknown.
+
+solved: 
+docker image ls, show that tag is stable
+docker run -itd quay.io/outline/shadowbox:stable
+
+------------------------------
 install outline on server:
 sudo wget -qO- https://raw.githubusercontent.com/Jigsaw-Code/outline-server/master/src/server_manager/install_scripts/install_server.sh | bash
 this will output a dict like {"apiUrl":..., "sha256":} and it will be stored in ~/shadowbox/access.txt
