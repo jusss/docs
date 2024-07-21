@@ -1,3 +1,11 @@
+cabal v2-repl web
+get into repl with all the packages of web
+where web is defined in up-load-files.cabal
+executable web
+ main-is: ...
+ build-depends: ...
+
+-------------------------
 mkdir upload-files
 cd upload-files
 cabal init # with --lib will generate a library, default is execute
