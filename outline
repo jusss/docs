@@ -1,3 +1,7 @@
+stop outline server
+docker stop watchtower
+docker stop shadowbox
+------------------------
 docker copy image from one machine to another
 
 docker image ls
