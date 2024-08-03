@@ -1,3 +1,7 @@
+latest stunnel on debian do not accept TLSv1 anymore
+use TLSv1.2 on server
+sslVersion = TLSv1.2
+-------------------
 stunnel from stunnel.org
 on windows
 
@@ -24,7 +28,7 @@ TIMEOUTidle = 30
 ON SERVER:
 root@rycbar:~# cat /etc/stunnel/stunnel.conf 
 cert = /etc/stunnel/server.pem
-sslVersion = TLSv1
+sslVersion = TLSv1.2
 pid = /stunnel.pid
 socket = l:TCP_NODELAY=1
 socket = r:TCP_NODELAY=1
@@ -64,7 +68,7 @@ PrivateTmp=false
 ON CLIENT
 [john@moon ~]$ cat /etc/stunnel/stunnel.conf
 pid = /tmp/stunnel.pid
-sslVersion = TLSv1
+sslVersion = TLSv1.2
 client = yes
 [ssh]
 accept=1990
