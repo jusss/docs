@@ -1,0 +1,12 @@
+query(D).filter(condition_a, condition_b).all()
+query(D).filter(and_(condition_a, condition_b)).all()
+they're equal, When you pass multiple conditions to filter, 
+SQLAlchemy implicitly combines them using the AND operator.
+there also have _or from sqlalchemy import func, and_, or_ 
+for Complex Logical Combinations
+results = session.query(User).filter(
+    and_(
+        condition_a,
+        or_(condition_b, condition_c)
+    )   
+).all()

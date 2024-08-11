@@ -1,0 +1,29 @@
+flask's model.py for all data model, 
+use 
+flask db upgrade 
+to initial create the tables in database 
+if it's changed
+use 
+flask db migrate
+flask db upgrade
+to update the database
+
+flask db history # for check all the history
+flask db downgrad-id # for downgrad
+
+# docker start
+docker compose -f docker.yaml -p project-name up -d
+
+# docker stop
+docker compose -p project-name down
+
+in docker.yaml, volumes points where the database data to store, so docker won't reset it everytime when docker started
+if you want new data
+rm -rf volumes
+
+curl with authorization in headers
+curl -H "Content-Type: application/json" -H "Authorization: Bearer " -X GET "http"
+
+
+
+

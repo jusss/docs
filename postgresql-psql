@@ -1,0 +1,13 @@
+psql -h localhost -p 5432 -U postgres database-name
+# delete table
+DROP TABLE table-name;
+
+or
+# clean table
+CHUNCATE TABLE table-name;
+
+psql -h localhost -p 5432 -U username database-name # then input password
+UPDATE table-name
+SET column = new-value
+WHERE condition;
+select column from table-name; # check if it's changed

@@ -1,0 +1,8 @@
+from flask import Flask, current_app
+create_new_thread = threading.Thread(target = f, args=(current_app,p1,p2))
+create_new_thread.start()
+create_new_thread.join()
+
+def f(flask_app,p1,p2):
+    with flask_app.app_context():
+        #handle db

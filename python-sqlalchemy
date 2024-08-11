@@ -1,0 +1,22 @@
+sqlalchemy create and update table
+1. create a class and table name
+class AppModel(db.Model):
+    __tablename__ = 'app_model'
+
+    id = db.Column(UUID(as_uuid=False), server_defaut=db.text('uuid_generate_v4()'),primary_key=True)
+    model = db.Column(db.Text)
+2. instaniate it
+#ADD data
+app_model = AppModel(model = "test")
+from flask_sqlalchemy import SQLAlchemy
+db = SQLAlchemy()
+db.session.add(app_model)
+db.session.flush()
+db.session.commit()
+#REPLACE data
+updateFileds = {AppModel.model: "new test"}
+db.session.query(AppModel).
+.filter(AppModel.id ==).update(updateFileds)
+db.session.commit()
+
+

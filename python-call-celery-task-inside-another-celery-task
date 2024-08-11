@@ -1,0 +1,31 @@
+call celery task B inside celery task A, shouldn't use while True to block inside task A for
+task B's state, it always be pending, pass cps to task B's delay
+
+1. celery.py
+imports = ["my_task"]
+beat_schedule ={ "my_task":{ "task": "my_task.py", "schedule": crontab(hour='19',minute='36')}}
+
+2. my_task.py
+redis_conn = redis.StrictRedis(host='localhost', port=6379, password='', decode_responses=True)
+redis_conn.delete('chat_summary_bot')
+redis_set = lambda k, v: redis_conn.hset('chat_summary_bot', k, v)
+redis_get = lambda k: ast.literal_eval(redis_conn.hget('chat_summary_bot', k))
+redis_get_keys = lambda: redis_conn.hkeys('chat_summary_bot')
+from another_celery_task import get_summary
+@app.celery.task(queue='generation')
+def my_task():
+for a,b,c in app_users:
+    redis_set(f"{a},{b},{c}", -1)
+    get_summary.delay(a,b,c)
+
+3. another_celery_task.py
+@shared_task(queue='mail')
+def get_summary(a,b,c):
+    from my_task import redis_set, redis_get, redis_get_keys
+    redis_set(f"{app_id},{user_id},{user_type}", cost)
+    if -1 in [redis_get(k) for k in redis_get_keys()]:
+        pass
+    else:
+        big_tasks = [k for k in redis_get_keys() if redis_get(k) > time_limit_per_task]
+        print(big_tasks)
+

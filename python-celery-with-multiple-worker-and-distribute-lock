@@ -1,0 +1,4 @@
+celery -A proj worker --loglevel=INFO --concurrency=2
+with redis_conn.lock('count_lock'):
+    count = ast.literal_eval(redis_conn.get("_count"))
+    redis_conn.set("_count", count-1)

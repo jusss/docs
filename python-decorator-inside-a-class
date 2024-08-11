@@ -1,0 +1,36 @@
+scheduler = APScheduler()
+@scheduler.task()
+def f():
+
+what if scheduler is instantiate inside a class
+class A:
+    def __init__(self):
+        self.scheduler = APScheduler()
+
+    @self.scheduler.task()
+    def f(self):
+
+how to use scheduler.task decorator?
+
+use staticmethod
+class A:
+    @staticmethod
+    @scheduler.task()
+    def f():
+
+A.f()
+
+
+
+one way is just don't use decorator,
+use self.scheduler.task()(f) to do function call
+
+another way is 
+    def task(self):
+        def d(func):
+            job = self.scheduler.task()
+            return job
+        return d
+
+    @task(self)
+    def f():

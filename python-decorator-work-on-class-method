@@ -1,0 +1,14 @@
+since class method all have self parameter
+and decorator couldn't handle self parameter
+use staticmethod to avoid self
+
+class A:
+    def g(self, a, b):
+        A.f(a,b)
+        or self.f(a,b)
+        
+    @staticmethod
+    @other_decorator
+    def f(a,b):
+        pass
+

@@ -1,0 +1,7 @@
+[for if ]
+[if else for ]
+for :
+    if :
+        if else
+[if else for if]
+print([ c if c == 3 else 9 for c in [1,2,3,4] if 3 == 4])

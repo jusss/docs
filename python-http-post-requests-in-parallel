@@ -1,0 +1,98 @@
+#1. threading
+import requests
+from concurrent.futures import ThreadPoolExecutor, as_completed
+def send_post_request(item):
+    response = requests.post(url, json=item)
+    return response
+
+items = [
+    {"data": "item1"},
+    {"data": "item2"},
+    {"data": "item3"},
+    {"data": "item4"},
+    {"data": "item5"}
+]
+
+with ThreadPoolExecutor(max_workers=5) as executor:
+   # Submit all the tasks
+   futures = [executor.submit(send_post_request, item) for item in items]
+   
+   # Process the results as they complete
+   for future in as_completed(futures):
+       try:
+           response = future.result()
+           print(f"Response: {response.status_code}, Content: {response.content}")
+       except Exception as e:
+           print(f"Request generated an exception: {e}")
+
+
+#2. asyncio with aiohttp
+import asyncio
+import aiohttp
+
+# Define the URL to which the POST requests will be sent
+url = "https://example.com/api"
+
+# Define the list of items to be sent in the POST requests
+items = [
+    {"data": "item1"},
+    {"data": "item2"},
+]
+
+# Asynchronous function to send a POST request and handle streaming response
+async def send_post_request(session, item):
+    async with session.post(url, json=item) as response:
+        if response.status == 200:
+            async for line in response.content:
+                print(f"Received line: {line.decode('utf-8')}")
+        else:
+            print(f"Request failed with status: {response.status}")
+        return response.status  # Return the status code
+
+# Asynchronous function to handle multiple POST requests concurrently
+async def main():
+    async with aiohttp.ClientSession() as session:
+        tasks = [send_post_request(session, item) for item in items]
+        results = await asyncio.gather(*tasks)
+        print(f"Results: {results}")
+        return results
+
+# Run the main function
+if __name__ == "__main__":
+    asyncio.run(main())
+
+
+#3. celery async task with redis
+call celery task inside another celery task
+call celery task B inside celery task A, shouldn't use while True to block inside task A for
+task B's state, it always be pending, pass cps to task B's delay
+
+1. celery.py
+imports = ["my_task"]
+beat_schedule ={ "my_task":{ "task": "my_task.py", "schedule": crontab(hour='19',minute='36')}}
+
+2. my_task.py
+redis_conn = redis.StrictRedis(host='localhost', port=6379, password='', decode_responses=True)
+redis_conn.delete('chat_summary_bot')
+redis_set = lambda k, v: redis_conn.hset('chat_summary_bot', k, v)
+redis_get = lambda k: ast.literal_eval(redis_conn.hget('chat_summary_bot', k))
+redis_get_keys = lambda: redis_conn.hkeys('chat_summary_bot')
+from another_celery_task import get_summary
+@app.celery.task(queue='generation')
+def my_task():
+for a,b,c in app_users:
+    redis_set(f"{a},{b},{c}", -1)
+    get_summary.delay(a,b,c)
+
+3. another_celery_task.py
+@shared_task(queue='mail')
+def get_summary(a,b,c):
+    from my_task import redis_set, redis_get, redis_get_keys
+		requests.post(a,b,c)
+    redis_set(f"{app_id},{user_id},{user_type}", cost)
+    if -1 in [redis_get(k) for k in redis_get_keys()]:
+        pass
+    else:
+        big_tasks = [k for k in redis_get_keys() if redis_get(k) > time_limit_per_task]
+        print(big_tasks)
+

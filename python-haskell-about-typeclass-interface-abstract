@@ -1,0 +1,34 @@
+a before, after perspective view
+android:
+    f( x: abstract class):
+        x.g()
+
+this f is write before x is implemented
+f expect future behavior
+
+so x must inherite abstract class and implement abstract method g
+so x.g() can be called
+
+and different object inherite one abstract class with implement different behavior in one function
+it produce different result, and they all can be called by one same f,
+
+all the instance (type, class) of abstract class(typeclass) have same urge to do some same things
+like living creature all have eat
+living creature is an abstract class, animal and human are instance of living creature
+
+f :: Monad m => m a -> ...
+very like android's f(x: abstract class):
+x has abstract method g, and monad has bind, ap, and map
+
+oo, interface, instance has abstract method implement,
+fp, typeclass, type has function implement when it's an instance of a typeclass
+
+'cause they have same behavior, eat, so abstract them as one class
+the point is find out the same behavior
+
+this is called parametric polymorphism, different parameter have different result
+and also called adhoc polymorphism, parameter is type constraint, only special type
+
+1. find same behavior, abstract a class
+2. find that polymorphism f which handle the same behavior g
+3. implement instance of abstract class, pass them to f as parameter, so they can call g inside f

@@ -1,0 +1,20 @@
+notify/email.py
+class Email(object):
+    def send(self, content):
+        ...
+
+notify/init.py
+"from module"
+module = importlib.import_module("notify.email")
+cls = getattr(module, "Email")
+obj = cls()
+obj.send(content)
+
+"from file path"
+file = "notify/email.py"
+module_name = "email"
+spec = importlib.util.spec_from_file_location(module_name, file)
+module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+m = module.Email()
+m.send(content)

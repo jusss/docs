@@ -1,0 +1,58 @@
+openai function calling, let ai decide if it wants to call your function,
+by checking the ai response if it contains 'function_call' in response['choices'][0]['message']
+1. send user query and function description to openai
+2. if openai response contain function call and its parameter,
+   then call the python function you defined on local with parameter to get result,
+   openai do not care your local function even its not a function, it only needs the result
+3. optional, use openai create response which contain the result
+
+send the user query with function description
+
+import openai
+openai.api_key = 'your-api-key'
+
+def get_weather(location):
+    return requests.post(...)
+
+response = openai.ChatCompletion.create(
+  model="gpt-4",
+  messages=[
+    {"role": "user", "content": "What's the weather like in New York?"}
+  ],  
+  functions=[
+    {   
+      "name": "get_weather",
+      "description": "Get the current weather for a given location",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "location": {
+            "type": "string",
+            "description": "The location to get the weather for"
+          }
+        },
+        "required": ["location"]
+      }
+    }
+  ]
+)
+
+print(response)
+
+# do or do not function call by ai response
+if 'function_call' in response['choices'][0]['message']:
+    function_call = response['choices'][0]['message']['function_call']
+    if function_call['name'] == 'get_weather':
+        location = function_call['arguments']['location']
+        # Call your weather API or function here
+        weather_info = get_weather(location)
+        # Return the result to the model
+        response = openai.ChatCompletion.create(
+          model="gpt-4",
+          messages=[
+            {"role": "user", "content": "What's the weather like in New York?"},
+            {"role": "assistant", "content": f"The current weather in {location} is {weather_info}."}
+          ]
+        )
+        print(response)
+

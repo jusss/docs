@@ -1,0 +1,19 @@
+1. when some files change on local, and you need to git pull to sync other files
+git stash save "save some files"
+git pull
+git stash pop
+
+git stash list # list stash store
+git stash show # show changes, git stash show stash@{1} for the second stash
+git stash apply # apply but do not remove from stash list
+git stash pop # apply and delete
+git stash drop stash@{0} # drop the first stash item
+git stash clear # clean all cache
+
+2. new files won't be stash, you need git add them first, then stash
+git add new-file
+git stash save "new-file"
+git checkout other-branch
+git checkout ... # get back
+git stash pop
+git reset HEAD new-file # undo git add, use 'git reset HEAD' undo all git add files

@@ -1,0 +1,11 @@
+a.py
+from b import g
+def f
+
+b.py
+from a import f
+def g
+
+import them inside def, not top
+def f():
+  from b import g

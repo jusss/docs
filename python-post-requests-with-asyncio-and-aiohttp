@@ -1,0 +1,61 @@
+python doesn't have something like kotlin's coroutineScope.launch { }
+python doesn't support async block just like kotlin's
+
+asyncio is designed to work with non-blocking I/O operations.
+If you have a blocking function, it can block the event loop and negate the benefits of asynchronous programming.
+async def f():
+    request.post()
+if blocking created by you then use await asyncio.sleep(1) to yield control to other coroutine
+like
+async def f():
+    while True:
+        await asyncio.sleep(1)
+
+use await loop.run_in_executor to handle blocking function
+async def async_wrapper(x):
+    loop = asyncio.get_running_loop()
+    result = await loop.run_in_executor(None, blocking_function, x)
+    return result
+async def main():
+    tasks = [async_wrapper(i) for i in range(5)]
+    results = await asyncio.gather(*tasks)
+    print(f"Results: {results}")
+
+# Run the main function
+if __name__ == "__main__":
+    asyncio.run(main())
+
+you can use asyncio with aiohttp for post requests
+import asyncio
+import aiohttp
+
+# Define the URL to which the POST requests will be sent
+url = "https://example.com/api"
+
+# Define the list of items to be sent in the POST requests
+items = [
+    {"data": "item1"},
+    {"data": "item2"},
+]
+
+# Asynchronous function to send a POST request and handle streaming response
+async def send_post_request(session, item):
+    async with session.post(url, json=item) as response:
+        if response.status == 200:
+            async for line in response.content:
+                print(f"Received line: {line.decode('utf-8')}")
+        else:
+            print(f"Request failed with status: {response.status}")
+        return response.status  # Return the status code
+
+# Asynchronous function to handle multiple POST requests concurrently
+async def main():
+    async with aiohttp.ClientSession() as session:
+        tasks = [send_post_request(session, item) for item in items]
+        results = await asyncio.gather(*tasks)
+        print(f"Results: {results}")
+        return results
+
+# Run the main function
+if __name__ == "__main__":
+    asyncio.run(main())

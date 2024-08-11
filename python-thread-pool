@@ -1,0 +1,31 @@
+with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+    futures = []
+    for i in range(size):
+        futures.append(executor.submite(f, current_app, p1, p2))
+    for future in futures:
+        g(future.result())
+import requests
+from concurrent.futures import ThreadPoolExecutor, as_completed
+def send_post_request(item):
+    response = requests.post(url, json=item)
+    return response
+
+items = [
+    {"data": "item1"},
+    {"data": "item2"},
+    {"data": "item3"},
+    {"data": "item4"},
+    {"data": "item5"}
+]
+
+with ThreadPoolExecutor(max_workers=5) as executor:
+   # Submit all the tasks
+   futures = [executor.submit(send_post_request, item) for item in items]
+   
+   # Process the results as they complete
+   for future in as_completed(futures):
+       try:
+           response = future.result()
+           print(f"Response: {response.status_code}, Content: {response.content}")
+       except Exception as e:
+           print(f"Request generated an exception: {e}")

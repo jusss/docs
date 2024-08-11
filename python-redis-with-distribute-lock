@@ -1,0 +1,5 @@
+# release lock in 20s, another thread should use same lock name and variable
+with redis_conn.lock('count_lock', timeout=20):
+    count = ast.literal_eval(redis_conn.get("_count"))
+    redis_conn.set("_count", count-1)
+    redis_conn.set("_count", count-1, ex=3600) # _count will be nil in 3600s

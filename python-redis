@@ -1,0 +1,18 @@
+redis tool
+brew install --cask another-redis-desktop-manager
+
+redis
+import redis, ast
+redis_conn = redis.StrictRedis(host='localhost', port=6379, password='', decode_responses=True)
+redis_conn.delete('chat_summary_bot')
+redis_set = lambda k, v: redis_conn.hset('chat_summary_bot', k, v)
+#redis_get = lambda k: redis_conn.hget('chat_summary_bot', k)
+redis_get = lambda k: ast.literal_eval(redis_conn.hget('chat_summary_bot', k))
+redis_get_keys = lambda: redis_conn.hkeys('chat_summary_bot')
+
+redis_set('a',-1)
+redis_get('a') == '-1'
+hget do not return int value, only str
+
+so if you want to use int, then int(redis_get('a'))
+or use ast.literal_eval

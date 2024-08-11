@@ -1,0 +1,5 @@
+db:
+ images: postgres
+ environment:
+    TZ:"GMT+8"
+    PGTZ: "GMT+8"

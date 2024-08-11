@@ -1,0 +1,5 @@
+use tuple to express failed status rather than add special prefix with string
+return 0, string
+not
+return "failed_" + string
+

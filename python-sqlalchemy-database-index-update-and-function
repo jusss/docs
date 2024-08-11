@@ -1,0 +1,18 @@
+add column app_id and user_id into indexing
+class Data(db.Model):
+    __tablename__ = 'table'
+    __table_args__ = (
+        db.PrimaryKeyConstraint('id', name='table_pkey'),
+        db.Index('table_idx', 'app_id', 'user_id'),
+        )
+    id = db.Column(UUID(as_uuid=False), nullable=False, server_default=db.text('uuid_generate_v4()'), primary_key=True)
+    app_id = db.Column(UUID(as_uuid=False), nullable=False)
+    user_id = db.Column(UUID(as_uuid=False), nullable=True)
+    @property
+    def f(self):
+        return self.app_id
+d = db.session.query(Data).filter(Data.app_id == x).first()
+d.user_id = new_user_id
+db.session.commit()
+it will update the table in the database,
+another way is using .update({Data.user_id: new_user_id})

@@ -1,0 +1,22 @@
+there're two tables A and B, A contain keyword "id" and "color",
+B contain keyword "id" and "user", how to filter table A with
+B's keyword "user" without foreign key?
+
+
+
+db.session.query(A).select_from(A).join(B, B.id == A.id).filter(B.user == ?).order_by(A.id.desc()).all()
+
+
+
+
+
+
+
+_b = db.session.query(B).filter(B.user == "name").first()
+db.session.query(A).filter(A.id == _b.id)
+db.session.query(A).select_from(A).join(B, A.id == B.id).filter(B.user == "name").order_by(A.id.desc()).all()
+
+filters = [B.user.like("name")]
+db.session.query(A).select_from(A).join(B, A.id == B.id).filter(B.user == "name").order_by(A.id.desc()).all()
+db.session.query(A).select_from(A).join(B, A.id == B.id).filter(*filters).order_by(A.id.desc()).all()
+

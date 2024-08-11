@@ -1,0 +1,28 @@
+1. app.py
+from extensions import ext_celery
+app=create_app()
+ext_celery.init_app(app)
+celery = app.extensions["celery"]
+
+2. extensions/ext_celery.py
+def init_app(app) -> Celery:
+
+    imports = [
+        "schedule.generate_chat_summary_task",
+    ]
+
+ beat_schedule = {
+   'generate_chat_summary_task':{
+     'task': 'schedule.generate_chat_summary_task.generate_chat_summary_task',
+     'schedule': timedelta(days=1),
+   }
+ }
+
+3. schedule/generate_chat_summary_task.py
+@app.celery.task(queue='generation')
+def generate_chat_summary_task():
+    ...
+
+4. celery -A app.celery worker -P gevent -c 1 --loglevel INFO -Q dataset,generation,mail
+
+5. celery -A app.celery beat --loglevel INFO

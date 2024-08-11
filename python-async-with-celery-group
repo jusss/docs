@@ -1,0 +1,22 @@
+1. Celery(
+    ...
+    task_ignore_result=False,
+    # if you set it True, you can set it False on specific task
+    )
+2. a.py
+@shared_task(ignore_result=False,queue='generation') # ignore_result must be first parameter
+def f()
+
+3. b.py
+from a import f
+from celery import group
+task_group = group(f.s(i) for i in range(10))
+# group_result = task_group.apply_async(ignore_result=False) won't work
+# refere https://github.com/celery/celery/issues/5398
+group_result = task_group.apply_async()
+result = group_result.get()
+
+4. flask run --host 0.0.0.0 --port=5001 --debug
+5. celery -A app.celery worker -P gevent -c 6 --loglevel INFO -Q dataset,generation,mail
+-c 6 is --concurrency=6 make 6 workers
+6. celery -A app.celery beat --loglevel INFO

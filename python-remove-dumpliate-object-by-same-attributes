@@ -1,0 +1,30 @@
+class A:
+    def __init__(self,a,b,c):
+        self.app_id = a
+        self.user_id = b
+        self.con_id = c
+
+a1 = A(1,2,3)
+a2 = A(2,3,4)
+a3 = A(1,3,2)
+
+# get_attrs = lambda obj,*atts: (getattr(obj,att) for att in atts)
+# will return a generator, 'cause () equal to without ()
+# use list comprehension will return a list
+get_attrs = lambda obj, *atts: [getattr(obj,att) for att in atts]
+
+# print(get_attrs(a1,"app_id","user_id"))
+
+alist = [a1, a2, a3]
+
+def remove_dumplicate(t, *keys):
+    r = [t[i] for i in range(len(t)-1) if get_attrs(t[i], *keys)\
+            not in map(lambda x: get_attrs(x, *keys), t[i+1:])]
+    r.append(t[-1])
+    return r
+
+# remove the dumplicate app_id object
+res = remove_dumplicate(alist, "app_id")
+
+for i in res:
+    print(i.con_id)

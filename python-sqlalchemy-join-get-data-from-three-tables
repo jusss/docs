@@ -1,0 +1,94 @@
+when you have three tables
+
+TaskItem          UserTask
+TaskItem   Task   UserTask
+TaskItem          UserTask
+
+multiple TaskItem.id related to one Task.id and then related to multiple UserTask.id
+
+results = (
+    db.session.query(TaskItem, Task, UserTask)
+    .join(Task, TaskItem.task_id == Task.id)
+    .join(UserTask,
+        (TaskItem.id == UserTask.task_item_id) &
+        (Task.id == UserTask.task_id))
+    .filter(TaskItem.status == 0)
+    .order_by(TaskItem.id)
+    .all()
+)
+
+for item, task, user in results:
+    print(item.id, end=' ')
+    print(task.id, end=' ')
+    print(user.id)
+
+it will make multiple same Task to match multiple TaskItem and UserTask
+
+
+in python with sqlalchemy, when Table A's primary key show multiple times in Table B, join Table A and Table B by A's primary key, what would happen
+
+When you join two tables in SQLAlchemy (or in SQL in general), and the primary key from Table A appears multiple times in Table B, the result will be a Cartesian product of the matching rows. This means that for each row in Table A, you will get multiple rows in the result set if there are multiple matching rows in Table B.
+
+Let's illustrate this with an example. Suppose you have two tables, TableA and TableB, defined as follows:
+
+Python
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship, sessionmaker
+
+Base = declarative_base()
+
+class TableA(Base):
+__tablename__ = 'table_a'
+id = Column(Integer, primary_key=True)
+name = Column(String)
+
+class TableB(Base):
+__tablename__ = 'table_b'
+id = Column(Integer, primary_key=True)
+table_a_id = Column(Integer, ForeignKey('table_a.id'))
+description = Column(String)
+
+table_a = relationship("TableA", back_populates="table_bs")
+
+TableA.table_bs = relationship("TableB", order_by=TableB.id, back_populates="table_a")
+
+# Create an SQLite database in memory
+engine = create_engine('sqlite:///:memory:')
+Base.metadata.create_all(engine)
+
+Session = sessionmaker(bind=engine)
+session = Session()
+
+# Insert sample data
+table_a1 = TableA(name='A1')
+table_a2 = TableA(name='A2')
+session.add_all([table_a1, table_a2])
+session.commit()
+
+table_b1 = TableB(table_a_id=table_a1.id, description='B1')
+table_b2 = TableB(table_a_id=table_a1.id, description='B2')
+table_b3 = TableB(table_a_id=table_a2.id, description='B3')
+session.add_all([table_b1, table_b2, table_b3])
+session.commit()
+In this setup, TableA has two rows, and TableB has three rows, with two of them referencing the same primary key from TableA.
+
+Now, let's perform a join between TableA and TableB:
+
+Python
+from sqlalchemy.orm import aliased
+
+# Perform the join
+results = session.query(TableA, TableB).join(TableB, TableA.id == TableB.table_a_id).all()
+
+for a, b in results:
+print(f"TableA: {a.name}, TableB: {b.description}")
+The output will be:
+
+TableA: A1, TableB: B1
+TableA: A1, TableB: B2
+TableA: A2, TableB: B3
+As you can see, the row from TableA with id=1 (name 'A1') is joined with both rows from TableB that have table_a_id=1 (descriptions 'B1' and 'B2'). The row from TableA with id=2 (name 'A2') is joined with the row from TableB that has table_a_id=2 (description 'B3').
+
+In summary, when you join TableA and TableB by TableA's primary key, and TableA's primary key appears multiple times in TableB, the result will include multiple rows for each matching primary key, reflecting the one-to-many relationship.
+

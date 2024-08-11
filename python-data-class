@@ -1,0 +1,9 @@
+class Model:
+    config: Config
+    instance: ModelProvider
+    model_type: AIModel
+
+    class Insider:
+        type_allowed = True
+
+data = Model(config="a", instance="b", model_type="c")

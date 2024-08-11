@@ -1,0 +1,6 @@
+db.session.query(App).filter(
+    and_(
+        App.user_id == 2,
+        App.user_type == "normal"
+        )
+).update({App.version: "new version"})

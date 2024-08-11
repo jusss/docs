@@ -1,0 +1,3 @@
+app=Celery()
+app.conf.enable_utc = False
+app.conf.timezone = "Asia/Calcutta" #change to your timezone

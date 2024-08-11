@@ -1,0 +1,29 @@
+1. enter app.py
+from p0 import bp as _bp
+app.register_blueprint(_bp)
+
+2. p0/__init__.py
+bp = Blueprint('_',__name__,url_prefix='/p0')
+from .p1 import p2
+
+3. p0/p1/p2.py
+from flask import request, jsonify
+from flask_restful import Resource
+class RESTFul(Resource):  
+    def post(self):
+        # use request.headers.get('Content-Type') get header key-value
+        parser = reqparse.RequestParser()
+        # data in requests.post
+        parser.add_argument('key', type=str, required=True, location='json')
+        args = parser.parse_args()
+        args['key']
+        return jsonify(x) # use jsonify instead of json.dumps
+                                                       
+    def get(self):                                     
+                                                       
+class RESTFul(Resource):                               
+    def post(self,app_id):                             
+    def get(self,app_id):                              
+                                                       
+api.add_resource(RESTFul,'/p1/p2')                     
+api.add_resource(RESTFul2,'/p1/<uuid:app_id>/p2')      

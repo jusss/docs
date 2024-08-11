@@ -1,0 +1,17 @@
+1. commands.py
+import click
+@click.command("custom-command")
+@click.option("--param")
+def f(param):
+    doSomething
+
+def register_commands(app):
+    app.cli.add_command(f)
+
+2. app.py
+from commands import register_commands
+app = Flask(__name__)
+register_commands(app)
+
+after add this function, flask will auto re-run,
+you can use `flask f param`

@@ -1,0 +1,26 @@
+1. coroutine.py
+from flask_apscheduler import APScheduler
+from extensions.ext_database import db
+from models.model import Message
+import requests, json, pandas
+class Coroutine:
+    def __init__(self, app):
+        self.scheduler = APScheduler()
+        self.scheduler.api_enabled = True
+        self.scheduler.init_app(app)
+        self.conversation_id = 'x'
+        self.scheduler.task('interval',id="my_job",seconds=60)(self._chat_summary)
+        self.scheduler.task(id="summary", trigger=CronTrigger.from_crontab("0 0 * * *"))(lambda: self.chat_summary(self.scheduler))
+        self.scheduler.task(id="summary", trigger=CronTrigger.from_crontab("0 0 * * *"))(lambda: self.chat_summary(self.scheduler))
+        self.scheduler.start()
+
+    def _chat_summary(self):
+        self.chat_summary(self.scheduler,self.conversation_id)
+    def chat_summary(self, scheduler, conversation_id):
+        with scheduler.app.app_context():
+            doSomething
+
+2. app.py
+app = Flask(__name__)
+from coroutine import  Coroutine
+coroutine = Coroutine(app)
