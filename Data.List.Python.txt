@@ -1,3 +1,48 @@
+let's assume there are three different type data in one database table
+they all contain id, parent_id, type columns,
+a's type is 1, b's type is 2, and c's type is 3
+c's parent_id is b's id, b's parent_id is a's id
+now get the data like [{a1:[{b1:[c1,c2]},{b2:[c3,c4]}], {a2:...}]
+
+# fmap = lambda f: lambda alist: list(map(f, alist))
+# filter_ = lambda f: lambda alist: list(filter(f, alist))
+
+map = lambda f: lambda alist: [ f(x) for x in alist ]
+filter = lambda f: lambda alist: [ x for x in alist if f(x) ]
+compose = lambda f, g: lambda x: f(g(x))
+(fmap . fmap) (+1) [[1,2]] == [[2,3]]
+compose(map, map)(lambda x: x+1)([[1,2]])
+
+map = lambda *args: [args[0](x) for x in args[1]] if len(args) == 2 else lambda x: map(args[0], x)
+filter = lambda *args: [x for x in args[1] if args[0](x)] if len(args) == 2 else lambda x: filter(args[0], x)
+
+data = Table.query.all()
+As = filter(lambda a: a.type == 1, data) # [a,b]
+Bs = map(lambda a: filter(lambda b: (b.parent_id == a.id) and (b.type == 2), data), As) # [[a],[b]]
+# fmap (fmap f ) x, unwrap [], fmap (fmap (+1)) [[1,2,3],[4,5,6]], 
+Cs = map(lambda bs: map(lambda b: filter(lambda c: (c.parent_id == b.id) and (c.type == 3), data), bs), Bs) # [[[a]],[[b]]]
+# Cs = compse(map,map)(lambda b: filter(lambda c: (c.parent_id == b.id) and (c.type == 3), data))(Bs)
+
+result = []
+
+for a, bs, css in zip(As, Bs, Cs):
+    result.append(
+        {a: [
+             {bs[i]: css[i]} 
+             for i in range(len(bs))
+            ]
+        }
+    )
+
+
+
+                 a1
+               /   \
+              b1    b2
+            /  \   /  \
+           c1  c2 c3  c4
+
+------------------------------------
 itertools.combination(L,2) any two combination
 permutations(L,3) 
 repeat(10,3)
