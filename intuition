@@ -3,6 +3,17 @@ fmap (fmap f) [[1,2],[3]]
 (fmap . fmap) f [[1,2],[3]]
 (fmap . fmap .fmap) f [[[1,2],[3]],[[5]]]
 
+
+fmap lift f into Functor []
+one list 
+fmap (f . g) == (fmap f) . (fmap g)
+
+nested list
+(fmap . fmap) f == fmap (fmap f)
+
+# https://stackoverflow.com/questions/2395697/what-is-lifting-in-haskell
+
+
 fmap to unwrap one list
 fmap . fmap to unwrap two level nested list
 one more wrapped list, one more fmap compose to unwrap
