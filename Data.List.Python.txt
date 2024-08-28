@@ -1,3 +1,19 @@
+find substring in string
+
+sub = "for"
+words = " of the people, for the people, by the people"
+
+p = [ i for i in range(len(words) - len(sub)) if sub[0] == words[i] and sub[1] == words[i+1] and sub[2] == words[i+2] ]
+print(p)
+
+p = [ i for i in range(len(words) - len(sub)) if all(sub[z] == words[i+z] for z in range(len(sub))) ]
+print(p)
+
+find_string_in_string = lambda sub, words: [ i for i in range(len(words) - len(sub)) if all(sub[z] == words[i+z] for z in range(len(sub))) ]
+
+print(find_string_in_string("e", words))
+
+---------------------------------------------------------------------
 let's assume there are three different type data in one database table
 they all contain id, parent_id, type columns,
 a's type is 1, b's type is 2, and c's type is 3
