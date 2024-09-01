@@ -117,3 +117,91 @@ print(p)
 find_string_in_string = lambda sub, words: [ i for i in range(len(words) - len(sub)) if all(sub[z] == words[i+z] for z in range(len(sub))) ]
 
 print(find_string_in_string("e", words)) 
+
+
+
+
+
+THREE TABLE
+
+let's assume there are three related tables in one database
+
+                  Task
+               /       \
+           TaskRunner  TaskRunner
+           /        \                  
+TaskRunnerItem TaskRunnerItem
+
+data = (db.session.query(TaskRunnerItem, TaskRunner, Task)
+        .join(TaskRunner, TaskRunnerItem.runner_task_id == TaskRunner.id)
+        .join(Task, TaskRunner.task_id == Task.id)
+        .all())
+
+result: dict[(Task, TaskRunner), [TaskRunnerItem]] = defaultdict(list)
+for task_runner_item, task_runner, task in data:
+    result[(task, task_runner)].append(task_runner_item)
+
+messages = []
+for k, v in result.items():
+    creator_id = k[0].creator_id,
+    runner_user_id = k[1].runner_user_id,
+    messages.append(
+        TaskStatistics(
+            task_id=k[0].id,
+            task_name=k[0].task_name,
+            creator_id=k[0].creator_id,
+            creator_name=db.session.query(Account).filter(Account.id == creator_id).first().name,
+            runner_id=k[1].id,
+            runner_name=db.session.query(Account).filter(Account.id == runner_user_id).first().name,
+            total_num=len(v),
+            finished_num=len(list(filter(lambda x: x.status == TaskRunnerItemStatus.COMPLETED.value, v))),
+            date=f'{datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S %Z")}',
+        )
+    )
+
+---------------------------------------------------------------------
+let's assume there are three different type data in one database table
+they all contain id, parent_id, type columns,
+a's type is 1, b's type is 2, and c's type is 3
+c's parent_id is b's id, b's parent_id is a's id
+now get the data like [{a1:[{b1:[c1,c2]},{b2:[c3,c4]}], {a2:...}]
+
+# fmap = lambda f: lambda alist: list(map(f, alist))
+# filter_ = lambda f: lambda alist: list(filter(f, alist))
+
+map = lambda f: lambda alist: [ f(x) for x in alist ]
+filter = lambda f: lambda alist: [ x for x in alist if f(x) ]
+compose = lambda f, g: lambda x: f(g(x))
+(fmap . fmap) (+1) [[1,2]] == [[2,3]]
+compose(map, map)(lambda x: x+1)([[1,2]])
+
+map = lambda *args: [args[0](x) for x in args[1]] if len(args) == 2 else lambda x: map(args[0], x)
+filter = lambda *args: [x for x in args[1] if args[0](x)] if len(args) == 2 else lambda x: filter(args[0], x)
+
+data = Table.query.all()
+As = filter(lambda a: a.type == 1, data) # [a,b]
+Bs = map(lambda a: filter(lambda b: (b.parent_id == a.id) and (b.type == 2), data), As) # [[a],[b]]
+# fmap (fmap f ) x, unwrap [], fmap (fmap (+1)) [[1,2,3],[4,5,6]], 
+Cs = map(lambda bs: map(lambda b: filter(lambda c: (c.parent_id == b.id) and (c.type == 3), data), bs), Bs) # [[[a]],[[b]]]
+# Cs = compse(map,map)(lambda b: filter(lambda c: (c.parent_id == b.id) and (c.type == 3), data))(Bs)
+
+result = []
+
+for a, bs, css in zip(As, Bs, Cs):
+    result.append(
+        {a: [
+             {bs[i]: css[i]} 
+             for i in range(len(bs))
+            ]
+        }
+    )
+
+
+
+                 a1
+               /   \
+              b1    b2
+            /  \   /  \
+           c1  c2 c3  c4
+
+
