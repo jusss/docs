@@ -1,0 +1,10 @@
+compiled language like haskell do not has eval function
+
+only interpreted languages have eval function, like js, ruby, python and scheme
+
+eval would have to compile the given code live at runtime, you'd need to have a copy
+of GHC in your executable
+
+people would object to having GHC in their programs at all times,
+if only because GHC is > 2GB
+

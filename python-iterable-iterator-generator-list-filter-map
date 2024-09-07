@@ -1,0 +1,25 @@
+there're three objects, iterable object, iterator object, and generator object
+they all can have for loop to iterate
+but iterable object like list, it can iterate multiple times
+a = [1,2,3]
+for i in a
+    print(i)
+
+for i in a
+    print(i)
+
+iterable object a can do a lot times,
+
+but iterator object like filter, and generator object, they only iterate once,
+
+b = filter(lambda x: x, [1,2,3])
+for i in b:
+    print(i)
+after this for loop, b become empty list []
+so does generator,
+
+generator object is created by yield, iterator and generator object only iterate once by for
+
+
+
+
