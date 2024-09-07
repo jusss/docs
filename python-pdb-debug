@@ -1,0 +1,33 @@
+python 3.7 use built-in breakpoint() to instead of import pdb; pdb.set_trace()
+
+p print
+pp pretty-print
+c for continue untile breakpoint is encountered
+n continue execution until next line is reached
+s step, execute the current line stop at the first possible occasion
+locals show all local variables
+b list all breaks
+w print stack trace
+h help
+q quit
+ll list the whole source code for current function
+
+env PYTHONBREAKPINT=0 python3 a.py # ignore all breakpoint, or comment out breakpoint()
+python3 -m pdb a.py # without insert breakpoint to debug
+
+ll list whole souce code
+n next
+s step
+b break
+c contine
+locals()
+
+
+python3 -m pdb a.py
+ll 
+b 387
+b 395
+c
+n
+n
+

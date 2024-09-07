@@ -1,0 +1,49 @@
+import re
+
+* zero or more of the preceding group
++ one or more of the preceding group
+. any character, except newline
+| for mutiple expressions, ;|, mean ; or ,  this can have string ; |,   mean ; space or ,
+[] or expressions, [;,] mean ; or ,  this have single character
+
+
+\W anything except word
+\D anything except digit
+\S anything except space
+
+\w a word
+\d a digit
+\s a space
+
+^absurd begin with absurd
+absurd$ end with absurd
+
+\* to match normal *
+\. to match .
+
+
+six_number = re.compile(r'\d\d\d-\d\d\d')
+result = six_number.search("my number is 123-456.")
+print(result.group())
+result.group(1) == 123
+result.group(2) == 456
+
+re.split('; |. |\*|\n', "ab; c. d*e\nf") 
+['ab', 'c', 'd', 'e', 'f']
+
+pattern = re.compile(r'; |. |\*|\n')
+pattern.split("ab; c. d*e\nf")
+
+pattern = re.compile(r'^[A-Za-z]+$')
+pattern.match(word)  # return Bool, if word is only alphebet character
+
+>>> a='a\n-------------\nb\n#########\nc'
+>>> re.split('-*-\n|#*#\n', a)
+['a\n', 'b\n', 'c']
+>>> re.split('^[-#]+\n$', a)
+['a\n-------------\nb\n#########\nc']
+>>> re.split('^[-#]+$', a)
+['a\n-------------\nb\n#########\nc']
+>>> re.split('[-#]+', a)
+['a\n', '\nb\n', '\nc']
+
