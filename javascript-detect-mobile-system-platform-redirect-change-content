@@ -1,0 +1,62 @@
+website x.net, only linux visit is normal, other like windows or mac show nothing
+it's use js variable `navigator.platform` on browsers to detect user's system
+
+wget https://x.net/index.html
+there's 
+<script type="text/javascript" src="/detect.js"></script>
+on the end
+
+wget https://x.net/detect.js
+
+(function(w, d) { 
+
+    var system = {
+        win: false,
+        mac: false,
+        xll: false
+    };
+    var p = navigator.platform;
+    var us = navigator.userAgent.toLowerCase();
+    system.win = p.indexOf("Win") == 0;
+    system.mac = p.indexOf("Mac") == 0;
+    system.x11 = (p == "X11") || (p.indexOf("Linux") == 0);
+    if (system.win || system.mac || system.xll) {
+        console.log(system)
+        console.log(navigator.platform)
+        var iframe_url='/nothing.html';
+        $("head").html('<meta charset="UTF-8"><meta name="referrer" content="no-referrer"><title>nothing</title><style>body{position:static !important;}body *{ visibility:hidden; }</style> ');
+        $("body").empty();
+        $(d).ready(function () {
+            $("body").html('<iframe style="width:100%; height:100%;position:absolute;margin-left:0px;margin-top:0px;top:0%;left:0%;" id="mainFrame" src="'+iframe_url+'" frameborder="0" scrolling="no"></iframe>').show();
+            $("body *").css("visibility", "visible");
+        });
+    }
+})(window, document);
+
+win mac will show nothing, x11 which is 'Linux x86_64' can show something
+
+run this code on console, change navigator.platform value, but it seems still get the original navigator.platform when reload x.net
+Object.defineProperty(navigator,'platform',{get:function(){return 'Android';}});
+
+
+use this website can detect navigator.platform, 
+https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_nav_platform
+
+safari on iPad, navigator.platform is 'iPad'
+brave on iPad, navigator.platform is 'MacIntel', request mobile site still 'MacIntel'
+chrome on iPad, is 'MacIntel' , request mobile site would be 'iPad'
+chrome on macbook pro m3, is 'MacIntel'
+chrome on Android, 'Linux armv81'
+aosp browser on Android, 'Linux aarch64'
+firefox focus on iPhone, 'iPhone'
+chrome on iPhone, 'iPhone'
+
+
+
+
+
+android and linux would be 'Linux xxx'
+iPhone and iPad 'iPhone', 'iPad'
+mac is 'MacIntel'
+
+
