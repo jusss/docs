@@ -118,6 +118,9 @@ find_string_in_string = lambda sub, words: [ i for i in range(len(words) - len(s
 
 print(find_string_in_string("e", words)) 
 
+Cartesian Product, A={1,2}, B={a,b,c}, A*B={(1,a),(1,b),(1,c),(2,a),(2,b),(2,c)}, in haskell it's `sequence`, in python `itertools.product`
+
+permutations, combinations, zip(transpose), sequence(product)
 
 
 

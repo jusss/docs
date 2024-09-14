@@ -1,3 +1,7 @@
+
+Cartesian Product, A={1,2}, B={a,b,c}, A*B={(1,a),(1,b),(1,c),(2,a),(2,b),(2,c)}, in haskell it's `sequence`, in python `itertools.product`
+permutations, combinations, zip(transpose), sequence(product)
+-------------------------------
 split string with multiple delimeters
 
 from operator import add
