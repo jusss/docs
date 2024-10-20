@@ -8,6 +8,10 @@ iptables -A INPUT -i lo -p tcp --dport 22 -j ACCEPT
 iptables -A INPUT -p tcp --dport 22 -j DROP
 iptables-save -f /etc/iptables/iptables.rules
 
+# vim /etc/iptables/iptables.rules, to change some rules and reload
+# iptables-restore < /etc/iptables/iptables.rules
+# iptables -L
+
 /etc/stunnel/stunnel.conf
 cert = /etc/stunnel/server.pem
 sslVersion = TLSv1

@@ -1,0 +1,6 @@
+add Run script over SSH
+User must not be empty! even it shows root as default, it is not!
+you must input that user name
+
+you can generate ssh RSA key, and append that public key to remote's ~/.ssh/authorized_keys
+
