@@ -1,0 +1,4 @@
+
+query.join is inner join
+query(A,B,C).join(B, A.x==B.x).join(C, C.x==B.x).all()
+it's select A,B,C from A join B at ON A.x == B.x join C at ON C.x == B.x;

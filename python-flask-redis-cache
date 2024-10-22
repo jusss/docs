@@ -1,0 +1,12 @@
+
+visit /a/b/c
+if /a/b/c point to function get_result
+
+redis_conn = redis.StrictRedis(host='localhost', port=6379, password='', decode_responses=True)
+def get_result():
+    if redis_conn.exists('some_key'):
+        result = redis_conn.get('some_key')
+        return jsonify(result)
+    result = db.session.query(...)
+    redis_conn.set('some_key', result, ex=3600 * 24)
+    return jsonify(result)

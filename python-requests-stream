@@ -1,0 +1,23 @@
+
+res = requests.post(url,headers=headers,json=payload, stream=True)
+
+if res.status_code == 200:
+    for line in res.iter_lines():
+        if line:
+            # line: bytes
+            data = line.decode('utf-8')
+            print(data)
+            if data == "data: ping":
+                pass
+            else:
+                _data = data[6:]
+                print(_data)
+
+                json_res = json.loads(_data)
+                if json_res.get('thought'):
+                    if json_res['thought'] != "":
+                        print(query, end=' ')
+                        print(json_res['thought'])
+                        return json_res['thought']
+else:
+    print("error", res.status_code)

@@ -1,0 +1,13 @@
+
+result = db.session.query(A,B,C).all()
+for a,b,c in result:
+    pass
+
+result = db.session.query(A.id, 
+    func.count(A.id).label('a'), 
+    func.sum(case((A.status == 1, 2), else_=0)).label('x')
+    ).filter(A.id.in_(id_list))
+    .group_by(A.id)
+    .all()
+
+r2 = [ item.id, item.a, item.x for item in result ]

@@ -1,0 +1,4 @@
+
+d = {"a":2, "b":1, "c":3}
+d2 = sorted(list(d.keys()), key=lambda x: d[x], reverse=True)
+d2 == ['c', 'a', 'b']

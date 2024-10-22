@@ -1,0 +1,8 @@
+
+alist = [1,2,3,2,3,6]
+for n, e in zip(range(len(alist)), alist):
+    print(n,e)
+
+its same as
+for n, e in enumerate(alist):
+    print(n,e)

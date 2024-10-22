@@ -1,0 +1,15 @@
+
+from collections import defaultdict
+
+# defaultdict is like get(x,default_value) for non-existed key
+# create a dict d, if d get non-existed key, will return int 0
+d = defaultdict(int)
+L = [1, 2, 3, 4, 2, 4, 1, 2]
+for i in L:
+    d[i] += 1 # so the first time d[1] not existed will get 0, d[1] be 1
+
+
+a=[1,2,3]
+a.count(1) == 1
+b="abc"
+b.count("a") == 1

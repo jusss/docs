@@ -1,0 +1,10 @@
+
+after change the models.py's class or add new class
+flask db migrate
+flask db upgrade
+
+if got error
+flask db history # get latest version
+psql -h localhost -p 5432 -U user database_name
+UPDATE alembic_version SET version_num 'latest version'
+then flask db migrate; flask db upgrade

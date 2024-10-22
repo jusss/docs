@@ -1,0 +1,29 @@
+
+headers = {
+    'Authorization': f'Bearer {service_token}',
+    'Content-Type': 'application/json',
+}
+payload = {
+    'inputs': {},
+    'query': query,
+    'response_mode': 'streaming',
+    "conversation_id": "",
+    'user': 'data'
+}
+
+try:
+    with httpx.Client(timeout=60) as client:
+        result = ''
+        with httpx_sse.connect_sse(client, method="POST",
+                                   url=service_url, headers=headers, json=payload) as event_source:
+            for sse in event_source.iter_sse():
+                if sse.data == 'ping':
+                    continue
+                sse_data = json.loads(sse.data)
+                if sse_data['event'] == 'agent_message':
+                    result += sse_data['answer']
+        return 1, result
+except Exception as e:
+    logging.error(str(e))
+    print(e)
+    return 0, str(e)

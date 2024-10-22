@@ -1,0 +1,29 @@
+
+import logging
+def error_logging(func):
+    def wrapper(*args, **kwargs):
+        try:
+            result = func(*args, **kwargs)
+            return result
+        except Exception as e:
+            logging.error(str(e))
+
+@error_logging
+def f(x):
+    pass
+
+from typing import get_type_hints
+from flask import request, jsonify
+def form_data_handle(func):
+    def wrapper(*args, **kwargs):
+    variable_types = get_type_hints(fun)
+    for _variable, _type in variable_types.items():
+        value = request.form.get(_variable)
+        kwargs[_variable] = _type(value)
+    result = func(*args, **kwargs)
+    return result
+
+# handle form data like https://x.org/x?name=john&age=30
+@form_data_handle
+def get(self, name: str, age: int):
+    pass

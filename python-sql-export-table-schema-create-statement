@@ -1,0 +1,7 @@
+
+since postgresql run in docker
+
+docker ps # get postgresql container id  like 9a080812850e
+docker exec -it 9a080812850e /bin/bash
+pg_dump -U user_name -h localhost -d database_name -t table_name --schema-only --no-owner -f table_name.sql
+docker cp 9a080812850e:/table_name.sql ./

@@ -1,0 +1,33 @@
+
+                  Task
+               /       \
+           TaskRunner  TaskRunner
+           /        \                  
+TaskRunnerItem TaskRunnerItem
+
+data = (db.session.query(TaskRunnerItem, TaskRunner, Task)
+        .join(TaskRunner, TaskRunnerItem.runner_task_id == TaskRunner.id)
+        .join(Task, TaskRunner.task_id == Task.id)
+        .all())
+
+result: dict[(Task, TaskRunner), [TaskRunnerItem]] = defaultdict(list)
+for task_runner_item, task_runner, task in data:
+    result[(task, task_runner)].append(task_runner_item)
+
+messages = []
+for k, v in result.items():
+    creator_id = k[0].creator_id,
+    runner_user_id = k[1].runner_user_id,
+    messages.append(
+        TaskStatistics(
+            task_id=k[0].id,
+            task_name=k[0].task_name,
+            creator_id=k[0].creator_id,
+            creator_name=db.session.query(Account).filter(Account.id == creator_id).first().name,
+            runner_id=k[1].id,
+            runner_name=db.session.query(Account).filter(Account.id == runner_user_id).first().name,
+            total_num=len(v),
+            finished_num=len(list(filter(lambda x: x.status == TaskRunnerItemStatus.COMPLETED.value, v))),
+            date=f'{datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S %Z")}',
+        )
+    )

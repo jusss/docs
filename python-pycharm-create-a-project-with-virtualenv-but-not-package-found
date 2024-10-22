@@ -1,0 +1,9 @@
+
+for example, path is 
+cd PycharmProjects/pythonProject1
+source .venv/bin/activate
+
+pip install openai
+
+deactivate # exit 
+

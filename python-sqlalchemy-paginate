@@ -1,0 +1,34 @@
+
+def get_paginated_query(query, page_number, page_size):
+    return query.limit(page_size).offset((page_number - 1) * page_size)
+
+page_size = 10
+page_number = 1
+
+query = session.query(User)
+
+paginated_query = get_paginated_query(query, page_number, page_size)
+results = paginated_query.all()
+
+limit for limit rows, offset for offset 
+there is count for count
+query.count()
+
+
+
+there're two way to do paginate, one is using .limit.offset
+page = 1
+limit=200
+result = query.limit(limit).offset((page - 1) * limit).all()
+this will get page 1 with 200 items
+None mean end
+
+another is flask-sqlalchemy .paginate
+
+query.paginate(page=None, per_page=None, error_out=True, max_per_page=None)
+return Pagination object, use has_next or has_prev to get data, None mean end
+
+posts = Posts.query.order_by(Posts.time.desc()).paginate(page,per_page,error_out=False)
+for post in posts.items, current items on current page
+use has_next until None
+

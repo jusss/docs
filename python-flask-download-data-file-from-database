@@ -1,0 +1,24 @@
+
+from flask import Response, jsonify
+import openpyxl
+import io
+
+class Download(Resource):
+    def get(self):
+        user_id = request.args.get("user_id")
+        datus = db.session.query(Blog).filter(Blog.user_id == user_id).order_by(Blog.created_at.asc()).all()
+        workbook = openpyxl.Workbook()
+        ws = workbook.active
+        try:
+            ws.append(['column1', 'column2'])
+            for data in datus:
+                ws.append([data.column1, data.column2])
+        except Exception as e:
+            ws.append([str(e)])
+        output = io.BytesIO()
+        workbook.save(output)
+        output.seek(0)
+        return Response(output.getvalue(),
+                mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                headers={
+                    "Content-Disposition": f"attachment; filename={user_id}.xlsx"})

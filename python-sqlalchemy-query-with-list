@@ -1,0 +1,7 @@
+
+two ways, one is multiple query
+user_id_list = [...]
+accounts = [db.session.query(Account).filter(Account.id == user_id).first() for user_id in user_id_list]
+
+another is
+accounts = db.session.query(Account).filter(Account.id.in_(user_id_list)).all()

@@ -1,0 +1,14 @@
+
+>>> a=[1,2,3]
+>>> b=filter(lambda x: x>1, a)
+>>> type(b)
+<class 'filter'>
+>>> for i in b:
+...  print(i)
+...
+2
+3
+>>> list(b)
+[]
+
+if you want to use it multiple times, turn it to list! list(filter(lambda x: x>1, a))

@@ -1,0 +1,20 @@
+
+#### Delete with subquery
+```python
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine
+from sqlalchemy.sql import select
+from your_model import User, Address  # Replace with your actual model import
+
+# Create a new session
+engine = create_engine('your_database_url')
+Session = sessionmaker(bind=engine)
+session = Session()
+
+# Subquery to find the users to delete
+subquery = session.query(User.id).join(Address).filter(Address.city == 'New York').subquery()
+
+# Delete operation using the subquery
+session.query(User).filter(User.id.in_(subquery)).delete(synchronize_session=False)
+session.commit()
+```

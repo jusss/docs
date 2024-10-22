@@ -1,0 +1,38 @@
+
+from pydantic import BaseModel, ValidationError
+
+class Person(BaseModel):
+    name: str
+    age: int
+
+def validate_json_with_pydantic(data: dict) -> bool:
+    try:
+        # Validate the data against the Person model
+        Person(**data)
+        return True
+    except ValidationError as e:
+        # Catch validation errors
+        print(f"Pydantic validation error: {e}")
+        return False
+
+# Example usage
+json_data = {"name": "Alice", "age": 30}
+print(validate_json_with_pydantic(json_data))  # Output: True
+
+invalid_json_data = {"name": "Alice", "age": "thirty"}
+print(validate_json_with_pydantic(invalid_json_data))
+
+data class need inherite BaseModel, also you can create an interface to create function to detect like
+class Human(ABC, BaseModel)
+    @abstractmethod
+    def check(self):
+        pass
+class Person(Human):
+    name: str
+    age: int
+    def check(self):
+        if not (self.name and self.age):
+            print("missing parameters")
+
+john = Person(name = 'John', age = 30)
+john.dict() # to dict 

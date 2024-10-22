@@ -1,0 +1,43 @@
+
+url: str
+data: dict, but value as str not dict, form data, multipart/form-data, in the body
+json: dict, use Content-Type application/json, in the body
+params: dict, url parameters use Content-Type application/x-www-form-urlencoded, or multipart/form-data, concat url with parameters, name=john, age=30, http://x.org/a?name=john&age=30
+headers: dict, Content-Type, Authorization
+cookies: dict
+files: dict, {'name': file-object} or {'name':file-tuple} for multipart encoding upload, multipart/form-data
+auth: auth tuple,
+timeout: timeout for server
+allow_redirects: Boolean
+proxies: proxy
+verify: Boolean for verify server TLS certificate
+stream: Boolean, streaming mode
+cert: .pem file or (cert, key)
+
+form-data doesn't support dict, it supports int, str and boolen 
+change
+data = {"task_config":  {"session_count":24}} 
+to
+data = {"task_config": '{"session_count":24}'}
+
+#upload file
+requests.post(url, files = {'file': open('report.xls', 'rb')})
+res = requests.post(url= url, headers=headers, data=data, files={'file': open(fp,'rb')})
+print(res.text)
+
+# for login session
+session = requests.Session()
+response = session.post(login_url, data=payload)
+
+params can be concat in the url like http://x.org/a?b=1&c=2
+so login user and password should not be url parameters with 'params',
+they should be form data in body with 'data'
+
+in html form, GET method will use url parameters, 
+POST method along with <form> element will use form data in body
+
+URL parameters can be intercepted, particularly if they are used over unsecured HTTP connections
+When data is transmitted over HTTP (as opposed to HTTPS), it is sent as plain text, 
+which can be intercepted by anyone between the client and the server,
+Always use HTTPS to encrypt data in transit. This ensures that URL parameters (and all other data 
+sent between the client and server) are encrypted.

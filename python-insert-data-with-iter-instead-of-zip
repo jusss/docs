@@ -1,0 +1,5 @@
+
+a=[(1,2,3),(5,6,7)]
+g=iter([4,8])
+for b,c,d in a:
+    print(b,c,d,next(g))
