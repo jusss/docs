@@ -1,0 +1,18 @@
+
+there're two ways to copy branch commit to another
+let's assume there're main and feature branch
+you do some changes on main then create feature branch
+git add commit them on feature branch, now main branch 
+doesn't have those changes
+one way is using 
+git checkout main
+git merge feature
+
+another is using
+git checkout main
+git cherry-pick feature # this will copy feature's latest commit to main branch
+or 
+git cherry-pick commit-id # this will copy that commit id changes to main branch
+
+git cherry-pick commit-id-A commit-id-B # copy two commit
+git cherry-pick commit-id-A^..commit-id-B # copy from commit-id-A to commit-id-B, without ^ it will excluse A

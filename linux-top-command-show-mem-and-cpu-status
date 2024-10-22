@@ -1,0 +1,7 @@
+
+top -l 1
+top -o mem -O cpu -s 6
+
+linux command check port 
+
+lsof -i :5001 | kill -9 

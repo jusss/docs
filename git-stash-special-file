@@ -1,0 +1,5 @@
+
+git stash push /path/to/file -m 'comment'
+git stash list # find the comment number n, 0 is latest
+git pull
+git stash pop stash@{n} # 0 is the latest

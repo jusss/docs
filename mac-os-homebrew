@@ -1,0 +1,3 @@
+
+install-GUI-emacs
+brew install --cask emacs

@@ -1,0 +1,10 @@
+
+sqlalchemy in_ doesn't return same items
+data = session.query(Task).filter(Task.id.in_([
+    "03257ef",
+    "03257ef",
+    "03257ef",
+    ]
+    )).all()
+print(data)
+it's one item list 

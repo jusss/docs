@@ -1,0 +1,4 @@
+
+1. click the line number, make a break point, which you want to debug
+2. click green bug icon on the top right corner, 
+3. trigger to run it, then press F8 or the left bottom button for step over, click on the variable it will show the value

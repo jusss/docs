@@ -1,0 +1,56 @@
+
+header, Content-Type: multipart/form-data
+body, form-data, {'file': open('file',rb), 'name': 'john', 'age': 30}
+params, url parameters, name=john, age=30, http://x.org/a?name=john&age=30
+
+from flask import request
+from flask_login import current_user
+from flask_restful import Resource, reqparse
+class A:
+    def post(self):
+        parser = reqparse.RequestParser()
+        # flask restful
+        # https://flask-restplus.readthedocs.io/en/stable/parsing.html
+        # Look only in the POST body, form data, python requests post with 'data' = {}
+        parser.add_argument('name', type=int, location='form')
+
+        # Look only in the querystring, url parameters, for python requests post with 'params' = {}
+        parser.add_argument('age', type=int, location='args')
+
+        # From the request headers
+        parser.add_argument('User-Agent', location='headers')
+
+        # From http cookies
+        parser.add_argument('session_id', location='cookies')
+
+        # From file uploads
+        parser.add_argument('picture', type=werkzeug.datastructures.FileStorage, location='files')
+
+        # Only use type=list when location='json'
+
+        args = parser.parse_args()
+        file = request.files['file'] # get file 
+
+
+
+# another way is using flask itself without flask_restful
+# https://flask.palletsprojects.com/en/2.3.x/api/#flask.Request.form
+# request.form will get a dict for form data in body
+# request.files will get a dict {filename: file object}
+# request.args will get a dict for url parameters
+# request.json for json
+
+do not use request.form.get('name'), it will find name in body's form-data, not in url parameters
+request.form.get() # body's form data, for python requests post with 'data' = {}
+
+upload file or form data need Content-Type multipart/form-data
+url parameters can use application/x-www-form-urlencoded
+
+in html form, GET method will use url parameters, 
+POST method along with <form> element will use form data in body
+
+URL parameters can be intercepted, particularly if they are used over unsecured HTTP connections
+When data is transmitted over HTTP (as opposed to HTTPS), it is sent as plain text, 
+which can be intercepted by anyone between the client and the server,
+Always use HTTPS to encrypt data in transit. This ensures that URL parameters (and all other data 
+sent between the client and server) are encrypted.

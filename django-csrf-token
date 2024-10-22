@@ -1,0 +1,96 @@
+
+Django, a popular web framework for Python, has built-in support for protecting against Cross-Site Request Forgery (CSRF) attacks. It uses CSRF tokens to ensure that requests made to the server are legitimate and come from authenticated users. Here's how Django uses CSRF tokens to protect against CSRF attacks:
+
+### How Django's CSRF Protection Works:
+
+1. **Token Generation**: When a user accesses a Django form, the framework generates a unique CSRF token for that session.
+2. **Token Inclusion**: This token is included in the form as a hidden field or in the request headers for AJAX requests.
+3. **Token Validation**: When the form is submitted, Django checks the token to ensure it matches the token stored in the user's session. If the tokens do not match, the request is rejected.
+
+### Steps to Use CSRF Tokens in Django:
+
+#### 1. Enable CSRF Middleware:
+Django's CSRF protection is enabled by default if you have `'django.middleware.csrf.CsrfViewMiddleware'` in your `MIDDLEWARE` setting in `settings.py`.
+
+```python
+MIDDLEWARE = [
+    ...
+    'django.middleware.csrf.CsrfViewMiddleware',
+    ...
+]
+```
+
+#### 2. Using CSRF Tokens in Forms:
+
+For Django forms, you need to include the CSRF token in your HTML templates. Django provides a template tag `{% csrf_token %}` to do this.
+
+```html
+<form method="post" action="/your-url/">
+    {% csrf_token %}
+    <!-- Your form fields here -->
+    <input type="submit" value="Submit">
+</form>
+```
+
+#### 3. CSRF Tokens in AJAX Requests:
+
+For AJAX requests, you need to include the CSRF token in the request headers. You can get the token from the cookie and set it in the headers. Here is an example using jQuery:
+
+```javascript
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+var csrftoken = getCookie('csrftoken');
+
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!/^(GET|HEAD|OPTIONS|TRACE)$/.test(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
+```
+
+#### 4. CSRF Exemptions:
+
+In some cases, you might want to exempt certain views from CSRF protection. You can use the `@csrf_exempt` decorator for this purpose.
+
+```python
+from django.views.decorators.csrf import csrf_exempt
+
+@csrf_exempt
+def my_view(request):
+    # Your view logic here
+    return HttpResponse('CSRF exempt view')
+```
+
+#### 5. CSRF Token in Django REST Framework (DRF):
+
+If you are using Django REST Framework, you can include CSRF tokens in your API requests similarly. DRF also provides its own CSRF protection mechanisms.
+
+```python
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+
+@api_view(['POST'])
+def my_api_view(request):
+    # Your API logic here
+    return Response({'message': 'Success'}, status=status.HTTP_200_OK)
+```
+
+### Summary:
+
+Django's CSRF protection is robust and easy to implement. By including the `{% csrf_token %}` tag in your forms and setting the CSRF token in AJAX request headers, you can protect your web application from CSRF attacks. Additionally, Django provides flexibility with decorators like `@csrf_exempt` for cases where CSRF protection is not needed.

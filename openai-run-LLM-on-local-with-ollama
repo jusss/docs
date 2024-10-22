@@ -1,0 +1,70 @@
+
+download ollama.zip from github,
+https://objects.githubusercontent.com/github-production-release-asset-2e65be/658928958/e27f6be2-dbb8-4191-ab76-be5e80283cc9?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=releaseassetproduction%2F20240918%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20240918T064011Z&X-Amz-Expires=300&X-Amz-Signature=8c49ae180b1f3c8715cc8407d4f628ad931f756003a95ca00095d61bfb039478&X-Amz-SignedHeaders=host&actor_id=0&key_id=0&repo_id=658928958&response-content-disposition=attachment%3B%20filename%3DOllama-darwin.zip&response-content-type=application%2Foctet-stream
+double click this zip file and it will pop install guide, move it to Application
+it should be running, use ps aux|grep ollama to check if it's running on the background
+you can run it with `ollma serve` manully,
+`ollama run dolphin-mixtral:latest` for uncensored 7b LLM, required 8GB memory
+
+dolphin-mixtral-8x7b required 64GB RAM
+
+other options like qwen, or qwen:7b
+
+`ollma run qwen2:7b`
+`ollama run llama2-uncensored`
+
+a "7B" model would have 7 billion parameters.
+GPT-3 has 175 billion parameters.
+
+you can download model from huggingface, GGUF file
+
+ollama support openai api now, https://ollama.com/blog/openai-compatibility
+
+apple M3 chips are based on arm chips, it has 66% RAM size VRAM, so 16GB memory could have 9GB VRAM
+training and inference both need VRAM, 7b inference needs 10GB VRAM, 7b training needs 24GB VRAM
+
+`ollama ps` show running model, just exit `ollama run qwen2:7b` by C-d will stop running model,
+`ollama stop llama3.1` can stop running model
+or `ps aux|grep ollama` can kill ollama pid to stop running model
+
+4090 can do inference/serving, but lack of communication bandwith, it can not do training
+H100 or A100 can do training, 
+https://cloud.tencent.com/developer/article/2400679
+
+
+`ollama run bge-m3` run text embedding model for vector search in RAG
+
+embedding with ollama https://gist.github.com/alucard001/eb5137154686d1d0fc67a1c894fb0fd6
+
+install huggingface model
+pip install vllm
+
+or download GGUF file from huggingface, perfer Q4_K_M, 
+1. Create a file named Modelfile, with a FROM instruction with the local filepath to the model you want to import.
+FROM ./vicuna-33b.Q4_0.gguf
+2. Create the model in Ollama
+ollama create example -f Modelfile
+3. Run the model
+ollama run example
+
+call local embedding model
+pip install ollama
+
+doc = ""
+with open("test.txt", 'r') as f:
+    doc = f.read()
+
+res = ollama.embeddings(model='bge-m3', prompt=doc)
+print(res['embedding'])
+
+# https://gist.github.com/alucard001/eb5137154686d1d0fc67a1c894fb0fd6
+
+pip install chromadb
+pip install ollama
+
+
+vector query for most matched, ElasticSearch is a search engine also can handle vector data,especially with the introduction of features like the "dense_vector" field type, Solr like ElasticSearch is a search engine and can handle vector data,
+vector database like ChromaDB, Weaviate, 
+
+vector database provide query for matching calculate
+

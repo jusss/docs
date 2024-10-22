@@ -1,0 +1,3 @@
+
+prompt: get sql table create statement from the next sqlalchemy data model code:
+input: class Table(db.Model): ...

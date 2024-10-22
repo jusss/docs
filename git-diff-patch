@@ -1,0 +1,3 @@
+
+git diff > changes.patch
+git apply changes.patch

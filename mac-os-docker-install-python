@@ -1,0 +1,13 @@
+
+echo "deb http://mirrors.tuna.tsinghua.edu.cn/debian/ bookworm main contrib non-free non-free-firmware" > /etc/apt/sources.list
+
+apt install python3.11
+pip3 install virtualenv
+apt install libmpfr-dev libmpc-dev libgmp-dev
+pip3 install celery
+sudo port install nvm
+
+defaults write -g ApplePressAndHoldEnabled -bool false
+
+which python3
+/opt/local/bin/python3

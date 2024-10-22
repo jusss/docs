@@ -1,0 +1,247 @@
+
+dify is a platform for LLM, backend use flask, which is in dify/api/
+front-end use next.js, which is in dify/web/
+next.js is also a backend, flask listen on 5001, node.js listen on 3000
+
+flask reset-encrypt-key-pair can solve dify error private key missing
+api/command.py has some click command for add user, auth user etc
+api$ flask add-user 
+
+1. add data annotation and eval
+2. extend search function, not just search by app, also by user id, name, etc
+3. some tools like quick eval, data proof, input a query file, generate answer into excel file
+4. implement chat summary, put that summary into prompt for next conversations
+prompt like 
+" $original prompt
+
+# the next infomations come from the previous conversations between user and you,
+use it carefully if it can help you to response integrity, percisily, and kind,
+1. avoid personal and sensitive messages, avoid insert history message directly, avoid no clear message or uncomplete history messages
+2. attention: avoid duplicate or list too many history messages, keep dialog stype simple and short
+
+$summary_messages
+"
+5. from app_mode_config get latest app_id, get conversation_id by that app_id in conversation table,
+group messages id by different from_account_id or from_end_user_id, which can check in accounts table,
+join that from_account_id or from_end_user_id with messages id for summary
+api_token come from api_tokens table for service_api, app_model_configs can get original prompt from pre_prompt
+
+6. new table create in api/models/model.py, new depend package in api/requirements.txt
+
+7. celery has timezone issue, set it 
+
+app=Celery()
+app.conf.enable_utc = False
+app.conf.timezone = "Asia/Calcutta" #change to your timezone
+
+use celery for parallel tasks, instead of python thread poll or asyncio
+use redis distribute lock for sync data in celery parallel tasks
+paginate for lot query, more hash table in redis for lots of messages
+
+8. data eval(generate by LLM), annotation, verify
+
+class EvalTask(db.Model):
+    __tablename__ = 'eval_task'
+    __table_args__ = (
+        db.PrimaryKeyConstraint('id', name='eval_task_pkey'),
+        db.Index('idx_status', 'status')
+    )
+
+    id = db.Column(UUID(as_uuid=False), server_default=db.text('uuid_generate_v4()'))
+    name = db.Column(db.String(30), nullable=True)
+    type = db.Column(db.Integer, nullable=False)
+    app_list = db.Column(db.String(300), nullable=False)
+    config = db.Column(db.String(300), nullable=False)
+    priority = db.Column(db.Integer, nullable=False)
+    status = db.Column(db.Integer, nullable=False)
+    generate_annotation = db.Column(db.Boolean, nullable=False, default=False)
+    creator_id = db.Column(UUID(as_uuid=False), nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False, server_default=db.text('CURRENT_TIMESTAMP(0)'))
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=True)
+
+class EvalTaskItem(db.Model):
+    __tablename__ = 'eval_task_item'
+    __table_args__ = (
+        db.PrimaryKeyConstraint('id', name='eval_task_item_pkey'),
+        db.Index('idx_eval_task_id_seq_no', 'eval_task_id', 'seq_no'),
+        db.Index('idx_eval_task_id_status', 'eval_task_id', 'status')
+    )
+    id = db.Column(UUID(as_uuid=False), server_default=db.text('uuid_generate_v4()'))
+    eval_task_id = db.Column(UUID(as_uuid=False), nullable=False)
+    seq_no = db.Column(db.Integer, nullable=False)
+    query = db.Column(db.String(128000), nullable=False)
+    result = db.Column(db.Text, nullable=True)
+    status = db.Column(db.Integer, nullable=False)
+    tag = db.Column(db.String(100), nullable=True)
+
+class AnnotationWorkerTaskItem(db.Model):
+    id = db.Column(UUID(as_uuid=False), server_default=db.text('uuid_generate_v4()'))
+    annotation_worker_task = db.Column(UUID(as_uuid=False), nullable=False)
+    annotation_task_item_id = db.Column(UUID(as_uuid=False), nullable=False)
+    annotation_result = db.Column(db.Text, nullable=True)
+
+class AnnotationWorkerTask(db.Model):
+    id = db.Column(UUID(as_uuid=False), server_default=db.text('uuid_generate_v4()'))
+    annotation_user_id = db.Column(UUID(as_uuid=False), nullable=False)
+    annotation_task_id = db.Column(UUID(as_uuid=False), nullable=False)
+
+class AnnotationTaskItem(db.Model):
+    id = db.Column(UUID(as_uuid=False), server_default=db.text('uuid_generate_v4()'))
+    annotation_task_id = db.Column(UUID(as_uuid=False), nullable=False)
+    annotation_data = db.Column(db.Text, nullable=False)
+
+class AnnotationTask(db.Model):
+    id = db.Column(UUID(as_uuid=False), server_default=db.text('uuid_generate_v4()'))
+    name = db.Column(db.String(30), nullable=True)
+    type = db.Column(db.Integer, nullable=False)
+    config = db.Column(db.String(2000), nullable=False)
+    dispatch_config = db.Column(db.String(2000), nullable=True)
+    deadline = db.Column(db.DateTime, nullable=True)
+    data_origin = db.Column(db.String(100), nullable=False)
+    creator_id = db.Column(UUID(as_uuid=False), nullable=False)
+
+class VerifyWorkerTaskItem(db.Model):
+    id = db.Column(UUID(as_uuid=False), server_default=db.text('uuid_generate_v4()'))
+    verify_worker_task_id = db.Column(UUID(as_uuid=False), nullable=False)
+    annotation_task_item_id = db.Column(UUID(as_uuid=False), nullable=False)
+    qualified = db.Column(db.Boolean, nullable=True)
+    annotation_result = db.Column(db.Text, nullable=True)
+
+class VerifyWorkerTask(db.Model):
+    id = db.Column(UUID(as_uuid=False), server_default=db.text('uuid_generate_v4()'))
+    name = db.Column(db.String(30), nullable=False)
+    verify_user_id = db.Column(UUID(as_uuid=False), nullable=False)
+    verify_task_id = db.Column(UUID(as_uuid=False), nullable=False)
+
+class VerifyTask(db.Model):
+    id = db.Column(UUID(as_uuid=False), server_default=db.text('uuid_generate_v4()'))
+    name = db.Column(db.String(30), nullable=False)
+    annotation_task_id = db.Column(UUID(as_uuid=False), nullable=False)
+    sampling_ratio = db.Column(db.Integer, nullable=False)
+    creator_id = db.Column(UUID(as_uuid=False), nullable=False)
+
+9. app app_id, workflow provider_id, custom tool is workflow, they both use api_tool
+ApiTool._invoke for workflow and custom tool to generate response
+
+10. celery task
+api/schedule/eval_task.py
+import app
+@app.celery.task(queue='generation')
+def eval_task():
+    EvalTask.run()
+
+api/extensions/ext_celery.py
+    celery_app.conf.update(
+        enable_utc=False,
+        timezone='Asia/Shanghai'
+    )
+
+    imports = [
+        "schedule.eval_task",
+    ]
+
+    beat_schedule = {
+        'eval_task': {
+            'task': 'schedule.eval_task.eval_task',
+            'schedule': crontab(minute='*/5')
+            # 'schedule': crontab(hour='0', minute='0')
+
+        },
+    }
+
+api$ celery -A app.celery beat --loglevel INFO
+api$ celery -A app.celery worker -P gevent -c 6 --loglevel INFO -Q dataset,generation,mail
+api$ ps aux | grep celery | grep -v grep | awk '{print $2}' | xargs kill -9
+
+also you can call eval task in api/command.py without celery's timer trigger for debug
+api/command.py registry in api/app.py, so it can get app, so it can operate database
+
+10. first init dify project, run `api$ flask db upgrade` to generate database tables, 
+if you add a new table, or change its attributes, run `api$ flask db migrate; flask db upgrade`
+`api$ flask db history` check latest version, if it's not matched, you can use
+`psql -h localhost -p 5432 -U postgres dify` then run `UPDATE alembic_version SET version_num 'latest version'`
+then `flask db migrate; flask db upgrade`
+api %migrations/versions can get version upgrade script also see what they changed
+
+11. login is LoginApi, filter email from accounts table, hash passwrod to compare with accounts table 
+
+three steps for account authrization
+I. post user and password
+II. read user and md5 hashed password to compare
+III. return jwt token to client as login credential, jwt token (HS256 algorithm) has user_id, expired time, client use it during the available time, client use "Bearer $jwt_token" as "Authorization" in Headers for authrization
+when user post requests with this token, server use jwt decode this token with algorithm, to get user_id, check if user_id in accounts table
+
+for example
+import hashlib
+# Example input
+input_string = "example_password"
+# Generate MD5 hash
+md5_hash = hashlib.md5(input_string.encode()).hexdigest()
+
+12. pip install apache-skywalking 
+app.py
+from skywalking import agent, config
+from config import CloudEditionConfig, Config
+if __name__ == "__main__":
+    config.init(
+        agent_collector_backend_services="",
+        agent_name = "",
+        agent_authentication="",
+        agent_logging_level=""
+    )
+    agent.start()
+
+13. Cross-Site Request Forgery (CSRF)
+user login on website A, then user click a malicious link,  The user's browser automatically includes the authentication token (session cookie) with the malicious request, making it appear legitimate to the web application.
+
+solution
+**Anti-CSRF Tokens**: Include a unique token in forms and validate it on the server side. This token should be unique to each session and request.
+
+python django has built-in csrf token, flask use pip install Flask-WTF
+
+Cross-Origin Resource Sharing (CORS) is a security feature implemented by web browsers to control how web pages can request resources from a different domain than the one that served the web page. This is essential for protecting users from malicious websites that might try to steal data or perform unauthorized actions on other websites.
+
+from flask import Flask
+from flask_cors import CORS
+
+app = Flask(__name__)
+CORS(app, resources={
+    r"/api/*": {
+        "origins": ["http://example.com", "http://anotherdomain.com"],
+        "methods": ["GET", "POST"],
+        "allow_headers": ["Content-Type", "Authorization"]
+    }
+})
+
+@app.route('/api/data')
+def get_data():
+    return {'data': 'This is some data'}
+
+bp = Blueprint('service_api', __name__, url_prefix='/v1')
+
+CORS(bp,
+        resources={
+            r"/*": {"origins": ["http://example.com", "http://anotherdomain.com"]}},
+        supports_credentials=True,
+        allow_headers=['Content-Type', 'Authorization', 'X-App-Code'],
+        methods=['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS', 'PATCH'],
+        expose_headers=['X-Version', 'X-Env']
+        )
+app.register_blueprint(bp)
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5001, debug=True)
+
+In this example, CORS is configured to allow requests from `http://example.com` and `http://anotherdomain.com`
+
+CSRF (Cross-Site Request Forgery) and CORS (Cross-Origin Resource Sharing) can and often do work together to provide a more secure web application.
+CSRF use csrf token to validate requests, CORS Controls which domains are allowed to make requests to your server.
+
+
+flask, sqlalchemy, celery, postgresql, redis, weaviate, RAG, skywalking(log on cloud)
+
+RAG: keyword most matched search with jieba, vector search with bge-m3 and chromadb
+
+resume, local LLM llama3.1 72b, qwen2.5 72b , embedding model bge-m3, ollama, dify, LLM platform, distribute with oneapi as openai_baseurl,
+vectordb chromadb, weaviate, chat summary, eval, annotation, verify, agent, workflow, function call,
+

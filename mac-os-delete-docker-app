@@ -1,0 +1,10 @@
+
+sudo rm -rf /Applications/Docker.app
+sudo rm -rf /Library/Containers/com.docker.docker
+sudo rm -rf /Library/Preferences/com.docker.docker.plist
+sudo rm -rf /Library/Application Support/Docker
+sudo rm -rf ~/Library/Containers/com.docker.docker
+sudo rm -rf ~/Library/Group\ Containers/group.com.docker
+sudo rm -rf ~/Library/Preferences/com.docker.docker.plist
+
+pkill -f com.docker.docker

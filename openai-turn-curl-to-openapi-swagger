@@ -1,0 +1,51 @@
+
+easy way is give curl to LLM, let it generate swagger json
+
+curl -H "Content-Type: application/json" -X POST -d '{"message":"hi"}' http://127.0.0.1:60080/echo
+
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Echo API",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:60080"
+    }
+  ],
+  "paths": {
+    "/echo": {
+      "post": {
+        "summary": "Echo back the received message",
+        "operationId": "echoMessage",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string",
+                    "example": "Hello, World!"
+                  }
+                },
+                "required": ["message"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Hello, World!"
+                    }}}}}}}}}}}
+
