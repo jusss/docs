@@ -1,0 +1,22 @@
+choose English when initalize, Settings -> Accounts & sync -> Basic Google services
+MIUI 14.0.7 aka Redmi X4 GT
+Display -> Color Scheme -> Advanced settings
+only google supported device has google play services
+buy phone, check if its type in google supported device list first
+
+
+redmi note14pro+ and redmi k70 have Google Play services
+
+check screen provider
+*#*#284#*#* will generate bugreport-2022-xxx.zip
+unzip it, and open bugreport.txt
+search display0, if it shows dsi_display0=qcom,mdss_dsi_l12_42_
+42 is HuaXingGuangDian, 36 is TianMa
+or search loop.max
+if it shows loop.max_part=7 panel-l16-42-02-0a-
+it's HuaXingGuangDian
+
+
+*#06# get IMEI code, check if its same to the wrapped box
+https://chat.kefu.mi.com/page/activation#/
+check activation time
