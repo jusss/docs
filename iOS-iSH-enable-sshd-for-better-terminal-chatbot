@@ -1,0 +1,21 @@
+apk update
+apk add openssh
+ssh-keygen -A
+
+vim /etc/ssh/sshd_config
+PermitRootLogin yes
+PasswordAuthentication yes
+PermitEmptyPasswords no
+ChallengeResponseAuthentication yes
+PermitTTY yes
+
+passwd user
+/usr/sbin/sshd
+
+ssh user@localhost
+
+since iOS app do not have network in the background
+so iSH app need run in the front, or use Stage Manager for multiple app at the front
+
+you can use WebSSH app to connect it, and run chatbot 
+
