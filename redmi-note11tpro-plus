@@ -1,5 +1,27 @@
 choose English when initalize, Settings -> Accounts & sync -> Basic Google services
-MIUI 14.0.7 aka Redmi X4 GT
+note 11t pro +, aka Redmi X4 GT Pro, or K50i, code name xagapro
+ 
+22041216G (GT Global), 22041216UG (GT Pro Global).
+MIUI 14.0.7
+
+rom: https://c.mi.com/global/miuidownload/detail/device/1900408
+
+Unlock bootloader first, open develop mode, choose OEM unlock, login xiaomi account, waiting for 7 days to unlock
+
+https://ultimateota.d.miui.com/OS1.0.6.0.ULOMIXM/miui_XAGAGlobal_OS1.0.6.0.ULOMIXM_833feef043_14.0.zip
+it's 5GB, flash it with Mi Flash Tool, 
+when you using Mi Flash Tool, it prompts to install drivers, create a new empty folder called log in the same folder as XiaoMiFlash.exe
+then repopen the tool, select button choose file, turn off phone, power and volume down get into fastboot mode, connect phone to PC,
+tap Refresh and check device ID if it shows, at the bottom of the window select Clean all not Clean all and lock, Tap Flash
+
+ref: https://www.techadvisor.com/article/738348/how-to-flash-miui-global-rom-on-xiaomi-phone.html
+
+Global version does not have nfc function
+
+# fastboot getvar product
+product: xagapro
+
+
 Display -> Color Scheme -> Advanced settings
 only google supported device has google play services
 buy phone, check if its type in google supported device list first
