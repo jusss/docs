@@ -8,25 +8,27 @@ rom: https://c.mi.com/global/miuidownload/detail/device/1900408
 
 Unlock bootloader first, open develop mode, choose OEM unlock, login xiaomi account, waiting for 7 days to unlock
 
+recovery rom
 https://ultimateota.d.miui.com/OS1.0.6.0.ULOMIXM/miui_XAGAGlobal_OS1.0.6.0.ULOMIXM_833feef043_14.0.zip
-it's 5GB, flash it with Mi Flash Tool, 
-when you using Mi Flash Tool, it prompts to install drivers, create a new empty folder called log in the same folder as XiaoMiFlash.exe
+
+mi flash rom, xaga and xagapro use the same rom
+https://ultimateota.d.miui.com/OS1.0.6.0.ULOMIXM/xaga_global_images_OS1.0.6.0.ULOMIXM_20241018.0000.00_14.0_global_f709e44394.tgz?t=1733638630&s=2fe5407a74c4f65c82d0c272ebcb6272
+
+use Mi Flash Tool to flash the flash rom
+when you using Mi Flash Tool, if it prompts to install drivers, create a new empty folder called log in the same folder as XiaoMiFlash.exe
 then repopen the tool, select button choose file, turn off phone, power and volume down get into fastboot mode, connect phone to PC,
 tap Refresh and check device ID if it shows, at the bottom of the window select Clean all not Clean all and lock, Tap Flash
 
 ref: https://www.techadvisor.com/article/738348/how-to-flash-miui-global-rom-on-xiaomi-phone.html
 
-Global version does not have nfc function
+Global version does not have nfc emulate function
 
 # fastboot getvar product
 product: xagapro
 
-
 Display -> Color Scheme -> Advanced settings
 only google supported device has google play services
 buy phone, check if its type in google supported device list first
-
-
 redmi note14pro+ and redmi k70 have Google Play services
 
 check screen provider
@@ -38,7 +40,8 @@ or search loop.max
 if it shows loop.max_part=7 panel-l16-42-02-0a-
 it's HuaXingGuangDian
 
-
 *#06# get IMEI code, check if its same to the wrapped box
 https://chat.kefu.mi.com/page/activation#/
 check activation time
+
+*#*#426#*#* for fcm which is used for google push messages
