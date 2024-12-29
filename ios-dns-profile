@@ -1,0 +1,10 @@
+cabal v2-run v9 config
+cd ~/web/others
+git clone https://github.com/paulmillr/encrypted-dns.git
+cabal v2-run web
+
+visit https://192.168.0.x on safari, click dnspod-tls.mobileconfig
+allow to install, open 'Settings' -> 'Profile Downloaded' -> 'Install'
+-> 'Install' 
+check it if it's used on 'Settings' -> 'VPN & Network' -> 'DNS'
+
