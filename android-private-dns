@@ -1,0 +1,20 @@
+since android 9.0, android has private dns for change dns
+
+Settings -> More connectivity options -> Private DNS
+
+provider hostname        
+dot.pub                 dnspod tls   1.12.12.12, 120.53.53.53
+dns.alidns.com          alibaba tls   223.5.5.5, 223.6.6.6
+dns.google             google 
+one.one.one.one        cloudflare
+dns.quad9.net          Quad9
+dns.adguard.com
+doh.mullvad.net
+adblock.doh.mullvad.net
+p2.freedns.controld.com
+1dot1dot1dot1.cloudflare-dns.com
+security-filter-dns.cleanbrowsing.org
+
+more details
+https://github.com/paulmillr/encrypted-dns.git
+
