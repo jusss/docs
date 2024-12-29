@@ -1,0 +1,56 @@
+coroutine, continuation, call/cc and yield
+
+full/undelimited continuation, call/cc capture the whole of rest program,
+delimited continuation, callCC capture what is inside callCC, shift/reset, prompt/cotroll
+
+Assembly longjump -> C's goto -> scheme's call/cc (goto with context) -> delimited continuation (only capture a part, callCC in haskell, shift/reset in scheme, yield/send in python)
+
+async/await in python is about parallel function without exchange context, just await asyncio.sleep for yield control
+do not exchange variable something, but yield can do exchange context
+
+there're two functions f and g, capture f's rest program as k1, call g with k1, capture g's rest program as k2,
+jump back k1 with k2, 
+
+python use yield and send can do the same, after 3.6 python has yield in async, the old way is yield with select/epoll for coroutine
+
+call/cc is Pierce'law in extending Curry-Howard to classical logic, related to Yoneda Embedding
+
+from contextvars import ContextVar
+import asyncio
+
+request_id = ContextVar("request_id", default="123")
+session_id = 123
+
+async def func():
+    print("request_id ", request_id.get())
+    await func1()
+    await func2()
+
+async def func1():
+    request_id.set("456")
+    session_id= 456
+    print("func1 session_id ", session_id)
+    print("func1 request id ",request_id.get())
+
+async def func2():
+    print("func2 session_id:",session_id)
+    print("func2 request_id ",request_id.get())
+
+async def main():
+    #tasks = [asyncio.create_task(func1()), asyncio.create_task(func2())]
+    tasks = [asyncio.create_task(func())]
+    await asyncio.gather(*tasks)
+
+asyncio.run(main())
+
+# 1. parallel functions like tasks = [asyncio.create_task(func1()), asyncio.create_task(func2())]
+# the context var and local var session they both send to func1 and func2, since they're parallel, func1 change them,
+# won't affect func2's context var and session,
+# 2. await will block function, await func1() await func2() will make them not parallel, func2 will block until func1 
+# is done, so func1 and func2 share the same context var, but func1 change local var won't affect func2's local var
+# 3. there's another way, share one var and jump with it between func1 and func2, use yield, like call/cc 
+# capture f's rest program as k1, call g with k1, capture g's rest as k2, call k1 with k2
+
+
+
+

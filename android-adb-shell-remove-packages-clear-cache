@@ -1,0 +1,11 @@
+adb shell pm help
+
+# list packages
+adb shell pm list packages
+
+# remove package
+adb shell pm uninstall --user 0 com.miui.video
+
+# clear app cache only
+adb shell pm clear --cache-only com.xingin.xhs
+
