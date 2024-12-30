@@ -1,3 +1,11 @@
+merge dict list to dict
+
+data = [{'a':1, 'b':2}, {'a':2, 'b':2}] 
+
+reduce(lambda d1, d2: {k: [v, d2[k]] for k,v in d1.items()}, data)
+
+{'a': [1, 2], 'b': [2, 2]}
+------------------------------------
 # two sorted list, concat to one sorted list
 def concat_sort_list(alist, blist, result):
     if not alist:
