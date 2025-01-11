@@ -1,0 +1,70 @@
+1. await will block current coroutine and jump to other coroutine, yield the control, when current coroutine is not blocking, jump back
+2. do not use block function in async function, do not use block function like time.sleep, use non-blocking asyncio.sleep,
+ do not await requests.post, do await non-blocking aiohttp.requests.post
+3. only async function can call async function, use asyncio.get_running_loop get current loop, 
+
+asyncio.get_running_loop then creat task will start task 
+use asyncio.get_running_loop().create_task(async_func()) to call async_func in regular func,
+if you don't need async func's return value in regular func, async_func won't block regular func
+use loop.run_until_complete(future) will get async func return value in regular func and blocking regular func
+
+use future = asyncio.get_running_loop().create_task(async_func()) in regular func
+loop = asyncio.get_running_loop()
+result = loop.run_until_complete(future) to get async function result in regular function
+use result = await future to get async function result in async function
+
+loop.run_until_complete(future) is blocking, not return control until future is complete, it just wait one future, automatically close the event loop
+await asyncio.gather(future1,future2) wait for multiple futures
+loop.run_forever() keeps the loop running continuously, until loop.stop()
+
+
+use asyncio.get_running_loop after loop.run_forever() or asyncio.run()
+use asyncio.get_event_loop before loop.run_forever() or asyncio.run()
+
+
+async def f():
+ loop = asyncio.get_running_loop()
+
+async def main():
+    loop = asyncio.get_event_loop()
+    loop.create_task(f())
+
+asyncio.run(main())
+
+
+HOW TO USE 
+
+One way
+
+if __name__ == '__main__':
+    loop = asyncio.get_event_loop()
+    t = loop.create_datagram_endpoint(RecvLocalThenSend, local_addr=('0.0.0.0', 53))
+    loop.run_until_complete(t)
+    loop.run_forever()
+
+
+Another way
+
+async def main():
+    loop = asyncio.get_running_loop()
+    t = await loop.create_datagram_endpoint(RecvLocalThenSend, local_addr=('0.0.0.0', 53)) #inside normal func, use asyncio.get_running_loop().create_task(async_func)
+    await asyncio.sleep(3600000)
+
+if __name__ == '__main__':
+    asyncio.run(main())
+
+
+Another way
+ 
+async def main():
+  task = asyncio.create_task(another_async_func())
+  # await task for other task
+  await asyncio.gather(task, another_task)
+
+if __name__ == '__main__':
+    asyncio.run(main())
+
+
+
+
+
