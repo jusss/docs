@@ -65,6 +65,20 @@ if __name__ == '__main__':
     asyncio.run(main())
 
 
+also
+asyncio.run can work on async function directly
+
+import asyncio
+import aiohttp
+async def f(url):
+    async with aiohttp.ClientSession() as session:
+        files={"file": open("a.txt", "rb")}
+        async with session.post(url, data=files) as response:
+            result = await response.text()
+            print(result)
+
+asyncio.run(f("https://httpbin.org/post"))
+
 
 
 
