@@ -8,3 +8,9 @@ allow to install, open 'Settings' -> 'Profile Downloaded' -> 'Install'
 -> 'Install' 
 check it if it's used on 'Settings' -> 'VPN & Network' -> 'DNS'
 
+remove on iPad 
+'Settings' -> 'VPN & Network' -> click it then remove
+
+remove on iPhone
+download a new profile by safari, then 'Settings' -> 'Profile Downloaded' -> click it then remove
+
