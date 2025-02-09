@@ -1,3 +1,34 @@
+# Magisk for root
+1. download magisk from github release
+2. in magisk app, select and patch boot.img which from https://ultimateota.d.miui.com/OS1.0.6.0.ULOMIXM/miui_XAGAGlobal_OS1.0.6.0.ULOMIXM_833feef043_14.0.zip, get a new patched boot.img
+3. adb push boot.img /sdcard/Download
+adb pull /sdcard/Download/magisk_patched.img .
+adb reboot bootloader
+sudo su
+fastboot devices
+fastboot flash boot magisk_patched-28100_YmZE4.img
+fastboot reboot
+adb shell
+su # will show permission grant request on magisk app
+
+# wallet for NFC
+https://0xclover.com/2023/05/miui-wallet-in-global-roms/
+1. download and install 
+https://www.apkmirror.com/apk/xiaomi-inc/mi-wallet/
+https://www.apkmirror.com/apk/xiaomi-inc/mismartcards/
+2. adb shell
+$ su
+# cd /data/adb/service.d
+# echo 'resetprop ro.vendor.se.type HCE,UICC,eSE' > set_se.sh
+# chmod +x set_se.sh
+
+3. reboot, open wallet, click transit, 
+if it shows Mi Wallet is not default wallet, change Settings -> More Connectivity options -> Secure element position to Embedded secure element
+then it works
+Wallet -> More Settings -> Smart Card -> Quick card setting and Shortcut
+
+
+------------------------------------------------
 choose English when initalize, Settings -> Accounts & sync -> Basic Google services
 note 11t pro +, aka Redmi X4 GT Pro, or K50i, code name xagapro
  

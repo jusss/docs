@@ -1,0 +1,12 @@
+
+1. download magisk from github release
+2. in magisk app, select and patch boot.img which from https://ultimateota.d.miui.com/OS1.0.6.0.ULOMIXM/miui_XAGAGlobal_OS1.0.6.0.ULOMIXM_833feef043_14.0.zip, get a new patched boot.img
+3. adb push boot.img /sdcard/Download
+adb pull /sdcard/Download/magisk_patched.img .
+adb reboot bootloader
+sudo su
+fastboot devices
+fastboot flash boot magisk_patched.img
+fastboot reboot
+adb shell
+su # will show permission grant request on magisk app
