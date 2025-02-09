@@ -10,3 +10,9 @@ fastboot flash boot magisk_patched.img
 fastboot reboot
 adb shell
 su # will show permission grant request on magisk app
+
+# install Shamiko module for hide root 
+download https://github.com/LSPosed/LSPosed.github.io/releases
+Magisk -> module install from local -> choose that zip file 
+Magisk -> Settings -> Configure DenyList -> three dots right top Show system apps
+choose apps won't detect root access
