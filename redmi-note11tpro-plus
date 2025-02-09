@@ -23,10 +23,16 @@ $ su
 # chmod +x set_se.sh
 
 3. reboot, open wallet, click transit, 
+adb reboot
 if it shows Mi Wallet is not default wallet, change Settings -> More Connectivity options -> Secure element position to Embedded secure element
 then it works
 Wallet -> More Settings -> Smart Card -> Quick card setting and Shortcut
 
+# install Shamiko module for hide root 
+download https://github.com/LSPosed/LSPosed.github.io/releases
+Magisk -> module install from local -> choose that zip file 
+Magisk -> Settings -> Configure DenyList -> three dots right top Show system apps
+choose apps won't detect root access
 
 ------------------------------------------------
 choose English when initalize, Settings -> Accounts & sync -> Basic Google services
