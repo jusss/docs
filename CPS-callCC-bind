@@ -1,0 +1,11 @@
+CPS function always take a k as the last parameter
+callCC can do eary return
+bind is not CPS, Cont Monad contain CPS compute, bind can chain CPS
+
+f v call_k = call_k v
+def_k v k2 = k2 v
+
+f v def_k
+
+
+
