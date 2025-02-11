@@ -42,6 +42,7 @@ TIMEOUTclose = 0
 accept = 20183
 connect = 20182
 
+# Created symlink /etc/systemd/system/multi-user.target.wants/stunnel.target → /lib/systemd/system/stunnel.target.
 
 root@rycbar:~# cat /etc/systemd/system/john-stunnel.service 
 [Unit]
