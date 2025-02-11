@@ -8,3 +8,14 @@ question: QNAME takes 1B for length, then content, repeat, end with 0x00, QTYPE 
 answer: NAME same as QNAME, TYPE 1B, CLASS 1B, TTL 1B, RDLENGTH 1B length for RDATA, RDATA
 
 https://mislove.org/teaching/cs4700/spring11/handouts/project1-primer.pdf
+
+TransactionID 2B for which asked
+Flags 2B 
+Response 1 as response, 0 as query,
+Opcode 0 stand, 1 reverse, 2 state
+Truncated 1 512B is cut off, 0 integrity
+TC same
+zero all 0 reserved
+Recursion hope for recursive response
+
+
