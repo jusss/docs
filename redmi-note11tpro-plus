@@ -1,3 +1,36 @@
+/system/build.prop
+
+for example
+adb shell # setprop sys.audio.quadspk 0
+
+1. low memory killer daemon, since android 12, it is in user space, 
+Starting with Android 12 the low memory killer is in the user space instead of the kernel. The kernel managers can no longer configure the low memory killer
+2. most ROMs use minfree_levels
+3. https://github.com/lululoid/LMKD-PSI-Activator
+4. /proc/sys/vm/swappiness should be 25 to 50
+https://source.android.com/docs/core/perf/lmkd
+https://forum.sailfishos.org/t/tuning-the-oom-killer-low-memory-killer/12676/15
+
+minfree 58580,70100,81620,93140,128245
+cat /sys/module/lowmemorykiller/parameters/minfree
+
+download fmiop-v2.3_941-beta.zip
+https://objects.githubusercontent.com/github-production-release-asset-2e65be/813609062/8a9a3a95-b54e-4cdd-a8cc-a3f38f91d305?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=releaseassetproduction%2F20250323%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250323T034502Z&X-Amz-Expires=300&X-Amz-Signature=d12630c1c64cfb2bdb6d527f7ca488b89c449cea6093574eae10a11c2f01c75f&X-Amz-SignedHeaders=host&response-content-disposition=attachment%3B%20filename%3Dfmiop-v2.3_941-beta.zip&response-content-type=application%2Foctet-stream
+install this module in magisk
+close memory extension, use this module create swap file 
++ no swap
+- set swap, then + will create /data/adb/fmiop_swap.1
+skip workaround patch
+after install is done, press back arrow on left top corner, you should see Fogimp module
+
+free -h check real memory, 
+if zygisk is off, enable it on settings -> enable zygisk for LSPosed
+
+android 14, AOSP use Pressure Stall Information(PSI) for low memory killer daemon,
+xiaomi HyperOS use min_free and oom_adj for lmkd
+https://github.com/lululoid/LMKD-PSI-Activator can do PSI for HyperOS
+AOSP use hybrid lmkd oom_adj and PSI on android 11
+-----------------------
 extension memory
 
 adb shell
@@ -44,6 +77,7 @@ change Magisk packages name to random for prevent by detect
 Magisk -> module install from local -> choose that zip file 
 Magisk -> Settings -> Configure DenyList -> three dots right top Show system apps
 choose apps won't detect root access
+see zygisk_shamiko module on modules in magisk
 
 ------------------------------------------------
 choose English when initalize, Settings -> Accounts & sync -> Basic Google services
