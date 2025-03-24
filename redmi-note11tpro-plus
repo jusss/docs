@@ -1,8 +1,85 @@
+
+/system/build.prop
+dalvik.vm.heapsize decide an app's memory size
+adb shell getprop|grep dalvik.vm.heapsize # get current heapsize
+512M as default for 4G+ RAM
+
+xagapro:/ $ getprop|grep lmk                                                             
+[init.svc.lmkd]: [running]
+[persist.sys.lmk.reportkills]: [true]
+[ro.lmk.debug]: [true]
+[ro.lmk.kill_timeout_ms]: [100]
+[ro.lmk.psi_complete_stall_ms]: [150]
+[ro.lmk.psi_partial_stall_ms]: [80]
+[ro.lmk.swap_free_low_percentage]: [40]
+[ro.lmk.thrashing_limit]: [30]
+[ro.lmk.thrashing_limit_decay]: [50]
+
+# find the current swap 
+xagapro:/ # cat /proc/swaps                                                              
+Filename				Type		Size		Used		Priority
+/data/adb/fmiop_swap                    file		2097148		1724888		32766
+
+xagapro:/ # zcat /proc/config.gz |grep PSI                                                                                                               
+CONFIG_PSI=y
+
+# unmount swap by LMKD-PSI-Activator
+swapoff /data/adb/fmiop_swap
+
 /system/build.prop
 
 for example
 adb shell # setprop sys.audio.quadspk 0
 
+# memory extension by HyperOS, it is zram, which compress in RAM, no swap like linux 
+xagapro:/ # cat /proc/swaps
+Filename				Type		Size		Used		Priority
+/dev/block/zram0                        partition	6291452		1668096		-2
+xagapro:/ #
+
+xagapro:/ # cat /sys/block/zram0/disksize 
+6442450944
+
+# make a swap like linux
+xagapro:/data/adb # magisk/busybox dd bs=1M count=4096 if=/dev/zero of=./myswap
+xagapro:/data/adb # magisk/busybox mkswap ./myswap
+xagapro:/data/adb # magisk/busybox swapon ./myswap
+# umount
+xagapro:/data/adb # magisk/busybox swapoff ./myswap
+
+xagapro:/ # cat /proc/sys/vm/swappiness                                                                                                                   100
+xagapro:/ # cat /proc/swaps                                                                                                                                  
+Filename				Type		Size		Used		Priority
+/dev/block/zram0                        partition	6291452		1457920		-2
+/data/adb/myswap                        file		2097148		0		-3
+xagapro:/ # 
+
+this is both zRAM and a traditional swap file, Dual Swap Mechanisms
+if you want to change the priority,
+umount swap before change the priority
+swapoff /dev/block/zram0
+swapoff /data/adb/myswap
+swapon /data/adb/myswap -p -2
+swapon /dev/block/zram0 -p -3
+
+if it show swapon: -p < 0 (see "swapon --help")
+then
+swapon /data/adb/myswap -p 0
+swapon /dev/block/zram0
+xagapro:/ # cat /proc/swaps
+Filename				Type		Size		Used		Priority
+/data/adb/swap_4G                       file		4194300		66816		0
+/dev/block/zram0                        partition	6291452		0		-2
+
+# write it to /etc/init.d/ for persistent
+/etc/init.d/change_swap_priority.sh
+swapoff /dev/block/zram0
+swapoff /data/adb/myswap
+swapon /data/adb/myswap -p -2
+swapon /dev/block/zram0 -p -3
+
+
+------------------------------------------------------
 1. low memory killer daemon, since android 12, it is in user space, 
 Starting with Android 12 the low memory killer is in the user space instead of the kernel. The kernel managers can no longer configure the low memory killer
 2. most ROMs use minfree_levels
