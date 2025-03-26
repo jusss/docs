@@ -1,3 +1,28 @@
+zram_swap dual 
+#!/system/bin/sh
+swapoff /dev/block/zram0
+mkswap /data/adb/swap_4G
+swapon /data/adb/swap_4G -p 0
+echo 4294967296 > /sys/block/zram0/disksize
+mkswap /dev/block/zram0
+swapon /dev/block/zram0
+echo "idle" > /sys/block/zram0/writeback
+echo 100 > /proc/sys/vm/swappiness
+
+ro.config.low_ram=false
+ro.lmk.use_psi=true
+ro.lmk.debug=false                                                                                           
+ro.lmk.use_minfree_levels=false  
+ro.lmk.low=1024
+ro.lmk.medium=2048
+ro.lmk.critical=4096
+
+use LMKD make swap, then 
+/data/adb # for F in fmiop_swap.*; do swapon $F; done
+cat /proc/swaps
+make 2G swap will make 20 files, 
+
+------------------------
 
 /system/build.prop
 dalvik.vm.heapsize decide an app's memory size
@@ -66,6 +91,7 @@ if it show swapon: -p < 0 (see "swapon --help")
 then
 swapon /data/adb/myswap -p 0
 swapon /dev/block/zram0
+
 xagapro:/ # cat /proc/swaps
 Filename				Type		Size		Used		Priority
 /data/adb/swap_4G                       file		4194300		66816		0
