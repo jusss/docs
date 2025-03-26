@@ -1,0 +1,49 @@
+see if zram is supported by kernel
+zcat /proc/config.gz |grep ZRAM
+CONFIG_ZRAM=m
+CONFIG_ZRAM_WRITEBACK=y
+
+zram + swap 
+# modprobe zram
+# echo "$(($(grep -Po 'MemTotal:\s*\K\d+' /proc/meminfo)/2))KiB"
+# zramctl /dev/zram0 --algorithm zstd --size "$(($(grep -Po 'MemTotal:\s*\K\d+' /proc/meminfo)/2))KiB"
+# ls /dev/zram0
+# mkswap /dev/zram0
+# cat /proc/swaps
+# swapoff /dev/sda6
+# swapon /dev/zram0
+# swapon /dev/sda6
+# free -h
+# echo 80 > /proc/sys/vm/swappiness
+
+
+when mkswap on /dev/zram0, get uuid for /etc/fstab
+UUID=ee1b935c-d298-4aca-871f-838f1fcab8c9
+size = 1.9 GiB (1991495680 bytes)
+
+# auto load
+echo zram > /etc/modules-load.d/zram.conf
+
+/etc/udev/rules.d/99-zram.rules
+ACTION=="add", KERNEL=="zram0", ATTR{initstate}=="0", ATTR{comp_algorithm}="zstd", ATTR{disksize}="1.9G", RUN="/usr/bin/mkswap -U ee1b935c-d298-4aca-871f-838f1fcab8c9 %N", TAG+="systemd"
+
+/etc/fstab
+# /dev/zram0
+UUID=ee1b935c-d298-4aca-871f-838f1fcab8c9 none swap defaults,discard,pri=100 0 0
+
+# get all the disk's uuid
+sudo blkid 
+
+zram with writeback
+you can resize zram by 'echo 1991495680 > /sys/block/zram0/disksize'
+# or modprobe -r zram; modprobe zram num_devices=1 comp_algorithm=lz4 disksize=1991495680
+echo "idle" > /sys/block/zram0/writeback
+# /dev/sda6 need to be swap file system
+echo /dev/sda6 > /sys/block/zram0/backing_dev   # none mean not enable
+mkswap /dev/zram0
+swapon /dev/zram0
+
+ref https://wiki.archlinux.org/title/Zram
+
+cat /sys/block/zram0/initstate # 0 mean not initialized, 1 mean initialized
+cat /sys/block/zram0/comp_algorithm # compressed algorithm
