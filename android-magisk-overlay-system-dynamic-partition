@@ -1,0 +1,26 @@
+
+magisk overlay on system dynamic partitions since android 10
+make zram size right!
+
+for overlay just one file
+
+$ su
+# cd /data/adb/modules
+# mkdir -p update_zram/system/system_ext/etc
+# cp /system/system_ext/etc/perfinit_bdsize_zram.conf update_zram/system/system_ext/etc
+# vi update_zram/system/system_ext/etc/perfinit_bdsize_zram.conf
+
+change that "4.0":6144 to 4096
+            "auto_zram_ram_8G":{
+                "def_bdsize":4.0, "4.0":6144, "6.0":6144, "8.0":8192
+            },
+# reboot
+
+
+for overlay entire etc directory, touch .replace, otherwise it will merge
+# cd /data/adb/modules
+# mkdir -p update_zram/system/system_ext
+# cp -r /system/system_ext/etc/ update_zram/system/system_ext/
+change that files under etc
+# touch update_zram/system/system_ext/etc/.replace    for replace, not merge
+https://topjohnwu.github.io/Magisk/guides.html
