@@ -16,6 +16,13 @@ change that "4.0":6144 to 4096
             },
 # reboot
 
+for reset system prop
+/data/adb/modules/update_zram/system.prop
+ro.lmk.swap_free_low_percentage=10
+ro.lmk.use_psi=true
+ro.lmk.use_minfree_levels=false
+ro.lmk.kill_heaviest_task=false
+
 
 for overlay entire etc directory, touch .replace, otherwise it will merge
 # cd /data/adb/modules
