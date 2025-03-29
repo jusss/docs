@@ -23,6 +23,38 @@ ro.lmk.use_psi=true
 ro.lmk.use_minfree_levels=false
 ro.lmk.kill_heaviest_task=false
 
+for auto swap after boot
+/data/adb/modules/update_zram/customize.sh
+set_perm $MODPATH/service.sh 0 0 0755
+
+/data/adb/modules/update_zram/service.sh
+#!/system/bin/sh
+# Do NOT assume where your module will be located.
+# ALWAYS use $MODDIR if you need to know where this script and module is placed.
+# This will make sure your module will still work if Magisk changes its mount point in the future
+MODDIR=${0%/*}
+
+export LOG_FILE="${MODDIR}/multi-mount.log"
+LOG_MAX_LINES=1000
+
+BOOTWAIT_MAX_COUNT=20
+BOOTWAIT_COUNT_INTERVAL=15s
+
+# wait for system boot to complete
+bootwait_count=0
+until [[ $(getprop sys.boot_completed) || ${bootwait_count} -ge ${BOOTWAIT_MAX_COUNT} ]]; do
+    sleep ${BOOTWAIT_COUNT_INTERVAL}
+    bootwait_count=$((bootwait_count+1))
+done
+if [ ${bootwait_count} -ge ${BOOTWAIT_MAX_COUNT} ]; then
+    exit 1
+fi
+
+swapon /data/adb/swap_2G
+# end of file
+
+chmod 0755 customize.sh service.sh
+
 
 for overlay entire etc directory, touch .replace, otherwise it will merge
 # cd /data/adb/modules
