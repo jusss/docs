@@ -32,7 +32,5 @@ Host moon
 
 DO NOT CONFIG ControlMaster
 
-
-or
-
-config ControlMaster, do not config Host moon
+ControlMaster auto, nologin user after auth will close the session, terminate 
+the master connection
