@@ -1,4 +1,18 @@
+mkdir /var/ssh-user
+# userdel john
+useradd -m -d /var/ssh-user/john  -s /bin/false john
+passwd john
+mkdir /var/ssh-user/john/.ssh
+cat john.pub > /var/ssh-user/john/.ssh/authorized_keys
+chown -R john:john /var/ssh-user/john/
+chmod 700 /var/ssh-user/john/.ssh
+chmod 600 /var/ssh-user/john/.ssh/authorized_keys
+systemctl restart sshd
 
+
+ssh -D 7070 -C -q -N -p PORT john@moon -i /home/john/.ssh/john
+
+----------------------------------------
 comment ~/.ssh/config
 #ServerAliveInterval 120
 #ControlPersist 2h

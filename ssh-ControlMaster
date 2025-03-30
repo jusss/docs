@@ -1,3 +1,28 @@
+
+comment ~/.ssh/config
+#ServerAliveInterval 120
+#ControlPersist 2h
+#ControlMaster auto
+#ControlPath ~/.ssh/master-%r@%h:%p
+
+disable ControlMaster for remote nologin user, otherwise it will login then disconnect immediatly
+
+when config like
+
+Host moon
+    HostName moon
+    User root
+    PreferredAuthentications publickey
+    Port 0
+    IdentityFile ~/.ssh/id_rsa
+
+DO NOT CONFIG ControlMaster
+
+
+or
+
+config ControlMaster, do not config Host moon
+------------------------------
 ~/.ssh/config
 Host *
 ControlPersist yes

@@ -1,3 +1,46 @@
+
+comment ~/.ssh/config
+#ServerAliveInterval 120
+#ControlPersist 2h
+#ControlMaster auto
+#ControlPath ~/.ssh/master-%r@%h:%p
+
+disable ControlMaster for remote nologin user, otherwise it will login then disconnect immediatly
+
+when config like
+
+Host moon
+    HostName moon
+    User root
+    PreferredAuthentications publickey
+    Port 0
+    IdentityFile ~/.ssh/id_rsa
+
+DO NOT CONFIG ControlMaster
+
+
+or
+
+config ControlMaster, do not config Host moon
+-------------------------------
+On Server
+
+# cat /etc/stunnel/stunnel.conf
+cert = /etc/stunnel/server.pem
+sslVersion = TLSv1.2
+pid = /stunnel.pid
+socket = l:TCP_NODELAY=1
+socket = r:TCP_NODELAY=1
+
+[sshd]
+accept = 0
+connect = 0
+TIMEOUTclose = 0
+
+
+this sslVersion=TLSv1.2 will work for macos client, 
+if it's TLSv1, server will show "tls_early_post_process_client_hello: unsupported protol" when client connect on macos
+---------------------------
 https://gist.github.com/jusss/5f9fa1c6c09f13622b4ae1225e9d2d5d
 https://gist.github.com/bwann/82ed679e94972666808d97587d276677
 
@@ -20,7 +63,7 @@ mkdir /var/run/stunnel4 ; chown john:john /var/run/stunnel4
 
 # write those into /etc/stunnel/stunnel.conf
 cert = /etc/stunnel/server.pem
-sslVersion = TLSv1
+sslVersion = TLSv1.2
 chroot = /var/run/stunnel4
 setuid = john
 setgid = john
