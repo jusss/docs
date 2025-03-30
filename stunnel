@@ -1,3 +1,22 @@
+
+On Server
+
+# cat /etc/stunnel/stunnel.conf
+cert = /etc/stunnel/server.pem
+sslVersion = TLSv1.2
+pid = /stunnel.pid
+socket = l:TCP_NODELAY=1
+socket = r:TCP_NODELAY=1
+
+[sshd]
+accept = 0
+connect = 0
+TIMEOUTclose = 0
+
+
+this sslVersion=TLSv1.2 will work for macos client, 
+if it's TLSv1, server will show "tls_early_post_process_client_hello: unsupported protol" when client connect on macos
+--------------------
 latest stunnel on debian do not accept TLSv1 anymore
 use TLSv1.2 on server
 sslVersion = TLSv1.2
