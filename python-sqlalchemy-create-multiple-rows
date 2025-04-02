@@ -1,0 +1,26 @@
+sqlalchemy create or update multiple rows
+
+create multiple rows with bulk_insert_mappings
+@classmethod
+def add_data(cls, data: [dict]):
+    with pg_db.session() as session:
+        session.bulk_insert_mappings(DatasetDetailModel, data)
+        dataset_id = data[0]["dataset_id"]
+        session.execute(
+            update(DatasetModel).where(DatasetModel.id == dataset_id).values(size=len(data) + DatasetModel.size)
+        )
+        session.commit()
+
+update multiple rows with execute(update)
+@classmethod
+def update(cls, result_update: dict):
+    with pg_db.session() as session:
+        session.execute(update(ResultDatasetModel), [result_update])
+        session.commit()
+
+
+create multiple rows with add_all
+models = [ResultDatasetModel(**variable_dict) for variable_dict in variable_dicts]
+session.add_all(models)
+session.commit()
+
