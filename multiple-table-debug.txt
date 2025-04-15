@@ -1,0 +1,16 @@
+                     result
+                    /
+            variable 
+          /
+experiment 
+         \  
+          variable
+                \
+                 result
+
+when experiment start, experiment state is 1, when it's done, it change to 2
+but when it's running, you update experiment to create a new variable record
+the new variable record will has nothing to link the result data, 
+and the old variable record which link to result data will never be update
+
+when it's running, do not accept update from post request
