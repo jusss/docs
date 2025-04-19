@@ -1,3 +1,19 @@
+degrade from hyper os 1.0.6 to MIUI 13.02
+
+DO NOT USE ADB REBOOT FASTBOOT TO GET INTO FASTBOOT MODE
+
+use `adb reboot fastboot` will get into a fake fastboot mode, the text FAST BOOT is blue
+use power button to poweroff, then hold volumn minus and power button to get real fastboot mode which text is orange
+
+
+1. download fastboot flash firm from miuiver.com
+2. exact the tgz package, run MiFlash 2020.3.14.0, choose the package where flash_all.sh path
+   like D:\Download\xaga\v1302\flash_all.sh, then click 'choose' D:\Download\xaga\v1302\
+3. connect the phone with PC by cable, click 'load device', check if the device is recognized
+4. choose 'delete all' on the bottom
+5. click 'flash'
+
+--------------------------------------------
 zram_swap dual 
 #!/system/bin/sh
 swapoff /dev/block/zram0
