@@ -13,6 +13,9 @@ use power button to poweroff, then hold volumn minus and power button to get rea
 4. choose 'delete all' on the bottom
 5. click 'flash'
 
+
+adb shell pm disable-user --user 0 com.google.android.setupwizard
+
 --------------------------------------------
 zram_swap dual 
 #!/system/bin/sh
