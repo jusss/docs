@@ -1,3 +1,6 @@
+turn files in music to mp3
+for i in *; do ffmpeg -i "$i" -b:a 192k "$i.mp3"; done
+-----------------------
 ffmpeg -i IMG_7540.MOV -vn -acodec copy -f adts IMG_7540.aac
 ------------------------------------
 ffmpeg -ss 01:45:07 -t 00:03:11 -i Wrong.Turn.2021.1080p.BluRay.x265-RARBG.mp4 -acodec copy -vcodec copy clip1.mp4
