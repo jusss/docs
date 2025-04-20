@@ -16,6 +16,8 @@ use power button to poweroff, then hold volumn minus and power button to get rea
 
 adb shell pm disable-user --user 0 com.google.android.setupwizard
 
+on miui 13, zram config is /system/etc/perfinit.conf
+on hyper os, zram config is /system/system_ext/etc/perfinit_bdsize_zram.conf
 --------------------------------------------
 zram_swap dual 
 #!/system/bin/sh

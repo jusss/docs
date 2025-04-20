@@ -3,8 +3,12 @@ https://github.com/yt-dlp/yt-dlp/issues/6763
 https://github.com/yt-dlp/yt-dlp/issues/6199
 https://github.com/yt-dlp/yt-dlp/issues/5716
 1. pip3 install yt-dlp or wget the link from release of yt-dlp at github then cp yt-dlp /usr/local/bin
+
+# chromium store cookies in ~/.config/chromium/Default/Cookies
+# firefox store cookies in ~/.mozilla/firefox/yqnxjsy3.default-release/cookies.sqlite
+
 2. use your local chromium to login twitter, get the cookies,
-    tar -cvf chromium.cookies.tar .config/chromium/Default
+    tar -cvf chromium.cookies.tar .config/chromium/Default/Cookies
     pass that to remote, and tar -xvf chromium.cookies.tar on remote
 3. yt-dlp -F "https://twitter.com/_Saraurora_/status/1614746772974501896" --cookies-from-browser "chrome:~/.config/chromium/Default::twitter"
 
