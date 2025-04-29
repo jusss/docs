@@ -1,3 +1,29 @@
+
+# HyperOS 2.0.3.0, develop options need enable App cache Optimization
+
+ps -A|grep xhs  # the pid is 9122
+cat /proc/9122/cgroup
+0::/uid_10239/pid_9122
+# check if 9122 in 
+/sys/fs/cgroup # cat uid_10239/pid_9122/cgroup.procs 
+/sys/fs/cgroup # echo 1 > uid_10239/pid_9122/cgroup.freeze
+dumpsys activity|grep frozen
+# now switch to xhs, you see it can't be scroll or click, it's frozen
+# undo frozen
+/sys/fs/cgroup # echo 0 > uid_10239/pid_9122/cgroup.freeze
+
+---------------------
+xagapro:/ $ pm uninstall --user 0 com.miui.guardprovider
+Success
+xagapro:/ $ pm uninstall --user 0 com.xiaomi.joyose
+Success
+xagapro:/ $ pm uninstall --user 0 com.xiaomi.mtb
+Success
+xagapro:/ $ pm uninstall --user 0 com.miui.powerkeeper
+Success
+com.iflytek.inputmethod.miui
+com.sohu.inputmethod.sogou.xiaomi
+-----------------------
 use minfree for lmkd
 
 xagapro:/ # cat data/adb/modules/change_system/system.prop
@@ -33,7 +59,7 @@ done
 if [ ${bootwait_count} -ge ${BOOTWAIT_MAX_COUNT} ]; then
     exit 1
 fi
-device_config put activity_manager_native_boot user_freezer true
+device_config put activity_manager_native_boot use_freezer true
 lmkd --reinit
 # swapoff /dev/block/zram0
 
