@@ -1,3 +1,27 @@
+https://stackoverflow.com/questions/74608958/
+sudo mount -t tmpfs cgroup_root /sys/fs/cgroup
+
+https://android.googlesource.com/kernel/common/+/android-trusty-3.10/Documentation/cgroups/cgroups.txt
+
+feed 'mount -t tmpfs cgrou_root /sys/fs/cgroup' to grok
+
+to freeze or unfreeze apps, you would manipulate files like /sys/fs/cgroup/uid_*/pid_*/cgroup.freeze, 1 to freeze 0 to unfreeze on android 12
+
+# android 11
+
+but on android 11, uid is in  /sys/fs/cgroup/cgroup.procs
+
+/sys/fs/cgroup # mount -t cgroup -o freezer cgroup /sys/fs/cgroup/freezer
+
+mkdir freezer/myfreezer
+ps -A|grep xhs
+echo 10948 > freezer/myfreezer/cgroup.procs
+echo FROZEN > freezer/myfreezer/freezer.state
+echo THAWED > freezer/myfreezer/freezer.state
+
+
+# mount -t cgroup -o freezer cgroup /sys/fs/cgroup/
+------------------------------------
 
 # HyperOS 2.0.3.0, develop options need enable App cache Optimization
 
@@ -11,6 +35,13 @@ dumpsys activity|grep frozen
 # now switch to xhs, you see it can't be scroll or click, it's frozen
 # undo frozen
 /sys/fs/cgroup # echo 0 > uid_10239/pid_9122/cgroup.freeze
+
+There are /sys/fs/cgroup/frozen and unfrozen path on HyperOS
+# frozen
+echo 3918 > frozen/cgroup.procs
+
+# unfrozen
+echo 3918 > unfrozen/cgroup.procs
 
 ---------------------
 xagapro:/ $ pm uninstall --user 0 com.miui.guardprovider
