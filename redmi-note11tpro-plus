@@ -1,3 +1,9 @@
+# frozen
+echo 1 > /sys/fs/cgroup/$(cat /proc/$(pidof com.xingin.xhs)/cgroup|tail -1|cut -d ':' -f 3)/cgroup.freeze
+# unfrozen
+echo 0 > /sys/fs/cgroup/$(cat /proc/$(pidof com.xingin.xhs)/cgroup|tail -1|cut -d ':' -f 3)/cgroup.freeze
+---------------------------------------
+III
 https://stackoverflow.com/questions/74608958/
 sudo mount -t tmpfs cgroup_root /sys/fs/cgroup
 
@@ -22,7 +28,7 @@ echo THAWED > freezer/myfreezer/freezer.state
 
 # mount -t cgroup -o freezer cgroup /sys/fs/cgroup/
 ------------------------------------
-
+I
 # HyperOS 2.0.3.0, develop options need enable App cache Optimization
 
 ps -A|grep xhs  # the pid is 9122
@@ -36,7 +42,8 @@ dumpsys activity|grep frozen
 # undo frozen
 /sys/fs/cgroup # echo 0 > uid_10239/pid_9122/cgroup.freeze
 
-There are /sys/fs/cgroup/frozen and unfrozen path on HyperOS
+II
+There also are /sys/fs/cgroup/frozen and unfrozen path on HyperOS
 # frozen
 echo 3918 > frozen/cgroup.procs
 
