@@ -1,0 +1,177 @@
+why when click "Refresh Activity" button, SwitchApp still use the previous toggle, not refresh by lates values, it cause the first element in previous activity been clicked, turn to checked, but click the refresh activity button, since list may changed, the element in the new arrange of may not still be the first, but the first still show been checked
+
+The issue you're describing arises because the `SwitchApp` composable in your `MainActivity.kt` is not properly updating its state when the activity is recreated via the "Refresh Activity" button. Specifically, the `checked` state in the `SwitchApp` composable is initialized based on the `frozenState` passed to it, but it does not dynamically update when the `frozenState` list changes after the activity is recreated. This leads to the switch retaining its previous toggle state (e.g., checked or unchecked) even if the underlying data has changed. Below, I'll explain the root cause and provide a solution.
+
+### Root Cause
+1. **State Persistence with `rememberSaveable`**:
+   - In the `SwitchApp` composable, you use `rememberSaveable` to persist the `checked` state across configuration changes or activity recreation:
+     ```kotlin
+     var checked by rememberSaveable { mutableStateOf(state) }
+     ```
+     `rememberSaveable` saves the state in a way that survives activity recreation (e.g., when `activity.recreate()` is called). However, the initial value of `checked` is set based on the `frozenState` passed to `SwitchApp` during the first composition:
+     ```kotlin
+     var state = false
+     if (frozenState == "1") {
+         state = true
+     }
+     ```
+     When the activity is recreated, the `frozenState` list might change (e.g., a different app might appear first in the list), but the `checked` state for each `SwitchApp` instance is restored from the saved state, not reinitialized based on the new `frozenState`. This causes a mismatch between the UI (switch toggle state) and the actual state of the app (as determined by `frozenState`).
+
+2. **Lack of Keyed Composable**:
+   - In the `ListApp` composable, you map over the `frozenState` list to create `SwitchApp` composables:
+     ```kotlin
+     frozenState.map {
+         SwitchApp(it[0], it[1], it[2], it[3])
+     }
+     ```
+     Jetpack Compose does not inherently know how to associate each `SwitchApp` instance with a specific item in the `frozenState` list. When the list changes (e.g., after refreshing), Compose may reuse the saved state of a `SwitchApp` for a different item in the list, leading to incorrect toggle states. This is particularly problematic because the order or contents of `frozenState` may change, but the saved `checked` states are applied to the new list items in the same order they were saved.
+
+3. **Activity Recreation**:
+   - When you call `activity.recreate()`, the entire activity is destroyed and recreated, and the `onCreate` function runs again to generate a new `frozenState` list. However, the `SwitchApp` composables restore their `checked` states from the saved state, which may no longer correspond to the correct apps in the new `frozenState` list.
+
+### Solution
+To fix this issue, you need to ensure that the `checked` state in each `SwitchApp` composable is tied to the specific app it represents (e.g., using a unique identifier like the `uid` or `appName`) and is updated correctly when the `frozenState` changes. You can achieve this by using a **key** in the `SwitchApp` composable to ensure that Compose correctly associates the state with the corresponding data item, and by reinitializing the `checked` state based on the latest `frozenState`.
+
+Here’s how you can modify the code:
+
+#### Modified Code
+```kotlin
+@Composable
+fun SwitchApp(uid: String, pid: String, appName: String, frozenState: String) {
+    // Initialize state based on frozenState
+    var checked by rememberSaveable(uid) { mutableStateOf(frozenState == "1") }
+
+    Row(
+        modifier = Modifier
+            .height(35.dp)
+            .padding(top = 10.dp),
+        horizontalArrangement = Arrangement.Start
+    ) {
+        Text(text = appName)
+        Switch(
+            modifier = Modifier.padding(10.dp),
+            checked = checked,
+            onCheckedChange = {
+                checked = it
+                if (checked) {
+                    runCmd("echo 1 > /sys/fs/cgroup/uid_10" + uid.slice(listOf(4,5,6)) + "/cgroup.freeze\n")
+                    frozenApps.add(listOf(uid, pid, appName, "1"))
+                } else {
+                    runCmd("echo 0 > /sys/fs/cgroup/uid_10" + uid.slice(listOf(4,5,6)) + "/cgroup.freeze\n")
+                    val target = frozenApps.filter { it[0] == uid }
+                    if (target.isNotEmpty()) {
+                        frozenApps.remove(target[0])
+                    }
+                }
+            }
+        )
+    }
+}
+
+@Composable
+fun ListApp(frozenState: List<List<String>>, activity: MainActivity) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 56.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Button(onClick = {
+            activity.recreate() // Refresh the activity
+        }) {
+            Text("Refresh Activity")
+        }
+
+        frozenState.forEach { app ->
+            key(app[0]) { // Use uid as a unique key
+                SwitchApp(app[0], app[1], app[2], app[3])
+            }
+        }
+    }
+}
+```
+
+#### Key Changes
+1. **Add a Unique Key to `rememberSaveable`**:
+   - In `SwitchApp`, the `checked` state is now saved with a key based on the `uid`:
+     ```kotlin
+     var checked by rememberSaveable(uid) { mutableStateOf(frozenState == "1") }
+     ```
+     By passing the `uid` as a key to `rememberSaveable`, the saved state is tied to the specific `uid` of the app. This ensures that when the activity is recreated, the `checked` state is restored for the correct app, even if the order of the `frozenState` list changes.
+
+2. **Use `key` in `ListApp`**:
+   - In `ListApp`, the `SwitchApp` composables are now wrapped in a `key` block that uses the `uid` (i.e., `app[0]`) as a unique identifier:
+     ```kotlin
+     frozenState.forEach { app ->
+         key(app[0]) {
+             SwitchApp(app[0], app[1], app[2], app[3])
+         }
+     }
+     ```
+     The `key` composable ensures that Compose tracks each `SwitchApp` instance by the `uid`, so if the `frozenState` list changes (e.g., a different app is now first), Compose correctly reuses or recreates the composable for the corresponding app, avoiding state mismatches.
+
+3. **Use `forEach` Instead of `map`**:
+   - Changed `frozenState.map { ... }` to `frozenState.forEach { ... }` in `ListApp`. While `map` works, `forEach` with `key` is more explicit for rendering UI elements and avoids creating an unnecessary list of composables.
+
+#### Why This Works
+- **Unique State Association**: Using `uid` as a key in both `rememberSaveable` and the `key` composable ensures that the `checked` state is tied to the specific app (identified by `uid`). This prevents the state from being incorrectly applied to a different app when the `frozenState` list changes.
+- **Correct State Initialization**: The `checked` state is initialized based on the latest `frozenState` value (`frozenState == "1"`) each time the composable is created, ensuring it reflects the current freeze state of the app.
+- **Handling List Changes**: The `key` composable ensures that Compose properly handles additions, removals, or reordering of items in the `frozenState` list, so the UI state remains consistent with the data.
+
+### Additional Considerations
+1. **Avoid Global `frozenApps` Mutations**:
+   - The `frozenApps` global variable is modified in the `SwitchApp` composable, which can lead to unpredictable behavior in a Compose-based app. Consider managing this state using a `ViewModel` or a similar state management solution to ensure predictable updates and to avoid side effects in composables. For example:
+     ```kotlin
+     class MainViewModel : ViewModel() {
+         private val _frozenApps = mutableStateListOf<List<String>>()
+         val frozenApps: List<List<String>> get() = _frozenApps
+
+         fun addFrozenApp(app: List<String>) {
+             _frozenApps.add(app)
+         }
+
+         fun removeFrozenApp(uid: String) {
+             _frozenApps.removeAll { it[0] == uid }
+         }
+     }
+     ```
+     Then, pass the `ViewModel` to `ListApp` and `SwitchApp` to manage `frozenApps` state.
+
+2. **Thread Safety for `runCmd`**:
+   - The `runCmd` function executes shell commands and modifies `frozenApps`. Since it involves I/O operations, ensure it runs on a background thread to avoid blocking the UI. You’re already using `GlobalScope` in other parts of the code, but for `runCmd` calls in `SwitchApp`, consider using a `CoroutineScope` tied to the composable’s lifecycle:
+     ```kotlin
+     val coroutineScope = rememberCoroutineScope()
+     Switch(
+         modifier = Modifier.padding(10.dp),
+         checked = checked,
+         onCheckedChange = {
+             coroutineScope.launch {
+                 checked = it
+                 if (checked) {
+                     withContext(Dispatchers.IO) {
+                         runCmd("echo 1 > /sys/fs/cgroup/uid_10" + uid.slice(listOf(4,5,6)) + "/cgroup.freeze\n")
+                         frozenApps.add(listOf(uid, pid, appName, "1"))
+                     }
+                 } else {
+                     withContext(Dispatchers.IO) {
+                         runCmd("echo 0 > /sys/fs/cgroup/uid_10" + uid.slice(listOf(4,5,6)) + "/cgroup.freeze\n")
+                         val target = frozenApps.filter { it[0] == uid }
+                         if (target.isNotEmpty()) {
+                             frozenApps.remove(target[0])
+                         }
+                     }
+                 }
+             }
+         }
+     )
+     ```
+
+3. **Error Handling**:
+   - The `runCmd` function catches exceptions but only prints the stack trace. Consider providing feedback to the user (e.g., a toast or snackbar) if a command fails, especially since this app requires root permissions (`su`).
+
+4. **Testing**:
+   - Test the app with various scenarios (e.g., apps being added/removed from `frozenState`, rapid refresh clicks) to ensure the UI updates correctly and no state mismatches occur.
+
+### Summary
+The issue is caused by `rememberSaveable` restoring the `checked` state for `SwitchApp` composables without accounting for changes in the `frozenState` list. By adding a unique `uid` key to both `rememberSaveable` and the `key` composable, you ensure that the state is correctly associated with each app, and the UI reflects the latest `frozenState` after a refresh. For a more robust solution, consider using a `ViewModel` to manage state and handle `runCmd` operations in a coroutine to avoid blocking the UI.
