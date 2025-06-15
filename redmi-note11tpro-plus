@@ -1,3 +1,72 @@
+fastboot reboot recovery # will cause bootloop on mtk chips, snapdragon does not have this issue
+snapdragon has 9008 to unbrick phone, mtk need OEM and mtk auth for flash da.bin by sp flash tool
+mtk bypas auth only for like 1200, not 8100 and 9000 serise
+mtk v5 and v6 need auth to flash
+there's a tool like xiaomi auth flash tool can buy auth to flash
+---------------------------------
+one plus ace 3pro can enable 'suspend execution when cached'
+OP5D06L1:/ $ dumpsys activity|grep free
+  use_freezer=true
+
+but 
+cat /sys/fs/cgroup/cgroup.controllers
+OP5D06L1:/ $ cat /sys/fs/cgroup/cgroup.subtree_control
+still be nothing
+
+cat /etc/cgroups.json                                                       
+{
+  "Cgroups": [
+    {
+      "Controller": "blkio",
+      "Path": "/dev/blkio",
+      "Mode": "0755",
+      "UID": "system",
+      "GID": "system"
+    },
+    {
+      "Controller": "cpu",
+      "Path": "/dev/cpuctl",
+      "Mode": "0755",
+      "UID": "system",
+      "GID": "system"
+    },
+    {
+      "Controller": "cpuset",
+      "Path": "/dev/cpuset",
+      "Mode": "0755",
+      "UID": "system",
+      "GID": "system"
+    },
+    {
+      "Controller": "memory",
+      "Path": "/dev/memcg",
+      "Mode": "0755",
+      "UID": "system",
+      "GID": "system",
+      "Optional": true
+    }
+  ],
+  "Cgroups2": {
+    "Path": "/sys/fs/cgroup",
+    "Mode": "0755",
+    "UID": "system",
+    "GID": "system",
+    "Controllers": [
+      {
+        "Controller": "freezer",
+        "Path": ".",
+        "Mode": "0755",
+        "UID": "system",
+        "GID": "system"
+      }
+    ]
+  }
+}
+
+-------------------
+google 'poco x4 gt crdroid'
+https://sourceforge.net/projects/xagaproject/files
+---------------------------
 # frozen
 echo 1 > /sys/fs/cgroup/$(cat /proc/$(pidof com.xingin.xhs)/cgroup|tail -1|cut -d ':' -f 3)/cgroup.freeze
 # unfrozen
