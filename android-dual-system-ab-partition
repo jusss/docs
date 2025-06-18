@@ -1,0 +1,44 @@
+system partition may have two partition since android 8.0, and compatible to project treble for only flash Generic System Images to upgrade android system,
+
+fastboot flash system GSI.img
+
+do not specify system_a or system_b, fastboot will flash on the active slot, 
+fastboot getvar all  # can get which slot is active
+
+fastboot --disable-verity --disable-verification flash vbmeta_b vbmeta_patched.img  # disable verified boot metadata
+fastboot erase system_b  # fastboot erase system_a
+fastboot flash system_b GSI.img # fastboot flash system_a GSI.img
+fastboot set_active b # change active slot 
+fastboot erase cache
+fastboot -w reboot    # -w will clean data
+
+# if the device can not boot, revert to the other slot
+fastboot set_active b
+
+boot(kernel ramdisk), system(android system), vendor(driver), vbmeta(verified boot metadata)
+dtbo(Device Tree Blob Overlay, config for hardware)
+data(data and apps), cache(temporary file), metadata(slot information)
+
+# dump origin vbmeta
+fastboot dump vbmeta vbmeta_backup.img
+# or extract it from the official fastboot package, copy boot.img and vbmeta.img to a.tar, 
+# magisk 'install' -> 'install to file' choose a.tar, it will generate patched vbmeta.img and boot.img
+
+fastboot flash vbmeta magisk_patched_vbmeta.img
+
+# or use avbtool
+pip3 install avbtool
+avbtool make_vbmeta_image --flag 2 --output vbmeta_patched.img
+
+
+The A/B partition scheme divides critical Android partitions (e.g., system, boot, vendor, vbmeta) into two sets, referred to as slot A and slot B. Each slot contains a complete, independent copy of the Android system, allowing updates to be applied to one slot while the other remains active.
+
+Slot A: system_a, boot_a, vendor_a, vbmeta_a
+Slot B: system_b, boot_b, vendor_b, vbmeta_b
+Shared: data, cache, metadata
+
+# get current active slot
+adb shell getprop ro.boot.slot_suffix
+
+
+

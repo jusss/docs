@@ -1,0 +1,7 @@
+https://sspai.com/post/53772
+https://developer.android.com/topic/generic-system-image/releases?hl=zh-cn
+
+GSI only contain vbmeta.img and system.img, but since android 10 most android devices use dynamic partitions,
+system.img and some other partitions merge into super.img
+
+search how to update system.img over OTA on dynamic partitions android
