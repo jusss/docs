@@ -1,0 +1,42 @@
+if you want store post message in memory without db, if this message only available one time for a long chain function call
+like A call B, but B is a post may stuck, it require a few time, message only available in this function call chain, use instance attribute
+can share variables to avoid like B=C(); A(B)
+
+class Service:
+    def __init__(self):
+        self.msg = []
+
+    def call(self, request):
+        self.request = request
+        self.new_msg = change(request)
+        self.post()
+        self.next()
+
+    def post():
+        do(self.new_msg, self.request)
+
+    def chat(self, request):
+        self.msg.append(request)
+
+
+@app.post("/api/run")
+async def f(request: str = Form()):
+    service = Service()
+    service.call(request)
+
+
+if you want the next post can use the previous post message like chat
+
+service = Service()
+@app.post("/api/chat")
+async def chat(request: str = Form()):
+    service.chat(request)
+
+since Service is initialized outside of function chat, so it can store message per request
+also you can store msg in data class
+
+class Service:
+    msg: list
+    @staticmethod
+    def chat(cls, request):
+        cls.msg.append(request)
