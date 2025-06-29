@@ -120,16 +120,23 @@ echo 3918 > frozen/cgroup.procs
 echo 3918 > unfrozen/cgroup.procs
 
 ---------------------
-xagapro:/ $ pm uninstall --user 0 com.miui.guardprovider
-Success
-xagapro:/ $ pm uninstall --user 0 com.xiaomi.joyose
-Success
-xagapro:/ $ pm uninstall --user 0 com.xiaomi.mtb
-Success
-xagapro:/ $ pm uninstall --user 0 com.miui.powerkeeper
-Success
-com.iflytek.inputmethod.miui
-com.sohu.inputmethod.sogou.xiaomi
+pm uninstall --user 0 com.miui.guardprovider
+pm uninstall --user 0 com.xiaomi.joyose
+pm uninstall --user 0 com.xiaomi.mtb
+pm uninstall --user 0 com.miui.powerkeeper
+pm uninstall --user 0 com.iflytek.inputmethod.miui
+pm uninstall --user 0 com.sohu.inputmethod.sogou.xiaomi
+pm uninstall --user 0 com.miui.personalassistant
+pm uninstall --user 0 com.android.browser
+pm uninstall --user 0 com.miui.miservice
+pm uninstall --user 0 com.mi.health
+pm uninstall --user 0 com.miui.voiceassist
+pm uninstall --user 0 com.miui.video
+pm uninstall --user 0 com.xiaomi.aiasst.vision
+pm uninstall --user 0 com.miui.player
+pm uninstall --user 0 com.xiaomi.mibrain.speech
+pm uninstall --user 0 com.miui.greenguard
+
 -----------------------
 use minfree for lmkd
 
