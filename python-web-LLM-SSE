@@ -1,0 +1,6 @@
+EventSource in Javascript only can do GET, not POST
+so use POST to post conversation_id and query, but do not expect result,
+use EventSource with GET and conversation_id to read SSE data
+query is with POST not GET, this is safe
+and SSE EventSource with GET can be a long connection, unless user create a new conversation, POST is one-off connection
+write chatbox into /chat.html for UI with text/html Content-Type, but POST and GET use another /api/chat with text/event-stream Content-Type
