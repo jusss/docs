@@ -1,0 +1,9 @@
+if you want rollback master branch to B branch was merged
+get the latest commit id before B branch merged
+
+on local
+git checkout master
+git reset --hard xxx
+git push origin master --force
+
+

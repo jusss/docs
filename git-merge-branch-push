@@ -1,0 +1,10 @@
+on branch A
+
+git add *
+git commit -m '.'
+git checkout master
+git merge A
+git log
+git push origin master
+git checkout A
+
