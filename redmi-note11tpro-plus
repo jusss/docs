@@ -122,6 +122,9 @@ echo 3918 > unfrozen/cgroup.procs
 ---------------------
 pm uninstall --user 0 com.miui.guardprovider
 pm uninstall --user 0 com.xiaomi.joyose
+pm uninstall --user 0 com.miui.hybrid
+pm uninstall --user 0 com.miui.analytics
+pm uninstall --user 0 com.miui.daemon
 pm uninstall --user 0 com.xiaomi.mtb
 pm uninstall --user 0 com.miui.powerkeeper
 pm uninstall --user 0 com.iflytek.inputmethod.miui
