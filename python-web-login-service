@@ -1,0 +1,86 @@
+nowadays they use 
+token return as data to front-end, front-end set token in request
+instead of 
+back-end set token in cookie of browser
+
+the old way, after login, server will use set_cookie function set token in browser's header, store in cookie
+now server will not set_cookie to browser, just return the token as data to front-end, and front-end put token
+in header for visit, front-end will store token in browser's localStorage for persistence
+
+server will check token in header for authorization
+
+JWT token can set user id and expired data
+
+python3 fastapi fastapi.Response
+
+    async def login(request: Login, r: Request, response: Response):
+        if (request.user == "") and (request.password == ""):
+            response.set_cookie(key= "token", value=token)
+            return {"code": 200, "msg": "login success", "data": {"token": token}}
+        else:
+            return {"code": 402, "msg": "Wrong user or password"}
+
+
+auth_dict = {"token": token}
+def check_login(r: Request, auth_dict: dict):
+    cookie_string = r.headers.get("Cookie", "")
+    if not cookie_string:
+        return False
+
+    cookie = SimpleCookie()
+    cookie.load(cookie_string)
+    cookie_dict = {key: cookie[key].value for key in cookie}
+    for k,v in auth_dict.items():
+        if cookie_dict.get(k, "") != v:
+            return False
+    return True
+
+
+@app.get("/")
+async def index(r: Request):
+    if check_login(r, auth_dict):
+        return {"msg": "Hello World!"}
+    return RedirectResponse(url="/api/login")
+
+
+
+haskell scotty Web.Scotty.Cookie
+setSimpleCookie "token" "xxx"
+
+python3 fastapi jwt token
+
+@app.post("/login")
+async def login(credentials: LoginCredentials, response: Response):
+    # Simulate authentication (replace with real auth logic)
+    if credentials.username != "" or credentials.password != "":
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
+
+    # Create JWT
+    token = jwt.encode({
+        "userId": "123",
+        "exp": datetime.utcnow() + timedelta(hours=1)
+    }, SECRET_KEY, algorithm=ALGORITHM)
+
+    # Set cookie
+    response.set_cookie(
+        key="auth_token",
+        value=token,
+        httponly=True,
+        secure=True,  # Use True in production with HTTPS
+        samesite="strict",
+        max_age=3600  # 1 hour
+    )
+    return {"message": "Logged in"}
+
+
+Difference
+
+set token in cookie, has XSS risks, only used by browser, front-end do not intervent
+handle token by front-end, store in localStorage, can be used on other devices for auth, and not only on browser
+
+use the old way, set cookie by server to save token, it can download some files without front-end but still auth with token
+
+When the browser makes a request to the server (e.g., to download a file), it automatically includes the cookie in the request headers for the same domain, as long as the cookie’s Path and SameSite attributes allow it.
+
+the new way is token as parameter to post or get for auth in request
+
