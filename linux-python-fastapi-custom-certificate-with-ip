@@ -1,0 +1,159 @@
+generate 
+
+openssl req -nodes -newkey rsa:2048 -keyout example.key -out example.csr -subj "/C=GB/ST=London/L=London/O=Acme Widgets/OU=IT Department/CN=127.0.0.1" -addext "subjectAltName=IP:127.0.0.1"
+
+openssl x509 -req -days 365 -in example.csr -signkey example.key -out example.crt -extfile <(echo "subjectAltName=IP:127.0.0.1")
+
+
+check
+openssl x509 -in example.crt -noout -text
+find 
+X509v3 extensions:
+    X509v3 Subject Alternative Name:
+        IP Address:127.0.0.1
+
+
+explain
+-addext "subjectAltName=IP:127.0.0.1": Adds the SAN for the IP address 127.0.0.1.
+-extfile <(echo "subjectAltName=IP:127.0.0.1"): Ensures the SAN is included in the signed certificate.
+modern browsers (since 2017) ignore CN and require a SAN that matches the accessed hostname or IP. Without a SAN, Chrome will reject the certificate.
+
+on mac os
+Launcher -> Search Keychain Access
+choose 'system' on the left bar, File -> import item -> example.crt on top bar, double click this item, 
+click Trust to unfold, choose SSL -> Trust Forever, then close, it will pop up auth window, input password, done
+
+on local
+if __name__ == "__main__":
+    import uvicorn
+    # uvicorn.run(app, host="0.0.0.0", port=6000)
+    uvicorn.run(
+        app,
+        host="0.0.0.0",
+        port=6000,
+        ssl_keyfile="./example.key",
+        ssl_certfile="./example.crt"
+    )
+
+re-open safari or chrome to visit https://127.0.0.1:6000
+
+test with curl
+curl --cacert example.crt https://localhost:6000
+
+example.key is Private Key, 
+example.csr is Certificate Signing Request
+example.crt is Certificate
+this above command does not generate Root Certificate, aka Root CA, 
+the next command can do it
+#Create the Root CA Private Key and CSR
+openssl req -nodes -newkey rsa:2048 -keyout ca.key -out ca.csr -subj "/C=GB/ST=London/L=London/O=Acme Widgets/OU=IT Department/CN=Acme Root CA"
+
+#Create the Root CA Certificate
+openssl x509 -req -days 3650 -in ca.csr -signkey ca.key -out ca.crt -extensions v3_ca -extfile <(echo -e "[v3_ca]\nbasicConstraints=critical,CA:TRUE\nkeyUsage=critical,keyCertSign,cRLSign")
+
+#Verify the Root CA Certificate:
+openssl x509 -in ca.crt -noout -text
+look for
+X509v3 Basic Constraints: critical
+    CA:TRUE
+X509v3 Key Usage: critical
+    Certificate Sign, CRL Sign
+
+# Generate a Server Certificate Signed by the Root CA
+openssl req -nodes -newkey rsa:2048 -keyout server.key -out server.csr -subj "/C=GB/ST=London/L=London/O=Acme Widgets/OU=IT Department/CN=127.0.0.1" -addext "subjectAltName=IP:127.0.0.1"
+
+#Sign the Server CSR with the Root CA
+openssl x509 -req -days 365 -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out server.crt -extfile <(echo -e "[v3_req]\nbasicConstraints=CA:FALSE\nsubjectAltName=IP:127.0.0.1\nkeyUsage=critical,digitalSignature,keyEncipherment")
+
+#Verify the Server Certificate:
+openssl x509 -in server.crt -noout -text
+look for
+Issuer: C=GB, ST=London, L=London, O=Acme Widgets, OU=IT Department, CN=Acme Root CA
+Subject: C=GB, Lill=London, O=Acme Widgets, OU=IT Department, CN=127.0.0.1
+X509v3 Subject Alternative Name:
+    IP Address:127.0.0.1
+X509v3 Basic Constraints:
+    CA:FALSE
+
+# Use the Certificates in Your FastAPI Script
+import uvicorn
+from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/")
+async def root():
+    return {"message": "Hello, HTTPS World!"}
+
+if __name__ == "__main__":
+    uvicorn.run(
+        app="main:app",
+        host="0.0.0.0",
+        port=6000,
+        ssl_keyfile="./server.key",
+        ssl_certfile="./server.crt"
+    )
+
+other systems
+
+Windows
+
+    Import the Certificate to the Trusted Root Certification Authorities Store:
+        Open the Certificate Management Tool:
+            Press Win + R, type certmgr.msc, and press Enter to open the Certificate Manager.
+        Navigate to Trusted Root Certification Authorities:
+            In the left pane, expand Certificates - Current User or Certificates (Local Computer) (for all users).
+            Right-click Trusted Root Certification Authorities > All Tasks > Import.
+        Import the Certificate:
+            Click Next in the Certificate Import Wizard.
+            Browse to your server.crt file and select it.
+            Ensure the certificate is placed in the Trusted Root Certification Authorities store.
+            Complete the wizard and click Finish.
+        Restart the Browser
+
+Linux (Ubuntu/Debian)
+
+    Add the Certificate to the System Trust Store:
+        Copy the Certificate:
+            Copy your server.crt to the system’s certificate store:
+            bash
+
+    sudo cp server.crt /usr/local/share/ca-certificates/
+
+    Update the Certificate Store:
+
+    Run the following command to update the system’s trusted certificates:
+    bash
+
+    sudo update-ca-certificates
+    This adds the certificate to /etc/ssl/certs.
+
+    Restart the Browser
+
+Firefox-Specific Steps (All Operating Systems)
+
+    Firefox maintains its own certificate store, independent of the OS.
+
+    Import the Certificate in Firefox:
+        Open Firefox and go to Settings > Privacy & Security.
+        Scroll to the Certificates section and click View Certificates.
+        In the Certificate Manager, go to the Authorities tab and click Import.
+        Select your server.crt file and click Open.
+        Check the box for Trust this CA to identify websites and click OK.
+        Restart Firefox.
+
+Mobile Browsers
+
+    iOS (Safari):
+        Email or transfer server.crt to your iOS device.
+        Open the file on the device, which prompts installation.
+        Go to Settings > General > Profile > [Your Certificate] > Install.
+        Enable trust: Go to Settings > General > About > Certificate Trust Settings and toggle on trust for your certificate.
+
+Android (Chrome):
+
+    Transfer server.crt to your device.
+    Go to Settings > Security > Install from storage (or similar, depending on the Android version).
+    Select server.crt and install it as a CA certificate.
+
+

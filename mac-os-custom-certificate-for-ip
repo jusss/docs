@@ -1,0 +1,38 @@
+generate 
+
+openssl req -nodes -newkey rsa:2048 -keyout example.key -out example.csr -subj "/C=GB/ST=London/L=London/O=Acme Widgets/OU=IT Department/CN=127.0.0.1" -addext "subjectAltName=IP:127.0.0.1"
+
+openssl x509 -req -days 365 -in example.csr -signkey example.key -out example.crt -extfile <(echo "subjectAltName=IP:127.0.0.1")
+
+
+check
+openssl x509 -in example.crt -noout -text
+find 
+X509v3 extensions:
+    X509v3 Subject Alternative Name:
+        IP Address:127.0.0.1
+
+
+explain
+-addext "subjectAltName=IP:127.0.0.1": Adds the SAN for the IP address 127.0.0.1.
+-extfile <(echo "subjectAltName=IP:127.0.0.1"): Ensures the SAN is included in the signed certificate.
+modern browsers (since 2017) ignore CN and require a SAN that matches the accessed hostname or IP. Without a SAN, Chrome will reject the certificate.
+
+on mac os
+Launcher -> Search Keychain Access
+choose 'system' on the left bar, File -> import item -> example.crt on top bar, double click this item, 
+click Trust to unfold, choose SSL -> Trust Forever, then close, it will pop up auth window, input password, done
+
+on local
+if __name__ == "__main__":
+    import uvicorn
+    # uvicorn.run(app, host="0.0.0.0", port=6000)
+    uvicorn.run(
+        app,
+        host="0.0.0.0",
+        port=6000,
+        ssl_keyfile="./example.key",
+        ssl_certfile="./example.crt"
+    )
+
+re-open safari or chrome to visit https://127.0.0.1:6000
