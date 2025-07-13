@@ -9,7 +9,23 @@ in header for visit, front-end will store token in browser's localStorage for pe
 
 server will check token in header for authorization
 
-JWT token can set user id and expired data
+JWT token can set user id and expired data, but backend handle expiration date, not the browser
+
+hash_key = hashlib.sha256(password.encode()).hexdigest()
+user_data = {"user_name": user, "user_id": 0}
+algorithm = "HS256" 
+
+# JWT token use hashed_password as hash_key and a dict contain user name, user id, and expire date to encode 
+# back-end will decode this token to get dict, check if expiration date is reached out
+# the old way is browser maintain expired cookies, use max_age or expires key in cookies
+# response.set_cookie(key="token", "value"="xxx", max_age=3600) expires in 1 hour
+
+create_access_token = lambda user_data, hash_key, algorithm, expired_minutes:\
+    jwt.encode(claims= user_data | {"expiration_date": datetime.utcnow() + timedelta(minutes=expired_minutes)}, 
+               key=hash_key, algorithm=algorithm)
+
+decode_token = lambda token, hash_key, algorithm: jwt.decode(token, hash_key, algorithm)
+
 
 python3 fastapi fastapi.Response
 
