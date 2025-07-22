@@ -1,12 +1,35 @@
-http://x.org/get?key1=value1&key2=value2
-this is form data, 
-pass a dict as form data, use 'params'
-pass a dict as a json, use 'data'
 
-_dict = {key1: value1, key2: value2}
-r=session.post(url=url, params = _dict)
-print(r.url) you can get the wrapped url after concat
+params is for URL Query parameters in GET request
+data is for Form Data in POST request, Content-Type: application/x-www-form-urlencoded
+json is for JSON Data in POST request, Content-Type: application/json
 
+
+import requests
+url = "https://api.example.com/search"
+params = {'q': 'python', 'page': 2}
+response = requests.get(url, params=params)
+print(response.url)  # Output: "https://api.example.com/search?q=python&page=2"
+
+
+import requests
+url = "https://example.com/login"
+data = {'username': '', 'password': ''}
+response = requests.post(url, data=data)
+print(response.text)
+
+
+import requests
+url = "https://api.example.com/create"
+json_data = {'name': '', 'age': }
+response = requests.post(url, json=json_data, headers={"Content-Type": "application/json"})
+print(response.json())
+
+
+in fastapi, Query() is for GET, Form() is for Form Data, class based on pydantic.BaseModel is for JSON Data
+
+
+@app.get(f'/api/list')
+def get_list(r: Request, query = Query()):
 
 ------------------------
 login_url = "http://www.x.org/login/"
