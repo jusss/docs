@@ -1,0 +1,45 @@
+def add_cps(a, b, cont):
+    sum = a + b
+    cont(sum)
+
+def mul_cps(x, y, cont):
+    product = x * y
+    cont(product)  
+
+# add → mul → print
+add_cps(2, 3, lambda sum: 
+    mul_cps(sum, 4, lambda product: 
+        print(f"{product}") 
+    )
+)
+
+def k1(sum):
+    mul_cps(sum, 4, id)
+
+add_cps(1,2,k1)
+
+1. definition with cps, only the first k1 was pass as parameter,
+2. other cps calling inside k1, parameter wasn't passing as parameter
+
+other cps call within the previous cps call, not the outside.
+
+f x (\r -> g r \r2 -> h r2) is CPS
+not
+f x (\r -> g r) (\r2 -> ...) (\r3 -> ...)
+
+the CPS \r -> k r itself is a Cont r a = (a->r)->r which contain a continuation k :: a -> r
+
+\r -> k r is CPS is Cont r a
+k :: a->r is continuation k
+
+when k is unary \r -> k r is equal to k by eta conversion
+when k is binary, \r -> k r \r2 -> ..., k r \r2 -> ... is CPS, is Cont r a
+
+use \r1 -> g r1 \r2 -> ... to chain all CPS in one lambda, even use >>=
+
+pyth_m :: Float -> Float -> Cont a Float
+pyth_m a b = pow2_m a >>= (\a2 ->
+             (pow2_m b >>= (\b2 ->
+             (cont (add' a2 b2) >>= (\anb ->
+             (cont (sqrt' anb) >>= (\r ->
+             return r)))))
