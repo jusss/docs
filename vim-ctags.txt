@@ -1,3 +1,12 @@
+
+# pip3 install toolz , will be in ~/.local/lib/python3.8/site-packages
+
+ctags --languages=python -R -o ~/.vim/python-tags ~/.local/lib/python3.8/site-packages/ ~/llm-project/new-project/src/
+
+or create an virtualenv, intall all packages into that venv, then ctags on venv
+
+------------------------------
+
 1. vim ~/.ctags
     -python-kinds=-i
 
