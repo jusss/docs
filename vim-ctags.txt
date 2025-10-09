@@ -21,5 +21,7 @@ put cursor on a word, C-] will jump to its definition, C-t will jump back,
 C-w C-] will open definition in a horizontal split
 https://weicode.wordpress.com/2018/05/01/configuring-ctags-for-python-and-vim
 
+apt install universal-ctags
+or
 https://github.com/universal-ctags/ctags
 ctags can trace multiple path, ./bin/ctags -R -o ~/.vim/python-tags ~/.local/lib/python3.8/site-packages/ ~/code/python/
