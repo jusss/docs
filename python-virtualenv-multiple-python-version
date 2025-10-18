@@ -34,3 +34,16 @@ exit and open a new terminal
 export PATH=$PATH:/home/user/another-python/bin
 pip3.8 install opencv-python
 source virtual-env/bin/activate
+
+or use venv
+python3 -m venv python-env
+rm python-env/bin/python
+rm python-env/bin/python3
+ln -s /home/user/another-python/bin/python3.14 python-env/bin/python
+ln -s /home/user/another-/python/bin/python3.14 python-env/bin/python3
+rm python-env/bin/pip
+rm python-env/bin/pip3
+ln -s /home/user/another-python/bin/pip3 python-env/bin/pip
+ln -s /home/user/another-python/bin/pip3 python-env/bin/pip3
+source python-env/bin/activate
+deactivate
