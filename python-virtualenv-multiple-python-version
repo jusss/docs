@@ -45,5 +45,9 @@ rm python-env/bin/pip
 rm python-env/bin/pip3
 ln -s /home/user/another-python/bin/pip3 python-env/bin/pip
 ln -s /home/user/another-python/bin/pip3 python-env/bin/pip3
+rm -r python-env/lib
+cp -r /home/user/another-python/lib python-env
+export PYTHONPATH=$PYTHONPATH:/home/user/another-python/lib/python3.14/site-packages
+echo "export PYTHONPATH=$PYTHONPATH:/home/user/another-python/lib/python3.14/site-packages" >> ~/.bashrc
 source python-env/bin/activate
 deactivate
