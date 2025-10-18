@@ -1,0 +1,143 @@
+claude mcp add --transport http ddg-search http://remote:8000/mcp
+claude
+/mcp -- to check mcp server status
+
+On Remote
+git clone https://github.com/nickclyde/duckduckgo-mcp-server
+
+server.py
+from fastmcp import FastMCP, Context
+mcp = FastMCP("ddg-search")
+searcher = DuckDuckGoSearcher()
+fetcher = WebContentFetcher()
+@mcp.tool()
+async def search(query: str, ctx: Context, max_results: int = 10) -> str:
+...
+def main():
+    #mcp.run()
+    mcp.run(transport="http", host="0.0.0.0", port=8000)
+
+
+if __name__ == "__main__":
+    main()
+
+python3 server.py
+
+On Local
+mcp_client.py
+from fastmcp import Client
+import asyncio
+
+async def main():
+    async with Client("http://host:8000/mcp") as client:
+        tools = await client.list_tools()
+        print(f"Available tools: {tools}")
+        result = await client.call_tool("search", {"query": "Beijing"})
+        print(f"Result: {result.content[0].text}")
+
+asyncio.run(main())
+
+
+-----------------------------------------
+the difference between mcp and function calling is that you write that logic code in function calling script,
+but in mcp server the official write the logic code, you only need to run mcp server on local or remote,
+then use mcp client to call it
+
+On Remote
+npx @modelcontextprotocol/server-brave-search
+
+vim mcp.json
+{
+  "mcpServers": {
+    "brave-search": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-brave-search", "--transport", "http"],
+      "env": {
+        "BRAVE_API_KEY": "YOUR_API_KEY_HERE"
+      },
+      "host":"0.0.0.0",
+      "port": 8000
+    }
+  }
+}
+
+run it 
+env BRAVE_API_KEY=api-key npx -y @modelcontextprotocol/server-brave-search --host 0.0.0.0 --port 8000
+
+or write your own mcp server 
+mcp_server.py
+from mcp import MCPServer
+import json
+from datetime import datetime
+server = MCPServer("get-time")
+@server.tool()
+def get_time(_str):
+    print("searching current time")
+    current_time = datetime.now()
+    return str(current_time)
+server.run(host="0.0.0.0", port=8000)
+
+On Local
+pip3 install mcp
+vim mcp-client.json
+{
+  "mcpServers": {
+    "brave-search": {
+      "host":"remote-addr",
+      "port": 8000,
+      "protocol": "http"
+    }
+  }
+}
+
+test.py
+from mcp import MCPClient
+mcp_client = MCPClient()
+mcp_client.connect("brave-search", host="remote-addr", port=8000)
+tools = mcp_client.discover_tools()
+print(tools)
+
+tools = mcp_client.get_tools()
+
+completion = client.chat.completions.create(
+                model = model,
+                messages = messages + message,
+                temperature = 0.3,
+                stream = stream,
+                tools = tools
+            )
+
+
+with fastmcp
+
+import asyncio, os
+from dotenv import load_dotenv
+from fastmcp.client import MCPClient
+
+async def main():
+    load_dotenv()
+    client = MCPClient.from_config_file("mcp-client.json")
+    response = await client.request({"method":"brave-search"}, {"query":"query"})
+    print(response)
+
+if __name__ == "__main__":
+    asyncio.run(main())
+
+
+in Claude Desktop
+mcp_server.json
+{
+  "mcpServers": {
+    "weather": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "/ABSOLUTE/PATH/TO/PARENT/FOLDER/weather",
+        "run",
+        "weather.py"
+      ]
+    }
+  }
+}
+add mcp_server.json would run this mcp server on local, restart Claude Desktop
+

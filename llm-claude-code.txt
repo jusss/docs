@@ -1,0 +1,26 @@
+sudo apt update
+sudo apt install npm
+sudo npm install -g @anthropic-ai/claude-code
+claude --version
+
+vim .claude/settings.json
+{
+  "env": {
+    "ANTHROPIC_AUTH_TOKEN": "zhipu-api-key",
+    "ANTHROPIC_BASE_URL": "https://open.bigmodel.cn/api/anthropic"
+  },
+  "alwaysThinkingEnabled": true
+}
+
+export ANTHROPIC_AUTH_TOKEN="zhipu-api-key"
+export ANTHROPIC_BASE_URL=https://open.bigmodel.cn/api/anthropic
+
+echo "export ANTHROPIC_AUTH_TOKEN=zhipu-api-key" >> ~/.bashrc
+echo "export ANTHROPIC_BASE_URL=https://open.bigmodel.cn/api/anthropic" >> ~/.bashrc
+
+cd ~/project
+claude
+/status
+# what is Model Context Protocol -- will make memory to ~/.claude/CLAUDE.md
+/quit
+
