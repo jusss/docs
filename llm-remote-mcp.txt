@@ -1,3 +1,67 @@
+openai now support mcp type
+client.responses.create(model="gpt-4.1",
+    tools=[
+        {"type": "mcp",
+        "server_label":"dice_server",
+        "server_url":"xxx/mcp/",
+        "require_approval": "never",
+        },
+        ]
+        input = "roll a dice"
+        )
+but not all the old models support this type, old models support function type
+
+or convert mcp client tools to openai tools
+
+async def mcp_client():
+    async with Client(f"http://{mcp_server_addr}:{mcp_server_port}/mcp") as client:
+        tools = await client.list_tools()
+        print(f"Available tools: {tools}") if debug else None
+        # result = client.call_tool("search", {"query": "Beijing"})
+        # print(f"Result: {result.content[0].text}")
+        # return [ tool.model_dump_json() for tool in tools]
+        openai_tools=[]
+        for tool in tools:
+            openai_tool={
+                    "type":"function",
+                    "function":{
+                        "name": tool.name,
+                        "description": tool.description,
+                        "parameters": tool.inputSchema
+                        }
+                    }
+            openai_tools.append(openai_tool)
+        return openai_tools
+
+mcp_tools = asyncio.run(mcp_client())
+
+mcp_tools_name = [tool['function']["name"] for tool in mcp_tools]
+
+def load_tools(plugins_dir):
+    tools = []
+    # Iterate over all .py files in the directory
+    for plugin_path in plugins_dir.glob('*.json'):
+        with open(plugin_path, "r") as f:
+            content = f.read()
+            data = json.loads(content)
+            tools.append(data)
+    return tools
+
+tools = load_tools(plugins_dir) + mcp_tools
+
+get mcp client result to json
+
+async def mcp_client_call_tool(tool_name, args_dict):
+    async with Client(f"http://{mcp_server_addr}:{mcp_server_port}/mcp") as client:
+        result = await client.call_tool(tool_name, args_dict)
+        return result
+
+call_tool_result = asyncio.run(mcp_client_call_tool(v["name"], json.loads(v["args"])))
+# r = call_tool_result.model_dump_json(indent=2,exclude_none=True)
+_r = call_tool_result.content
+r = _r[0].text
+
+-------------------------
 claude mcp add --transport http ddg-search http://remote:8000/mcp
 claude
 /mcp -- to check mcp server status
