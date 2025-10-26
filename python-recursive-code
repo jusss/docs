@@ -1,0 +1,70 @@
+...
+            # for result, line, tool_messages in Service.do_post(url, headers, data):
+                # if not tool_messages:
+                    # content = result["choices"][0]["delta"].get("content")
+                    # if content:
+                        # answer = answer + content
+                    # yield line + b'\n\n'
+                # else:
+                    # messages = messages + tool_messages
+                    # data["messages"] = messages
+                    # for result, line, tool_messages in Service.do_post(url, headers, data):
+                        # if not tool_messages:
+                            # content = result["choices"][0]["delta"].get("content")
+                            # if content:
+                                # answer = answer + content
+                            # yield line + b'\n\n'
+                        # else:
+                            # messages = messages + tool_messages
+                            # data["messages"] = messages
+                            # for result, line, tool_messages in Service.do_post(url, headers, data):
+                                # if not tool_messages:
+                                    # content = result["choices"][0]["delta"].get("content")
+                                    # if content:
+                                        # answer = answer + content
+                                    # yield line + b'\n\n'
+
+            while True:
+                one_more=False
+
+                for result, line, tool_messages in Service.do_post(url, headers, data):
+                    if not tool_messages:
+                        content = result["choices"][0]["delta"].get("content")
+                        if content:
+                            answer = answer + content
+                        yield line + b'\n\n'
+                    else:
+                        messages = messages + tool_messages
+                        data["messages"] = messages
+                        one_more = True
+
+                if one_more:
+                    continue
+                else:
+                    break
+
+
+            # def recursive_tool_call(url, headers,data, answer, messages, tool_messages=[]):
+
+                # print(f"\n\n\n *** call recursive tool call, data is {data}, answer is {answer}, messages is {messages}, \ntool is {tool_messages}\n\n\n")
+                # if tool_messages:
+                    # messages = messages + tool_messages
+                    # data["messages"] = messages
+
+                # for result, line, _tool_messages in Service.do_post(url, headers, data):
+                    # if not _tool_messages:
+                        # content = result["choices"][0]["delta"].get("content")
+                        # if content:
+                            # answer = answer + content
+                        # yield line + b'\n\n', answer, messages
+                    # else:
+                        # yield recursive_tool_call(url, headers, data, answer, messages, _tool_messages), None, None
+
+            # for line, answer, messages in recursive_tool_call(url, headers, data, answer, messages):
+                # if (answer is None) and (messages is None):
+                    # continue
+                # answer = answer
+                # messages = messages
+                # yield line
+
+...
