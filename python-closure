@@ -1,3 +1,5 @@
+closure is just about to cache
+------------------------------
 # make a lexical scope closure for bind a variable to a function
 def make_mcp_client_call_tool():
     time_list = []
