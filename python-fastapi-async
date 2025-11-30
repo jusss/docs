@@ -1,0 +1,6 @@
+use async all along
+if endpoint A is async def, then all the function inside that endpoint A
+should be async, if there is regular function call inside it, 
+it will be blocked, and other endpoint will not get message until endpoint A is completed
+
+
