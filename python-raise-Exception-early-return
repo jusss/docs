@@ -1,0 +1,12 @@
+...
+    try:
+        raise Exception("something")
+
+    except Exception as e:
+        print(e)
+        raise
+
+
+
+do early return with Exception, so when some exception inside try except
+add raise in except so it can do early return, it can break nested function call
