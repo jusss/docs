@@ -1,0 +1,12 @@
+def f():
+    ...
+    return f()
+
+def f():
+  yield x
+  yield from f()
+
+async f():
+    yield x
+    async for _x in f():
+        yield _x
