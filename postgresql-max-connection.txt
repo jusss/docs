@@ -1,0 +1,11 @@
+max connections is 100, 
+if postgresql is in docker
+ sudo docker ps | grep postgres
+sudo docker exec -it c72ddd97e6b5 /bin/bash
+ psql -U user -d database -c "SHOW max_connections";
+
+sed -i 's/^max_connections = 100/max_connections = 300/' /var/lib/postgresql/data/postgresql.conf
+cat /var/lib/postgresql/data/postgresql.conf|grep max_conne
+
+sudo systemctl restart docker
+docker start c72ddd97e6b5

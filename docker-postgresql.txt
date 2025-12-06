@@ -1,0 +1,39 @@
+root@atom:~/docker# cat docker-compose.yaml
+version: '3.8'
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=databse
+      - TZ=Asia/Shanghai         
+      - PGTZ=Asia/Shanghai       
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:
+
+# run it
+docker-compose up -d
+
+# change yaml then up
+docker-compose down   
+docker-compose up -d
+
+# get timezone
+docker-compose exec postgres psql -U postgres -d database -c "SHOW TIMEZONE;"
+
+change its source
+image: docker.1ms.run/library/postgres:15
+
+if 5432 port is taken,
+lsof -i :5432
+kill -9 
+or
+docker ps
+docker kill 
+

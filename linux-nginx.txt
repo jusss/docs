@@ -1,0 +1,148 @@
+cd /var/www/frontend-new
+npm run build # get dist, you may need npm install
+vim /etc/nginx/site-enabled/new-web
+server {
+    listen 3000; #frontend port
+    server_name your-domain;
+
+    access_log /var/log/nginx/web-new-access.log;
+    error_log /var/log/nginx/web-new-error.log;
+
+    # 前端静态文件目录
+    root /var/www/frontend-new/dist;
+    index index.html;
+
+    client_max_body_size 50m;
+    # Gzip 压缩配置
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_comp_level 6;
+    gzip_types
+        text/plain
+        text/css
+        text/xml
+        text/javascript
+        application/json
+        application/javascript
+        application/xml+rss
+        application/x-javascript
+        image/svg+xml;
+
+      location ~ ^/api/[^/]+/events$ {
+      proxy_pass http://127.0.0.1:8080;  #backend api port
+      proxy_http_version 1.1;
+
+      # 代理请求头
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-Proto $scheme;
+
+      # 关键：禁用缓冲，启用流式传输
+      proxy_buffering off;
+      proxy_cache off;
+
+      # SSE 必需的响应头
+      proxy_set_header Connection '';
+      chunked_transfer_encoding on;
+
+      # 增加超时时间（SSE 是长连接）
+      proxy_connect_timeout 3600s;
+      proxy_send_timeout 3600s;
+      proxy_read_timeout 3600s;
+  }
+
+    # API 代理到后端服务
+    location /api/ {
+        proxy_pass http://127.0.0.1:8080; #backend api port
+        proxy_http_version 1.1;
+
+        # 代理请求头
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # WebSocket 支持（如果需要）
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+
+        # 超时设置
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+    }
+
+    # 静态文件缓存（可选，根据需要启用）
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+        access_log off;
+    }
+
+    # 前端路由（SPA 应用支持）
+    location / {
+        try_files $uri /index.html;
+    }
+
+    # 安全配置：隐藏nginx版本号
+    server_tokens off;
+}
+
+vim /etc/nginx/nginx.conf
+user www-data;
+worker_processes auto;
+pid /run/nginx.pid;
+error_log /var/log/nginx/error.log;
+include /etc/nginx/modules-enabled/*.conf;
+events {
+        worker_connections 768;
+}
+
+http {
+        sendfile on;
+        tcp_nopush on;
+        types_hash_max_size 2048;
+        include /etc/nginx/mime.types;
+        default_type application/octet-stream;
+        ssl_prefer_server_ciphers on;
+        access_log /var/log/nginx/access.log;
+        gzip on;
+        include /etc/nginx/conf.d/*.conf;
+        include /etc/nginx/sites-enabled/*;   # enable all config in sites-enabled
+}
+
+systemctl restart nginx
+
+visit http://localhost:3000
+
+----------------------------------------
+
+apt install nginx
+
+listen on 80, /api/ route redirect to 8080, front code in /var/www/web, index in /var/www/web/index.html
+/etc/nginx/nginx/site-enabled/web
+server {
+    listen 80;
+
+    access_log /var/log/nginx/web-access.log;
+    error_log /var/log/nginx/web-error.log;
+
+    root /var/www/web;
+    index index.html;
+    location ~ ^/api/[^/]+/events$ {
+      proxy_pass http://127.0.0.1:8080;
+      proxy_http_version 1.1;
+    }
+ location /api/ {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_http_version 1.1;
+}
+   location / {
+        try_files $uri /index.html;
+    }
+
+
+systemctl start nginx
+
