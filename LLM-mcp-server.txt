@@ -1,0 +1,5 @@
+{"mcpServers": {"12306-mcp": {"type": "stdio", "command": "npx", "args": ["-y", "12306-mcp"]}, "context7": {"type": "stdio", "command": "npx", "args": ["-y", "@upstash/context7-mcp"]}}}
+
+{"mcpServers": {"get-weather": {"type": "stdio", "command": "uvx", "args": ["weather-forecast-server"]}}}
+
+{"mcpServers": {"sequential-thinking": {"type": "stdio", "command": "npx", "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]}, "context7": {"type": "stdio", "command": "npx", "args": ["-y", "@upstash/context7-mcp"]}}}

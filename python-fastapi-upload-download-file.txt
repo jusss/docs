@@ -1,0 +1,27 @@
+from fastapi import UploadFile, File
+ 
+async def upload_files(
+ 
+        files: List[UploadFile] = File(...),
+ 
+        project_id: str = Body(...)):
+ 
+        for file in files:
+ 
+            file_paths.append({"path":file.filename, "name":file.filename})
+ 
+            file_list.append((file.filename, file.file.read()))
+ 
+async def download_files(path: str):
+ 
+return FileResponse(
+ 
+            path=path,
+ 
+            filename=path.split("/")[-1],
+ 
+            media_type='application/octet-stream',
+ 
+            background=None
+ 
+        )

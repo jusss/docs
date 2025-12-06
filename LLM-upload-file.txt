@@ -1,0 +1,8 @@
+upload file to LLM, openai and kimi support openai file api like chat api, other LLMs do not support openai file, pictures can turn to base64 encodings string as context pass to LLM, small files can be text as context pass to LLM, large files need to be a place where LLM can visit, LLM host file storage or somewhere, for claude code, put this file where claude code can visit, and put this file path to user input
+import anyio
+from claude_agent_sdk import query
+path = "file"
+async def main():
+    async for message in query(prompt="analyse this file" + f", file: {path}"):
+        print(message)
+anyio.run(main)
