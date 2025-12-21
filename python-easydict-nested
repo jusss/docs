@@ -1,0 +1,2 @@
+from easydict import EasyDict as edict
+result = json.loads(json_str, object_hook=lambda d: edict(d), strict=False)
