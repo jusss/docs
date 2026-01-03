@@ -1,0 +1,7 @@
+unlock bootloader or rooted device will cause Google Play not certificated
+some apps like X app use Google Play Integrity to decide if let user login
+magisk module Play Integrity Fix is only work for android below 13
+also after you login X app failed by attestation denied, 
+login in browser will faied too
+
+uninstall X app, use chrome annoymouse login x.com, it will work, do not use brave browser, use chrome below 120.0.6099.193
