@@ -1,0 +1,1 @@
+nohup python3 12306-mcp.py > 12306-mcp.log &
