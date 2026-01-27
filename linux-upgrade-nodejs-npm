@@ -1,0 +1,22 @@
+### Install NVM (if not already installed):
+```bash
+curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
+source ~/.bashrc  # or ~/.zshrc
+```
+
+### Update/Install Node.js with NVM:
+```bash
+# Check available versions
+nvm list-remote
+
+# Install latest version
+nvm install node
+
+# Install latest LTS
+nvm install --lts
+
+# Use a specific version
+nvm use node
+
+# Set default version
+nvm alias default node
