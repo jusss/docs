@@ -1,0 +1,45 @@
+Android 7
+    A/B system partition, dual boot, slot_a, slot_b
+
+Android 8
+    Project Treble, only update system.img, not firmware, Generic System Images
+
+Android 10 
+    Lazy Restoration, jump to the activaty where it was killed
+    Low Memory Killer Daemon, from vmpressure to Pressure Stall Information
+    Dynamic Partition, super.img contain system.img, vendor, and product partition, super_a and super_b
+    cgroup v2, add "freezer" feature
+
+Android 12
+    Low Memory Killer Daemon, agressive kill apps, android 11 use 6.5GB on 8GB, android 12 use 4.5G on 8G to kill app,
+    won't keep app for long time like android 11, kill apps even there's free memory
+    change LMK module from kernel to userspace
+    PhantomProcessKiller, limit 32 subprocess per app
+
+
+# 查看当前 LMK 阈值
+adb shell cat /sys/module/lowmemorykiller/parameters/minfree
+
+# 修改 LMK 阈值（需要 root）
+adb shell "su -c 'echo 1024,2048,3072,4096,5120,6144 > /sys/module/lowmemorykiller/parameters/minfree'"
+
+# 查看 oom_adj 分数
+adb shell cat /sys/module/lowmemorykiller/parameters/adj
+
+
+
+adb shell setprop ro.lmk.low 1001
+adb shell setprop ro.lmk.medium 800
+adb shell setprop ro.lmk.critical 0
+
+
+ - Android 12+: DisablePhantomProcessKilling + A1Memory
+ - Android 10-11: A1Memory
+ - Android 9-: LMK Controller
+https://github.com/OneB1ank/A1Memory
+
+
+
+
+
+
