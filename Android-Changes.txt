@@ -15,8 +15,10 @@ Android 12
     won't keep app for long time like android 11, kill apps even there's free memory
     change LMK module from kernel to userspace
     PhantomProcessKiller, limit 32 subprocess per app
+    CachedAppOptimizer 
 
 
+# before android 14
 # 查看当前 LMK 阈值
 adb shell cat /sys/module/lowmemorykiller/parameters/minfree
 
@@ -27,10 +29,15 @@ adb shell "su -c 'echo 1024,2048,3072,4096,5120,6144 > /sys/module/lowmemorykill
 adb shell cat /sys/module/lowmemorykiller/parameters/adj
 
 
-
+# after android 14
 adb shell setprop ro.lmk.low 1001
 adb shell setprop ro.lmk.medium 800
 adb shell setprop ro.lmk.critical 0
+
+adb shell setprop lmkd.reinit 1
+lmkd --init
+or
+lmkd --reinit
 
 
  - Android 12+: DisablePhantomProcessKilling + A1Memory
