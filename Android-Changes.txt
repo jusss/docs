@@ -53,6 +53,13 @@ echo 160 > /proc/sys/vm/swappiness
 
 chmod 755 data/adb/modules/flex/service.sh
 
+Keep Apps at Background Alive
+1. set Apps Unrestricted in app battery manager
+2. change zram compress algorithm to zstd
+3. change zram0 disk size to 3G
+4. change vm.swappiness to 160
+5. change vm.page-cluster to 0
+
 
 
 # before android 14
