@@ -1,0 +1,376 @@
+example2.com 80 -> ip:80 nginx -> frontend 80 -> backend 8080
+cat /etc/nginx/sites-enabled/abc
+server {
+    listen 80;
+    server_name _;
+
+    # 访问日志和错误日志
+    access_log /var/log/nginx/web-access.log;
+    error_log /var/log/nginx/web-error.log;
+
+    # 前端静态文件目录
+    root /var/www/web;
+    index index.html;
+
+    # 文件上传大小限制（私有环境支持大文件：500MB）
+    client_max_body_size 500m;
+
+    # Gzip 压缩配置
+    gzip off;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_comp_level 6;
+    gzip_types
+        text/plain
+        text/css
+        text/xml
+        text/javascript
+        application/json
+        application/javascript
+        application/xml+rss
+        application/x-javascript
+        image/svg+xml;
+
+    # SSE (Server-Sent Events) 配置 - 用于实时事件流
+    # 匹配：/api/{project_id}/events
+    location ~ ^/api/[^/]+/events$ {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_http_version 1.1;
+
+        # 代理请求头
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # 关键：禁用缓冲，启用流式传输
+        proxy_buffering off;
+        proxy_cache off;
+
+        # 禁用 gzip 压缩（gzip 会导致 SSE 数据被缓冲）
+        gzip off;
+
+        # SSE 必需的响应头
+        proxy_set_header Connection '';
+        chunked_transfer_encoding on;
+
+        # 增加超时时间（30分钟，平衡性能和资源占用）
+        proxy_connect_timeout 1800s;
+        proxy_send_timeout 1800s;
+        proxy_read_timeout 1800s;
+    }
+
+    # API 代理到后端服务
+    # 支持：/api/project/*, /api/user/* 等所有 API
+    # 使用 ^~ 修饰符提升优先级，避免被静态文件规则拦截
+    location ^~ /api/ {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_http_version 1.1;
+
+        # 代理请求头
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # WebSocket 支持
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+
+        # 超时设置
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+    }
+
+    # 静态文件缓存（前端资源）
+    # 前端打包资源带版本号哈希，可以长期缓存
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        access_log off;
+    }
+
+    # 前端路由（SPA 应用支持）
+    location / {
+        try_files $uri /index.html;
+    }
+
+    # 安全配置：隐藏nginx版本号
+    server_tokens off;
+}
+
+frontend in /var/www/web/, frontend will visit backend at 8080
+backend listen on 8080
+
+
+
+example.com 80 -> ip:20080 nginx -> gunicorn and uvicorn 30080
+/etc/nginx/sites-enabled/sms
+server {
+    listen 20080;
+    server_name _;
+
+    # 访问日志和错误日志
+    access_log /var/log/nginx/web-access.log;
+    error_log /var/log/nginx/web-error.log;
+
+    # 前端静态文件目录
+    root /var/www/web;
+    index index.html;
+
+    # 文件上传大小限制（私有环境支持大文件：500MB）
+    client_max_body_size 500m;
+
+    # Gzip 压缩配置
+    gzip off;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_comp_level 6;
+    gzip_types
+        text/plain
+        text/css
+        text/xml
+        text/javascript
+        application/json
+        application/javascript
+        application/xml+rss
+        application/x-javascript
+        image/svg+xml;
+
+    # SSE (Server-Sent Events) 配置 - 用于实时事件流
+    # 匹配：/api/{project_id}/events
+    location ~ ^/api/[^/]+/events$ {
+        proxy_pass http://127.0.0.1:30080;
+        proxy_http_version 1.1;
+
+        # 代理请求头
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # 关键：禁用缓冲，启用流式传输
+        proxy_buffering off;
+        proxy_cache off;
+
+        # 禁用 gzip 压缩（gzip 会导致 SSE 数据被缓冲）
+        gzip off;
+
+        # SSE 必需的响应头
+        proxy_set_header Connection '';
+        chunked_transfer_encoding on;
+
+        # 增加超时时间（30分钟，平衡性能和资源占用）
+        proxy_connect_timeout 1800s;
+        proxy_send_timeout 1800s;
+        proxy_read_timeout 1800s;
+    }
+
+    # API 代理到后端服务
+    # 支持：/api/project/*, /api/user/* 等所有 API
+    # 使用 ^~ 修饰符提升优先级，避免被静态文件规则拦截
+    location ^~ /api/ {
+        proxy_pass http://127.0.0.1:30080;
+        proxy_http_version 1.1;
+
+        # 代理请求头
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # WebSocket 支持
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+
+        # 超时设置
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+    }
+
+    # 静态文件缓存（前端资源）
+    # 前端打包资源带版本号哈希，可以长期缓存
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        access_log off;
+    }
+
+    # 重定向根路径到登录页
+    location = / {
+        return 302 https://$http_host/api/user/login;
+    }
+
+    # 安全配置：隐藏nginx版本号
+    server_tokens off;
+}
+
+ cat start.sh
+#!/bin/bash
+source ./.env
+pkill -f gunicorn
+exec .venv/bin/gunicorn main:app \
+  --workers 8 \
+  --worker-class uvicorn.workers.UvicornWorker \
+  --bind 0.0.0.0:30080 \
+  --timeout 120 \
+  --access-logfile app.log \
+  --error-logfile app.log \
+  --log-level info
+
+cat main.py
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="0.0.0.0", port=30080)
+
+
+
+
+---------------------------------------
+
+client -> nginx(SSL handle) -> gunicorn(WSGI multiple process) -> uvicorn(ASGI asynio) -> fastapi(ASGI framework)
+
+nginx /etc/nginx/sites-enabled/web
+server {
+    listen 80;
+    server_name _;
+
+    # 访问日志和错误日志
+    access_log /var/log/nginx/web-access.log;
+    error_log /var/log/nginx/web-error.log;
+
+    # 前端静态文件目录
+    root /var/www/web;
+    index index.html;
+
+    # 文件上传大小限制（私有环境支持大文件：500MB）
+    client_max_body_size 500m;
+
+    # Gzip 压缩配置
+    gzip off;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_comp_level 6;
+    gzip_types
+        text/plain
+        text/css
+        text/xml
+        text/javascript
+        application/json
+        application/javascript
+        application/xml+rss
+        application/x-javascript
+        image/svg+xml;
+
+    # SSE (Server-Sent Events) 配置 - 用于实时事件流
+    # 匹配：/api/{project_id}/events
+    location ~ ^/api/[^/]+/events$ {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_http_version 1.1;
+
+        # 代理请求头
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # 关键：禁用缓冲，启用流式传输
+        proxy_buffering off;
+        proxy_cache off;
+
+        # 禁用 gzip 压缩（gzip 会导致 SSE 数据被缓冲）
+        gzip off;
+
+        # SSE 必需的响应头
+        proxy_set_header Connection '';
+        chunked_transfer_encoding on;
+
+        # 增加超时时间（30分钟，平衡性能和资源占用）
+        proxy_connect_timeout 1800s;
+        proxy_send_timeout 1800s;
+        proxy_read_timeout 1800s;
+    }
+
+    # API 代理到后端服务
+    # 支持：/api/project/*, /api/user/* 等所有 API
+    # 使用 ^~ 修饰符提升优先级，避免被静态文件规则拦截
+    location ^~ /api/ {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_http_version 1.1;
+
+        # 代理请求头
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # WebSocket 支持
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+
+        # 超时设置
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+    }
+
+    # 静态文件缓存（前端资源）
+    # 前端打包资源带版本号哈希，可以长期缓存
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        access_log off;
+    }
+
+    # 重定向根路径到登录页
+    location = / {
+        return 302 /api/user/login;
+    }
+
+    # 安全配置：隐藏nginx版本号
+    server_tokens off;
+}
+
+gunicorn start.sh
+#!/bin/bash
+source ./.env
+exec .venv/bin/gunicorn main:app \
+  --workers 8 \
+  --worker-class uvicorn.workers.UvicornWorker \
+  --bind 0.0.0.0:8080 \
+  --timeout 120 \
+  --access-logfile app.log \
+  --error-logfile app.log \
+  --log-level info
+
+fastapi uvicorn main.py
+@app.get("/api/user/login", response_class=HTMLResponse)
+def login_page(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request})
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="0.0.0.0", port=8080)
+
+
+
+
+
+
+--------------------------------------------------------
+
+uvicorn start fastapi, reload=True (development mode) will handle 1 request at a time
+remove reload=True
+
+use gunicorn for parallel
+ .venv/bin/pip install gunicorn
+
+  Then run:
+  .venv/bin/gunicorn main:app \
+    --workers 8 \
+    --worker-class uvicorn.workers.UvicornWorker \
+    --bind 0.0.0.0:8080 \
+    --timeout 120 \
+    --access-logfile app.log \
+    --error-logfile app.log
