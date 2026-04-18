@@ -4,6 +4,14 @@ Android 7
 Android 8
     Project Treble, only update system.img, not firmware, Generic System Images
 
+Android 9
+    App Standby Buckets, App battery usage
+    Unrestricted, allow backgroud activity at any time, brave browser for youtube
+    Optimized, place the app into the correct App Standby Bucket(Active, Frequent, Working Set, Rare) based on usage 
+    Restricted, force app into the Restricted bucket, No Background, GCM/FCM may be blocked, missing notification of wechat gmail etc
+
+    LMKD PERFER App Standby Buckets THAN PSI and LMK
+
 Android 10 
     Lazy Restoration, jump to the activaty where it was killed
     Low Memory Killer Daemon, from vmpressure to Pressure Stall Information
@@ -16,6 +24,35 @@ Android 12
     change LMK module from kernel to userspace
     PhantomProcessKiller, limit 32 subprocess per app
     CachedAppOptimizer 
+    LMK driver is removed from kernel, only PSI for lmkd
+
+
+about zram
+zstd cost more cpu but has better compress ratio than lz4
+and zstd has kernel parameter, 
+
+
+change zram compress algorithm to zstd
+cat /data/adb/post-fs-data.d/a.sh
+#!/system/bin/sh
+swapoff /dev/block/zram0
+echo zstd > /sys/block/zram0/comp_algorithm
+# echo "algo=zstd level=1" > /sys/block/zram0/algorithm_params
+echo 1 > /sys/block/zram0/reset
+echo 3G > /sys/block/zram0/disksize # Adjust size as needed
+swapon /dev/block/zram0
+
+chmod 755 /data/adb/post-fs-data.d/a.sh
+
+cat data/adb/modules/flex/service.sh
+#!/system/bin/sh
+until [ "$(getprop sys.boot_completed)" = "1" ]; do sleep 5; done
+sleep 2
+echo 0 > /proc/sys/vm/page-cluster
+echo 160 > /proc/sys/vm/swappiness
+
+chmod 755 data/adb/modules/flex/service.sh
+
 
 
 # before android 14

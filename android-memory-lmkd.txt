@@ -1,0 +1,71 @@
+android 12 does not have /sys/module/lowmemorykiller/parameters/minfree, it does not have Low Memory Killer, its lmkd use PSI,
+lowmemorykill module is removed from kernel, 
+so
+ro.lmk.use_minfree_levels=true
+won't work
+but PSI still use some minfree parameter like sys.lmk.minfree_levels
+
+magisk
+/data/adb/modules/flex/system.prop                                                 <
+# PSI 部分阻塞阈值（默认 70ms，调高可降低敏感度）
+ro.lmk.psi_partial_stall_ms=200
+
+# PSI 完全阻塞阈值（默认 700ms）
+ro.lmk.psi_complete_stall_ms=1000
+
+# 颠簸限制（默认 100，调高可容忍更多内存颠簸）
+ro.lmk.thrashing_limit=150
+ro.lmk.thrashing_limit_decay=50
+
+# swap 使用率上限（默认 100%）
+ro.lmk.swap_util_max=100
+
+ro.lmk.minfree_levels=10240:0,15360:100,20480:200,25600:250,40960:900,61440:950
+
+
+/data/adb/modules/flex/module.prop
+id=flex_lmkd_optimizer
+name=LMKD Optimizer
+version=1.0
+versionCode=1
+author=YourName
+description=Optimize LMKD behavior for better background app retention
+
+/data/adb/modules/flex/service.sh                                                          
+#!/system/bin/sh
+until [ "$(getprop sys.boot_completed)" = "1" ]; do sleep 5; done
+sleep 2
+# swapoff /dev/block/zram0
+echo "lzo-rle" > /sys/block/zram0/comp_algorithm
+resetprop -n sys.lmk.minfree_levels "10240:0,15360:100,20480:200,25600:250,40960:900,61440:950"
+setprop persist.device_config.lmkd_native.thrashing_limit 150
+setprop lmkd.reinit 1
+
+chmod 755 service.sh
+
+
+/data/adb/service.d/oom_protect.sh                                         <
+#!/system/bin/sh
+
+# 等待系统启动
+# sleep 60
+
+# Wait until the system is actually booted
+until [ "$(getprop sys.boot_completed)" = "1" ]; do
+    sleep 1
+done
+
+# Optional: Wait a few extra seconds for all services to initialize
+sleep 2
+
+# 循环保护目标应用
+while true; do
+    for pkg in "com.hundsun.stockwinner.paqh" "com.xingin.xhs"; do
+        PID=$(pidof $pkg)
+        [ -n "$PID" ] && echo -500 > /proc/$PID/oom_score_adj
+    done
+    sleep 60  # 每 1 分钟检查一次
+done
+
+chmod 755 oom_protect.sh
+
