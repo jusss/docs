@@ -40,6 +40,7 @@ echo zstd > /sys/block/zram0/comp_algorithm
 # echo "algo=zstd level=1" > /sys/block/zram0/algorithm_params
 echo 1 > /sys/block/zram0/reset
 echo 3G > /sys/block/zram0/disksize # Adjust size as needed
+mkswap /dev/block/zram0
 swapon /dev/block/zram0
 
 chmod 755 /data/adb/post-fs-data.d/a.sh
