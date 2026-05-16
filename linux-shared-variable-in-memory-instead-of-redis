@@ -1,0 +1,3 @@
+touch file /dev/shm/mystore
+read and write this file like regular file, it is in memory
+no redis, no sql, share variable in multiple gunicorn instances 
