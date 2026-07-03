@@ -1,0 +1,5 @@
+there are two ways auth, JWT token for api auth, and cookie for browser,
+JWT token use secret key encrypt user and other info to a token, front-end insert it into headers
+cookie use custom dict in browser, front-end do not handle any auth,
+browser maintain expired cookies, use max_age or expires key in cookies
+but also you can set JWT token in cookie
