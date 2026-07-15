@@ -64,3 +64,27 @@ echo 3G > /sys/block/zram0/disksize # Adjust size as needed
 #echo 1288490188 > /sys/block/zram0/disksize
 mkswap /dev/block/zram0
 swapon /dev/block/zram0
+
+
+# getprop |grep lmk
+[init.svc.lmkd]: [running]
+[init.svc_debug_pid.lmkd]: [405]
+[lmkd.reinit]: []
+[persist.device_config.aconfig_flags.lmkd_native.thrashing_limit_critical]: [300]
+[persist.device_config.lmkd_native.kill_timeout_ms]: []
+[persist.device_config.lmkd_native.thrashing_limit]: [250]
+[persist.device_config.lmkd_native.thrashing_limit_critical]: [300]
+[persist.sys.lmk.reportkills]: [true]
+[ro.boottime.lmkd]: [4568156615]
+[ro.lmk.minfree_levels]: [2048:0,4096:100,8192:200,12288:250,16384:900,24576:950]
+[ro.lmk.psi_complete_stall_ms]: [1200]
+[ro.lmk.psi_partial_stall_ms]: [300]
+[ro.lmk.swap_util_max]: [100]
+[ro.lmk.thrashing_limit]: [250]
+[ro.lmk.thrashing_limit_decay]: [50]
+[ro.lmk.use_minfree_levels]: [true]
+[ro.lmk.use_psi]: [false]
+[sys.lmk.minfree_levels]: [2048:0,4096:100,8192:200,12288:250,16384:900,24576:950]
+[sys.lmk.reportkills]: [1]
+
+
