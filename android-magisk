@@ -50,8 +50,8 @@ ro.lmk.thrashing_limit=250
 ro.lmk.thrashing_limit_decay=50
 # swap 使用率上限（默认 100%）
 ro.lmk.swap_util_max=100
-# ro.lmk.swap_free_low_percentage=10
-ro.lmk.minfree_levels=10240:0,15360:100,20480:200,25600:250,40960:900,61440:950
+ro.lmk.swap_free_low_percentage=10
+# ro.lmk.minfree_levels=10240:0,15360:100,20480:200,25600:250,40960:900,61440:950
 
 
 cat /data/adb/post-fs-data.d/a.sh
@@ -60,7 +60,7 @@ swapoff /dev/block/zram0
 echo 1 > /sys/block/zram0/reset
 #echo lzo > /sys/block/zram0/comp_algorithm
 echo lz4 > /sys/block/zram0/comp_algorithm
-echo 3G > /sys/block/zram0/disksize # Adjust size as needed
+echo 2G > /sys/block/zram0/disksize # Adjust size as needed
 #echo 1288490188 > /sys/block/zram0/disksize
 mkswap /dev/block/zram0
 swapon /dev/block/zram0
