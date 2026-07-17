@@ -43,8 +43,8 @@ done
 # Start the clean loop in an independent background process
 (
     while true; do
-        # Sleep for 30 minutes
-        sleep 1800
+        # Sleep for 3 minutes
+        sleep 180
 
         # Flush pending writes to storage
         sync
