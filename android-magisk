@@ -20,11 +20,39 @@ resetprop sys.lmk.minfree_levels "2048:0,4096:100,8192:200,12288:250,16384:900,2
 # 3. Tell the system to prioritize physical RAM before touching zRAM
 echo "30" > /proc/sys/vm/swappiness
 
+# Make the kernel reclaim file/directory caches much more aggressively
+echo "150" > /proc/sys/vm/vfs_cache_pressure
+
+# Keep dirty file cache footprints low by flushing to disk earlier
+echo "5" > /proc/sys/vm/dirty_background_ratio
+echo "10" > /proc/sys/vm/dirty_ratio
+
 # 4. Disable the Android Phantom Process Killer (No more 32-process limit)
 device_config put activity_manager max_phantom_processes 2147483647
 
 # 5. Force lmkd to restart and apply all changes
 setprop lmkd.reinit 1
+
+cat /data/adb/service.d/clean.sh
+#!/system/bin/sh
+# Wait for system boot to complete fully before running
+until [ "$(getprop sys.boot_completed)" = "1" ]; do
+    sleep 3
+done
+
+# Start the clean loop in an independent background process
+(
+    while true; do
+        # Sleep for 30 minutes
+        sleep 1800
+
+        # Flush pending writes to storage
+        sync
+
+        # Clear the caches
+        echo 3 > /proc/sys/vm/drop_caches
+    done
+) &
 
 cat /data/adb/modules/flex/service.sh                                                                                                       
 #!/system/bin/sh
