@@ -14,18 +14,17 @@ resetprop ro.lmk.use_psi false
 resetprop ro.lmk.use_minfree_levels true
 
 # 2. Set highly relaxed minfree values (in pages)
-# Translates to: 
-# Only kill empty apps below 96MB of free RAM.
-# Only kill foreground apps below 8MB (basically never).
 resetprop ro.lmk.minfree_levels "2048:0,4096:100,8192:200,12288:250,16384:900,24576:950"
 resetprop sys.lmk.minfree_levels "2048:0,4096:100,8192:200,12288:250,16384:900,24576:950"
 
 # 3. Tell the system to prioritize physical RAM before touching zRAM
 echo "30" > /proc/sys/vm/swappiness
 
-# 4. Force lmkd to restart and apply all changes
-setprop lmkd.reinit 1
+# 4. Disable the Android Phantom Process Killer (No more 32-process limit)
+device_config put activity_manager max_phantom_processes 2147483647
 
+# 5. Force lmkd to restart and apply all changes
+setprop lmkd.reinit 1
 
 cat /data/adb/modules/flex/service.sh                                                                                                       
 #!/system/bin/sh
