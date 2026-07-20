@@ -81,9 +81,15 @@ ro.lmk.swap_free_low_percentage=10
 # ro.lmk.minfree_levels=10240:0,15360:100,20480:200,25600:250,40960:900,61440:950
 
 
+dd if=/dev/zero of=/data/local/tmp/swapfile bs=1M count=4096
+chmod 600 /data/local/tmp/swapfile
+
 cat /data/adb/post-fs-data.d/a.sh
 #!/system/bin/sh
 swapoff /dev/block/zram0
+LOOP_DEV=$(losetup -f)
+losetup $LOOP_DEV /data/local/tmp/swapfile
+mkswap $LOOP_DEV
 echo 1 > /sys/block/zram0/reset
 #echo lzo > /sys/block/zram0/comp_algorithm
 echo lz4 > /sys/block/zram0/comp_algorithm
@@ -91,6 +97,9 @@ echo 2G > /sys/block/zram0/disksize # Adjust size as needed
 #echo 1288490188 > /sys/block/zram0/disksize
 mkswap /dev/block/zram0
 swapon /dev/block/zram0
+swapon $LOOP_DEV
+echo $LOOP_DEV > /sys/block/zram0/backing_dev
+
 
 
 # getprop |grep lmk
