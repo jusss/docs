@@ -1,0 +1,237 @@
+sometimes it's not lmkd kill apps, it is the **cgroup process killer** — used by Android's `ActivityManager` and `init` for normal lifecycle cleanup. Not an OOM/lmkd kill
+
+check which kill apps 
+logcat -d -b all | grep -iE "Killing|kill.*process|died|diedfor" | tail -30
+
+use this to get killed by lmkd
+dumpsys activity lmk
+
+three things need to re-compile 
+dumpsys activity|grep use_free,use_freezer=false,  Acitivity Mananger cgroup v2,
+zram_write kernel config /sys/block/zram/write
+dumpsys activity settings | grep -i cached, mCustomizedMaxCachedProcesses 
+
+
+MAX_CACHED_APPS limit, App Standby Bucket (Battery settings), excessive cpu,
+
+mCustomizedMaxCachedProcesses=32
+android RRO Runtime Resource Overlay
+
+on a PC to decompile `FrameworksResOverlayXaga.apk`, change the value in `res/values/integers.xml`, recompile, and install as a Magisk module.
+
+unzip -l /vendor/overlay/FrameworksResOverlayXaga.apk 2>/dev/null | head -20
+Archive:  /vendor/overlay/FrameworksResOverlayXaga.apk
+  Length      Date    Time    Name
+---------  ---------- -----   ----
+      400  2009-01-01 00:00   META-INF/MANIFEST.MF
+     1536  2009-01-01 00:00   AndroidManifest.xml
+    11720  2009-01-01 00:00   resources.arsc
+      535  2009-01-01 00:00   META-INF/CERT.SF
+     8728  2009-01-01 00:00   res/xml/power_profile_pro.xml
+     1590  2009-01-01 00:00   META-INF/CERT.RSA
+    24608  2009-01-01 00:00   res/xml/power_profile.xml
+---------                     -------
+    49117                     7 files
+
+
+another way
+xaga:/ # device_config set_sync_disabled_for_tests persistent
+xaga:/ # device_config put activity_manager max_cached_processes 128
+device_config put activity_manager max_phantom_processes 256
+xaga:/ # dumpsys activity settings | grep -i cached
+  max_cached_processes=1024
+  no_kill_cached_processes_until_boot_completed=true
+  no_kill_cached_processes_post_boot_completed_duration_millis=600000
+  use_tiered_cached_adj=false
+  tiered_cached_adj_decay_time=60000
+  mCustomizedMaxCachedProcesses=32
+  CUR_MAX_CACHED_PROCESSES=128
+  CUR_TRIM_CACHED_PROCESSES=21
+CachedAppOptimizer settings
+
+
+
+# ─── Relax App Standby restrictions ───
+setprop persist.sys.app_standby_enabled false
+# Or per-app: turn off battery optimization for apps you want kept alive
+# Settings → Apps → [app] → Battery → Unrestricted
+
+# ─── Raise CPU abuse threshold so background apps don't get killed as easily ───
+setprop persist.sys.fw.bg_cgroup_cpu_limit 25
+# Default is 10 — raises to 25 so background apps don't get "excessive cpu" kills
+device_config put activity_manager bg_cgroup_cpu_limit 25
+
+
+
+
+
+# CRITICAL — if this is "true", Android treats your 12GB device like a 2GB device!
+getprop ro.config.low_ram
+
+# Check what's actually killing apps
+logcat -d -b all | grep -iE "Killing|kill.*process|died|diedfor" | tail -30
+
+# Check ActivityManager process limits
+dumpsys activity processes | grep -iE "limit|max.*proc|num.*proc|config"
+
+# Check battery optimization / background limits
+dumpsys deviceidle | grep -iE "whitelist|force|state"
+
+# Check if there's a vendor thermal daemon killing things
+ps -A | grep -iE "thermal|mitigation|perfd"
+
+# Also check cgroup freezer
+cat /sys/fs/cgroup/frozen/cgroup.procs 2>/dev/null
+
+1. `ro.config.low_ram` is empty/false — good, not the problem
+2. The kills are all from `ActivityManager`, not `lmkd`:
+   - `adj 999: empty #17` — normal empty process trimming (cached background processes)
+   - `adj 900: excessive cpu` — killed for excessive CPU usage (小红书/xiaohongshu)
+   - `adj 915/925/945/955: cached idle & background restricted` — killed due to background restrictions
+   - `adj 0: remove task` — user swiped away from recents
+   - `adj 100: remove task` — same, user action
+
+These are NORMAL Android behavior, not aggressive LMKD killing. But from the user's perspective, "apps are being killed" — and they're right, but it's the ActivityManager's cached process trimming, not lmkd.
+
+The key issues:
+
+1. **`empty #17`** kills: ActivityManager's default MAX_CACHED_APPS limit is 32. At `#17`, it's already quite full. But these are truly empty cached processes that should be safe to kill.
+
+2. **`cached idle & background restricted`**: These are apps that are in a "restricted" bucket in the App Standby system. Android's background restriction system is killing them.
+
+3. **`excessive cpu`**: 小红书 (xiaohongshu) used 48540ms CPU in ~5 minutes. That's about 16% sustained CPU, which triggered the excessive CPU kill. `limit=10` is the threshold.
+
+The user's complaint is that apps are being killed "even with 5GB free RAM." The `empty #17` kills are standard Android behavior — the cached process limit is being hit. But the "cached idle & background restricted" kills are from Android's power management.
+
+
+xaga:/ # cat /sys/fs/cgroup/frozen/cgroup.procs 2>/dev/null
+1|xaga:/ # dumpsys activity settings | grep -i cached
+  max_cached_processes=1024
+  no_kill_cached_processes_until_boot_completed=true
+  no_kill_cached_processes_post_boot_completed_duration_millis=600000
+  use_tiered_cached_adj=false
+  tiered_cached_adj_decay_time=60000
+  mCustomizedMaxCachedProcesses=32
+  CUR_MAX_CACHED_PROCESSES=32
+  CUR_TRIM_CACHED_PROCESSES=5
+CachedAppOptimizer settings
+
+xaga:/ # logcat -d -b all | grep -iE "Killing|kill.*process|died|diedfor" | tail -30
+07-24 22:29:17.561  1407  3687 I ActivityManager: Killing 17099:com.google.android.webview:webview_service/u0a150 (adj 999): empty #17
+07-24 22:29:19.955  1407  2294 I ActivityManager: Killing 28720:com.google.process.gapps/u0a137 (adj 999): empty #17
+07-24 22:29:19.956  1407  2294 I ActivityManager: Killing 19921:com.xingin.xhs:widgetProvider/u0a206 (adj 999): empty #18
+07-24 22:29:51.613  1407  1470 I ActivityManager: Killing 17499:com.xingin.xhs/u0a206 (adj 900): excessive cpu 48540 during 300057 dur=896305 limit=10
+07-24 22:29:52.164  1407  1764 I ActivityManager: Killing 28857:com.android.permissioncontroller/u0a187 (adj 995): empty #17
+07-24 22:29:52.199  1407  1482 I ActivityManager: Process PhantomProcessRecord {e6f8407 18313:17499:com.xingin.xhs:widgetProvider/u0a206} died
+07-24 22:29:52.200  1407  1482 I ActivityManager: Process PhantomProcessRecord {7b82a46 18404:17499:zygote/u0a206} died
+07-24 22:29:52.422  1407  1454 I ActivityManager: Killing 14733:com.google.android.googlequicksearchbox:search/u0a136 (adj 999): empty #17
+07-24 22:29:56.172  1407  3991 I ActivityManager: Killing 32595:com.android.providers.calendar/u0a75 (adj 999): empty #17
+07-24 22:29:56.173  1407  3991 I ActivityManager: Killing 1867:com.android.settings/1000 (adj 999): empty #18
+07-24 22:30:52.167  1407  1470 I ActivityManager: Killing 2686:com.android.vending/u0a134 (adj 915): cached idle & background restricted
+07-24 22:31:17.616  1407  1470 I ActivityManager: Killing 2077:com.android.vending:background/u0a134 (adj 925): cached idle & background restricted
+07-24 22:34:02.168  1407  1470 I ActivityManager: Killing 3734:com.android.cellbroadcastreceiver.module/u0a188 (adj 955): cached idle & background restricted
+07-24 22:37:29.984  1407  1470 I ActivityManager: Killing 4888:com.android.cellbroadcastreceiver.module/u0a188 (adj 955): cached idle & background restricted
+07-24 22:40:10.345  1407  1470 I ActivityManager: Killing 6333:com.android.cellbroadcastreceiver.module/u0a188 (adj 905): cached idle & background restricted
+07-24 22:43:32.797  1407  4001 I ActivityManager: Killing 2217:com.google.android.setupwizard/u0a119 (adj 935): empty #17
+07-24 22:44:32.384  1407  1470 I ActivityManager: Killing 7476:com.android.cellbroadcastreceiver.module/u0a188 (adj 945): cached idle & background restricted
+07-24 22:46:08.277  1407  1470 I ActivityManager: Killing 10509:com.android.cellbroadcastreceiver.module/u0a188 (adj 905): cached idle & background restricted
+07-24 22:46:09.423  1407  1470 I ActivityManager: Killing 9717:com.android.vending:background/u0a134 (adj 965): cached idle & background restricted
+07-24 22:53:51.605  1407  1460 I ActivityManager: Killing 14465:com.hundsun.stockwinner.paqh:pushcore/u0a217 (adj 100): remove task
+07-24 22:53:51.605  1407  1460 I ActivityManager: Killing 25297:com.hundsun.stockwinner.paqh/u0a217 (adj 0): remove task
+07-24 22:53:51.606  1407  1460 I ActivityManager: Killing 14410:com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0/u0a217i46 (adj 0): remove task
+07-24 22:53:51.741  1407  1482 I ActivityManager: Process PhantomProcessRecord {bf91bd7 25321:25297:com.hundsun.stockwinner.paqh/u0a217} died
+07-24 22:54:57.396  1407  1470 I ActivityManager: Killing 13994:com.android.cellbroadcastreceiver.module/u0a188 (adj 905): cached idle & background restricted
+07-24 22:54:57.404  1407  1482 I libprocessgroup: Successfully killed process cgroup uid 10188 pid 13994 in 6ms
+07-24 22:57:00.091  8447  8447 W TimedProcessReaper: Scheduling killing of process to refresh configuration
+07-24 22:57:49.156  1407  1470 I ActivityManager: Killing 15407:com.android.cellbroadcastreceiver.module/u0a188 (adj 945): cached idle & background restricted
+07-24 22:57:49.163  1407  1482 I libprocessgroup: Successfully killed process cgroup uid 10188 pid 15407 in 5ms
+07-24 22:57:49.202  1407  3999 I ActivityManager: Killing 2399:com.google.android.gm/u0a156 (adj 999): empty #17
+07-24 22:57:49.210  1407  1482 I libprocessgroup: Successfully killed process cgroup uid 10156 pid 2399 in 5ms
+
+
+## What's actually killing your apps
+
+### Type 1: `empty #17` — Cached process limit hit
+```
+Killing 17099:com.google.android.webview:webview_service (adj 999): empty #17
+```
+Android's `ActivityManager` keeps a **maximum number of cached processes** (default 32). When a 33rd app goes into cache, the oldest empty one gets killed. "empty #17" means it was the 17th oldest empty process. This is normal Android design, not a bug.
+
+### Type 2: `cached idle & background restricted` — App Standby
+```
+Killing 3734:com.android.cellbroadcastreceiver.module (adj 955): cached idle & background restricted
+```
+Android's **App Standby Buckets** system flags apps as "restricted" when they haven't been used recently, then proactively kills them. CellBroadcastReceiver getting killed over and over is the dead giveaway.
+
+### Type 3: `excessive cpu` — CPU abuse
+```
+Killing 17499:com.xingin.xhs (adj 900): excessive cpu 48540 during 300057 dur=896305 limit=10
+```
+小红书 burned 48 seconds of CPU in 5 minutes while in background → killed. The `limit=10` means the threshold is only 10 "power usage" units.
+
+### Type 4: `remove task` — You did it
+```
+Killing 14465:com.hundsun.stockwinner.paqh (adj 100): remove task
+```
+This is you swiping the app away from recents. Not the system.
+
+---
+
+
+# 1. Create the module directory
+mkdir -p /data/adb/modules/cached_fix
+
+# 2. Write module.prop
+cat > /data/adb/modules/cached_fix/module.prop << 'EOF'
+id=cached_fix
+name=Cached Process Limit Fix
+version=1.0
+versionCode=1
+author=you
+description=Raises max cached processes from 32 to 128, relaxes background limits for 12GB RAM
+EOF
+
+# 3. Write the boot script
+cat > /data/adb/modules/cached_fix/service.sh << 'EOF'
+#!/system/bin/sh
+
+# Wait for boot to complete
+while [ "$(getprop sys.boot_completed)" != "1" ]; do
+    sleep 2
+done
+
+# Give ActivityManager time to start
+sleep 10
+
+# ─── Cached process limits ───
+# Raises from 32 → 128 (makes actual use of 12GB RAM)
+device_config put activity_manager max_cached_processes 128
+device_config put activity_manager max_phantom_processes 256
+
+# Keep empty processes alive longer (30 min instead of ~10 min)
+device_config put activity_manager max_empty_time_millis 1800000
+
+# ─── Relax background CPU throttling ───
+# Default is 10 — raises to 25 so background apps don't get "excessive cpu" kills
+device_config put activity_manager bg_cgroup_cpu_limit 25
+resetprop persist.sys.fw.bg_cgroup_cpu_limit 25
+
+
+# ─── App standby: less aggressive ───
+# Extend the time before apps are marked "restricted" (7 days → 30 days)
+settings put global app_idle_constants inactive_to_never=2592000000
+
+# Log what we did
+echo "[cached_fix] Applied: max_cached=128, empty_time=1800000, cpu_limit=25" >> /data/local/tmp/cached_fix.log
+EOF
+
+# 4. Make the script executable
+chmod +x /data/adb/modules/cached_fix/service.sh
+
+# 5. Verify
+cat /data/adb/modules/cached_fix/module.prop
+echo "---"
+cat /data/adb/modules/cached_fix/service.sh
+echo "---"
+echo "Module created. Reboot to apply."
+
