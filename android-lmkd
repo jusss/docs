@@ -6,14 +6,19 @@ logcat -d -b all | grep -iE "Killing|kill.*process|died|diedfor" | tail -30
 use this to get killed by lmkd
 dumpsys activity lmk
 
+show device_config options
+device_config list activity_manager
+
 three things need to re-compile 
 dumpsys activity|grep use_free,use_freezer=false,  Acitivity Mananger cgroup v2,
 zram_write kernel config /sys/block/zram/write
 dumpsys activity settings | grep -i cached, mCustomizedMaxCachedProcesses 
 
 
-MAX_CACHED_APPS limit, App Standby Bucket (Battery settings), excessive cpu,
+1. MAX_CACHED_APPS limit (CUR_MAX_CACHED_PROCESSES), 2. App Standby Bucket (Battery restricted), 3. ActivityManagerService.java excessive cpu killing
 
+#1
+logcat show 07-24 22:57:49.202  1407  3999 I ActivityManager: Killing 2399:com.google.android.gm/u0a156 (adj 999): empty #17
 mCustomizedMaxCachedProcesses=32
 android RRO Runtime Resource Overlay
 
@@ -51,15 +56,67 @@ CachedAppOptimizer settings
 
 
 
+
+#2
+logcat show Killing 3734:com.android.cellbroadcastreceiver.module (adj 955): cached idle & background restricted
 # ─── Relax App Standby restrictions ───
 setprop persist.sys.app_standby_enabled false
 # Or per-app: turn off battery optimization for apps you want kept alive
 # Settings → Apps → [app] → Battery → Unrestricted
 
+
+
+#3
 # ─── Raise CPU abuse threshold so background apps don't get killed as easily ───
+# `CachedAppOptimizer` monitors background apps and kills them based on CPU usage
 setprop persist.sys.fw.bg_cgroup_cpu_limit 25
 # Default is 10 — raises to 25 so background apps don't get "excessive cpu" kills
 device_config put activity_manager bg_cgroup_cpu_limit 25
+
+# device_config put activity_manager bg_excessive_cpu_threshold 50
+
+# logcat show 07-26 00:18:53.574  1403  1468 I ActivityManager: Killing 16074:com.deepseek.chat/u0a214 (adj 900): excessive cpu 11150 during 300002 dur=910819 limit=2, why? can this cpu limit be set?
+# Gemini 3.5 flash fake options bg_current_drain_high_threshold and bg_current_drain_monitor_enabled
+# Grok fake phantom_process_cpu_limit
+# deepseek_v4_pro fake bg_excessive_cpu_threshold
+
+# or set the app unrestricted battery usage
+# or close phantom killer
+# settings put global settings_enable_monitor_phantom_procs false
+
+device_config put activity_manager max_phantom_processes 2147483647
+device_config put activity_manager settings_enable_monitor_phantom_procs false
+device_config put activity_manager bg_cgroup_cpu_limit -1
+
+device_config put activity_manager POWER_CHECK_INTERVAL 1800000
+device_config put activity_manager power_check_max_cpu_1 100
+device_config put activity_manager power_check_max_cpu_2 100
+device_config put activity_manager power_check_max_cpu_3 100
+device_config put activity_manager power_check_max_cpu_4 100
+settings put global settings_enable_monitor_phantom_procs false
+resetprop persist.sys.fflag.override.settings_enable_monitor_phantom_procs false
+# stop activity && sleep 2 && start activity 
+killall system_server
+
+none of those would solve excessive cpu killing by ActivityManagerService.java's updateAppProcessCpuTimeLPr and updatePhantomProcessCpuTimeLPr
+comment those function to avoid app.killLocked, it may need recompile whole AOSP code,
+or using LSPosed module to hook the killing function 
+download LSPosed or JingMatrix/Vector zip package from github, installed it by magisk
+open it by notification manager, download LSPosed module AppRetention.apk from Xposed-Modules-Repo/com.hchen.appretention in github
+install AppRetention.apk by package installer, then in LSPosed module enable AppRetention, choose system framework, then reboot
+after reboot, go into module settings and enable protection for the apps you want to keep alive
+AppRetention may conflict with A1Memory module,
+A1Memory is installed by magisk
+
+https://modules.lsposed.org/module/com.hchen.appretention
+https://github.com/Xposed-Modules-Repo/com.hchen.appretention/releases/tag/2025021500-5.2.2
+https://github.com/JingMatrix/Vector
+
+creat a lsposed module to hook the function updateAppProcessCpuTimeLPr and updatePhantomProcessCpuTimeLPr can solve excessive cpu killing
+
+
+
+
 
 
 
