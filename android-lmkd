@@ -114,9 +114,13 @@ https://github.com/JingMatrix/Vector
 
 creat a lsposed module to hook the function updateAppProcessCpuTimeLPr and updatePhantomProcessCpuTimeLPr can solve excessive cpu killing
 
+https://github.com/jusss/AppAlive
 
 
-
+new phone after magisk
+1. magisk_lmkd_optimized.tar.gz from github.com/jusss/config, extract to /data/adb, chmod +x a.sh
+2. Vector-v2.0-3021-Release.zip from github.com/JingMatrix/Vector, install by magisk
+3. app-alive.apk from github.com/jusss/AppAlive, install by package manager, then enable this module by Vector from notification bar, toggle system framework then reboot
 
 
 
