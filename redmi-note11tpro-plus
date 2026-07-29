@@ -1,3 +1,5 @@
+https://github.com/ItsVixano-releases/LineageOS_xaga lineageos 22.2 for Poco x4 gt
+-------------------
 fastboot reboot recovery # will cause bootloop on mtk chips, snapdragon does not have this issue
 snapdragon has 9008 to unbrick phone, mtk need OEM and mtk auth for flash da.bin by sp flash tool
 mtk bypas auth only for like 1200, not 8100 and 9000 serise
