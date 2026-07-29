@@ -1,0 +1,9 @@
+firefox
+about:confg genera.platform.override "Linux armv81"
+
+chrome
+C-S-P show sensors, set a specific locale
+
+extension
+User-Agent Switch and Manager
+other navigator.userAgentData still can detect real environment
