@@ -1,4 +1,17 @@
+degrade by the official from hyperos2 to miui 14, and it can not bind account in development mode to unlock bootloader,
+mean time user login in settings,
+but after one year, disable time auto sync, change time to 2022.07.29 22:27, try bind account 176 in development mode, 
+it can't bind, then log out account in settings, then
+bind OEM unlock account in development mode, it jump to settings account login, after login succesful then 
+switch back to bind OEM unlock account in development mode, bind OEM unlock account again
+it binds the account sucessful, power off, hold power and decrease volumn get into bootloader, plugin to PC,
+open miflash_unlock-5.5.224.55 on windows, login the same phone number click unlock,
+it remind 168 hour to try again, 
+
+------------------------
 https://github.com/ItsVixano-releases/LineageOS_xaga lineageos 22.2 for Poco x4 gt
+custom kernel
+https://github.com/xiaomi-mt6895-devs/android_kernel_xiaomi_mt6895, MTK Dimensity 8100
 -------------------
 fastboot reboot recovery # will cause bootloop on mtk chips, snapdragon does not have this issue
 snapdragon has 9008 to unbrick phone, mtk need OEM and mtk auth for flash da.bin by sp flash tool
