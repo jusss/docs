@@ -1,0 +1,16 @@
+尝试解决安卓杀后台应用，你知道需要多久吗？
+
+你需要解bootloader，然后装magisk，然后xposed，然后写Android app，你需要懂Linux内存管理和内存压缩zram，
+还有安卓的app standby bucket，还有从logcat查出什么在杀后台，然后写Linux bash脚本通过magisk解决max cached app问题，
+查出是excessive cpu killing，你需要能找到AOSP代码搜索到ActivityManagerService.java，阅读java代码，然后写apk，
+通过lsposed来禁用杀后台问题，你看到这些知识需要多久才能让一人学会吗？
+
+排查问题需要花费大量时间，大内存安卓手机往往不是lmkd杀的后台app，不是oom问题，
+而是Activity Manager杀的后台，你还需要了解lmkd在Android不同版本的不同，包括minfree和PSI，
+然后发现不是lmkd的问题，而是AcitivityManager在杀后台
+
+然后你还需要会用java kotlin写安卓系统app，通过lsposed或vector框架hook AMS的check ExcessiveCpuUsage来解决这个问题，
+lsposed需要magisk，magisk需要解bootloader然后fastboot刷boot.img, 你看这里都有多少知识需要累积？需要多久一个人才能解决这个问题
+
+可能还需要学习suspended app pause execution， linux cgroup v2 freezer，还有学习安卓java开发还有Android Studio使用的时间
+
