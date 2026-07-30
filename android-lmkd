@@ -10,7 +10,8 @@ show device_config options
 device_config list activity_manager
 
 three things need to re-compile 
-dumpsys activity|grep use_free,use_freezer=false,  Acitivity Mananger cgroup v2,
+dumpsys activity|grep use_free,use_freezer=false,  Acitivity Mananger cgroup v2, lineageos 18.1 doesn't enable it in CachedAppOptimizer.java
+but after lineageos 19, it is enabled, after android 14 AOSP enabled suspend app paused execution by default, backgroud app is cached app
 zram_write kernel config /sys/block/zram/write
 dumpsys activity settings | grep -i cached, mCustomizedMaxCachedProcesses 
 
@@ -93,6 +94,7 @@ device_config put activity_manager power_check_max_cpu_1 100
 device_config put activity_manager power_check_max_cpu_2 100
 device_config put activity_manager power_check_max_cpu_3 100
 device_config put activity_manager power_check_max_cpu_4 100
+device_config set_sync_disabled_for_tests persistent
 settings put global settings_enable_monitor_phantom_procs false
 resetprop persist.sys.fflag.override.settings_enable_monitor_phantom_procs false
 # stop activity && sleep 2 && start activity 
@@ -106,11 +108,13 @@ open it by notification manager, download LSPosed module AppRetention.apk from X
 install AppRetention.apk by package installer, then in LSPosed module enable AppRetention, choose system framework, then reboot
 after reboot, go into module settings and enable protection for the apps you want to keep alive
 AppRetention may conflict with A1Memory module,
-A1Memory is installed by magisk
+A1Memory is installed by magisk, enabled by Vector https://github.com/OneB1ank/A1Memory/releases
+
 
 https://modules.lsposed.org/module/com.hchen.appretention
 https://github.com/Xposed-Modules-Repo/com.hchen.appretention/releases/tag/2025021500-5.2.2
 https://github.com/JingMatrix/Vector
+https://github.com/lsposed/lsposed
 
 creat a lsposed module to hook the function updateAppProcessCpuTimeLPr and updatePhantomProcessCpuTimeLPr can solve excessive cpu killing
 
