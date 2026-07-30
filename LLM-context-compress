@@ -1,0 +1,175 @@
+大模型上下文压缩，
+1 滑动窗口 超过token之后保留最近几轮的对话 
+2 超过token上限的对话信息生成总结摘要写入md文件并更新system prompt在此文件搜索old context， 
+3 过滤messages里的tool call信息，只保留user和assistant信息，甚至再激进点只保留user信息
+
+sliding_window
+class SlidingWindowCompressor:
+    def __init__(self, max_tokens=4096, keep_rounds=10):
+        self.max_tokens = max_tokens
+        self.keep_rounds = keep_rounds  # 保留最近N轮
+
+    def compress(self, messages):
+        # 从后往前保留完整对话轮次
+        kept = []
+        token_count = 0
+
+        for msg in reversed(messages):
+            msg_tokens = self.count_tokens(msg['content'])
+            if token_count + msg_tokens > self.max_tokens:
+                break
+            kept.append(msg)
+            token_count += msg_tokens
+
+        return list(reversed(kept))
+
+    def count_tokens(self, text):
+        # 使用tiktoken粗略估算
+        import tiktoken
+        enc = tiktoken.encoding_for_model("gpt-4")
+        return len(enc.encode(text))
+
+
+summary
+import json
+from datetime import datetime
+
+class SummaryCompressor:
+    def __init__(self, summary_file="context_summary.md"):
+        self.summary_file = summary_file
+        self.summary = ""
+
+    def compress(self, messages, llm_client):
+        # 检测是否超过token上限
+        total_tokens = sum(self.count_tokens(m['content']) for m in messages)
+        if total_tokens < 8000:  # 假设上限8000
+            return messages, None
+
+        # 分离新旧对话
+        old_context, recent_context = self.split_context(messages)
+
+        # 生成摘要
+        if old_context:
+            self.summary = self.generate_summary(old_context, llm_client)
+            self.save_summary()
+
+            # 更新system prompt
+            system_msg = self.build_system_prompt()
+            return [system_msg] + recent_context, self.summary
+
+        return messages, None
+
+    def generate_summary(self, old_context, llm_client):
+        prompt = f"""请总结以下对话的关键信息，包括：
+1. 用户的主要需求和问题
+2. 已经做出的决策和结论
+3. 重要的上下文信息
+4. 未完成的任务
+
+对话内容：
+{json.dumps(old_context, ensure_ascii=False)}
+"""
+        response = llm_client.chat(prompt)
+        return response
+
+    def save_summary(self):
+        with open(self.summary_file, 'w', encoding='utf-8') as f:
+            f.write(f"# 对话摘要 - {datetime.now()}\n\n")
+            f.write(self.summary)
+            f.write("\n\n## 检索关键词\n")
+            # 提取关键词便于检索
+            keywords = self.extract_keywords(self.summary)
+            f.write(", ".join(keywords))
+
+    def build_system_prompt(self):
+        return {
+            "role": "system",
+            "content": f"""你是AI助手。以下是历史对话摘要，请在此基础上继续对话：
+
+{self.summary}
+
+注意：
+1. 参考摘要中的历史信息
+2. 如需要详细历史，请在 {self.summary_file} 中搜索关键词
+3. 保持对话连贯性"""
+        }
+
+    def search_old_context(self, keyword):
+        """在摘要文件中搜索"""
+        if not os.path.exists(self.summary_file):
+            return None
+        with open(self.summary_file, 'r', encoding='utf-8') as f:
+            content = f.read()
+        # 简单搜索
+        lines = [line for line in content.split('\n') if keyword in line]
+        return '\n'.join(lines[:5])  # 返回前5条匹配
+
+
+filter tool_call
+class AggressiveCompressor:
+    def compress(self, messages):
+        # 策略3a: 过滤tool calls
+        filtered = []
+        for msg in messages:
+            # 只保留user和assistant
+            if msg['role'] in ['user', 'assistant']:
+                # 移除tool_call相关字段
+                clean_msg = {
+                    'role': msg['role'],
+                    'content': msg.get('content', '')
+                }
+                filtered.append(clean_msg)
+
+        # 策略3b: 更激进 - 只保留user消息
+        user_only = [msg for msg in filtered if msg['role'] == 'user']
+
+        return {
+            'user_assistant': filtered,
+            'user_only': user_only
+        }
+
+
+
+class HybridCompressor:
+    def __init__(self, max_tokens=8000):
+        self.max_tokens = max_tokens
+        self.sliding = SlidingWindowCompressor(max_tokens)
+        self.summary = SummaryCompressor()
+        self.aggressive = AggressiveCompressor()
+
+    def compress(self, messages, llm_client):
+        # 1. 先尝试滑动窗口
+        windowed = self.sliding.compress(messages)
+
+        # 2. 如果还是超限，生成摘要
+        if self.count_tokens(windowed) > self.max_tokens:
+            compressed, summary = self.summary.compress(messages, llm_client)
+            if summary:
+                return compressed, "summary_mode"
+
+        # 3. 极端情况：激进过滤
+        if self.count_tokens(windowed) > self.max_tokens:
+            aggressive = self.aggressive.compress(messages)
+            return aggressive['user_assistant'], "aggressive_mode"
+
+        return windowed, "sliding_mode"
+
+
+# 初始化
+compressor = HybridCompressor(max_tokens=8000)
+
+# 模拟对话历史
+messages = [
+    {"role": "system", "content": "You are a helpful assistant"},
+    {"role": "user", "content": "帮我写一个Python函数"},
+    {"role": "assistant", "content": "好的..."},
+    {"role": "tool", "content": "代码执行结果..."},  # 会被过滤
+    # ... 更多消息
+]
+
+# 压缩
+compressed, mode = compressor.compress(messages, llm_client)
+
+# 需要搜索历史时
+summary_compressor = SummaryCompressor()
+result = summary_compressor.search_old_context("Python")
