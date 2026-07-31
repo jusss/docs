@@ -10,49 +10,74 @@ until [ "$(getprop sys.boot_completed)" = "1" ]; do
 done
 
 # 1. Force lmkd to disable PSI and use the legacy minfree engine
-resetprop ro.lmk.use_psi false
-resetprop ro.lmk.use_minfree_levels true
+#resetprop ro.lmk.use_psi false
+#resetprop ro.lmk.use_minfree_levels true
+
+
+resetprop ro.lmk.use_psi true
+resetprop ro.lmk.use_minfree_levels false
+resetprop ro.lmk.low 1001            # Low memory PSI threshold
+resetprop ro.lmk.medium 800          # Medium threshold
+resetprop ro.lmk.critical 600        # Critical threshold (higher = less killing)
+resetprop ro.lmk.critical_upgrade false
+resetprop ro.lmk.upgrade_pressure 100
+resetprop ro.lmk.kill_timeout_ms 100
+resetprop ro.lmk.downgrade_pressure 100
+resetprop ro.lmk.swap_free_low_percentage 10
+resetprop ro.lmk.psi_partial_stall_ms 200
+resetprop ro.lmk.psi_complete_stall_ms 700
+
+
+# resetprop persist.sys.fw.bg_cgroup_cpu_limit 25
+resetprop ro.sys.fw.bservice_enable true
+resetprop ro.sys.fw.bservice_limit 10
+resetprop ro.sys.fw.bservice_age 60000
+
 
 # 2. Set highly relaxed minfree values (in pages)
 resetprop ro.lmk.minfree_levels "2048:0,4096:100,8192:200,12288:250,16384:900,24576:950"
 resetprop sys.lmk.minfree_levels "2048:0,4096:100,8192:200,12288:250,16384:900,24576:950"
 
 # 3. Tell the system to prioritize physical RAM before touching zRAM
-echo "30" > /proc/sys/vm/swappiness
+echo "200" > /proc/sys/vm/swappiness
 
 # Make the kernel reclaim file/directory caches much more aggressively
-echo "150" > /proc/sys/vm/vfs_cache_pressure
+# echo "200" > /proc/sys/vm/vfs_cache_pressure
+# echo 0 > /proc/sys/vm/compaction_proactiveness
+# echo 1000 > /proc/sys/vm/watermark_scale_factor
 
 # Keep dirty file cache footprints low by flushing to disk earlier
-echo "5" > /proc/sys/vm/dirty_background_ratio
-echo "10" > /proc/sys/vm/dirty_ratio
+#echo "5" > /proc/sys/vm/dirty_background_ratio
+#echo "10" > /proc/sys/vm/dirty_ratio
+
 
 # 4. Disable the Android Phantom Process Killer (No more 32-process limit)
-device_config put activity_manager max_phantom_processes 2147483647
+device_config put activity_manager max_phantom_processes 256
 
 # 5. Force lmkd to restart and apply all changes
 setprop lmkd.reinit 1
 
-cat /data/adb/service.d/clean.sh
+
+# cat /data/adb/service.d/clean.sh
 #!/system/bin/sh
 # Wait for system boot to complete fully before running
-until [ "$(getprop sys.boot_completed)" = "1" ]; do
-    sleep 3
-done
-
-# Start the clean loop in an independent background process
-(
-    while true; do
-        # Sleep for 3 minutes
-        sleep 180
-
-        # Flush pending writes to storage
-        sync
-
-        # Clear the caches
-        echo 3 > /proc/sys/vm/drop_caches
-    done
-) &
+#until [ "$(getprop sys.boot_completed)" = "1" ]; do
+#    sleep 3
+#done
+#
+## Start the clean loop in an independent background process
+#(
+#    while true; do
+#        # Sleep for 3 minutes
+#        sleep 180
+#
+#        # Flush pending writes to storage
+#        sync
+#
+#        # Clear the caches
+#        echo 3 > /proc/sys/vm/drop_caches
+#    done
+#) &
 
 cat /data/adb/modules/flex/service.sh                                                                                                       
 #!/system/bin/sh
@@ -60,12 +85,13 @@ until [ "$(getprop sys.boot_completed)" = "1" ]; do sleep 5; done
 sleep 2
 echo 0 > /proc/sys/vm/page-cluster
 # up to 200
-echo 30 > /proc/sys/vm/swappiness
+echo 200 > /proc/sys/vm/swappiness
 # swapoff /dev/block/zram0
 #echo "lzo-rle" > /sys/block/zram0/comp_algorithm
 #resetprop -n sys.lmk.minfree_levels "10240:0,15360:100,20480:200,25600:250,40960:900,61440:950"
 #setprop persist.device_config.lmkd_native.thrashing_limit 150
 #setprop lmkd.reinit 1
+
 
 cat /data/adb/modules/flex/system.prop
 # PSI 部分阻塞阈值（默认 70ms，调高可降低敏感度）
@@ -81,26 +107,59 @@ ro.lmk.swap_free_low_percentage=10
 # ro.lmk.minfree_levels=10240:0,15360:100,20480:200,25600:250,40960:900,61440:950
 
 
-dd if=/dev/zero of=/data/local/tmp/swapfile bs=1M count=4096
-chmod 600 /data/local/tmp/swapfile
+#dd if=/dev/zero of=/data/local/tmp/swapfile bs=1M count=4096
+#chmod 600 /data/local/tmp/swapfile
 
 cat /data/adb/post-fs-data.d/a.sh
 #!/system/bin/sh
 swapoff /dev/block/zram0
-LOOP_DEV=$(losetup -f)
-losetup $LOOP_DEV /data/local/tmp/swapfile
-mkswap $LOOP_DEV
+#LOOP_DEV=$(losetup -f)
+#losetup $LOOP_DEV /data/local/tmp/swapfile
+#mkswap $LOOP_DEV
 echo 1 > /sys/block/zram0/reset
 #echo lzo > /sys/block/zram0/comp_algorithm
 echo lz4 > /sys/block/zram0/comp_algorithm
-echo 2G > /sys/block/zram0/disksize # Adjust size as needed
-#echo 1288490188 > /sys/block/zram0/disksize
+echo 6G > /sys/block/zram0/disksize # Adjust size as needed
+#echo 268435456 > /sys/block/zram0/disksize
 mkswap /dev/block/zram0
 swapon /dev/block/zram0
-swapon $LOOP_DEV
-echo $LOOP_DEV > /sys/block/zram0/backing_dev
+#swapon $LOOP_DEV
+# echo $LOOP_DEV > /sys/block/zram0/backing_dev
+
+cat /data/adb/modules/cached_fix/serice.sh
+#!/system/bin/sh
+
+# Wait for boot to complete
+while [ "$(getprop sys.boot_completed)" != "1" ]; do
+    sleep 2
+done
+
+# Give ActivityManager time to start
+sleep 10
+
+# ─── Cached process limits ───
+# Raises from 32 → 128 (makes actual use of 12GB RAM)
+device_config set_sync_disabled_for_tests persistent
+device_config put activity_manager max_cached_processes 128
+device_config put activity_manager max_phantom_processes 2147483647
+settings put global settings_enable_monitor_phantom_procs false
+
+# Keep empty processes alive longer (30 min instead of ~10 min)
+device_config put activity_manager max_empty_time_millis 600000
+
+# ─── Relax background CPU throttling ───
+# Default is 10 — raises to 25 so background apps don't get "excessive cpu" kills
+# device_config put activity_manager bg_cgroup_cpu_limit 25
+# resetprop persist.sys.fw.bg_cgroup_cpu_limit 25
 
 
+# ─── App standby: less aggressive ───
+# Extend the time before apps are marked "restricted" (7 days → 30 days)
+settings put global app_idle_constants inactive_to_never=2592000000
+
+
+# Log what we did
+echo "[cached_fix] Applied: max_cached=128, empty_time=1800000, cpu_limit=25" >> /data/local/tmp/cached_fix.log
 
 # getprop |grep lmk
 [init.svc.lmkd]: [running]
