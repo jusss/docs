@@ -70,9 +70,10 @@ setprop persist.sys.app_standby_enabled false
 #3
 # ─── Raise CPU abuse threshold so background apps don't get killed as easily ───
 # `CachedAppOptimizer` monitors background apps and kills them based on CPU usage
-setprop persist.sys.fw.bg_cgroup_cpu_limit 25
+# setprop persist.sys.fw.bg_cgroup_cpu_limit 25
+# resetprop --delete persist.sys.fw.bg_cgroup_cpu_limit
 # Default is 10 — raises to 25 so background apps don't get "excessive cpu" kills
-device_config put activity_manager bg_cgroup_cpu_limit 25
+# device_config put activity_manager bg_cgroup_cpu_limit 25
 
 # device_config put activity_manager bg_excessive_cpu_threshold 50
 
