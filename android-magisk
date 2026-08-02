@@ -28,10 +28,10 @@ resetprop ro.lmk.psi_partial_stall_ms 200
 resetprop ro.lmk.psi_complete_stall_ms 700
 
 
-# resetprop persist.sys.fw.bg_cgroup_cpu_limit 25
-resetprop ro.sys.fw.bservice_enable true
-resetprop ro.sys.fw.bservice_limit 10
-resetprop ro.sys.fw.bservice_age 60000
+## resetprop persist.sys.fw.bg_cgroup_cpu_limit 25
+#resetprop ro.sys.fw.bservice_enable true
+#resetprop ro.sys.fw.bservice_limit 10
+#resetprop ro.sys.fw.bservice_age 60000
 
 
 # 2. Set highly relaxed minfree values (in pages)
@@ -83,7 +83,7 @@ cat /data/adb/modules/flex/service.sh
 #!/system/bin/sh
 until [ "$(getprop sys.boot_completed)" = "1" ]; do sleep 5; done
 sleep 2
-echo 0 > /proc/sys/vm/page-cluster
+# echo 0 > /proc/sys/vm/page-cluster
 # up to 200
 echo 200 > /proc/sys/vm/swappiness
 # swapoff /dev/block/zram0
@@ -110,21 +110,21 @@ ro.lmk.swap_free_low_percentage=10
 #dd if=/dev/zero of=/data/local/tmp/swapfile bs=1M count=4096
 #chmod 600 /data/local/tmp/swapfile
 
-cat /data/adb/post-fs-data.d/a.sh
-#!/system/bin/sh
-swapoff /dev/block/zram0
-#LOOP_DEV=$(losetup -f)
-#losetup $LOOP_DEV /data/local/tmp/swapfile
-#mkswap $LOOP_DEV
-echo 1 > /sys/block/zram0/reset
-#echo lzo > /sys/block/zram0/comp_algorithm
-echo lz4 > /sys/block/zram0/comp_algorithm
-echo 6G > /sys/block/zram0/disksize # Adjust size as needed
-#echo 268435456 > /sys/block/zram0/disksize
-mkswap /dev/block/zram0
-swapon /dev/block/zram0
-#swapon $LOOP_DEV
-# echo $LOOP_DEV > /sys/block/zram0/backing_dev
+#cat /data/adb/post-fs-data.d/a.sh
+##!/system/bin/sh
+#swapoff /dev/block/zram0
+##LOOP_DEV=$(losetup -f)
+##losetup $LOOP_DEV /data/local/tmp/swapfile
+##mkswap $LOOP_DEV
+#echo 1 > /sys/block/zram0/reset
+##echo lzo > /sys/block/zram0/comp_algorithm
+#echo lz4 > /sys/block/zram0/comp_algorithm
+#echo 6G > /sys/block/zram0/disksize # Adjust size as needed
+##echo 268435456 > /sys/block/zram0/disksize
+#mkswap /dev/block/zram0
+#swapon /dev/block/zram0
+##swapon $LOOP_DEV
+## echo $LOOP_DEV > /sys/block/zram0/backing_dev
 
 cat /data/adb/modules/cached_fix/serice.sh
 #!/system/bin/sh
