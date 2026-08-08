@@ -1,3 +1,10 @@
+dual partition is wonderful
+use adb slide to flash lineageos in recovery mode, it will start with _a partition,
+after failed, try again, it will flash in _b partition, like boot_b
+then install magisk and flash patched boot.img, it will flash on boot_a partition,
+if patched boot.img in boot_a failed to boot, it will use boot_b to start
+
+---------------------------------
 system partition may have two partition since android 8.0, and compatible to project treble for only flash Generic System Images to upgrade android system,
 
 fastboot flash system GSI.img
