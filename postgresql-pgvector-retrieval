@@ -1,0 +1,183 @@
+pgvector是postgresql启用了vector扩展之后的向量数据库，dbeaver可以用postgresql的驱动链接pgvector,
+向量表里会有一个vector类型的embedding column, 1024维就是一个str list里面存了1024个数字,
+可以向量化某个column的值然后存储在embedding column, 然后向量检索embedding column
+这个向量维度和embedding模型的维度需要一致，比如用bge-m3 向量化数据然后存储，存储维度需要和bge-m3的维度一样
+比如想要向量搜索question，那就把question向量化的数据存储在embedding column, 然后query向量化后和embedding匹配获取question
+
+
+使用pgvector扩展存储文本向量
+
+启用pgvector扩展（如果未启用）
+CREATE EXTENSION IF NOT EXISTS vector;
+
+
+CREATE TABLE IF NOT EXISTS question_generalization_vectors (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),          -- 使用 gen_random_uuid() 自动生成 UUID
+    question TEXT NOT NULL,                                 -- 问题文本，假设为非空
+    question_list TEXT[],                                   -- 文本列表，使用 PostgreSQL 数组类型
+    embedding VECTOR(1024),  -- 向量（embedding模型输出1024维向量）
+    region VARCHAR(255),                                    -- 区域，可指定长度
+    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- 创建时间
+    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- 更新时间
+    source VARCHAR(255),                                    -- 来源
+    extra JSONB                                             -- 额外的 JSON 数据
+);
+
+
+创建向量索引（使用IVFFlat索引，适合大规模向量检索）
+CREATE INDEX IF NOT EXISTS question_generalization_vectors_embedding_idx
+ON question_generalization_vectors
+USING ivfflat (embedding vector_cosine_ops)
+WITH (lists = 100);
+
+
+向量搜索
+pgvector的threshold和ChromaDB有差异
+pgvector 你需要先在查询中计算出相似度分数，然后再用WHERE子句进行过滤
+ChromaDB 在调用similarity_search_with_relevance_scores等方法时，直接传入score_threshold参数，由数据库自动过滤
+
+-- 假设用户输入的新问题是 "怎样修改密码？"
+-- 第一步：在应用程序中调用嵌入模型，将 "怎样修改密码？" 转换为1024维向量
+-- 假设得到的向量为 [0.234, -0.567, 0.891, ...] (共1024个数字)
+
+-- 第二步：执行相似度搜索，并过滤出相似度大于0.7的结果
+WITH query_vector AS (
+    SELECT '[0.234, -0.567, 0.891, ...]'::vector AS vec  -- 替换为实际生成的向量
+)
+SELECT id, question,
+    -- 计算相似度分数 (余弦相似度 = 1 - 余弦距离)，范围 [0, 2]，越接近1越相似
+    1 - (embedding <=> (SELECT vec FROM query_vector)) AS similarity_score
+FROM 
+    question_generalization_vectors
+WHERE 
+    -- 过滤：仅返回相似度 > 0.7 的记录
+    1 - (embedding <=> (SELECT vec FROM query_vector)) > 0.7
+ORDER BY 
+    embedding <=> (SELECT vec FROM query_vector)  -- 按距离升序（越相似越靠前）
+LIMIT 10;  -- 限制返回数量
+
+
+            SELECT
+                question,
+                question_list,
+                1 - (embedding <=> "QUERY_EMBEDDING_STRING"::vector) AS similarity
+            FROM question_generalization_vectors
+            WHERE region = "REGION"
+              AND 1 - (embedding <=> "QUERY_EMBEDDING_STRING"::vector) >= THRESHOLD
+            ORDER BY embedding <=> "QUERY_EMBEDDING_STRING"::vector
+
+this will return question and question_list column data, which embedding column data match the query vector,
+since embedding column data is question vectorization data, so query embedding data is match question embedding data,
+filter by region and threshold, get the question and question_list data
+
+
+---------------------------------------------------------------
+
+-- 插入数据时，先用bge-m3模型将question向量化
+INSERT INTO question_generalization_vectors (
+    question,
+    question_list,
+    embedding,  -- 存储bge-m3生成的1024维向量
+    region,
+    source,
+    extra
+) VALUES (
+    '如何重置密码？',
+    ARRAY['密码重置', '忘记密码'],
+    '[0.123, -0.456, 0.789, ...]'::vector(1024),  -- bge-m3生成的向量
+    'asia',
+    'user_manual',
+    '{"category": "security"}'::jsonb
+);
+
+-- 用户查询："怎样修改密码？"
+-- 第一步：用bge-m3将查询文本向量化
+-- 第二步：执行相似度搜索
+
+WITH query_vector AS (
+    SELECT '[0.234, -0.567, 0.891, ...]'::vector(1024) AS vec  -- bge-m3生成的查询向量
+)
+SELECT
+    id,
+    question,
+    question_list,
+    1 - (embedding <=> qv.vec) AS similarity_score
+FROM
+    question_generalization_vectors,
+    query_vector qv
+WHERE
+    region = 'asia'  -- 区域过滤
+    AND 1 - (embedding <=> qv.vec) >= 0.7  -- 相似度阈值
+ORDER BY
+    embedding <=> qv.vec  -- 按距离升序排列
+LIMIT 10;
+
+
+-- 如果数据量很大（>100万条），考虑使用HNSW索引
+CREATE INDEX IF NOT EXISTS question_generalization_vectors_embedding_hnsw_idx
+ON question_generalization_vectors
+USING hnsw (embedding vector_cosine_ops)
+WITH (m = 16, ef_construction = 200);
+
+-- 或者使用IVFFlat（适合中等规模数据）
+CREATE INDEX IF NOT EXISTS question_generalization_vectors_embedding_ivfflat_idx
+ON question_generalization_vectors
+USING ivfflat (embedding vector_cosine_ops)
+WITH (lists = 100);
+
+-- 如果查询频繁，可以创建物化视图预计算热门查询
+CREATE MATERIALIZED VIEW hot_question_similarity AS
+SELECT
+    q1.id AS source_id,
+    q2.id AS target_id,
+    q1.question AS source_question,
+    q2.question AS target_question,
+    1 - (q1.embedding <=> q2.embedding) AS similarity
+FROM
+    question_generalization_vectors q1,
+    question_generalization_vectors q2
+WHERE
+    q1.id != q2.id
+    AND 1 - (q1.embedding <=> q2.embedding) > 0.8;
+
+    # Python示例：批量向量化并插入
+import psycopg2
+from sentence_transformers import SentenceTransformer
+
+model = SentenceTransformer('BAAI/bge-m3')
+questions = ["问题1", "问题2", "问题3"]
+embeddings = model.encode(questions)
+
+conn = psycopg2.connect("dbname=test user=postgres")
+cur = conn.cursor()
+
+# 批量插入
+data = [(q, emb.tolist()) for q, emb in zip(questions, embeddings)]
+cur.executemany(
+    "INSERT INTO question_generalization_vectors (question, embedding) VALUES (%s, %s::vector)",
+    data
+)
+conn.commit()
+
+-- 适用于应用程序调用的参数化查询
+SELECT
+    question,
+    question_list,
+    1 - (embedding <=> %(query_vector)s::vector) AS similarity
+FROM
+    question_generalization_vectors
+WHERE
+    region = %(region)s
+    AND 1 - (embedding <=> %(query_vector)s::vector) >= %(threshold)s::float
+ORDER BY
+    embedding <=> %(query_vector)s::vector
+LIMIT %(limit)s;
+
+注意事项
+维度一致性：确保bge-m3模型输出1024维，与表定义VECTOR(1024)一致
+
+相似度范围：余弦相似度范围是[-1, 1]，使用1 - cosine_distance转换为[0, 2]
+
+阈值调优：根据实际数据分布调整阈值，一般0.7-0.9之间效果较好
+
+索引重建：大数据量插入后，需要重建IVFFlat索引以保持性能
