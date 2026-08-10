@@ -1,0 +1,62 @@
+CREATE TABLE IF NOT EXISTS chunk_question (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),          -- 使用 gen_random_uuid() 自动生成 UUID
+    doc_name VARCHAR(255) NOT NULL,
+    chunk TEXT NOT NULL,                                 -- 切片文本，假设为非空
+    question_list TEXT[],                                   -- 文本列表，使用 PostgreSQL 数组类型
+    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- 创建时间
+    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- 更新时间
+    extra JSONB                                             -- 额外的 JSON 数据
+);
+
+-- 1. doc_name 单列索引（用于按文档过滤）
+CREATE INDEX idx_chunk_question_doc_name ON chunk_question(doc_name);
+
+-- 2. doc_name + chunk 复合索引（用于精确查询切片）
+CREATE INDEX idx_chunk_question_doc_chunk ON chunk_question(doc_name, chunk);
+
+-- 3. chunk 全文搜索索引（用于内容搜索）
+CREATE INDEX idx_chunk_question_chunk_fts ON chunk_question 
+USING GIN (to_tsvector('simple', chunk));
+
+-- 4. 已有的 question_list GIN 索引（保持不变）
+CREATE INDEX idx_chunk_question_question_list ON chunk_question 
+USING GIN (question_list);
+
+search text match chunk
+
+    async def get_question_list_by_chunks(chunks: list[str], db) -> list[str]:
+        from sqlalchemy import func, select, text
+        question_list = []
+        try:
+            for chunk in chunks:
+                tsquery = func.plainto_tsquery('simple', chunk)
+
+                stmt = select(ChunkQuestion).where(
+                    func.to_tsvector('simple', ChunkQuestion.chunk).op('@@')(tsquery)
+                )
+                result = await db.execute(stmt)
+                records = result.scalars().all()
+                for record in records:
+                    question_list.append(record.question_list)
+
+            return reduce(add, question_list)
+        except Exception as e:
+            logger.error(e)
+            return []
+
+
+
+"""简单匹配：所有关键词都必须出现"""
+    tsquery = func.plainto_tsquery('simple', search_text)
+
+  """短语匹配：要求词序一致"""
+    tsquery = func.phraseto_tsquery('simple', search_text)
+    
+高级搜索：支持引号、OR、NOT 等
+    例如：'foo OR bar', '"exact phrase"', '-exclude'
+    """
+    tsquery = func.websearch_to_tsquery('simple', search_text)
+
+'simple'：只做小写转换，适合精确匹配
+'english'：做词干提取（running→run），更模糊但更智能
+如果内容是中文，'simple' 会把每个汉字当作一个词，效果有限。可以考虑安装 zhparser 扩展。
