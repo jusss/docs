@@ -1,0 +1,13 @@
+in python, do not use threading inside async def, use asyncio.create_task to run block function inside async def and it will not block rest code
+
+1. do not use threading inside async def
+2. use asyncio.create_task to run another async function without await inside async def, and it will not block rest code
+3. use loop.run_in_executor to run blocking function inside async def
+
+`await` will yield control to event loop, other function inside event loop will run, but the `await` will block the rest code
+until it get result
+
+1. loop.run_in_executor() WITHOUT await - It WILL run immediately! return Future object, not block rest code
+2. await loop.run_in_executor() - Runs AND returns the actual result (not a Future), block rest code
+3. asyncio.create_task() WITHOUT await - Starts immediately, returns a Task object, not block rest code
+4. await asyncio.create_task() - Starts immediately AND awaits the result, block rest code

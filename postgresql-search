@@ -1,3 +1,184 @@
+
+from sqlalchemy import func, select, text
+from functools import reduce
+from typing import List
+import logging
+
+logger = logging.getLogger(__name__)
+
+async def get_question_list_by_chunks(chunks: List[str], db) -> List[str]:
+    """根据切片文本搜索关联的问题列表"""
+    if not chunks:
+        return []
+
+    try:
+        all_questions = set()
+
+        # 方案1：批量查询（推荐）
+        # 构建 OR 条件的全文搜索
+        tsquery_conditions = []
+        for chunk in chunks:
+            # 使用 websearch_to_tsquery 支持更丰富的搜索语法
+            tsquery = func.websearch_to_tsquery('simple', chunk)
+            condition = func.to_tsvector('simple', ChunkQuestion.chunk).op('@@')(tsquery)
+            tsquery_conditions.append(condition)
+
+        # 使用 OR 组合所有条件
+        stmt = select(ChunkQuestion).where(
+            reduce(lambda x, y: x | y, tsquery_conditions)
+        )
+
+        result = await db.execute(stmt)
+        records = result.scalars().all()
+
+        # 收集所有问题并去重
+        for record in records:
+            if record.question_list:
+                all_questions.update(record.question_list)
+
+        return list(all_questions)
+
+    except Exception as e:
+        logger.error(f"查询问题列表失败: {e}", exc_info=True)
+        return []
+
+
+async def get_question_list_by_chunks_advanced(chunks: List[str], db,
+                                               search_mode: str = 'websearch') -> List[str]:
+    """
+    高级版本：支持多种搜索模式
+
+    Args:
+        chunks: 切片文本列表
+        db: 数据库会话
+        search_mode: 'plain' | 'phrase' | 'websearch'
+    """
+    if not chunks:
+        return []
+
+    # 映射搜索模式
+    tsquery_funcs = {
+        'plain': func.plainto_tsquery,
+        'phrase': func.phraseto_tsquery,
+        'websearch': func.websearch_to_tsquery
+    }
+
+    tsquery_func = tsquery_funcs.get(search_mode, func.websearch_to_tsquery)
+
+    try:
+        all_questions = set()
+
+        # 批量查询
+        conditions = []
+        for chunk in chunks:
+            # 对长文本进行截断，防止tsquery过长
+            safe_chunk = chunk[:500]  # 根据实际需求调整
+            tsquery = tsquery_func('simple', safe_chunk)
+            condition = func.to_tsvector('simple', ChunkQuestion.chunk).op('@@')(tsquery)
+            conditions.append(condition)
+
+        if conditions:
+            stmt = select(ChunkQuestion).where(
+                reduce(lambda x, y: x | y, conditions)
+            )
+
+            result = await db.execute(stmt)
+            records = result.scalars().all()
+
+            for record in records:
+                if record.question_list:
+                    all_questions.update(record.question_list)
+
+        return list(all_questions)
+
+    except Exception as e:
+        logger.error(f"高级查询失败: {e}", exc_info=True)
+        return []
+
+
+async def get_question_list_by_chunks_with_score(chunks: List[str], db,
+                                                 threshold: float = 0.1) -> List[dict]:
+    """
+    带相关度评分的版本
+
+    Returns:
+        [{'question': 'xxx', 'score': 0.8}, ...]
+    """
+    if not chunks:
+        return []
+
+    try:
+        # 使用 ts_rank 计算相关性
+        query_parts = []
+        for chunk in chunks:
+            tsquery = func.websearch_to_tsquery('simple', chunk)
+            query_parts.append(tsquery)
+
+        # 合并查询
+        combined_query = reduce(lambda x, y: func.operator('||', x, y), query_parts)
+
+        stmt = select(
+            ChunkQuestion,
+            func.ts_rank(
+                func.to_tsvector('simple', ChunkQuestion.chunk),
+                combined_query
+            ).label('rank')
+        ).where(
+            func.to_tsvector('simple', ChunkQuestion.chunk).op('@@')(combined_query)
+        ).order_by(text('rank DESC'))
+
+        result = await db.execute(stmt)
+        records = result.all()
+
+        scored_questions = []
+        seen_questions = set()
+
+        for record in records:
+            chunk_question = record[0]
+            rank = record[1]
+
+            if rank >= threshold and chunk_question.question_list:
+                for q in chunk_question.question_list:
+                    if q not in seen_questions:
+                        seen_questions.add(q)
+                        scored_questions.append({
+                            'question': q,
+                            'score': float(rank)
+                        })
+
+        return scored_questions
+
+    except Exception as e:
+        logger.error(f"带评分的查询失败: {e}", exc_info=True)
+        return []
+
+
+
+
+# 基础查询
+questions = await get_question_list_by_chunks(
+    ["用户登录失败", "密码重置"],
+    db
+)
+
+# 带相关度评分
+scored = await get_question_list_by_chunks_with_score(
+    ["用户登录失败 密码错误"],
+    db,
+    threshold=0.2
+)
+
+# 高级搜索（支持 OR, NOT, 引号）
+questions = await get_question_list_by_chunks_advanced(
+    ['"用户登录" 失败 -测试', '密码 OR 重置'],
+    db,
+    search_mode='websearch'
+)
+
+
+
+--------------------
+
 CREATE TABLE IF NOT EXISTS chunk_question (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),          -- 使用 gen_random_uuid() 自动生成 UUID
     doc_name VARCHAR(255) NOT NULL,
@@ -60,3 +241,4 @@ search text match chunk
 'simple'：只做小写转换，适合精确匹配
 'english'：做词干提取（running→run），更模糊但更智能
 如果内容是中文，'simple' 会把每个汉字当作一个词，效果有限。可以考虑安装 zhparser 扩展。
+
