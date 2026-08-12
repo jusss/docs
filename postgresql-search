@@ -1,3 +1,18 @@
+search with substring, not keyword
+
+pg search chinese string match
+            with Session() as db:
+                for chunk in chunks:
+                       needle = chunk[:100].strip()
+                    stmt = select(ChunkQuestion).where(
+                        ChunkQuestion.chunk.ilike(f'%{needle}%')
+                    )
+                    result = db.execute(stmt)
+                    records = result.scalars().all()
+                    for record in records:
+                        column_a_list.append(record.column_a)
+
+--------------------------------
 
 from sqlalchemy import func, select, text
 from functools import reduce
