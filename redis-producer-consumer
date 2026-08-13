@@ -16,3 +16,11 @@ if raw:
 ```
 redis can do api cache, distribute lock, producer/consumer, shared variable in multiple instance
 
+
+normal way
+
+redis_client.set("my_key", json.dumps(data), ex=1600)
+r = redis_client.get("my_key")
+if r: 
+    data = json.loads(r)
+
