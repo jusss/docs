@@ -8,3 +8,5 @@ uninstall X app, use chrome annoymouse login x.com, it will work, do not use bra
 
 can not use email or user name with password to login X app, attestation denied, but try OAuth login with gmail, it works, 
 apkmirror install X app 10.67.0-release.0, download X-app.apkm, use apkmirror to install this apkm
+Grok AI app need this PlayIntegrityFix_v4.4-inject-s.zip installed by magisk, so it can be download from Google Play
+deepseek app need this too
