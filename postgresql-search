@@ -1,5 +1,8 @@
 search with substring, not keyword
 
+create extension if not exists pg_trgm; # for performance
+create index idx_col_trgm on chunk_question using gin (chunk gin_trgm_ops); # create index for ilike(f'%{keyword}%') search
+
 pg search chinese string match
             with Session() as db:
                 for chunk in chunks:
@@ -11,6 +14,52 @@ pg search chinese string match
                     records = result.scalars().all()
                     for record in records:
                         column_a_list.append(record.column_a)
+
+
+# Use `%` operator (trigram similarity) - MORE EFFICIENT
+with Session() as db:
+    for chunk in chunks:
+        needle = chunk[:100].strip()
+        # Use `%` operator for trigram similarity (threshold 0.3 by default)
+        stmt = select(ChunkQuestion).where(
+            ChunkQuestion.chunk.op('%')(needle)
+        )
+        # Or specify similarity threshold
+        # stmt = select(ChunkQuestion).where(
+        #     func.similarity(ChunkQuestion.chunk, needle) > 0.3
+        # )
+        result = db.execute(stmt)
+        records = result.scalars().all()
+        for record in records:
+            column_a_list.append(record.column_a)
+
+
+
+-- For trigram similarity search
+CREATE INDEX IF NOT EXISTS idx_chunk_trgm
+ON chunk_question USING gin (chunk gin_trgm_ops);
+
+-- For full-text search (if using Chinese)
+CREATE INDEX IF NOT EXISTS idx_chunk_fts
+ON chunk_question USING gin (to_tsvector('chinese', chunk));
+
+-- For exact substring (if you need exact matching)
+CREATE INDEX IF NOT EXISTS idx_chunk_btree
+ON chunk_question (chunk varchar_pattern_ops);
+
+
+for Chinese
+with Session() as db:
+    for chunk in chunks:
+        needle = chunk[:100].strip()
+        # Use full-text search
+        stmt = select(ChunkQuestion).where(
+            func.to_tsvector('chinese', ChunkQuestion.chunk).op('@@')(
+                func.to_tsquery('chinese', needle)
+            )
+        )
+        result = db.execute(stmt)
+        records = result.scalars().all()
 
 --------------------------------
 
