@@ -20,7 +20,9 @@ but asyncio.create_task and loop.run_in_executor would run immediately without a
 then await for its result
 
 but also
-[await i for i in [asyncio.create_task(f1())]] is ok
+[await i for i in [asyncio.create_task(f1())]] is ok 
+
+but [await i for i in [f1(), f1()]] would be sequencial, not concurrent
 --------------------------
 
 
