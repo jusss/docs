@@ -1,3 +1,29 @@
+
+--------------------
+await asyncio.gather(*[ asyncio.create_task(f()) ])
+that async def f() need return concret value not Task/Future,
+
+# use async def to construct Task with concret value, like return 3:: Maybe Int
+async def g()
+    return 3
+
+Right:
+async def f():
+    return await g()
+
+Wrong:
+async def f1():
+    return g()
+
+call async function g with g() would do nothing, until await g() it will run
+but asyncio.create_task and loop.run_in_executor would run immediately without await
+then await for its result
+
+but also
+[await i for i in [asyncio.create_task(f1())]] is ok
+--------------------------
+
+
 in python, do not use threading inside async def, use asyncio.create_task to run block function inside async def and it will not block rest code
 
 1. do not use threading inside async def
