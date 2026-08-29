@@ -1,3 +1,20 @@
+those run in async function
+1. asyncio.create_task(f(x)) for async function, run immediately, get result with await
+
+2. g() if g is async function, this will not run, untill await g()
+
+3. loop=asyncio.get_event_loop() or get_running_loop() or new_event_loop(),
+  loop.run_in_executor(None, lambda: f(x)) for blocking function in other thread, run immediately, get result with await
+
+4. asyncio.to_thread(lambda: f(x)) sugar syntax for loop.run_in_executor
+
+5. task = asyncio.ensure_future(f(x)), run blocking function in the current thread,
+   tasks = set()
+   tasks.add(task)
+   task.add_done_callback(tasks.discard) # drop cache reference
+
+those run in blocking function
+asyncio.run(g())
 
 --------------------
 await asyncio.gather(*[ asyncio.create_task(f()) ])
