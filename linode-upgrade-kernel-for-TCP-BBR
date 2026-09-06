@@ -1,3 +1,18 @@
+active bbr
+echo bbr > /proc/sys/net/ipv4/tcp_congestion_control   # exit=0
+cat /proc/sys/net/ipv4/tcp_congestion_control           # → bbr  ✓
+this will work until next reboot
+
+or 
+/etc/sysctl.conf
+net.core.default_qdisc = fq
+net.ipv4.tcp_congestion_control = bbr
+
+sysctl -p
+
+lsmod|grep tcp_bbr
+
+---------------------------------------
 debian wheezy 7.8 don't need to upgrade to jessie for kernel 4.9
 because linode provide kernel 4.9 for wheezy
 https://www.linode.com/docs/migrate-to-linode/disk-images/disk-images-and-configuration-profiles#editing-a-configuration-profile
