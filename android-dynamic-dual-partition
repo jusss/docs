@@ -1,0 +1,127 @@
+android 10引进了动态分区super block partition
+
+super分区里包含system_a, system_b, product_a, product_b, vendor, system_ext, odm等动态逻辑分区
+
+super分区的大小和物理存储无关，由厂商出厂时设定，一般4G大小
+
+外面其他物理分区还有boot_a, boot_b,vbmeta_a, vbmeta_b, userdata(/data)
+
+刷GSI一般不刷boot, 只刷system分区，而super里面的system可能空间不足，需要进fastbootd删除product_a分区
+
+但是MTK芯片 fastboot reboot recovery和 fastboot reboot fastboot会导致变砖，无法通过fastboot进入fastbootd,
+
+需要通过recovery进入fastbootd,
+
+fastboot delete-logical-partition product_a 进入fastbootd后删除product分区
+
+fastboot resize-logical-partition system_a 你想要的大小
+
+fastboot flash system_a 你的GSI镜像文件.img
+
+
+
+df -h /system可以查看system分区大小
+
+
+
+bootloader locked状态AndroidVerifiedBoot检测vbmeta分区，
+
+vbmeta分区存放boot system vendor分区的签名，接着验证boot system分区签名，签名不符会终止启动
+
+解锁bootloader之后，不再验证vbmeta里的签名信息，不再验证其他分区的完整性
+
+
+
+即使解锁bootloader后，刷lineageos GSI版本时，需要刷vbmeta分区或vbmeta_system分区关闭AVB启动验证
+
+vbmeta_system用来验证super内system分区签名
+
+在fastbootd模式下
+
+fastboot flash vbmeta --disable-verity --disable-verification vbmeta.img
+
+fastboot flash vbmeta_system --disable-verity --disable-verification vbmeta_system.img
+
+
+
+官方的lineageos,是先刷入recovery然后recovery里slide zip包刷机，zip包里包含了正确签名的vbmeta分区不需要再fastbootd里操作
+
+第三方的lineageos, 需要手动刷入vbmeta绕过AVB
+
+
+
+Google GSI提供system.img和vbmeta.img, system.img用刷super里的system分区, vbmeta.img用于绕过AVB验证
+
+全量刷机包就是super.img，包含system product vendor
+
+fastboot模式只能解析物理分区super, boot, vbmeta, recovery
+
+fastbootd模式能解析super里的system, product, vendor等逻辑分区
+
+刷system.img需要在fastbootd里
+
+fastboot getvar is-userspace #return yes, it means fastbootd, no is traditional fastboot mode
+
+
+
+android10之后boot分区的功能,部分转到了vendor_boot(厂商驱动), dtbo分区(DTB)
+
+fastboot flash boot boot.img
+
+fastboot flash vendor_boot vendor_boot.img
+
+fastboot flash dtbo dtbo.img
+
+
+
+android 11引进了vendor_dlkm分区存SoC kernel driver, 更新内核模块，不需要更新整个vendor分区,vendor_dlkm是super里的逻辑分区
+
+
+
+物理分区super, boot, vbmeta, userdata, vendor_boot, dtbo, cache, metadata
+
+super里的逻辑分区 system, product, vendor, system_ext, odm, vendor_dlkm, odm_dlkm, system_dlkm, 
+
+android 10之后，A/B双分区，没有了recovery分区，recovery功能在boot分区，android 10之前的没有A/B双分区的有recovery物理分区
+
+
+
+分区表是设备出厂时就固定的，旧设备非A/B分区，保留recovery物理分区，即使升级到 android 11，recovery功能还是在recovery分区，也没有A/B双分区
+
+
+
+动态双分区，指的是super里动态逻辑分区和A/B双分区，super partition是android 10, A/B dual partition 是android 7.0, Virtual A/B给super里的分区实现双分区是android 11引进
+
+
+
+
+
+刷GSI
+
+1. df -h /system可以查看当前system分区大小, 从google下载system.img和vbmeta.img，对比system.img和system分区大小，看是否需要调整system分区大小
+
+2. 通过recovery进入fastbootd，MTK芯片不要用fastboot reboot fastboot或fastboot reboot recovery
+
+3. 调整system大小
+
+fastboot delete-logical-partition product_a 进入fastbootd后删除product分区
+
+fastboot resize-logical-partition system_a 你想要的大小
+
+4. 刷system分区
+
+fastboot flash system_a 你的GSI镜像文件.img
+
+5. 刷vbmeta分区
+
+fastboot flash vbmeta --disable-verity --disable-verification vbmeta.img
+
+fastboot flash vbmeta_system --disable-verity --disable-verification vbmeta_system.img
+
+
+
+如果刷完后，需要重建一个5MB大小的product_a分区，fastboot create-logical-partition product_a 5120,super分区大小是出厂固定的，
+
+fastboot getvar partition-size:super 返回16进制super分区大小, 0x100000000是4GB
+
+fastboot getvar all列出所有分区大小，super分区大小减去所有虚拟分区大小，就是super分区可用空间
