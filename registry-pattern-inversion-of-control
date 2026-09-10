@@ -1,0 +1,79 @@
+registry patter, Inversion of Control, Dependency Injection, android callback, continuation
+
+一个可更新的函数，函数本身代码不变，但是功能一直在增加
+假设有这样一些fastapi api, /api/f, /api/g, 每创建一个新的需求需要创建一个新的/api/x
+what if there is only one api, /api/common, parameter is like [{"function":"f", "parameter":{"x":1, "y":2}]
+and you can only focus on function itself, no api stuff, it's like RPC, one api, pass different name to call different functions
+that is registry pattern! 
+
+tradition flow is your code -> calls -> library functions/framework, your_code(lib(x))
+Inversion of Control is library function/framework -> calls -> your code, lib(x, your_code)
+IoC in android button.setOnClickListener { your code }
+Dependency Injection is passing object as parameter instead of create it inside, 
+IoC or DI is framework call my function, it can do something before or after my function like decorator
+
+def f():
+  user = User()
+
+DI: def f(user):   when calling f(User())
+
+fastapi Depends is DI, @app.get() is IoC, match api route, call your function
+def create_user(name:str, db=Depends(get_db)):  fastapi call get_db for u, and fastapi can do cache for get_db
+
+def create_user(name:str):
+  db=get_db()   you call get_db()
+
+framework call my function, my function can get framework's value, just like android
+keep framework code unchange, but passing my function, it can change behavior
+if my function pass to framework is the last parameter, and framework call my function in the end, my funciton is continuation
+-----------------------------------------------------------
+
+def create_register():
+    registered = {}
+    def wrapper(func):
+        registered[func.__name__] = func
+        return func
+    return wrapper, registered
+
+register, functions = create_register()
+
+def common(alist):
+    result = []
+    for i in alist:
+        if functions.get(i["function"]):
+            result.append({"function": i["function"], "result": functions[i["function"]](**i["parameter"])})
+        else:
+            result.append({"function":i["function"], "result": f"function {i['function']} is not found"})
+    return result
+
+@register
+def f(x):
+    print(x)
+    return x
+
+@register
+def g(x):
+    print(x+1)
+
+#1 IoC
+@app.post("/api/common1")
+def f(alist:[dict]):
+  # let assume alist is like [{"function":"f", "parameter":{"x":1}}, {"function":"g", "parameter":{"x":1}},{"function":"x", "parameter":{"x":1}}]
+  r= common(alist)
+  return r
+
+#2 DI,  (lambda **kwargs: f" not found")(1,2)  short-circuit, beautiful, this lambda **kwargs is a continuation, framework call my function in the end, my funciton is continuation
+
+@app.post("/api/common2")
+def f(function:str=Body(...), parameter: dict=Body(...), fn=Depends(lambda function: functions.get(function, lambda **kwargs: f"{function} not found"))):
+  return fn(**parameter)
+
+#3 DI, framework call my function, it can pass the envrionment to my function, my function can access that 'function' and 'parameter'
+def get_fn(function: str):
+  return functions.get(function, lambda **kwargs: f"{function} not found")
+
+@app.post("/api/common2")
+def f(function:str=Body(...), parameter: dict=Body(...), fn=Depends(get_fn)):
+  return fn(**parameter)
+
+#Query for GET url parameter, Form for POST form-data, Body for JSON string without declair a pydantic data class
