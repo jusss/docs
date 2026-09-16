@@ -49,6 +49,16 @@ run = lambda list1, list2, cond, action: amb(list1,
 # map, filter, reduce is IoC
 # continuation is the rest of the program, inside a function, in the end, call callback, callback would be a continuation
 # CPS is in the definition of function f, in the end call callback g first, then call f, the g's parameter would be f's result
+# callback and continuation are IoC, call callback in the end is continuation
+# IoC call k first in define f, define k later when call f, define funciton f, tail call callback k, k is continuation, in k's definition, tail call callback g, g is k's continuation, somehow you can construct k's continuation g inside f, and this g can access f's context, when call k with g in f, f take control back again! this is jumpback, call continuation with continuation, like that use call/cc get g, then call k with g , what if call k with k, it would be a loop
+
+# closure is a inner function, this inner function definition visit outside variable directly not by passing variable
+
+# call/cc capture the rest as a continuation g inside function f, actually is put the rest in a inner function g inside f, and g would have a continuation c, call c in the end of g, then in the end of f, call g with c is (g c), if call g with g, would be a loop?
+
+# continuation, CPS, call/cc, delimited continuation
+
+# in CPS, the passing continuation is alread what call/cc captured, no need to use call/cc
 
 # find first
 print(run(list(range(7)), list(range(9)), lambda x,y: x + y == 7, lambda x,y,k: ("solution", x,y)))
@@ -104,4 +114,46 @@ def step2CPS(n,k):
     return lambda: step2CPS(n-1, lambda r: lambda: k(n+r))
 
 print(tramp(step2CPS(10000,lambda x: x)))
+
+# jumpback
+def f(k):
+    def g(value):
+        print("back in f, value =", value)
+        return "done"
+    return k(g)
+
+def k(v):
+    print("in k, v =", v)
+    return v(42)
+
+print(f(k))
+
+
+
+
+what would happen call outside function within inner function? a loop
+def f():
+  def g():
+    f()
+  g()
+
+
+
+the code has issue, you can not use plain function to do what call/cc did
+but in CPS, the passing continuation is alread what call/cc captured, no need to use call/cc
+
+def f():
+  ...
+  def g(c):
+  ...
+   if c is a constant c:
+       return c+1
+   return c(g_result)
+  g(3)
+  g(g)
+
+this g is the continuation call/cc caputred, g(g) so c is g, then g(g) would be recursive loop
+
+
+
 """
