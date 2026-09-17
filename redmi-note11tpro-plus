@@ -1,3 +1,31 @@
+it's funny that you should re-mount zram in post-fs-data.d/a.sh
+but umount zram and mount disk in modules/a/service.sh
+swapon 4G img is very stuck, but swap on 512M is fast
+
+/data/adb # dd bs=1M count=512 if=/dev/zero of=./swap1.img 
+/data/adb # dd bs=1M count=512 if=/dev/zero of=./swap2.img 
+/data/adb # dd bs=1M count=512 if=/dev/zero of=./swap3.img 
+/data/adb # dd bs=1M count=512 if=/dev/zero of=./swap4.img 
+/data/adb # mkswap swap1.img
+/data/adb # mkswap swap2.img
+/data/adb # mkswap swap3.img
+/data/adb # mkswap swap4.img
+/data/adb # swapon swap1.img
+/data/adb # swapon swap2.img
+/data/adb # swapon swap3.img
+/data/adb # swapon swap4.img
+
+/data/adb/modules/flex/service.sh
+#!/system/bin/sh
+until [ "$(getprop sys.boot_completed)" = "1" ]; do sleep 5; done
+sleep 6
+swapoff /dev/block/zram0
+swapon /data/adb/swap1.img
+swapon /data/adb/swap2.img
+swapon /data/adb/swap3.img
+swapon /data/adb/swap4.img
+
+--------------------
 degrade by the official from hyperos2 to miui 14, and it can not bind account in development mode to unlock bootloader,
 mean time user login in settings,
 but after one year, disable time auto sync, change time to 2022.07.29 22:27, try bind account 176 in development mode, 
@@ -12,6 +40,25 @@ it remind 168 hour to try again,
 https://github.com/ItsVixano-releases/LineageOS_xaga lineageos 22.2 for Poco x4 gt
 custom kernel
 https://github.com/xiaomi-mt6895-devs/android_kernel_xiaomi_mt6895, MTK Dimensity 8100
+
+lineageos 21 enabled Suspend Execution for Cached App, dumpsys activity |grep use_freezer it will be true
+
+# fastboot flash boot boot.img
+# fastboot flash vendor_boot vendor_boot.img
+# fastboot flash dtbo dtbo.img
+
+power off, do not use fastboot get into recovery, MTK sucks
+just use power button, poweroff, then volumn increase and power get into recovery
+hold volumn increase and power key, screen light up, release them, get recovery
+
+factory reset, apply update
+# adb sideload lineage-21.0-20240517-UNOFFICIAL-xaga.zip
+
+poweroff get into recovery mode again, choose apply update
+
+# adb sideload MindTheGapps-14.0.0-arm64-20250203_200051.zip
+
+
 -------------------
 fastboot reboot recovery # will cause bootloop on mtk chips, snapdragon does not have this issue
 snapdragon has 9008 to unbrick phone, mtk need OEM and mtk auth for flash da.bin by sp flash tool

@@ -1,3 +1,5 @@
+# it's funny that you should re-mount zram in post-fs-data.d/a.sh
+# but umount zram and mount disk in modules/a/service.sh
 # first run /data/adb/post-fs-data.d/a.sh, use resetprop for attribute
 # second run /data/adb/modules/flex/service.sh
 # third run /data/adb/service.d/max_multitasking.sh, 
@@ -84,6 +86,7 @@ cat /data/adb/modules/flex/service.sh
 #!/system/bin/sh
 until [ "$(getprop sys.boot_completed)" = "1" ]; do sleep 5; done
 sleep 2
+# set it to 0 when use zram
 echo 0 > /proc/sys/vm/page-cluster
 # up to 200
 echo 200 > /proc/sys/vm/swappiness
