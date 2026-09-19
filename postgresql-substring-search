@@ -1,0 +1,479 @@
+pg_vector is an extension on pgsql, pg_vector can with regular pg table in one database
+
+if the data and vectorized data in one pg_vector table, so substring match pg_trgm and vector search can on one table
+
+同一张表上同时建 pg_trgm 的 GIN 索引和 pgvector 的 HNSW 索引，互不冲突，查询时按条件各取所需。
+
+CREATE EXTENSION IF NOT EXISTS vector;
+
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+
+
+
+CREATE TABLE chunk_question (
+
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    doc_name VARCHAR(255) NOT NULL,
+
+    chunk TEXT NOT NULL,
+
+    question_list TEXT[],
+
+    extra JSONB,
+
+    embedding vector(384),
+
+    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+);
+
+
+
+-- 普通 B-tree
+
+CREATE INDEX idx_doc_name ON chunk_question(doc_name);
+
+
+
+-- 子串匹配（ILIKE '%...%'）
+
+CREATE INDEX idx_chunk_trgm ON chunk_question
+
+    USING GIN (chunk gin_trgm_ops);
+
+
+
+-- 全文检索
+
+CREATE INDEX idx_chunk_fts ON chunk_question
+
+    USING GIN (to_tsvector('simple', chunk));
+
+
+
+-- 向量检索
+
+CREATE INDEX idx_chunk_vector ON chunk_question
+
+    USING hnsw (embedding vector_cosine_ops);
+
+
+
+PostgreSQL 一个查询通常只用一个索引来驱动扫描
+
+如果想要真正的混合检索（全文 top-k + 向量 top-k 再融合），需要写成两个子查询用 CTE 或 UNION，各自用自己的索引：
+
+WITH text_hits AS (
+
+    SELECT id, chunk,
+
+           ts_rank(to_tsvector('simple', chunk),
+
+                   plainto_tsquery('simple', :q)) AS text_score
+
+    FROM chunk_question
+
+    WHERE to_tsvector('simple', chunk) @@ plainto_tsquery('simple', :q)
+
+    ORDER BY text_score DESC
+
+    LIMIT 20
+
+),
+
+vec_hits AS (
+
+    SELECT id, chunk,
+
+           1 - (embedding <=> :query_vec) AS vec_score
+
+    FROM chunk_question
+
+    ORDER BY embedding <=> :query_vec
+
+    LIMIT 20
+
+)
+
+SELECT COALESCE(t.id, v.id) AS id,
+
+       COALESCE(t.chunk, v.chunk) AS chunk,
+
+       t.text_score,
+
+       v.vec_score
+
+FROM text_hits t
+
+FULL OUTER JOIN vec_hits v USING (id);
+
+
+
+--------------------------
+
+CREATE INDEX idx_chunk_fts ON chunk_question
+
+USING GIN (to_tsvector('simple', chunk));
+
+
+
+simple parser 对中文的处理，可以用一句话概括：它会把每个汉字当成一个独立的 token。下面展开讲。
+
+
+
+SELECT to_tsvector('simple', '保障房建设');
+
+plainto_tsquery('simple', '保障房') 会变成 '保' & '障' & '房'。原文里有这三个字，所以命中
+
+SELECT to_tsvector('simple', '保障房建设')
+
+       @@ plainto_tsquery('simple', '障房'); 原文里这两个字也都有，所以也会命中
+
+
+
+plainto_tsquery把关键词之间当成 AND，不要求相邻、不要求顺序
+
+phraseto_tsquery('simple', '保障房')要求三个字相邻且顺序一致，这才接近"短语匹配"。
+
+和pg_trgm创建索引用ilike做substring匹配很像，但是ilike是连续的，phraseto_tsquery是不连续的，"保障.房" "保障 房" 符号不记作位置，所以和"保障房"匹配
+
+
+
+
+
+上面使用了simple创建索引，使用phraseto_tsquery去匹配, 保障房在 chunk column
+
+SELECT * FROM chunk_question
+
+WHERE to_tsvector('simple', chunk)
+
+      @@ phraseto_tsquery('simple', '保障房');
+
+
+
+
+
+
+
+-------------------------------------------
+
+
+
+Full match, ==
+
+CREATE INDEX idx_chunk_question_doc_name ON chunk_question(doc_name);
+
+B-tree index, doc_name == 'abc'
+
+--------------------------------------------------------------
+
+Substring match, ilike, handle Chinese slow, built-in, 使用pg_trgm创建索引，使用ilike匹配
+
+search with substring, not keyword
+
+create extension if not exists pg_trgm;
+
+create index idx_col_trgm on chunk_question using gin (chunk gin_trgm_ops); # create index for ilike(f'%{keyword}%') search
+
+SELECT * FROM A WHERE content LIKE '%人工智能%';
+
+
+
+
+
+使用simple parse做类似substring match, built-in
+
+创建索引  CREATE INDEX idx_chunk_fts ON chunk_question USING GIN (to_tsvector('simple', chunk));
+
+查询 SELECT * FROM chunk_question WHERE to_tsvector('simple', chunk) @@ phraseto_tsquery('simple', '人工智能');
+
+
+
+from sqlalchemy import func, select
+
+
+
+stmt = select(ChunkQuestion).where(
+
+    func.to_tsvector('simple', ChunkQuestion.chunk).op('@@')(
+
+        func.phraseto_tsquery('simple', '人工智能')
+
+    )
+
+)
+
+result = await db.execute(stmt)
+
+records = result.scalars().all()
+
+
+
+websearch_to_tsquery支持google搜索语法
+
+SELECT *
+
+FROM chunk_question
+
+WHERE to_tsvector('simple', chunk) @@ websearch_to_tsquery('simple', '"machine learning" -python');
+
+这样就能找到 chunk 里包含短语 “machine learning” 但不包含 “python” 的行
+
+
+
+------------------------------------------------------------------------
+
+Chinese Full match search, need install zhparser,  zhparser will segmented "保障房建设" into '保障房' and '建设', search '保障房' will match, '障房' will not, it's full match
+
+
+
+to_tsvector will segment,  but only the parser inside the text search configuration does the segmenting, not to_tsvector itself.
+
+'chinese_zh' and 'simple' is the parser, 'simple' is built-in, 'chinese_zh' is not
+
+
+
+there is also pg_jieba, 
+
+
+
+CREATE EXTENSION pg_jieba;
+
+
+
+-- 使用精确模式做索引
+
+CREATE TEXT SEARCH CONFIGURATION chinese (PARSER = jieba);
+
+ALTER TEXT SEARCH CONFIGURATION chinese ADD MAPPING FOR n,v,a,i,e,l WITH simple;
+
+
+
+CREATE INDEX idx_chunk_fts ON chunk_question 
+
+USING GIN (to_tsvector('chinese', chunk));
+
+
+
+
+
+CREATE EXTENSION IF NOT EXISTS zhparser;
+
+-- Create text search configuration
+
+CREATE TEXT SEARCH CONFIGURATION chinese_zh (PARSER = zhparser);
+
+ALTER TEXT SEARCH CONFIGURATION chinese_zh 
+
+    ADD MAPPING FOR n,v,a,i,e,l WITH simple;
+
+
+
+-- Create GIN index for full-text search
+
+CREATE INDEX idx_chunk_fts ON chunk_question 
+
+    USING GIN (to_tsvector('chinese_zh', chunk));
+
+
+
+
+
+if column 'chunk' only contain English, no need zhparser
+
+CREATE INDEX idx_chunk_question_chunk_fts ON chunk_question 
+
+USING GIN (to_tsvector('simple', chunk));
+
+
+
+---------------------------------------------------------------------
+
+Vector search
+
+CREATE EXTENSION IF NOT EXISTS vector;
+
+ALTER TABLE chunk_question ADD COLUMN embedding vector(384);  -- For sentence-transformers
+
+-- Create HNSW index for vector similarity
+
+CREATE INDEX idx_chunk_vector ON chunk_question 
+
+    USING hnsw (embedding vector_cosine_ops);
+
+-------------------------------
+
+json search, if a column 'data' has jsob type
+
+
+
+-- 基本 GIN 索引（支持 @>、?、?|、?&）
+
+CREATE INDEX idx_data_gin ON mytable USING GIN (data);
+
+-- 包含（@>）：data 包含 {"name":"Alice"}
+
+SELECT * FROM mytable WHERE data @> '{"name":"Alice"}';
+
+
+
+-- 键存在（?）
+
+SELECT * FROM mytable WHERE data ? 'email';
+
+-- 所有键存在（?&）
+
+SELECT * FROM mytable WHERE data ?& array['a','b'];
+
+
+
+--------------------
+
+A normal B-tree index maps one key → one row. A GIN index maps one key → many rows, and works in reverse: it answers "which rows contain this value?"
+
+
+
+gin is for array, jsonb, tsvector
+Generalized Inverted Index 通用倒排索引
+
+
+CREATE INDEX idx_chunk_question_question_list ON chunk_question 
+
+USING GIN (question_list);
+
+
+
+
+
+----------------------------------------------------
+
+
+
+
+
+CREATE TABLE IF NOT EXISTS chunk_question (
+
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),          -- 使用 gen_random_uuid() 自动生成 UUID
+
+    doc_name VARCHAR(255) NOT NULL,
+
+    chunk TEXT NOT NULL,                                 -- 切片文本，假设为非空
+
+    question_list TEXT[],                                   -- 文本列表，使用 PostgreSQL 数组类型
+
+    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- 创建时间
+
+    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- 更新时间
+
+    extra JSONB                                             -- 额外的 JSON 数据
+
+);
+
+
+
+-- 1. doc_name 单列索引（用于按文档过滤）
+
+CREATE INDEX idx_chunk_question_doc_name ON chunk_question(doc_name);
+
+
+
+-- 2. doc_name + chunk 复合索引（用于精确查询切片）
+
+CREATE INDEX idx_chunk_question_doc_chunk ON chunk_question(doc_name, chunk);
+
+
+
+-- 3. chunk 全文搜索索引（用于内容搜索）, 如果是中文，则按字分割
+
+CREATE INDEX idx_chunk_question_chunk_fts ON chunk_question 
+
+USING GIN (to_tsvector('simple', chunk));
+
+
+
+-- 4. 已有的 question_list GIN 索引（保持不变）
+
+CREATE INDEX idx_chunk_question_question_list ON chunk_question 
+
+USING GIN (question_list);
+
+
+
+search text match chunk
+
+
+
+    async def get_question_list_by_chunks(chunks: list[str], db) -> list[str]:
+
+        from sqlalchemy import func, select, text
+
+        question_list = []
+
+        try:
+
+            for chunk in chunks:
+
+                tsquery = func.plainto_tsquery('simple', chunk)
+
+
+
+                stmt = select(ChunkQuestion).where(
+
+                    func.to_tsvector('simple', ChunkQuestion.chunk).op('@@')(tsquery)
+
+                )
+
+                result = await db.execute(stmt)
+
+                records = result.scalars().all()
+
+                for record in records:
+
+                    question_list.append(record.question_list)
+
+
+
+            return reduce(add, question_list)
+
+        except Exception as e:
+
+            logger.error(e)
+
+            return []
+
+
+
+
+
+
+
+"""简单匹配：所有关键词都必须出现"""
+
+    tsquery = func.plainto_tsquery('simple', search_text)
+
+
+
+  """短语匹配：要求词序一致"""
+
+    tsquery = func.phraseto_tsquery('simple', search_text)
+
+    
+
+高级搜索：支持引号、OR、NOT 等
+
+    例如：'foo OR bar', '"exact phrase"', '-exclude'
+
+    """
+
+    tsquery = func.websearch_to_tsquery('simple', search_text)
+
+
+
+'simple'：只做小写转换，适合精确匹配
+
+'english'：做词干提取（running→run），更模糊但更智能
+
+如果内容是中文，'simple' 会把每个汉字当作一个词，效果有限。可以考虑安装 zhparser 扩展。
