@@ -1,3 +1,6 @@
+GSI only flash system.img, GKI only flash boot.img, do not flash vendor_boot.img and dtbo.img
+GKI required phone come with android 12 and kernel 5.10
+
 android 10引进了动态分区super block partition
 
 super分区里包含system_a, system_b, product_a, product_b, vendor, system_ext, odm等动态逻辑分区
