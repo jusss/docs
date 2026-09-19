@@ -1,3 +1,44 @@
+pixos 14 rom's kernel bug cause reboot, but it support falcon x kernel
+backup is flash boot.img, vendor_boot.img dtbo.img from pixos 14 
+also consider flash preloader.bin
+
+active slot: a
+
+1. backup boot.img
+since already use magisk patched boot, then copy boot.img that magisk patched
+kernel 5.10.168-android12-9-00001-g81e7418c6466-ab10486262
+
+2. fastboot flash boot boot.img
+only flash a
+fastboot flash boot_a boot.img
+if failed switch to boot_b
+
+fastboot --set-active=b
+
+a magisk patched
+b original 
+
+flash a, failed switch to b, or flash a with patchd boot.img 
+
+
+I tried flash lineageos boot.img into pixos to instead of pixos kernel and get init loop
+I only flash _a slot, when it failed to boot, I use pixos's vendor_boot.img and magisk's boot.img flash back, it worked
+
+$ sudo su
+# fastboot getvar current-slot                  #if it's a then flash slot a, and set active a, in case you want boot with b when failed
+# fastboot flash boot_a boot.img 
+# fastboot flash vendor_boot_a vendor_boot.img
+# fastboot flash dtbo_a dtbo.img
+
+# fastboot --set-active=a
+# fastboot flash boot_a /tmp/pixos14-boot/magisk_patched-28100_4X0mY.img 
+# fastboot flash vendor_boot_a /tmp/pixos14-boot/vendor_boot.img 
+# fastboot flash dtbo_a /tmp/pixos14-boot/dtbo.img 
+
+
+
+
+---------------------------
 it's funny that you should re-mount zram in post-fs-data.d/a.sh
 but umount zram and mount disk in modules/a/service.sh
 swapon 4G img is very stuck, but swap on 512M is fast
