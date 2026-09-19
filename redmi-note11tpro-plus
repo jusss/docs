@@ -35,6 +35,9 @@ lineageos 21.0
 lineageos 23.2
 5.10.249-gb8a5d5fb244c
 
+it's weird, after change kernel, you need toggle USB debugging off then on,
+so you can use adb shell sometimes
+
 ---------------------------
 it's funny that you should re-mount zram in post-fs-data.d/a.sh
 but umount zram and mount disk in modules/a/service.sh
