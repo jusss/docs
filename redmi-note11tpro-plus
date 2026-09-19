@@ -1,42 +1,39 @@
-pixos 14 rom's kernel bug cause reboot, but it support falcon x kernel
-backup is flash boot.img, vendor_boot.img dtbo.img from pixos 14 
+pixos 14 rom's kernel bug cause reboot, but it support falcon-x kernel, so I wonder if lineageos kernel work
+backup is flash boot.img from pixos 14 
 also consider flash preloader.bin
 
 active slot: a
 
 1. backup boot.img
+cp magisk_pixelos_boot.img /tmp
 since already use magisk patched boot, then copy boot.img that magisk patched
 kernel 5.10.168-android12-9-00001-g81e7418c6466-ab10486262
 
-2. fastboot flash boot boot.img
-only flash a
-fastboot flash boot_a boot.img
-if failed switch to boot_b
+2. get boot.img from lineageos, use magisk to patch it, get magisk_lineage_boot.img
+fastboot flash boot_a magisk_lineage_boot.img
+only flash slot a, if it failed to boot up you can always switch to slot b `fastboot --set-active=b` to boot up 
+or flash a with /tmp/magisk_pixelos_boot.img
 
-fastboot --set-active=b
-
-a magisk patched
-b original 
-
-flash a, failed switch to b, or flash a with patchd boot.img 
-
-
-I tried flash lineageos boot.img into pixos to instead of pixos kernel and get init loop
+I tried flash lineageos boot.img, vendor_boot.img and dtbot.img into pixos to instead of pixos kernel and get init loop
 I only flash _a slot, when it failed to boot, I use pixos's vendor_boot.img and magisk's boot.img flash back, it worked
+turn out, only flash boot.img is ok, DO NOT flash vendor_boot.img and dtbo.img, you can use magisk patch the boot.img then flash it
 
 $ sudo su
-# fastboot getvar current-slot                  #if it's a then flash slot a, and set active a, in case you want boot with b when failed
-# fastboot flash boot_a boot.img 
-# fastboot flash vendor_boot_a vendor_boot.img
-# fastboot flash dtbo_a dtbo.img
+# fastboot getvar current-slot                  #if it's a then flash slot a, in case you want boot with b when failed
+# fastboot flash boot_a magisk_lineage_boot.img
 
-# fastboot --set-active=a
-# fastboot flash boot_a /tmp/pixos14-boot/magisk_patched-28100_4X0mY.img 
-# fastboot flash vendor_boot_a /tmp/pixos14-boot/vendor_boot.img 
-# fastboot flash dtbo_a /tmp/pixos14-boot/dtbo.img 
+android GKI only need boot.img, no need vendor_boot and dtbo, like GSI only need system.img
+GKI required after phone comes with android12 and kerne 5.10 
 
+ONLY FLASH LINEAGEOS boot.img is OK!!!!!!!!!!!!  do not flash vendor_boot and dtbo!!!!!!!!!!!!!!!!!
+also I tried official GKI android12-5.10 boot.img, get init loop
+# fastboot flash boot_a /mnt/tmp/lineageos-boot-image/boot.img
 
+lineageos 21.0
+5.10.209-g15292cdd60c7
 
+lineageos 23.2
+5.10.249-gb8a5d5fb244c
 
 ---------------------------
 it's funny that you should re-mount zram in post-fs-data.d/a.sh
