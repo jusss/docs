@@ -38,6 +38,25 @@ lineageos 23.2
 it's weird, after change kernel, you need toggle USB debugging off then on,
 so you can use adb shell sometimes
 
+
+use recovery to flash anykerel3, but still got bootloop
+download ferstar kernel from xda poco x4 gt 
+since anykernel can not get activate slot, write a slot
+unzip ferstar.zip
+
+anykernel.sh
+
+# shell variables
+block=/dev/block/by-name/boot_a;
+is_slot_device=0;
+
+then zip -r ../new-ferstar.zip .
+
+adb reboot recovery
+apply update
+adb sideload new-ferstar.zip
+
+
 ---------------------------
 it's funny that you should re-mount zram in post-fs-data.d/a.sh
 but umount zram and mount disk in modules/a/service.sh
