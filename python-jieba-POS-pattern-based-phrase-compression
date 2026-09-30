@@ -1,0 +1,120 @@
+Python 的 jieba 库具备词性标注功能，能够区分名词和动词。
+标准的分词函数 jieba.cut() 只负责切分词语。要获取词性，需要使用 jieba.posseg 模块，它会为每个切分出的词语标注词性
+
+import jieba.posseg as pseg
+text = "我爱自然语言处理技术"
+words = pseg.cut(text)
+
+for word, flag in words:
+    print(f"{word}: {flag}")
+
+使用自定义字典明确描述 自然语言 是一个完整的词，从而避免被切分成 自然  语言 两个词
+
+userdict.txt
+自然语言 100 n
+
+第一列：词语
+第二列：词频（可省略，越大越容易被保留为一个词）
+第三列：词性（可省略，这里指定为名词 n）
+
+import jieba
+import jieba.posseg as pseg
+
+jieba.load_userdict("userdict.txt")
+# from io import StringIO
+# fake_file = StringIO("\n".join([i + " 100 n" for i in word_list]))
+# jieba.load_userdict(fake_file)
+
+text = "我爱自然语言处理技术"
+for word, flag in pseg.cut(text):
+    print(f"{word}: {flag}")
+
+def text_segment2(text, topK=3):
+        keywords = jieba.analyse.extract_tags(text, topK=topK)
+        keywords = filter_tags(list(set(keywords)), stop_words)
+        return keywords
+
+def text_segment(text):
+        r1 = [(word, flag) for word, flag in pseg.cut(text) if flag.startswith(('n', 'v')) and len(word) > 1]
+        print(r1)
+        if r1:
+            last = r1[-1]
+            if last[1].startswith('n'):
+                for i in r1[::-1]:
+                    if i[1].startswith('v'):
+                        return [i[0] + last[0]]
+            else:
+                for i in r1[::-1]:
+                    if i[1].startswith('n'):
+                        return [i[0] + last[0]]
+        return [text]
+
+关于中文的语言精炼提取，我认为有语言模式匹配可以提取，从 n,v,n -> v,n
+
+pseg.cut() 返回的是 (词语, 词性) 对。
+常见词性：
+n：名词
+v：动词
+a：形容词
+d：副词
+m：数词
+q：量词
+nr：人名
+ns：地名
+nt：机构名
+
+advanced version
+
+def text_segment(text):
+    r1 = [(word, flag) for word, flag in pseg.cut(text)
+          if flag.startswith(('n', 'v')) and len(word) > 1]
+
+    if not r1:
+        return [text]
+
+    results = []
+    used = set()
+
+    for idx, (word, flag) in enumerate(r1):
+        if idx in used:
+            continue
+
+        if flag.startswith('n'):
+            # 往前找动词
+            for j in range(idx - 1, -1, -1):
+                if j not in used and r1[j][1].startswith('v'):
+                    results.append(r1[j][0] + word)
+                    used.add(idx)
+                    used.add(j)
+                    break
+        elif flag.startswith('v'):
+            # 往前找名词
+            for j in range(idx - 1, -1, -1):
+                if j not in used and r1[j][1].startswith('n'):
+                    results.append(r1[j][0] + word)
+                    used.add(idx)
+                    used.add(j)
+                    break
+
+    return results if results else [text]
+
+从 n,v,n -> v,n
+本质上是一种 词性序列模式抽取。
+可以用更形式化的方式做：
+
+patterns = [
+    ['n', 'v', 'n'],
+    ['v', 'n'],
+    ['n', 'v'],
+]
+然后对词性序列做匹配，抽取核心短语。
+
+这其实就是：
+规则-based 信息抽取
+轻量级事件抽取
+关键词短语压缩
+如果再结合：
+依存句法分析
+语义角色标注
+大模型摘要
+效果会更好。
