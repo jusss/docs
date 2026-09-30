@@ -68,8 +68,15 @@ def f(alist:[dict]):
 def f(function:str=Body(...), parameter: dict=Body(...), fn=Depends(lambda function: functions.get(function, lambda **kwargs: f"{function} not found"))):
   return fn(**parameter)
 
+@app.get("/api/common3")
+def f(function:str, parameter:str, fn=Depends(lambda function: functions.get(function, lambda **kwargs: f"{function} not found"))):
+  return fn(**json.loads(parameter))
+
+
+
 #3 DI, framework call my function, it can pass the envrionment to my function, my function can access that 'function' and 'parameter'
-def get_fn(function: str):
+# def get_fn(function: str):
+def get_fn(function: str=Body(...)):
   return functions.get(function, lambda **kwargs: f"{function} not found")
 
 @app.post("/api/common2")
@@ -77,3 +84,25 @@ def f(function:str=Body(...), parameter: dict=Body(...), fn=Depends(get_fn)):
   return fn(**parameter)
 
 #Query for GET url parameter, Form for POST form-data, Body for JSON string without declair a pydantic data class
+
+example
+    def get_fn(app: str = Body(...)):
+        async def not_found(**kwargs):
+            return f"app {app} not found"
+        return functions.get(app, not_found)
+
+    @app.post("/api/common")
+    async def get_data(param: dict = Body(...), fn=Depends(get_fn)):
+        return await fn(**param)
+
+    post json data {"app":"app", "param":{"start_date":"2026-06-01", "end_date":"2026-09-30"}}
+
+simple api route
+    @app.post("/api/common/{app}")
+    async def get_data(app: str, param: dict = Body(...)):
+        fn = functions.get(app)
+        if fn is None:
+            return f"app {app} not found"
+        return await fn(**param)
+
+post json data like {"start_date":"2026-06-01", "end_date":"2026-09-30"}
