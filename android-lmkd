@@ -1,5 +1,34 @@
 sometimes it's not lmkd kill apps, it is the **cgroup process killer** — used by Android's `ActivityManager` and `init` for normal lifecycle cleanup. Not an OOM/lmkd kill
 
+AOSP source code https://cs.android.com/android/platform/superproject/+/android-latest-release:frameworks/base/services/core/java/com/android/server/am/ActivityManagerService.java;l=602?q=ActivityManagerService&sq=
+
+lineage 18.1 source code https://github.com/LineageOS/android_frameworks_base/blob/lineage-18.1/services/core/java/com/android/server/am/ActivityManagerService.java
+
+
+iOS always 1 app at foreground, backgroud app is frozen, and use Apple Push Notification Service for notification,
+android 8, ActivityManagerService.java add backgroud app killing for better battery,
+android 9, App Standby Bucket to kill not important app,
+android 10, Lazy Restoration, jump to the activity where it was killed, PSI instead of minfree
+android 11, Suspend Execution for Cached Apps to frozen cpu for better battery
+android now can have backgroud app frozen for better battery, but the forzen app need to use Firebase Cloud Messaging
+
+ActivityManager: Process com.xingin.xhs:longlinkNew (pid 32512) has died: cch+20 CACC
+ActivityManager: Process com.xingin.xhs:pushservice (pid 29625) has died: cch+10 CACC
+ActivityManager: Process com.xingin.xhs (pid 31237) has died: cch CAC
+Many Chinese apps (especially 小红书) use a **self-watchdog** in their push/longlink services to detect when the main process is stuck or unresponsive. If the watchdog decides the process is hung, it kills the main process (and all sub-processes follow).
+
+The sub-processes dying first could mean:
+- `pushservice` / `longlinkNew` detected a network stall → triggered restart
+- `simplePush` / `widgetProvider` timed out waiting for main process → self-exited
+
+if those process are frozen by Suspend Execution for Cached App, then after un-freeze the app itself would restart, not system killing,
+if wechat is frozen, then wechat would restart itself, not system killing
+
+But honestly, this is really a **小红书 bug**. Well-written apps handle freeze/thaw cycles — `SystemClock.elapsedRealtime()` is the wrong clock for a watchdog timeout precisely because of freezer/cgroup. They should use `Thread`/`Handler` timeouts that don't tick during suspension, or `SystemClock.uptimeMillis()` which also pauses during deep sleep but not during freezer (hmm, actually uptimeMillis also advances during freezer). The proper fix is in the app: detect freezer state or use a tolerance window
+
+keep app background alive, set those app which do not handle freeze in Unrestricted battery, or disable Suspend Execution for Cached App
+
+
 check which kill apps 
 logcat -d -b all | grep -iE "Killing|kill.*process|died|diedfor" | tail -30
 
