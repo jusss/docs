@@ -1,3 +1,14 @@
+if object a has attribute n,     [a,a,a,] how to sort by a.n?
+sorted_list = sorted(my_list, key=lambda x: x.n)
+after sort by a.n, then how to groupby a.n
+
+order by item's attribute,  sorted([obj, obj, obj], key=lambda x: x.attribute)
+
+group by iterm's attribute, [(key, group) for key, group in groupby(alist, key=lambda x: x.attribute)]
+
+groupby . sorted $ alist
+
+-----------------------
 merge dict list to dict
 
 data = [{'a':1, 'b':2}, {'a':2, 'b':2}] 
