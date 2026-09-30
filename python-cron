@@ -1,0 +1,63 @@
+1. **APScheduler** - Advanced Python Scheduler, one of the most popular
+2. **schedule** - Simple job scheduling library
+3. **Celery** - Distributed task queue with periodic tasks (celery beat)
+4. **python-crontab** - Interact with system crontab
+5. **crontab** - croniter for parsing cron expressions
+6. **croniter** - Parse cron expressions and iterate over scheduled times
+
+while True + asyncio.sleep inside async function implement cron event loop
+
+`croniter` 本身只负责**解析 cron 表达式 + 计算下次执行时间**，调度循环需要自己写。
+
+```python
+from croniter import croniter
+from datetime import datetime
+import asyncio
+
+async def run_cron(cron_expr: str, job):
+    while True:
+        cron = croniter(cron_expr, datetime.now())
+        next_run = cron.get_next(datetime)
+        await asyncio.sleep((next_run - datetime.now()).total_seconds())
+        await job()  # 建议包一层 try/except 防止任务异常导致循环退出
+```
+
+if you use this in fastapi, in lifespan, use 'syncio.create_task(run_cron())', if you use 'await run_cron()' it would stuck lifespan's boot, the application wouldn't run 
+
+server.py
+async def lifespan(app: FastAPI):
+  asyncio.create_task(run_cron()) # just run at background, no need for result
+  yield
+
+def create_app():
+  app=FastAPI(..., lifespan=lifespan)
+
+app=create_app()
+
+如果用 `uvicorn --workers 4` 或 gunicorn 多进程，**每个 worker 都会跑一份调度器** → 同一任务执行 4 次。这种情况下 cron 任务应该：
+- 用单独进程跑（如独立的 `python -m scripts.xxx` + 系统 cron / supervisor），或
+- 加分布式锁（ Redis，用 `SET NX EX` 抢锁），或
+- 环境变量控制只在 worker 0 启用
+
+## 其他主流库
+
+| 库 | 特点 | 适用场景 |
+|---|---|---|
+| **APScheduler** | 功能最全：cron/interval/date 触发器、任务持久化、misfire 补跑、原生 asyncio 支持 | 单进程定时任务的首选，FastAPI 友好 |
+| **Celery Beat** | 分布式任务队列 + 定时调度 | 多实例部署、任务量大、需要 broker（Redis/RabbitMQ） |
+| **schedule** | API 极简（`every(10).minutes.do(job)`），但阻塞式且不支持异步 | 简单脚本 |
+
+## APScheduler 示例（如果你想要更省事的 cron 调度）
+
+```python
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.triggers.cron import CronTrigger
+scheduler = AsyncIOScheduler()
+scheduler.add_job(my_job, CronTrigger.from_crontab("0 2 * * *"))  # 每天凌晨2点
+scheduler.start()  # 配合 FastAPI 在 startup 事件里启动
+
+```
+APScheduler 相比手写 `croniter` 循环的优势：
+- **misfire_grace_time / coalesce**：错过的任务可补跑或合并
+- **jobstore**：任务可持久化到 PostgreSQL/Redis（你有现成的 Redis 和 PG）
+- **max_instances**：防止上一次任务没跑完又启动新的
