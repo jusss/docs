@@ -1,0 +1,131 @@
+python-multiple-decorator-fastapi-auto-api
+
+@f
+@g
+def h(...)
+
+def g(func):
+  def get_param(*args, **kwargs):
+    return func(*args, **kwargs)
+  return get_param
+
+g would get func h, inner func get func h's parameter
+
+@g
+def h(x)
+
+it is g(h)(x)
+
+so 
+@f
+@g
+def h(x)
+
+is f(g(h))(x)
+
+then f's inner function can get h's x
+-----------------------------------
+def create_register():
+    registered = {}
+    def wrapper(func):
+        registered[func.__name__] = func
+        return func
+    return wrapper, registered
+
+register, functions = create_register()
+
+def json_wrapper(func):
+    def _para(*args, **kwargs):
+        now = datetime.now()
+        timestamp = now.isoformat()
+        try:
+            result = func(*args, **kwargs)
+            return {
+                "code": 200,
+                "msg": "success",
+                "data": result,
+                "success": True,
+                "time": timestamp
+            }
+
+        except Exception as e:
+            return {
+                "code": 500,
+                "msg": str(e),
+                "success": False,
+                "time": timestamp
+            }
+
+    return _para
+
+# define function, auto add func into api, and auto try catch for wrap result, no try catch inside
+
+@json_wrapper
+@register
+async def test(msg):
+    1/0
+    return msg
+
+@app.post("/api/common/{app}")
+async def get_data(app: str, param: dict = Body(...)):
+        now = datetime.now()
+        timestamp = now.isoformat()
+        fn = functions.get(app)
+        if fn is None:
+            return {
+                "code": 404,
+                "msg": f"/api/commmon/{app} not found",
+                "success": False,
+                "time": timestamp
+                }
+        return await fn(**param)
+
+curl --location 'http://localhost/api/common/test' \
+--header 'Content-Type: application/json' \
+--data '{"msg":1}'
+
+but that there's a promblem, function call function would get wrapped result, that may unwrapp result to get data
+two way, one is add a decorator parameter to control if add json wrapper, default no wrapper for function calling,
+another is move json_wrapper into api
+
+    def json_wrapper(func):
+        import inspect
+
+        async def _para(*args, **kwargs):
+            now = datetime.now()
+            timestamp = now.isoformat()
+            try:
+                result = func(*args, **kwargs)
+                if inspect.isawaitable(result):
+                    result = await result
+                return {
+                    "code": 200,
+                    "msg": "success",
+                    "data": result,
+                    "success": True,
+                    "time": timestamp
+                }
+
+            except Exception as e:
+                log.error(str(e))
+                return {
+                    "code": 500,
+                    "msg": str(e),
+                    "success": False,
+                    "time": timestamp
+                }
+        return _para
+
+    @app.post("/api/common/{app}")
+    async def get_data(app: str, param: dict = Body(...)):
+        now = datetime.now()
+        timestamp = now.isoformat()
+        fn = functions.get(app)
+        if fn is None:
+            return {
+                "code": 404,
+                "msg": f"/api/commmon/{app} not found",
+                "success": False,
+                "time": timestamp
+                }
+        return await json_wrapper(fn)(**param)
