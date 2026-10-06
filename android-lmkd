@@ -1,5 +1,13 @@
 sometimes it's not lmkd kill apps, it is the **cgroup process killer** — used by Android's `ActivityManager` and `init` for normal lifecycle cleanup. Not an OOM/lmkd kill
 
+
+1. checkExcessivePowerUsageLPr AMS killed apps, five minutes a check, hook to avoid
+2. cached app, related to CUR_MAX_CACHED_PROCESSES, normal it will reached 72 when no app is running, increase it and hook the cached app killing,
+   # device_config put activity_manager max_cached_processes 128
+   # ps -A|grep 'com.'|wc -l # get current cached app count
+3. LMKD, nowadays android always has half zram memory, so it's not the main issue
+
+
 AOSP source code https://cs.android.com/android/platform/superproject/+/android-latest-release:frameworks/base/services/core/java/com/android/server/am/ActivityManagerService.java;l=602?q=ActivityManagerService&sq=
 
 lineage 18.1 source code https://github.com/LineageOS/android_frameworks_base/blob/lineage-18.1/services/core/java/com/android/server/am/ActivityManagerService.java
