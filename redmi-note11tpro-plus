@@ -1,3 +1,8 @@
+pm disable-user --user 0 com.android.DeviceAsWebcam
+pm disable-user --user 0 net.pixelos.ota
+pm disable-user --user 0 com.google.android.googlequicksearchbox
+
+------------------
 pixos 14 rom's kernel bug cause reboot, but it support falcon-x kernel, so I wonder if lineageos kernel work
 backup is flash boot.img from pixos 14 
 also consider flash preloader.bin
