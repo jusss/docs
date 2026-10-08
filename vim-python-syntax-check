@@ -1,0 +1,12 @@
+vim .vimrc
+let g:ale_python_pyflakes_executable = 'pyflakes'
+let g:ale_linters = {'python': ['pyflakes']}
+highlight SignColumn guibg=black ctermbg=black
+" highlight SignColumn guibg=white ctermbg=white
+
+pip3 install pyflakes
+mkdir -p ~/.vim/pack/git-plugins/start
+
+git clone --depth 1 https://github.com/dense-analysis/ale.git ~/.vim/pack/git-plugins/start/ale
+
+vim a.py
