@@ -1,3 +1,13 @@
+
+download boot.img,vendor_boot.img and PixelOS_xaga-17.0-20260912-1209.zip from https://aosp.angxddeep.com/docs/xaga
+
+but after flash boot.img and vendor_boot.img, volumn + and power key can not get into recovery mode to adb sideload the zip package,
+so flash back the old PixelOS 14's boot.img, vendor_boot.img and dtbo.img
+then use volumn + and power to get recovery, then factory reset clean data
+adb sideload PixelOS_xaga-17.0-20260912-1209.zip
+
+
+-------------------------
 pm disable-user --user 0 com.android.DeviceAsWebcam
 pm disable-user --user 0 net.pixelos.ota
 pm disable-user --user 0 com.google.android.googlequicksearchbox
