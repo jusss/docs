@@ -1,3 +1,25 @@
+after server migrate or changed ip addr, but the docker still running,
+you need change the ip addr for outline server
+
+1. vim /opt/outline/access.txt
+change the ip to new ip
+
+2. docker ps # get the name like shadowbox and watchtower
+docker exec -it shadowbox sh
+vi /opt/outline/persisted-state/shadowbox_server_config.json
+change ip to new ip
+
+3. docker restart shadowbox
+
+4. on local run Outline-Manager.AppImage, click that Add Server, 
+converse the content from access.txt to json, and paste it into the second input frame, it will connect to server,
+then create new key
+
+----------------------------
+stop outline server
+docker stop watchtower
+docker stop shadowbox
+------------------------
 docker copy image from one machine to another
 
 docker image ls
@@ -6,6 +28,7 @@ docker save -o copy.shadowbox.tar quay.io/outline/shadowbox
 
 then copy to another machine
 docker load -i copy.shadowbox.tar
+docker load -i copy.watchtower.tar
 docker image ls
 
 wget https://raw.githubusercontent.com/Jigsaw-Code/outline-server/master/src/server_manager/install_scripts/install_server.sh
@@ -24,6 +47,28 @@ then run it on client, click "get started"
 copy the dict message from server into it,
 click "add key" then click the key and share it, pull down the share page you'll find
 the ss key address, and copy it to others
+
+-------------------------
+install docker on debian
+
+sudo apt-get update
+sudo apt-get install ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+sudo docker run hello-world
+
+-----------------------------------
+
 
 Issue
 1. root@Mars:~# docker run -itd containrrr/watchtower                                     
