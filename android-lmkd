@@ -3,9 +3,19 @@ sometimes it's not lmkd kill apps, it is the **cgroup process killer** — used 
 
 1. checkExcessivePowerUsageLPr AMS killed apps, five minutes a check, hook to avoid
 2. cached app, related to CUR_MAX_CACHED_PROCESSES, normal it will reached 72 when no app is running, increase it and hook the cached app killing,
-   # device_config put activity_manager max_cached_processes 128
-   # ps -A|grep 'com.'|wc -l # get current cached app count
+   # device_config set_sync_disabled_for_tests persistent
+   # device_config put activity_manager max_cached_processes 1024
+   # device_config put activity_manager max_phantom_processes 1024
 3. LMKD, nowadays android always has half zram memory, so it's not the main issue
+4. enable Suspend execution for cached apps in Developer options, and set magisk app Unrestricted battery usage for vector module to hook checkExcessivePowerUsageLPr
+
+
+ps -A|grep 'com.'|wc -l # get current cached app count
+dumpsys activity settings |grep -i use_freezer
+device_config get activity_manager_native_boot freeze_debounce_timeout # freeze timeout
+device_config put activity_manager_native_boot freeze_debounce_timeout 1000 # change freeze timeout to 1s
+dumpsys activity | grep -A 50 "Apps frozen" # get frozen apps
+dumpsys activity | grep CUR_MAX_CACHED_PROCESSES  # get current cached process limit
 
 
 AOSP source code https://cs.android.com/android/platform/superproject/+/android-latest-release:frameworks/base/services/core/java/com/android/server/am/ActivityManagerService.java;l=602?q=ActivityManagerService&sq=
