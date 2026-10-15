@@ -5,25 +5,101 @@ python-multiple-decorator-fastapi-auto-api
 def h(...)
 
 def g(func):
-  def get_param(*args, **kwargs):
+  @wraps(func) # keep func original __name__, otherwise h.__name__ would be wrapper
+  def wrapper(*args, **kwargs):
     return func(*args, **kwargs)
-  return get_param
+  return wrapper
 
 g would get func h, inner func get func h's parameter
 
 @g
 def h(x)
 
-it is g(h)(x)
+it is h = g(h), and g's inner function can get h's parameter
 
 so 
 @f
 @g
 def h(x)
 
-is f(g(h))(x)
+is h = f(g(h)), and g's inner and f's inner function both can get h's parameter, and this moment, f(g(h)) is called to bind to h
+so f or g can get h.__name__ and put it in a variable, even h is never called
+in another word is when define function h with decorator g, g is executed and take h as its parameter, even h is not called yet, so decorator f and g both are executed and take h as their parameter When define h, so f and g can take h.__name__
 
-then f's inner function can get h's x
+you may need functools.update_wrapper or functools.wraps to keep original h's attribute like h.__name__ after decorator sometimes
+def g(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        print("run before")
+        r= func(*args, **kwargs)
+        print("run after)
+        return r
+
+@g
+def f(x)
+
+now f.__name__ is 'f', without @wraps, f.__name__ is 'wrapper'
+
+
+if you want use a functools.lru_cache decorator for function, 
+functools.lru_cache preserves the original function's __name__ (and other metadata like __doc__, __module__, etc.).
+it should be
+@register
+@lru_cache
+def f()
+
+but there's an issue, lru_cache is not for async function, use async_lru.alru_cache for async function
+
+pip3 install async_lru
+from async_lru import alru_cache
+@register
+@alru_cache(maxsize=128)
+async def f(x):
+    ...
+
+
+another issue, since lru_cache use hashable parameter, so parameter must be hashable, 
+but list, set and dict are not hashable, so you need to converse them to tuple
+
+
+or implement your own version 
+
+
+from functools import wraps
+import json
+def cache_func(f):
+    _dict = {}
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        k = f.__name__ + json.dumps({"args": args, "kwargs": kwargs})
+        if k in _dict:
+            return _dict[k]
+        else:
+            result = f(*args, **kwargs)
+            _dict[k] = result
+            return result
+    return wrapper
+
+
+# cache fib(n), fib(6) will use fib(5) cache
+@cache_func
+def fib(n):
+    if n <= 1:
+        return n
+    return fib(n - 1) + fib(n - 2)
+        
+for i in range(1,9000):
+    print(fib(i))
+
+@cache_func
+def test():
+    import time
+    time.sleep(3)
+    return 3
+
+print(test())
+print(test()) # this second won't wait for 3s
+
 -----------------------------------
 def create_register():
     registered = {}
@@ -74,7 +150,7 @@ async def get_data(app: str, param: dict = Body(...)):
         if fn is None:
             return {
                 "code": 404,
-                "msg": f"/api/commmon/{app} not found",
+                "msg": f"/api/common/{app} not found",
                 "success": False,
                 "time": timestamp
                 }
