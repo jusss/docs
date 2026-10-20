@@ -1,0 +1,14 @@
+install vscode for windows
+
+1. install python extension
+Settings -> Extensions -> install python extension
+
+2. in the wsl project root
+mkdir .vscode
+vim .vscode/settings.json
+{
+  "python.defaultInterpreterPath": "/home/your_username/your_project/venv/bin/python"
+}
+
+3. connect wsl project
+Settings -> Command Palette -> choose WSL: connect to WSl, connect to the project in wsl

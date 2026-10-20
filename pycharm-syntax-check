@@ -1,0 +1,6 @@
+new unify version, after pro subcription, syntax check would have some issue,
+比如没有定义变量或函数，直接使用，语法检查不会提示未定义错误
+如果检查项已开启但仍无提示，可能是 PyCharm 的缓存索引出了问题，导致它“读不懂”你的项目代码。
+点击菜单栏 File > Invalidate Caches...。
+在弹出的窗口中，勾选 Clear file system cache and Local History，然后点击 Invalidate and Restart。
+等待重启后索引重建完成，再测试未定义变量是否会被标记。
