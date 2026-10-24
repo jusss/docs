@@ -1,0 +1,77 @@
+LLM-clarify-based-on-RAG
+
+it's like similiar clarify when input is not correct or clear, very like "you want to search xxx?" when you have a typo in search
+after user input and RAG, before send RAG and input to LLM to answer, check if user's input if it's completed and clear based on old conversation context, if it's not then generate clarify questions based on RAG document chunks, and do clarify
+
+def clarify_question(old_conversation: str, rag: str, query: str):
+        try:
+            context = old_conversation
+            prompt = ("check user's input if it's completed and clear based on context, "
+                          "if the input is clear, then output 0,"
+                          "if the input is not clear, then generate clarify questions based on the retrieval document chunks and output the questions") +\
+                "\n## Context\n" + context + "\n## Retrieval Document Chunks\n" + rag
+
+            response = llm.invoke([
+                SystemMessage(content=prompt),
+                HumanMessage(content=query)])
+            return response.content
+
+        except Exception as e:
+            return "0"
+
+then call this clarify_question after RAG and before call LLM to response, if result != "0" then use result as answer to let user clarify, and add this clarify message into conversation
+
+------------------------------------------------------------------
+CLARIFY_PROMPT = """You are a clarification gate for a RAG assistant.
+
+Decide if the user's CURRENT query is clear enough to answer, given the prior
+conversation and retrieved chunks.
+
+Rules:
+- If the immediately preceding assistant turn was a clarify question, treat the
+  user's reply as resolving it. Only clarify again if a NEW, distinct ambiguity
+  appears. Do not clarify the same ambiguity twice.
+- Clarify if: the query references an entity/scope not present in context or
+  chunks; contains a typo/unknown term that chunks can disambiguate; or is
+  underspecified (missing file, version, time range, etc.).
+- If clear, output exactly: <CLEAR>
+- If not clear, output 1-3 short questions, grounded in the chunks, offering
+  concrete options where possible. No preamble.
+
+## Prior conversation
+{context}
+
+## Retrieved chunks
+{rag}
+"""
+
+MAX_CONSECUTIVE_CLARIFY = 2
+
+def clarify_question(old_conversation, rag, query, consecutive_clarify_turns=0):
+    # Hard cap: never clarify more than N times in a row
+    if consecutive_clarify_turns >= MAX_CONSECUTIVE_CLARIFY:
+        return None
+    try:
+        resp = llm.invoke([
+            SystemMessage(content=CLARIFY_PROMPT.format(context=old_conversation, rag=rag)),
+            HumanMessage(content=f"Current query: {query}"),
+        ]).content.strip()
+        if resp.startswith("<CLEAR>") or not resp:
+            return None
+        return resp
+    except Exception:
+        return None  # fail open
+
+q = clarify_question(old_conversation, rag, query,
+                     consecutive_clarify_turns=state.clarify_streak)
+
+if q is not None:
+    state.clarify_streak += 1
+    append_assistant_turn(q, type="clarify")   # <-- the addition you described
+    return q
+
+# clear path
+state.clarify_streak = 0
+answer = answer_llm(old_conversation, rag, query)
+append_assistant_turn(answer, type="answer")
+return answer

@@ -1,0 +1,29 @@
+LLM-suggest-question-based-on-RAG
+
+1. let's assume there's documents library, generate questions based on every article with LLM, and save them into database
+generate_questions list, document name, per row
+
+prompt = (
+        "你是一个问题生成助手。请根据以下文档片段，生成三个用户可能会问到的相关问题。\n"
+        "要求：\n"
+        "1. 每个问题独立成行，以数字编号（1. 2. 3.）开头\n"
+        "2. 问题应覆盖文档中的关键信息点\n"
+        "3. 问题应使用自然、口语化的中文表达\n"
+        f"\n文档片段:\n{context}\n"
+        "\n生成的问题:"
+    )
+
+response = asyncio.run(llm.invoke([HumanMessage(content=prompt)]))
+raw = response.content.strip()
+# 解析 LLM 返回的三行问题
+questions: list[str] = []
+for line in raw.splitlines():
+    line = line.strip()
+    if not line:
+        continue
+    # 去掉编号前缀 "1.", "2.", "3." 等
+    if line[0].isdigit() and len(line) > 1 and line[1] in ".、)":
+        line = line[2:].strip()
+    questions.append(line)
+
+2. after user's input and RAG, you can get document chunks and document name, then use this document name to get generate_questions from that database, as suggest question 
