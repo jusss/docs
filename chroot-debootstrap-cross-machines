@@ -21,6 +21,24 @@ apt install sysvinit-core
 export PATH=$PATH:/bin:/usr/sbin
 dpkg-reconfigure debconf # solve package config issue when install package
 apt install vim
+apt install mpv
+
+# Intel Graphics (8th Generation Core and Newer)
+apt install intel-media-va-driver vainfo
+
+# older machine
+apt install i965-va-driver vainfo
+
+# download scrcpy.tar.gz and extract
+./scrcpy
+./scrcpy --new-display=1920x1080 --start-app=com.brave.browser --turn-screen-off
+# android 17, desktop mode, click app won't work, but --start-app work
+# install HyperDroid Launcher from Google Play, enable 'Force activities to be resizable, enable non-resizable in multi window, enable desktop experience features' in Developer options
+./scrcpy --new-display=1920x1080 --start-app=com.binary.hyperdroid
+# move cursor to the bottom bar, click recent apps to switch app after open an app inside hyper droid launcher
+./scrcpy --new-display=1920x1080 --start-app=com.binary.hyperdroid --flex-display  # auto scale android app display
+./scrcpy --new-display=1920x1080 --start-app=com.binary.hyperdroid --flex-display  --turn-screen-off --keyboard=uhid 
+
 
 ------------------
 mount-amd64.sh
