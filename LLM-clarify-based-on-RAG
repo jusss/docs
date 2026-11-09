@@ -21,6 +21,25 @@ def clarify_question(old_conversation: str, rag: str, query: str):
 
 then call this clarify_question after RAG and before call LLM to response, if result != "0" then use result as answer to let user clarify, and add this clarify message into conversation
 
+if the query is clear, and you want to make suggest questions
+
+    def ask_based_on_rag(old_conversation: str,query: str, rag: str):
+        try:
+
+            prompt = ("check user's input may not be completed and clear based on context, "
+                          "generate clarify questions based on the retrieval document chunks and output the questions,"
+                          "in the end, you should say something like would you let me to help you do something based on that generated questions") +\
+                "\n## Context\n" + old_conversation + "\n## Retrieval Document Chunks\n" + rag
+
+            response = self.llm.invoke([
+                SystemMessage(content=prompt),
+                HumanMessage(content=query)])
+
+            return response.content
+
+        except Exception as e:
+            return "0"
+
 ------------------------------------------------------------------
 CLARIFY_PROMPT = """You are a clarification gate for a RAG assistant.
 
