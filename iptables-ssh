@@ -1,11 +1,14 @@
 On Server:
 
-ssl.sh
+iptables-ssh.sh
 #!/bin/bash
+SSH_PORT=22
+ALLOW_IP="1.1.1.1"
 systemctl start iptables
 systemctl enable iptables
-iptables -A INPUT -i lo -p tcp --dport 22 -j ACCEPT
-iptables -A INPUT -p tcp --dport 22 -j DROP
+iptables -A INPUT -i lo -p tcp --dport "$SSH_PORT" -j ACCEPT
+iptables -A INPUT -s "$ALLOW_IP" -p tcp --dport "$SSH_PORT" -j ACCEPT
+iptables -A INPUT -p tcp --dport "$SSH_PORT" -j DROP
 iptables-save -f /etc/iptables/iptables.rules
 
 # vim /etc/iptables/iptables.rules, to change some rules and reload
@@ -14,7 +17,7 @@ iptables-save -f /etc/iptables/iptables.rules
 
 /etc/stunnel/stunnel.conf
 cert = /etc/stunnel/server.pem
-sslVersion = TLSv1
+sslVersion = TLSv1.2
 pid = /stunnel.pid
 socket = l:TCP_NODELAY=1
 socket = r:TCP_NODELAY=1
@@ -28,11 +31,15 @@ TIMEOUTclose = 0
 accept = 20183
 connect = 20182
 
+systemctl start stunnel
+systemctl enable stunnel
+
+
 On Local:
 
 /etc/stunnel/stunnel.conf
 pid = /tmp/stunnel.pid
-sslVersion = TLSv1
+sslVersion = TLSv1.2
 client = yes
 [ssh2]
 accept=22
