@@ -45,6 +45,32 @@ client = yes
 accept=22
 connect=$SERVER:22222
 
+----------------------
+fail2ban
+apt install fail2ban
+systemctl start fail2ban
+systemctl enable fail2ban
+
+change ssh port, need to change fail2ban config
+vim /etc/fail2ban/jail.d/ssh-port.conf
+[sshd]
+port=NEW-PORT
+backend=systemd
+allowipv6=no
+
+systemctl restart fail2ban
+systemctl status fail2ban
+
+disable ipv6
+
+vim /etc/sysctl.conf
+net.ipv6.conf.all.forwarding = 0
+net.ipv6.conf.default.disable_ipv6 = 1
+net.ipv6.conf.lo.disable_ipv6 = 1
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.eth0.disable_ipv6 = 1
+sysctl -p
+
 --------------------------------------
 https://serverfault.com/questions/247176/iptables-only-allow-localhost-access
 https://wiki.archlinux.org/index.php/Iptables
